@@ -322,27 +322,17 @@ export default function Landing() {
             justifyContent: 'space-between', gap: 16,
           }}>
 
-            {/* Left: Ashoka Emblem logo + vertical divider + Brand */}
+            {/* Left: Emblem + Divider + Logo + Brand */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
-              <div style={{ width: 64, height: 58, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <object data="/lion-capital.svg?v=1" type="image/svg+xml" aria-label="Lion Capital of Ashoka" style={{ width: 56, height: 56, display: 'block', pointerEvents: 'none' }} />
-              </div>
-              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 16px', flexShrink: 0 }} />
-              {/* Emblem / logo image */}
-              <div style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src="/logo.png" alt="LADRIS" style={{ width: 42, height: 42, objectFit: 'contain' }} />
+              {/* MoRTH Ashoka Emblem */}
+              <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <img src="/logo_morth.png" alt="MoRTH Emblem" style={{ width: 40, height: 40, objectFit: 'contain' }} />
               </div>
               {/* Vertical divider */}
-              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 14px', flexShrink: 0 }} />
-              {/* LP badge + Brand text */}
+              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 12px', flexShrink: 0 }} />
+              {/* logo.png + Brand text */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                  background: isDark ? 'linear-gradient(135deg,#4080ff,#7c5cfc)' : 'linear-gradient(135deg,#003366,#004a99)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.6rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.01em',
-                  boxShadow: isDark ? '0 2px 8px rgba(64,128,255,0.45)' : '0 2px 6px rgba(0,51,102,0.3)',
-                }}>LP</div>
+                <img src="/logo.png" alt="LADRIS" style={{ width: 38, height: 38, objectFit: 'contain', flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
                     LADRIS<span style={{ color: '#4080ff' }}>·</span>AI
@@ -743,22 +733,9 @@ export default function Landing() {
 
             <p style={{
               fontSize: '0.95rem', lineHeight: 1.8,
-              color: colors.sectionText, marginBottom: 24,
-            }}>
-              LADRIS is an AI-driven land acquisition intelligence and risk-management platform
-              designed for India's national infrastructure programs. By integrating high-frequency
-              cadastral telemetry, cloud analytics, machine-learning models, and an interactive GIS
-              twin, LADRIS delivers real-time parcel-level risk scores, AI recommendations,
-              and predictive alerts to reduce acquisition delays and minimise litigation.
-            </p>
-            <p style={{
-              fontSize: '0.95rem', lineHeight: 1.8,
               color: colors.sectionText, marginBottom: 36,
             }}>
-              The platform is built to government security standards and role-based access control,
-              enabling safe deployments for Central Ministries, State Nodal Authorities, District
-              Collectors, LA Officers, and Project Agencies — providing auditable, end-to-end
-              acquisition intelligence.
+              LADRIS AI is an AI-powered decision-support platform for land acquisition. It studies historical and live project data, predicts delay probability, finds the main risk factors, shows risky projects on GIS maps, sends alerts and recommends preventive actions.
             </p>
 
             {/* CTA pair */}
