@@ -35,161 +35,76 @@ Follow these instructions to clone, configure, and run **LADRIS** from scratch o
 
 ---
 
-### 💻 Prerequisites
+### 💻 Standard Setup Overview
 
-| Component | Docker Setup (Recommended) | Local / Non-Docker Setup |
+| Component | Execution Method | Details |
 | :--- | :--- | :--- |
-| **Git** | Installed | Installed |
-| **Container Engine** | [Docker Desktop](https://www.docker.com/products/docker-desktop/) (with Docker Compose v2+) | Not Required |
-| **Node.js** | Not Required | [Node.js (v18+)](https://nodejs.org/) & `npm` |
-| **Python** | Not Required | [Python 3.11 / 3.12](https://python.org) |
-| **Database** | Handled automatically by Docker | [PostgreSQL 14+](https://www.postgresql.org/) with **PostGIS 3.4+** extension |
+| **Database** | **Docker** (`docker compose up -d db`) | PostGIS container on port `15432` with auto-schema migration |
+| **Backend** | **Native Terminal** (`uvicorn`) | FastAPI server on `http://localhost:8000` with auto-reload |
+| **Frontend** | **Native Terminal** (`npm run dev`) | React + Vite app on `http://localhost:5173` |
+| **ML Engine** | **Native Terminal** (`python`) | Feature engineering & model training scripts |
 
 ---
 
-### 📦 Option A: Quick Launch with Docker Compose (Recommended)
+### 🚀 Step-by-Step Launch Guide
 
-This method sets up the entire application (PostgreSQL + PostGIS database, FastAPI backend, and React Vite frontend) in isolated containers with zero manual configuration.
-
-#### 1. Clone the Repository
+#### Step 1: Clone Repository & Create `.env`
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/SathvikaTalari/LADRIS---Land-Acquisition.git
 cd LandPulse_AI
+
+# Create .env file from template
+cp .env.example .env    # Linux/macOS
+Copy-Item .env.example .env   # Windows PowerShell
 ```
 
-#### 2. Configure Environment Variables
-Copy `.env.example` to create your local `.env` configuration:
+#### Step 2: Launch Database with Docker
+Run Docker Compose to start only the PostgreSQL + PostGIS database container:
 ```bash
-# On Linux / macOS / Git Bash:
-cp .env.example .env
-
-# On Windows PowerShell:
-Copy-Item .env.example .env
+docker compose up -d db
 ```
-*(Optional)* Open `.env` in a text editor to customize environment variables (or leave defaults for quick local development).
+> The container automatically initializes the `ladris` database schema, PostGIS extensions, and tables.
 
-#### 3. Build & Launch Container Stack
+#### Step 3: Launch FastAPI Backend (Terminal 1)
 ```bash
-docker compose up --build -d
+cd backend
+
+# Create & activate virtual environment
+python -m venv venv
+.\venv\Scripts\Activate.ps1   # Windows PowerShell
+# source venv/bin/activate    # Linux/macOS
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start backend development server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-This command automatically downloads images, builds the backend and frontend containers, and initializes the PostGIS database with all SQL migration scripts in `database/migrations/`.
+- API Docs: `http://localhost:8000/docs`
+- Default Users Auto-Created: `admin@ladris.gov.in` / `officer@ladris.gov.in` (password: `admin123`)
 
-#### 4. Seed Database with Realistic Infrastructure Data (Optional)
-Run the automated database seeders inside the backend container:
-```bash
-docker compose exec backend python seed_realistic_data.py
-docker compose exec backend python seed_risk_snapshots.py
-```
-
-#### 5. Verify Running Services
-- 🌐 **Frontend App**: `http://localhost:5173`
-- ⚙️ **Backend API (Swagger Docs)**: `http://localhost:8000/docs`
-- 🗄️ **PostgreSQL / PostGIS**: `localhost:15432`
-
-#### 6. Stop Services
-```bash
-# Stop containers keeping database volume intact
-docker compose down
-
-# Stop containers and wipe database state for a fresh start
-docker compose down -v
-```
-
----
-
-### 🛠️ Option B: Local Native Setup (Without Docker)
-
-Use this setup if you want to run Python and Node.js directly on your host operating system.
-
-#### 1. Clone the Repository
-```bash
-git clone <your-repository-url>
-cd LandPulse_AI
-```
-
-#### 2. PostgreSQL + PostGIS Database Setup
-1. Ensure PostgreSQL is running on your machine.
-2. Open `psql` shell or PgAdmin and create the database and user:
-   ```sql
-   CREATE DATABASE landpulse;
-   CREATE USER landpulse_user WITH PASSWORD 'CHANGE_ME_STRONG_PASSWORD';
-   GRANT ALL PRIVILEGES ON DATABASE landpulse TO landpulse_user;
-   
-   -- Connect to landpulse database and enable PostGIS extension
-   \c landpulse
-   CREATE EXTENSION IF NOT EXISTS postgis;
-   ```
-3. Run the database migration and initialization scripts:
-   ```bash
-   psql -U landpulse_user -d landpulse -f database/migrations/001_initial_schema.sql
-   psql -U landpulse_user -d landpulse -f database/migrations/002_indexes.sql
-   psql -U landpulse_user -d landpulse -f database/migrations/003_seed.sql
-   psql -U landpulse_user -d landpulse -f database/migrations/004_phase2_additions.sql
-   psql -U landpulse_user -d landpulse -f database/migrations/005_rbac_roles.sql
-   ```
-
-#### 3. Configure Environment Variables
-Copy `.env.example` to `.env`:
-```bash
-cp .env.example .env
-```
-Update database host to `localhost` and specify your local database password in `.env`:
-```env
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_DB=landpulse
-POSTGRES_USER=landpulse_user
-POSTGRES_PASSWORD=CHANGE_ME_STRONG_PASSWORD
-
-DATABASE_URL=postgresql+asyncpg://landpulse_user:CHANGE_ME_STRONG_PASSWORD@localhost:5432/landpulse
-SYNC_DATABASE_URL=postgresql://landpulse_user:CHANGE_ME_STRONG_PASSWORD@localhost:5432/landpulse
-JWT_SECRET_KEY=e5999ad77d4411136b6900f8dfb158bb38f87b8d8df7c5885e34771f25b59620
-```
-
-#### 4. Backend Setup (FastAPI)
-1. Navigate into the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Create and activate a Python virtual environment:
-   ```bash
-   # Windows (PowerShell)
-   python -m venv venv
-   .\venv\Scripts\Activate.ps1
-
-   # macOS / Linux
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. Install backend dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Seed realistic infrastructure data:
-   ```bash
-   python seed_realistic_data.py
-   python seed_risk_snapshots.py
-   ```
-5. Start the FastAPI development server:
-   ```bash
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
-#### 5. Frontend Setup (React + Vite)
+#### Step 4: Launch React Frontend (Terminal 2)
 Open a **new terminal window** and run:
-1. Navigate to frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install Node modules:
-   ```bash
-   npm install
-   ```
-3. Launch Vite development server:
-   ```bash
-   npm run dev
-   ```
-4. Frontend will open at `http://localhost:5173`.
+```bash
+cd frontend
+
+# Install Node modules
+npm install
+
+# Start Vite dev server
+npm run dev
+```
+- App UI: `http://localhost:5173`
+
+#### Step 5: Run ML Pipeline & Tests (Terminal 3)
+Open another terminal window for ML tasks:
+```bash
+# Re-train IsolationForest anomaly scorer
+python ml/training/train.py
+
+# Run unit & integration tests
+pytest
+```
 
 ---
 

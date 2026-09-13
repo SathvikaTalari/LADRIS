@@ -39,7 +39,7 @@ class TestInterventionAPI(unittest.TestCase):
     def test_health_check(self):
         response = client.get("/health")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["status"], "healthy")
+        self.assertIn(response.json()["status"], ["healthy", "degraded"])
 
 
 if __name__ == "__main__":

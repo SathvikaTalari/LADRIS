@@ -15,16 +15,16 @@ services:
     container_name: landpulse_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-landpulse}
-      POSTGRES_USER: ${POSTGRES_USER:-landpulse_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-ladris}
+      POSTGRES_USER: ${POSTGRES_USER:-ladris_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-landpulse_pass}
     ports:
       - "15432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-landpulse_user} -d ${POSTGRES_DB:-landpulse}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ladris_user} -d ${POSTGRES_DB:-ladris}"]
       interval: 10s
       timeout: 5s
       retries: 5

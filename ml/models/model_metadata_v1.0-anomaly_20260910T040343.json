@@ -2,7 +2,7 @@
   "model_version": "v1.0-anomaly",
   "model_type": "ANOMALY_SCORER",
   "model_name": "LandPulse IsolationForest Risk Anomaly Scorer",
-  "training_date": "2026-09-10T04:07:02.665307+00:00",
+  "training_date": "2026-09-10T04:03:43.799313+00:00",
   "dataset_version": "d3e61580c4ab",
   "record_count_used": 168,
   "feature_list": [
@@ -29,8 +29,8 @@
     "score_max": 1.0,
     "score_mean": 0.3394
   },
-  "model_path": "isolation_forest_v1.0-anomaly_20260910T040702.pkl",
-  "preprocessing_path": "score_normalisation_v1.0-anomaly_20260910T040702.json",
+  "model_path": "C:\\LandPulse_AI\\ml\\models\\isolation_forest_v1.0-anomaly_20260910T040343.pkl",
+  "preprocessing_path": "C:\\LandPulse_AI\\ml\\models\\score_normalisation_v1.0-anomaly_20260910T040343.json",
   "is_current": true,
   "authenticity_statement": "This model is an IsolationForest anomaly scorer trained on real publicly available data from the BhoomiRashi portal (bhoomirashi.gov.in). It produces an ANOMALY SCORE — a measure of structural unusualness relative to the dataset population. It is NOT a delay prediction and does NOT predict whether a project will be delayed. No fabricated training labels were used. This distinction must be preserved in all downstream use.",
   "data_sources_used": [

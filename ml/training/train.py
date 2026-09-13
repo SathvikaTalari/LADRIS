@@ -47,7 +47,7 @@ def main():
         ML_DIR / "data" / "processed" / "data_gap_report.json"
     )
     print(f"      -> Supervised training: DEFERRED")
-    print(f"      -> Reason: {gap_report['supervised_target_requirement']['reason'][:80]}...")
+    print(f"      -> Reason: {gap_report.get('supervised_target_definition', {}).get('reason', '')[:80]}...")
 
     # ── Step 2: Load processed data ───────────────────────────────────────────
     print("\n[2/5] Loading processed data...")

@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "ladris"
     POSTGRES_USER: str = "ladris_user"
-    POSTGRES_PASSWORD: str
+    POSTGRES_PASSWORD: str = "landpulse_pass"
 
     @property
     def effective_host(self) -> str:
@@ -66,7 +66,7 @@ class Settings(BaseSettings):
         )
 
     # ─── JWT ──────────────────────────────────────────────────────────────────
-    JWT_SECRET_KEY: str
+    JWT_SECRET_KEY: str = "01fd109a6c2887b1253cf7d8d77b4a1149f1bfeb38a22750ef7b137b4d5aa060"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7

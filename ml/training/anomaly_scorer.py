@@ -165,8 +165,8 @@ def train(feature_df: pd.DataFrame, feature_cols: list[str]) -> dict:
         "record_count_used": int(n),
         "feature_list": feature_cols,
         "evaluation_metrics": metrics,
-        "model_path": str(model_path),
-        "preprocessing_path": str(norm_path),
+        "model_path": model_filename,
+        "preprocessing_path": norm_path.name,
         "is_current": True,
         "authenticity_statement": AUTHENTICITY_STATEMENT,
         "data_sources_used": ["BHOOMIRASHI_PUBLIC_SEARCH_TABLE"],
@@ -195,8 +195,10 @@ def load_current_model() -> tuple[Pipeline | None, dict | None, dict | None]:
         return None, None, None
 
     meta = json.loads(current_path.read_text())
-    model_path = Path(meta.get("model_path", ""))
-    norm_path = Path(meta.get("preprocessing_path", ""))
+    raw_model = meta.get("model_path", "")
+    raw_norm = meta.get("preprocessing_path", "")
+    model_path = MODELS_DIR / Path(raw_model).name
+    norm_path = MODELS_DIR / Path(raw_norm).name
 
     if not model_path.exists():
         log.warning("Model file not found at %s", model_path)

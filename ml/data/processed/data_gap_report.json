@@ -1,13 +1,12 @@
 {
-  "title": "LandPulse AI — Multi-Source Integration & Data Gap Report",
-  "updated_at": "2026-09-04T14:15:00.000000+00:00",
-  "version": "2.0.0",
-  "summary": "This document outlines the authoritative data provenance strategy for LandPulse AI across BhoomiRashi, Data.gov.in, eCourts, LACRRIS, and GIS layers. Real public data is prioritized, derived indicators are explicitly tagged, and non-public government fields are transparently documented as acknowledged data gaps.",
-  "data_sources_status": [
+  "title": "LandPulse AI — Phase 3 Data Gap Report & Supervised Target Specification",
+  "generated_at": "2026-09-10T04:06:57.859820+00:00",
+  "version": "1.1.0",
+  "summary": "Supervised delay prediction training remains DEFERRED. Although 10 real delayed project records with delay_months labels were ingested from DataGov.in (2023-2025), this sample size is far below the 200-record statistically defensible minimum required for supervised classification. No fake labels were generated. An unsupervised IsolationForest anomaly risk scorer and a stage-risk proxy engine are active instead.",
+  "data_sources_investigated": [
     {
       "source": "BhoomiRashi Portal (bhoomirashi.gov.in)",
-      "status": "OFFICIAL_PUBLIC",
-      "records_count": 56,
+      "status": "ACCESSIBLE — publicly visible search table (56 records ingested)",
       "fields_available": [
         "state",
         "district",
@@ -16,15 +15,22 @@
         "sanctioned_la_cost_crore",
         "notification_3a_date",
         "notification_3d_date"
-        
       ],
-      "provenance_label": "OFFICIAL_PUBLIC",
-      "notes": "Real gazette notification dates and project structural parameters directly ingested."
+      "fields_unavailable": [
+        "project_planned_start_date",
+        "project_planned_end_date",
+        "project_actual_completion_date",
+        "project_delay_status",
+        "stage_milestone_dates",
+        "compensation_disbursement_status"
+      ],
+      "api_available": false,
+      "bulk_csv_available": false,
+      "notes": "BhoomiRashi has no public API or bulk CSV download. Provides notification_3a_date and notification_3d_date — used for notification_interval_days feature, but lacks outcome labels."
     },
     {
-      "source": "Open Government Data Platform (data.gov.in / MoSPI)",
-      "status": "OFFICIAL_PUBLIC",
-      "records_count": 10,
+      "source": "Open Government Data Platform (data.gov.in)",
+      "status": "ACCESSIBLE — 10 delayed project records ingested (2023-2025)",
       "fields_available": [
         "project_code",
         "name",
@@ -32,46 +38,58 @@
         "district_codes",
         "total_area_ha",
         "estimated_compensation_inr",
-        "affected_families",
-        "delay_months",
-        "delay_reason",
         "planned_start_date",
-        "target_completion_date"
+        "target_completion_date",
+        "status",
+        "risk_level",
+        "reported_year",
+        "delay_months",
+        "delay_reason"
       ],
-      "provenance_label": "OFFICIAL_PUBLIC",
-      "notes": "Real official infrastructure project delay records across 2021-2025 reporting periods."
-    },
-    {
-      "source": "eCourts Services (services.ecourts.gov.in)",
-      "status": "DERIVED_ADAPTER",
-      "provenance_label": "DERIVED_ECOURTS",
-      "strategy": "DerivedECourtsAdapter extracts legal dispute signals from official delay reason texts and district legal risk priors. Adapter Interface pattern allows future authorized NAPIX/eCourts API pluggability.",
-      "notes": "No live unauthenticated scraping. Legal case counts and status are derived and labeled explicitly."
-    },
-    {
-      "source": "LACRRIS — Dept of Land Resources (lacrris.nic.in)",
-      "status": "PLANNED_PRODUCTION_INTEGRATION",
-      "provenance_label": "PLANNED_LACRRIS",
       "fields_unavailable": [
-        "project_level_disbursed_compensation_breakdown",
-        "family_level_rehabilitation_milestones",
-        "possession_handover_certificates"
+        "per-stage milestone completion dates",
+        "granular compensation disbursement logs"
       ],
-      "notes": "Treat as planned production government integration. Unavailable fields are documented as an acknowledged data gap rather than claimed as live."
+      "notes": "DataGov.in provides 10 REAL project-level records with delay_months (range 3-24 months). These serve as authoritative domain outcome definitions, but N=10 is insufficient to train a supervised model without extreme overfitting."
     },
     {
-      "source": "GIS & Boundaries Layer",
-      "status": "HYBRID_GIS",
-      "provenance_label": "OFFICIAL_PUBLIC",
-      "strategy": "State and District choropleth maps implemented using official Survey of India / GADM boundaries overlaid with verified project lat/lng points. PostGIS database schema prepared for future parcel and corridor polyline layers.",
-      "notes": "No synthetic corridor geometries are generated."
+      "source": "MoRTH Annual Reports (PDF)",
+      "status": "DOWNLOADED AND PARSED — state-level aggregate only (36 records)",
+      "fields_available": [
+        "state",
+        "nh_length_km",
+        "financial_year"
+      ],
+      "fields_unavailable": [
+        "per-project planned dates",
+        "per-project actual dates",
+        "project delay information"
+      ],
+      "notes": "Annual reports contain state-level aggregate construction statistics only."
     }
   ],
-  "data_provenance_tier_definitions": {
-    "OFFICIAL_PUBLIC": "Data extracted directly from official open government portals, gazette notifications, or MoSPI reports.",
-    "DERIVED_ECOURTS": "Legal indicators derived heuristically from official delay documentation via DerivedECourtsAdapter.",
-    "SYNTHETIC_DEMO": "Physics-constrained fallback fields generated for non-public stage milestones, clearly tagged in UI and DB.",
-    "PLANNED_LACRRIS": "Fields reserved for future authenticated LACRRIS agency integration."
+  "supervised_target_definition": {
+    "canonical_target_formula": "delay_event = 1 if (delay_months >= 6) or (actual_completion_date - planned_completion_date > 90 days) else 0",
+    "threshold_basis": "Derived from MoRTH infrastructure project monitoring guidelines: Delays exceeding 1 quarter (90 days / 6 months) represent material contract escalation.",
+    "current_sample_count": 10,
+    "required_sample_count": 200,
+    "positive_class_rate_required": "≥ 20%",
+    "can_be_constructed": false,
+    "reason": "Available real labeled dataset (N=10) is insufficient for statistical training. Supervised models will remain DEFERRED until sample size reaches 200."
   },
-  "integrity_statement": "LandPulse AI maintains strict data transparency. Every metric, map point, and ML risk input displays its data provenance badge. System limitations are acknowledged in accordance with public sector data governance standards."
+  "ml_decision": {
+    "supervised_training": "DEFERRED",
+    "alternative_implemented": "IsolationForest Anomaly Scorer + Stage Risk Proxy Engine",
+    "alternative_description": "An unsupervised IsolationForest model is trained on real structural features (land area, cost, state, agency, notification interval). Outputs an ANOMALY SCORE — not a delay probability. A stage-risk proxy engine calculates risk signals for 6 lifecycle stages.",
+    "alternative_validity": "Defensible as structural anomaly detection and proxy risk fingerprinting. NOT defensible as a delay predictor — this claim is NOT made anywhere.",
+    "minimum_data_required_for_anomaly": 50,
+    "minimum_data_required_for_supervised": 200
+  },
+  "how_to_enable_supervised_training": [
+    "Obtain project-level milestone data via RTI (Right to Information) application to MoRTH",
+    "Access NHAI data sharing program for recognized research institutions (IITs/NITs)",
+    "Partner with state-level Competent Authority for Land Acquisition (CALA) offices",
+    "Use NIC data sharing protocols for government-to-government data access"
+  ],
+  "integrity_statement": "LandPulse AI does NOT fabricate delay labels, synthetic government records, or invented project data. All training data is traceable to real public sources. Model outputs are labeled with their actual nature (anomaly score, not delay prediction). This data gap report is part of the public documentation of system limitations."
 }
