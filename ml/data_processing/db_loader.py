@@ -42,9 +42,9 @@ if env_path.exists():
 # Database Connection Parameters (Docker default or environment)
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = int(os.getenv("POSTGRES_PORT", "15432"))  # 15432 outside, 5432 inside container
-DB_NAME = os.getenv("POSTGRES_DB", "landpulse")
-DB_USER = os.getenv("POSTGRES_USER", "landpulse_user")
-DB_PASS = os.getenv("POSTGRES_PASSWORD", "CHANGE_ME_STRONG_PASSWORD")
+DB_NAME = os.getenv("POSTGRES_DB", "ladris")
+DB_USER = os.getenv("POSTGRES_USER", "ladris_user")
+DB_PASS = os.getenv("POSTGRES_PASSWORD", "landpulse_pass")
 
 
 def connect_db():
