@@ -258,8 +258,27 @@ export default function Login() {
         }} />
 
         {/* Logo top-left */}
-        <div style={{ position: 'absolute', top: 28, left: 36, zIndex: 3 }}>
+        <div style={{ position: 'absolute', top: 28, left: 36, zIndex: 3, display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/logo.png" alt="LADRIS Logo" style={{ height: 48, width: 'auto', display: 'block' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <span style={{
+              fontSize: '1.35rem',
+              fontWeight: 800,
+              color: '#ffffff',
+              letterSpacing: '0.04em',
+              lineHeight: 1.1,
+              textShadow: '0 1px 6px rgba(0,0,0,0.6)',
+              fontFamily: 'inherit',
+            }}>LADRIS</span>
+            <span style={{
+              fontSize: '0.6rem',
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.75)',
+              letterSpacing: '0.02em',
+              lineHeight: 1.3,
+              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+            }}>Land Acquisition Delay Risk Intelligence Platform</span>
+          </div>
         </div>
 
         {/* Hero Content */}
@@ -269,25 +288,7 @@ export default function Login() {
           transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
           style={{ position: 'relative', zIndex: 2 }}
         >
-          <div style={{
-            fontSize: '0.72rem',
-            fontWeight: 800,
-            color: '#ffffff',
-            letterSpacing: '0.15em',
-            textTransform: 'uppercase',
-            marginBottom: 16,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            textShadow: '0 1px 4px rgba(0,0,0,0.7)',
-          }}>
-            <div style={{
-              width: 24, height: 2,
-              background: '#ffffff',
-              boxShadow: '0 0 8px rgba(255,255,255,0.8)',
-            }} />
-            INFRASTRUCTURE GOVERNANCE
-          </div>
+
           <h1 style={{
             fontSize: '2.4rem',
             fontWeight: 800,
@@ -663,25 +664,15 @@ export default function Login() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            style={{
-              marginTop: 24,
-              padding: '14px 16px',
-              background: isDark ? 'rgba(14,22,40,0.8)' : 'rgba(240,244,249,0.8)',
-              border: `1px solid ${isDark ? 'rgba(64,128,255,0.1)' : 'rgba(0,51,102,0.12)'}`,
-              borderRadius: 'var(--radius-lg)',
-              display: 'flex',
-              gap: 12,
-              alignItems: 'flex-start',
-            }}
+            style={{ marginTop: 24 }}
           >
-            <Shield size={15} color={isDark ? 'rgba(64,128,255,0.6)' : '#003366'} style={{ flexShrink: 0, marginTop: 1 }} />
             <p style={{
               fontSize: '0.75rem',
               color: isDark ? '#4a5880' : '#5a7194',
               margin: 0,
               lineHeight: 1.6,
             }}>
-              <strong style={{ color: isDark ? '#8898b8' : '#0a1d37', fontWeight: 600 }}>Prototype</strong> — All roles currently use the same dashboard.
+              <strong style={{ color: isDark ? '#8898b8' : '#0a1d37', fontWeight: 600 }}>Note</strong> — As this is prototype, All roles currently use the same dashboard.
             </p>
           </motion.div>
 
