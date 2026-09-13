@@ -61,46 +61,46 @@ const FEATURES = [
 /* ─── Hero Slideshow data ───────────────────────────────────────────────── */
 const HERO_SLIDES = [
   {
-    src: '/slide_highways.png',
+    src: '/slide_highway.jpg',
     ministry: 'Ministry of Road Transport & Highways (MoRTH)',
-    caption: 'Building World-Class Expressway Infrastructure',
-    tag: 'Highways & Roads',
+    caption: 'Keeping Highway Projects Moving',
+    tag: 'Land Acquisition & Highways',
   },
   {
-    src: '/slide_railways.png',
+    src: '/slide_railway.jpg',
     ministry: 'Ministry of Railways',
-    caption: 'Transforming Rail Connectivity Across India',
-    tag: 'Railways',
+    caption: 'Clearing the Way for Railway Projects',
+    tag: 'Land Acquisition & Railways',
   },
   {
-    src: '/slide_metro_urban.png',
+    src: '/slide_metro.jpg',
     ministry: 'Ministry of Housing & Urban Affairs (MoHUA)',
-    caption: 'Smart Cities, Metro Rail & Urban Development',
-    tag: 'Metro & Urban Housing',
+    caption: 'Supporting Faster Metro Development',
+    tag: 'Land Acquisition & Metro ',
   },
   {
-    src: '/slide_power.png',
+    src: '/slide_powergrid.jpg',
     ministry: 'Ministry of Power',
-    caption: 'Energising the Nation with Grid Infrastructure',
-    tag: 'Power Grids',
+    caption: 'Keeping Power Projects on Track',
+    tag: 'Land Acquisition & Power Grids',
   },
   {
-    src: '/slide_aviation.png',
+    src: '/slide_airport.jpg',
     ministry: 'Ministry of Civil Aviation',
-    caption: 'Expanding India\'s Aviation Network',
-    tag: 'Airports',
+    caption: 'Supporting Timely Airport Development',
+    tag: 'Land Acquisition & Airports',
   },
   {
-    src: '/slide_ports.png',
-    ministry: 'Ministry of Ports, Shipping & Waterways',
-    caption: 'Powering Maritime & Port Connectivity',
-    tag: 'Ship Ports',
+    src: '/slide_urban_const.jpg',
+    ministry: 'Ministry of Housing & Urban Affairs (MoHUA)',
+    caption: 'Enabling Timely Urban Development',
+    tag: 'Land Acquisition & Urban Projects',
   },
   {
-    src: '/slide_morth.png',
-    ministry: 'Ministry of Heavy Industries & Public Agencies',
-    caption: 'Industrial & Infrastructure Development Corridors',
-    tag: 'Industrial Zones',
+    src: '/slide_industrial.jpg',
+    ministry: 'Ministry of Commerce & Industry',
+    caption: 'Enabling Faster Industrial Development',
+    tag: 'Land Acquisition & Industrial Zones',
   },
 ]
 
@@ -180,34 +180,25 @@ export default function Landing() {
           background: isDark ? '#070c1b' : '#ffffff',
           borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : '#e2e8f0'}`,
           padding: '0 32px',
-          height: 42,
+          height: 65,
           display: 'flex', alignItems: 'center',
           justifyContent: 'space-between',
         }}>
 
           {/* Left: Flag + हिंदी/English govt label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 200 }}>
-            {/* Indian Tricolor Flag */}
-            <img
-              src="/indian-flag.png"
-              alt="Indian national flag"
-              style={{
-                width: 34, height: 'auto', borderRadius: 2,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#cbd5e1'}`,
-                flexShrink: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
-              }}
-            />
+
             {/* Indian Tricolor Flag — inline SVG, no background padding */}
-            <svg width="44" height="30" viewBox="0 0 44 30" style={{ flexShrink: 0, borderRadius: 2, display: 'block' }} xmlns="http://www.w3.org/2000/svg">
+            <svg width="30" height="48" viewBox="0 0 44 30" style={{ flexShrink: 0, borderRadius: 2, display: 'block' }} xmlns="http://www.w3.org/2000/svg">
               {/* Saffron */}
-              <rect x="0" y="0" width="44" height="10" fill="#FF9933"/>
+              <rect x="0" y="0" width="44" height="10" fill="#FF9933" />
               {/* White */}
-              <rect x="0" y="10" width="44" height="10" fill="#FFFFFF"/>
+              <rect x="0" y="10" width="44" height="10" fill="#FFFFFF" />
               {/* Green */}
-              <rect x="0" y="20" width="44" height="10" fill="#138808"/>
+              <rect x="0" y="20" width="44" height="10" fill="#138808" />
               {/* Ashoka Chakra */}
-              <circle cx="22" cy="15" r="4.2" fill="none" stroke="#000080" strokeWidth="0.8"/>
-              <circle cx="22" cy="15" r="0.7" fill="#000080"/>
+              <circle cx="22" cy="15" r="4.2" fill="none" stroke="#000080" strokeWidth="0.8" />
+              <circle cx="22" cy="15" r="0.7" fill="#000080" />
               {[...Array(24)].map((_, i) => {
                 const angle = (i * 15 * Math.PI) / 180
                 return (
@@ -313,7 +304,7 @@ export default function Landing() {
         }}>
           <div style={{
             maxWidth: 1320, margin: '0 auto',
-            padding: '0 32px', height: 60,
+            padding: '0 32px', height: 75,
             display: 'flex', alignItems: 'center',
             justifyContent: 'space-between', gap: 16,
           }}>
@@ -324,19 +315,20 @@ export default function Landing() {
               <img
                 src="/logo_morth_clean.png"
                 alt="MoRTH Emblem"
-                style={{ height: 52, width: 'auto', display: 'block', flexShrink: 0 }}
+                style={{ height: 40, width: 'auto', display: 'block', flexShrink: 0 }}
               />
               {/* Vertical divider */}
-              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 12px', flexShrink: 0 }} />
+              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 2px', flexShrink: 0 }} />
               {/* logo.png + Brand text */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                 <img src="/logo.png" alt="LADRIS" style={{ width: 38, height: 38, objectFit: 'contain', flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-                    LADRIS<span style={{ color: '#4080ff' }}>·</span>AI
+                    LADRIS<span style={{ color: '#4080ff' }}></span>
                   </div>
-                  <div style={{ fontSize: '0.58rem', fontWeight: 600, color: isDark ? '#4a6280' : '#64748b', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 1 }}>
-                    Land Intelligence Platform
+                  <div style={{ fontSize: '0.45rem', fontWeight: 600, color: isDark ? '#4a6280' : '#64748b', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 1 }}>
+                    Land Acquisition Delay Risk<br />
+                    Intelligence Platform
                   </div>
                 </div>
               </div>
@@ -913,13 +905,13 @@ export default function Landing() {
                 transition={{ duration: 0.5, ease: 'easeOut', delay: i * 0.07 }}
                 onMouseEnter={e => {
                   (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(74,111,165,0.4)'
-                  ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
-                    ? '0 8px 28px rgba(0,0,0,0.4), 0 0 0 1px rgba(74,111,165,0.2)'
-                    : '0 6px 22px rgba(74,111,165,0.12), 0 0 0 1px rgba(74,111,165,0.15)'
+                    ; (e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+                      ? '0 8px 28px rgba(0,0,0,0.4), 0 0 0 1px rgba(74,111,165,0.2)'
+                      : '0 6px 22px rgba(74,111,165,0.12), 0 0 0 1px rgba(74,111,165,0.15)'
                 }}
                 onMouseLeave={e => {
                   (e.currentTarget as HTMLDivElement).style.borderColor = isDark ? 'rgba(74,111,165,0.14)' : 'rgba(74,111,165,0.1)'
-                  ;(e.currentTarget as HTMLDivElement).style.boxShadow = 'none'
+                    ; (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'
                 }}
                 style={{
                   background: colors.cardBg,
