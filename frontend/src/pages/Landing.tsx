@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import {
-  MapPin, ShieldCheck, Zap, Globe, Brain,
+  MapPin, ShieldCheck, Zap, Brain,
   ArrowRight, ChevronRight, Sun, Moon, Menu, X,
-  Layers, AlertTriangle, TrendingUp,
+  AlertTriangle, TrendingUp,
   User, Map, FileText, Briefcase, Building, Settings
 } from 'lucide-react'
 import { useThemeStore } from '@/store/themeStore'
@@ -218,18 +218,15 @@ export default function Landing() {
           {/* Left: Flag + हिंदी/English govt label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 200 }}>
             {/* Indian Tricolor Flag */}
-            <div style={{
-              width: 34, height: 22, borderRadius: 2,
-              overflow: 'hidden', display: 'flex', flexDirection: 'column',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#cbd5e1'}`,
-              flexShrink: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
-            }}>
-              <div style={{ flex: 1, background: '#FF9933' }} />
-              <div style={{ flex: 1, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ width: 7, height: 7, borderRadius: '50%', border: '1.5px solid #000080' }} />
-              </div>
-              <div style={{ flex: 1, background: '#138808' }} />
-            </div>
+            <img
+              src="/indian-flag.png"
+              alt="Indian national flag"
+              style={{
+                width: 34, height: 'auto', borderRadius: 2,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#cbd5e1'}`,
+                flexShrink: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
+              }}
+            />
             <div>
               <div style={{ fontSize: '0.74rem', fontWeight: 700, color: isDark ? '#c9d8f0' : '#1a2e4a', lineHeight: 1.25 }}>
                 भारत सरकार
@@ -325,23 +322,17 @@ export default function Landing() {
             justifyContent: 'space-between', gap: 16,
           }}>
 
-            {/* Left: Ashoka Emblem logo + vertical divider + Brand */}
+            {/* Left: Emblem + Divider + Logo + Brand */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
-              {/* Emblem / logo image */}
-              <div style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src="/logo.png" alt="LADRIS" style={{ width: 42, height: 42, objectFit: 'contain' }} />
+              {/* MoRTH Ashoka Emblem */}
+              <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <img src="/logo_morth.png" alt="MoRTH Emblem" style={{ width: 40, height: 40, objectFit: 'contain' }} />
               </div>
               {/* Vertical divider */}
-              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 14px', flexShrink: 0 }} />
-              {/* LP badge + Brand text */}
+              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 12px', flexShrink: 0 }} />
+              {/* logo.png + Brand text */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                  background: isDark ? 'linear-gradient(135deg,#4080ff,#7c5cfc)' : 'linear-gradient(135deg,#003366,#004a99)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.6rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.01em',
-                  boxShadow: isDark ? '0 2px 8px rgba(64,128,255,0.45)' : '0 2px 6px rgba(0,51,102,0.3)',
-                }}>LP</div>
+                <img src="/logo.png" alt="LADRIS" style={{ width: 38, height: 38, objectFit: 'contain', flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
                     LADRIS<span style={{ color: '#4080ff' }}>·</span>AI
@@ -535,34 +526,6 @@ export default function Landing() {
             maxWidth: 1280, margin: '0 auto', padding: '48px 40px 52px',
           }}>
             <div style={{ maxWidth: 680 }}>
-              {/* Tag line */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  marginBottom: 16,
-                  padding: '6px 16px',
-                  background: 'rgba(6,15,30,0.65)',
-                  border: '1px solid rgba(244,119,33,0.45)',
-                  borderRadius: 999,
-                  backdropFilter: 'blur(12px)',
-                }}
-              >
-                <div style={{
-                  width: 6, height: 6, borderRadius: '50%',
-                  background: '#f47721',
-                  boxShadow: '0 0 8px #f47721',
-                  animation: 'lp-pulse 2s ease-in-out infinite',
-                }} />
-                <span style={{
-                  fontSize: '0.72rem', fontWeight: 800, color: '#f47721',
-                  letterSpacing: '0.12em', textTransform: 'uppercase',
-                }}>
-                  India's Premier Land Intelligence Platform
-                </span>
-              </motion.div>
-
               {/* Main headline */}
               <motion.h1
                 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
@@ -670,19 +633,6 @@ export default function Landing() {
           pointerEvents: 'none',
           maxWidth: 360,
         }}>
-          {/* Sector tag */}
-          <div style={{
-            display: 'inline-block', marginBottom: 6,
-            padding: '3px 10px',
-            background: 'rgba(244,119,33,0.18)',
-            border: '1px solid rgba(244,119,33,0.5)',
-            borderRadius: 999,
-            fontSize: '0.65rem', fontWeight: 800, color: '#f47721',
-            letterSpacing: '0.1em', textTransform: 'uppercase',
-            backdropFilter: 'blur(6px)',
-          }}>
-            {HERO_SLIDES[activeSlide].tag}
-          </div>
           <div style={{
             fontSize: '0.72rem', fontWeight: 700,
             color: 'rgba(255,255,255,0.6)', letterSpacing: '0.02em',
@@ -772,19 +722,6 @@ export default function Landing() {
             initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }} transition={{ duration: 0.65 }}
           >
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '4px 12px',
-              background: isDark ? 'rgba(244,119,33,0.08)' : 'rgba(0,51,102,0.07)',
-              border: `1px solid ${isDark ? 'rgba(244,119,33,0.25)' : 'rgba(0,51,102,0.2)'}`,
-              borderRadius: 999, marginBottom: 20,
-            }}>
-              <Globe size={12} color={isDark ? '#f47721' : '#003366'} />
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isDark ? '#f47721' : '#003366', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                Platform Overview
-              </span>
-            </div>
-
             <h2 style={{
               fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
               fontWeight: 900, letterSpacing: '-0.035em',
@@ -796,22 +733,9 @@ export default function Landing() {
 
             <p style={{
               fontSize: '0.95rem', lineHeight: 1.8,
-              color: colors.sectionText, marginBottom: 24,
-            }}>
-              LADRIS is an AI-driven land acquisition intelligence and risk-management platform
-              designed for India's national infrastructure programs. By integrating high-frequency
-              cadastral telemetry, cloud analytics, machine-learning models, and an interactive GIS
-              twin, LADRIS delivers real-time parcel-level risk scores, AI recommendations,
-              and predictive alerts to reduce acquisition delays and minimise litigation.
-            </p>
-            <p style={{
-              fontSize: '0.95rem', lineHeight: 1.8,
               color: colors.sectionText, marginBottom: 36,
             }}>
-              The platform is built to government security standards and role-based access control,
-              enabling safe deployments for Central Ministries, State Nodal Authorities, District
-              Collectors, LA Officers, and Project Agencies — providing auditable, end-to-end
-              acquisition intelligence.
+              LADRIS AI is an AI-powered decision-support platform for land acquisition. It studies historical and live project data, predicts delay probability, finds the main risk factors, shows risky projects on GIS maps, sends alerts and recommends preventive actions.
             </p>
 
             {/* CTA pair */}
@@ -948,25 +872,6 @@ export default function Landing() {
             viewport={{ once: true }}
             style={{ textAlign: 'center', marginBottom: 56 }}
           >
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '4px 14px', marginBottom: 18,
-              background: isDark ? 'rgba(64,128,255,0.08)' : 'rgba(0,51,102,0.07)',
-              border: `1px solid ${isDark ? 'rgba(64,128,255,0.22)' : 'rgba(0,51,102,0.18)'}`,
-              borderRadius: 999,
-            }}>
-              <Layers size={12} color={isDark ? '#7daaff' : '#003366'} />
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isDark ? '#7daaff' : '#003366', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                Platform Capabilities
-              </span>
-            </div>
-            <h2 style={{
-              fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
-              fontWeight: 900, letterSpacing: '-0.03em',
-              color: colors.sectionTitle, marginBottom: 14,
-            }}>
-              Everything you need for Land Acquisition
-            </h2>
             <p style={{
               fontSize: '1rem', color: colors.sectionText,
               maxWidth: 560, margin: '0 auto', lineHeight: 1.7,
@@ -1147,34 +1052,6 @@ export default function Landing() {
             viewport={{ once: true }} transition={{ duration: 0.6 }}
             style={{ textAlign: 'center', marginBottom: 72 }}
           >
-            {/* Badge */}
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: isDark ? 'rgba(64,128,255,0.12)' : 'rgba(0,51,102,0.07)',
-              border: `1px solid ${isDark ? 'rgba(64,128,255,0.28)' : 'rgba(0,51,102,0.16)'}`,
-              borderRadius: 100, padding: '6px 18px',
-              marginBottom: 20,
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke={isDark ? '#7daaff' : '#3b5fa0'} strokeWidth="2"
-                strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="3" width="20" height="14" rx="2" />
-                <path d="M8 21h8m-4-4v4" />
-              </svg>
-              <span style={{
-                fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: isDark ? '#7daaff' : '#3b5fa0',
-              }}>Platform Architecture</span>
-            </div>
-
-            <h2 style={{
-              fontSize: 'clamp(1.7rem, 3vw, 2.4rem)',
-              fontWeight: 900, letterSpacing: '-0.03em',
-              color: colors.sectionTitle, marginBottom: 16, lineHeight: 1.15,
-            }}>
-              System Architecture
-            </h2>
             <p style={{
               fontSize: '1rem', color: colors.sectionText,
               maxWidth: 620, margin: '0 auto', lineHeight: 1.75,
