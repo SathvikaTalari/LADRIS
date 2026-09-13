@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, AlertCircle, Lock, Mail, Shield, Zap, Sun, Moon, UserCheck } from 'lucide-react'
+import { Eye, EyeOff, AlertCircle, Lock, Mail, Zap, Sun, Moon, UserCheck } from 'lucide-react'
 import { useAuthStore, getRoleDefaultPath } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 
@@ -277,7 +277,7 @@ export default function Login() {
               letterSpacing: '0.02em',
               lineHeight: 1.3,
               textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-            }}>Land Acquisition Delay Risk Intelligence Platform</span>
+            }}>Land Acquisition Delay Risk Intelligence System</span>
           </div>
         </div>
 
