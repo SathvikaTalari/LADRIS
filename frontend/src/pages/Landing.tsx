@@ -12,32 +12,35 @@ import {
   User, Map, FileText, Briefcase, Building, Settings
 } from 'lucide-react'
 import { useThemeStore } from '@/store/themeStore'
+import KeyComponentsSection from './sections/KeyComponentsSection'
+import FeaturesRippleSection from './sections/FeaturesRippleSection'
+import RolesConnectedSection from './sections/RolesConnectedSection'
 
 /* ─── Feature cards data ────────────────────────────────────────────────── */
 const FEATURES = [
   {
     icon: <Zap size={28} strokeWidth={1.8} />,
     title: 'Real-time Risk Scoring',
-    desc: 'Live parcel-level risk telemetry with trend alerts, legal status tracking, and acquisition timeline forecasts across all corridors.',
-    color: '#f47721',
+    desc: 'Know the risk early. LADRIS AI checks project data and shows whether a project has low, medium, or high delay risk.',
+    color: '#4a6fa5',
   },
   {
     icon: <Brain size={28} strokeWidth={1.8} />,
     title: 'AI Decision Intelligence',
-    desc: 'Regression & policy models recommending optimal acquisition strategies while preserving project momentum and minimising disputes.',
-    color: '#4080ff',
+    desc: 'Get smarter decisions. AI studies past and current data to find risky patterns and help teams choose the right action early.',
+    color: '#4a6fa5',
   },
   {
     icon: <MapPin size={28} strokeWidth={1.8} />,
     title: 'GIS Spatial Analytics',
-    desc: 'Interactive multi-layer maps with cadastral overlays, satellite imagery, and district-level drill-down for national infrastructure packages.',
-    color: '#138808',
+    desc: 'See risk on the map. View project locations, high-risk areas, and district-wise patterns on an interactive GIS map for faster understanding.',
+    color: '#4a6fa5',
   },
   {
     icon: <AlertTriangle size={28} strokeWidth={1.8} />,
     title: 'Predictive Bottleneck Detection',
-    desc: 'Signature-based anomaly detection with litigation risk estimates, compensation delay windows, and maintenance alerts to reduce unplanned stoppages.',
-    color: '#ff4757',
+    desc: 'Find problems before they grow. LADRIS AI detects issues like approval, legal, compensation, and documentation delays before they seriously affect the project.',
+    color: '#4a6fa5',
   },
   {
     icon: <TrendingUp size={28} strokeWidth={1.8} />,
@@ -54,39 +57,6 @@ const FEATURES = [
 ]
 
 
-/* ─── Roles data ────────────────────────────────────────────────────────── */
-const ROLES = [
-  {
-    icon: <User size={24} />,
-    title: 'Field Surveyor',
-    desc: 'Capture on-ground parcel data, upload documents, verify boundaries, and flag local disputes in real-time.',
-  },
-  {
-    icon: <Map size={24} />,
-    title: 'GIS Analyst',
-    desc: 'Overlay satellite imagery, verify geospatial alignments, run proximity buffers, and map infrastructure corridors.',
-  },
-  {
-    icon: <FileText size={24} />,
-    title: 'Legal Officer',
-    desc: 'Review land titles, track litigation statuses, manage compensation calculations, and approve final awards.',
-  },
-  {
-    icon: <Briefcase size={24} />,
-    title: 'Project Manager',
-    desc: 'Monitor corridor acquisition progress, manage budgets, resolve bottlenecks, and oversee multi-district execution.',
-  },
-  {
-    icon: <Building size={24} />,
-    title: 'District Collector',
-    desc: 'Approve Section 11/19 notifications, coordinate with state nodal agencies, and oversee grievance redressal.',
-  },
-  {
-    icon: <Settings size={24} />,
-    title: 'System Admin / Auditor',
-    desc: 'View comprehensive audit logs, configure RBAC permissions, monitor platform health, and enforce compliance.',
-  },
-]
 
 /* ─── Hero Slideshow data ───────────────────────────────────────────────── */
 const HERO_SLIDES = [
@@ -227,6 +197,32 @@ export default function Landing() {
                 flexShrink: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
               }}
             />
+            {/* Indian Tricolor Flag — inline SVG, no background padding */}
+            <svg width="44" height="30" viewBox="0 0 44 30" style={{ flexShrink: 0, borderRadius: 2, display: 'block' }} xmlns="http://www.w3.org/2000/svg">
+              {/* Saffron */}
+              <rect x="0" y="0" width="44" height="10" fill="#FF9933"/>
+              {/* White */}
+              <rect x="0" y="10" width="44" height="10" fill="#FFFFFF"/>
+              {/* Green */}
+              <rect x="0" y="20" width="44" height="10" fill="#138808"/>
+              {/* Ashoka Chakra */}
+              <circle cx="22" cy="15" r="4.2" fill="none" stroke="#000080" strokeWidth="0.8"/>
+              <circle cx="22" cy="15" r="0.7" fill="#000080"/>
+              {[...Array(24)].map((_, i) => {
+                const angle = (i * 15 * Math.PI) / 180
+                return (
+                  <line
+                    key={i}
+                    x1={22 + 0.7 * Math.cos(angle)}
+                    y1={15 + 0.7 * Math.sin(angle)}
+                    x2={22 + 4.2 * Math.cos(angle)}
+                    y2={15 + 4.2 * Math.sin(angle)}
+                    stroke="#000080"
+                    strokeWidth="0.5"
+                  />
+                )
+              })}
+            </svg>
             <div>
               <div style={{ fontSize: '0.74rem', fontWeight: 700, color: isDark ? '#c9d8f0' : '#1a2e4a', lineHeight: 1.25 }}>
                 भारत सरकार
@@ -324,10 +320,12 @@ export default function Landing() {
 
             {/* Left: Emblem + Divider + Logo + Brand */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
-              {/* MoRTH Ashoka Emblem */}
-              <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src="/logo_morth.png" alt="MoRTH Emblem" style={{ width: 40, height: 40, objectFit: 'contain' }} />
-              </div>
+              {/* MoRTH Ashoka Emblem — pre-cropped: emblem + Hindi only, no English text */}
+              <img
+                src="/logo_morth_clean.png"
+                alt="MoRTH Emblem"
+                style={{ height: 52, width: 'auto', display: 'block', flexShrink: 0 }}
+              />
               {/* Vertical divider */}
               <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 12px', flexShrink: 0 }} />
               {/* logo.png + Brand text */}
@@ -722,6 +720,7 @@ export default function Landing() {
             initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }} transition={{ duration: 0.65 }}
           >
+
             <h2 style={{
               fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
               fontWeight: 900, letterSpacing: '-0.035em',
@@ -859,172 +858,144 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ════ ALL FEATURES SECTION ════ */}
+      {/* ════ CHALLENGES SECTION ════ */}
       <section style={{
-        background: isDark ? '#0a182e' : '#eaf0f8',
-        padding: '80px 40px',
-        borderTop: `1px solid ${isDark ? 'rgba(244,119,33,0.1)' : 'rgba(0,51,102,0.08)'}`,
-        borderBottom: `1px solid ${isDark ? 'rgba(244,119,33,0.1)' : 'rgba(0,51,102,0.08)'}`,
+        background: isDark ? '#07111f' : '#f5f8fc',
+        padding: '80px 40px 60px',
+        borderTop: `1px solid ${isDark ? 'rgba(74,111,165,0.12)' : 'rgba(74,111,165,0.1)'}`,
+        borderBottom: `1px solid ${isDark ? 'rgba(74,111,165,0.12)' : 'rgba(74,111,165,0.1)'}`,
+        overflow: 'hidden',
       }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+
+          {/* Section header */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            style={{ textAlign: 'center', marginBottom: 56 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            style={{ textAlign: 'center', marginBottom: 52 }}
           >
-            <p style={{
-              fontSize: '1rem', color: colors.sectionText,
-              maxWidth: 560, margin: '0 auto', lineHeight: 1.7,
+            <h2 style={{
+              fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800,
+              color: colors.sectionTitle, letterSpacing: '-0.03em',
+              lineHeight: 1.2, marginBottom: 14,
             }}>
-              A unified command center combining GIS intelligence, AI risk scoring,
-              and government-grade access control for every stakeholder.
+              Challenges in Land Acquisition
+            </h2>
+            <p style={{
+              fontSize: '0.92rem', color: colors.sectionText,
+              maxWidth: 560, margin: '0 auto', lineHeight: 1.75,
+            }}>
+              Land acquisition for infrastructure projects faces deep-rooted challenges across administration, law, and coordination.
             </p>
           </motion.div>
 
+          {/* 6 Challenge cards — 3×2 grid */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: 24,
+            gap: 20,
           }}>
-            {FEATURES.map((feat, i) => (
+            {[
+              { title: 'Approval Delays', desc: 'Too many approvals and slow government processes can hold up land acquisition and delay the overall infrastructure project.' },
+              { title: 'Legal & Ownership Issues', desc: 'Land disputes and ownership conflicts can stop acquisition, create uncertainty, and delay project progress for a long time.' },
+              { title: 'Compensation Delays', desc: 'Late compensation can slow land possession and create difficulties for landowners, authorities, and project teams during acquisition.' },
+              { title: 'Incomplete Documents', desc: 'Missing documents and pending notifications can slow verification, approvals, and other important steps in the land acquisition process.' },
+              { title: 'Rehabilitation Challenges', desc: 'Slow rehabilitation and resettlement can affect families and delay land acquisition, creating further impact on overall project implementation.' },
+              { title: 'Coordination Gaps', desc: 'Different departments and agencies must work together, but slow communication and responses can create bottlenecks and delay project progress.' },
+            ].map((challenge, i) => (
               <motion.div
-                key={feat.title}
-                initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.07 }}
-                whileHover={{ translateY: -4 }}
-                style={{
-                  background: colors.cardBg,
-                  border: `1px solid ${colors.cardBorder}`,
-                  borderRadius: 18,
-                  padding: '28px 26px',
-                  boxShadow: isDark ? '0 4px 24px rgba(0,0,0,0.45)' : '0 2px 12px rgba(0,51,102,0.07)',
-                  transition: 'all 0.22s ease',
-                  position: 'relative', overflow: 'hidden',
-                }}
+                key={challenge.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, ease: 'easeOut', delay: i * 0.07 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = `${feat.color}55`
-                  e.currentTarget.style.boxShadow = isDark
-                    ? `0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px ${feat.color}22`
-                    : `0 8px 28px rgba(0,51,102,0.14), 0 0 0 1px ${feat.color}22`
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(74,111,165,0.4)'
+                  ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+                    ? '0 8px 28px rgba(0,0,0,0.4), 0 0 0 1px rgba(74,111,165,0.2)'
+                    : '0 6px 22px rgba(74,111,165,0.12), 0 0 0 1px rgba(74,111,165,0.15)'
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = colors.cardBorder
-                  e.currentTarget.style.boxShadow = isDark ? '0 4px 24px rgba(0,0,0,0.45)' : '0 2px 12px rgba(0,51,102,0.07)'
+                  (e.currentTarget as HTMLDivElement).style.borderColor = isDark ? 'rgba(74,111,165,0.14)' : 'rgba(74,111,165,0.1)'
+                  ;(e.currentTarget as HTMLDivElement).style.boxShadow = 'none'
+                }}
+                style={{
+                  background: colors.cardBg,
+                  border: `1px solid ${isDark ? 'rgba(74,111,165,0.14)' : 'rgba(74,111,165,0.1)'}`,
+                  borderRadius: 14, padding: '24px 22px',
+                  cursor: 'default',
+                  transition: 'border-color 0.25s ease, box-shadow 0.25s ease',
+                  position: 'relative', overflow: 'hidden',
                 }}
               >
-                {/* Accent corner */}
+                {/* Top accent bar */}
                 <div style={{
                   position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-                  background: `linear-gradient(90deg, ${feat.color}, transparent 60%)`,
-                  opacity: 0.7,
+                  background: 'linear-gradient(90deg, #4a6fa5, transparent)',
+                  borderRadius: '14px 14px 0 0',
                 }} />
 
+                {/* Number */}
                 <div style={{
-                  width: 52, height: 52, borderRadius: 14,
-                  background: `${feat.color}15`,
-                  border: `1px solid ${feat.color}30`,
+                  width: 36, height: 36, borderRadius: '50%',
+                  background: isDark ? 'rgba(74,111,165,0.15)' : 'rgba(74,111,165,0.1)',
+                  border: `1px solid ${isDark ? 'rgba(74,111,165,0.3)' : 'rgba(74,111,165,0.25)'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: feat.color, marginBottom: 18,
-                  boxShadow: `0 0 20px ${feat.color}18`,
+                  fontSize: '0.85rem', fontWeight: 800, color: '#4a6fa5',
+                  marginBottom: 14, flexShrink: 0,
                 }}>
-                  {feat.icon}
+                  {String(i + 1).padStart(2, '0')}
                 </div>
 
-                <div style={{
-                  fontSize: '1rem', fontWeight: 700,
-                  color: colors.sectionTitle, marginBottom: 10, lineHeight: 1.3,
+                {/* Title */}
+                <h3 style={{
+                  fontSize: '0.95rem', fontWeight: 700,
+                  color: colors.sectionTitle, marginBottom: 8,
+                  lineHeight: 1.3,
                 }}>
-                  {feat.title}
-                </div>
+                  {challenge.title}
+                </h3>
+
+                {/* Description */}
                 <p style={{
-                  fontSize: '0.875rem', lineHeight: 1.7,
-                  color: colors.sectionText, margin: 0,
+                  fontSize: '0.83rem', color: colors.sectionText,
+                  lineHeight: 1.7, margin: 0,
                 }}>
-                  {feat.desc}
+                  {challenge.desc}
                 </p>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ════ ROLES SECTION ════ */}
-      <section style={{
-        background: isDark ? '#060f1e' : '#f5f7f9',
-        padding: '80px 40px',
-      }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          {/* Bridge connector */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            style={{ textAlign: 'center', marginBottom: 56 }}
+            transition={{ duration: 0.55, ease: 'easeOut', delay: 0.45 }}
+            style={{ textAlign: 'center', marginTop: 52 }}
           >
-            <h2 style={{
-              fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
-              fontWeight: 900, letterSpacing: '-0.03em',
-              color: colors.sectionTitle, marginBottom: 14,
-            }}>
-              Built for Every Role in Infrastructure Acquisition
-            </h2>
-            <p style={{
-              fontSize: '1rem', color: colors.sectionText,
-              maxWidth: 600, margin: '0 auto', lineHeight: 1.7,
-            }}>
-              LADRIS provides actionable intelligence tailored to the decision-making needs of your entire team.
-            </p>
+            {/* Vertical line */}
+            <div style={{
+              width: 1, height: 40, background: `linear-gradient(to bottom, rgba(74,111,165,0.35), transparent)`,
+              margin: '0 auto 20px',
+            }} />
+
           </motion.div>
 
-          {/* Horizontal scrolling / wrapping container for cards */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: 16,
-          }}>
-            {ROLES.map((role, i) => (
-              <motion.div
-                key={role.title}
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.05 }}
-                whileHover={{ translateY: -3 }}
-                style={{
-                  background: colors.cardBg,
-                  border: `1px solid ${colors.cardBorder}`,
-                  borderRadius: 12,
-                  padding: '24px 20px',
-                  boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,51,102,0.05)',
-                  display: 'flex', flexDirection: 'column',
-                  transition: 'all 0.22s ease',
-                }}
-              >
-                {/* Icon box (light blue background as in reference) */}
-                <div style={{
-                  width: 44, height: 44, borderRadius: 8,
-                  background: isDark ? 'rgba(64,128,255,0.15)' : '#eef2ff',
-                  color: isDark ? '#7daaff' : '#3b82f6',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: 16,
-                }}>
-                  {role.icon}
-                </div>
-
-                <div style={{
-                  fontSize: '0.95rem', fontWeight: 800,
-                  color: colors.sectionTitle, marginBottom: 12,
-                }}>
-                  {role.title}
-                </div>
-
-                <div style={{
-                  fontSize: '0.8rem', lineHeight: 1.6,
-                  color: colors.sectionText,
-                }}>
-                  {role.desc}
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
+
+      {/* ════ KEY COMPONENTS SECTION ════ */}
+      <KeyComponentsSection isDark={isDark} />
+
+      {/* ════ ALL FEATURES SECTION ════ */}
+      <FeaturesRippleSection isDark={isDark} />
+
+      {/* ════ ROLES SECTION ════ */}
+      <RolesConnectedSection isDark={isDark} />
 
       {/* ════ 4-TIER ARCHITECTURE SECTION ════ */}
       <section style={{
