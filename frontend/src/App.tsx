@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/authStore'
 import { AppShell } from '@/components/layout/AppShell'
 import Login from '@/pages/Login'
 import Landing from '@/pages/Landing'
+import SiteMap from '@/pages/SiteMap'
 import Dashboard from '@/pages/Dashboard'
 import ProjectList from '@/pages/Projects/ProjectList'
 import ProjectDetail from '@/pages/Projects/ProjectDetail'
@@ -53,6 +54,7 @@ export default function App() {
         {/* Public Routes */}
         <Route path="/landing" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/sitemap" element={<SiteMap />} />
 
         {/* Protected Dashboard Routes */}
         <Route
