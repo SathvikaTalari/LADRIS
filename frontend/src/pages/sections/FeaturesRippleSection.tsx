@@ -1,7 +1,7 @@
 /**
- * FeaturesRippleSection — LADRIS AI
+ * FeaturesRippleSection â€” LADRIS AI
  * "Everything You Need for Land Acquisition"
- * Animation: RIPPLE REVEAL — one central signal activates all 6 cards.
+ * Animation: RIPPLE REVEAL â€” one central signal activates all 6 cards.
  * Library: Framer Motion (already installed)
  */
 import { useEffect, useRef, useState } from "react"
@@ -333,7 +333,7 @@ export default function FeaturesRippleSection({ isDark }: { isDark: boolean }) {
             color: isDark ? "#f0f6fc" : "#0a1d37",
             marginBottom: 12, lineHeight: 1.2,
           }}>
-            Everything You Need for Land Acquisition
+            Key Components of LADRIS AI
           </h2>
 
           <motion.p

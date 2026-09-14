@@ -15,6 +15,9 @@ import { useThemeStore } from '@/store/themeStore'
 import KeyComponentsSection from './sections/KeyComponentsSection'
 import FeaturesRippleSection from './sections/FeaturesRippleSection'
 import RolesConnectedSection from './sections/RolesConnectedSection'
+import SystemArchitectureSection from './sections/SystemArchitectureSection'
+import GisIntelligenceSection from './sections/GisIntelligenceSection'
+import SmartAnalyticsSection from './sections/SmartAnalyticsSection'
 
 /* ─── Feature cards data ────────────────────────────────────────────────── */
 const FEATURES = [
@@ -1240,18 +1243,21 @@ export default function Landing() {
       {/* ════ ALL FEATURES SECTION ════ */}
       <FeaturesRippleSection isDark={isDark} />
 
+      {/* ════ SMART ANALYTICS SECTION ════ */}
+      <SmartAnalyticsSection isDark={isDark} />
+
+      {/* ════ GIS INTELLIGENCE SECTION ════ */}
+      <GisIntelligenceSection isDark={isDark} />
+
       {/* ════ ROLES SECTION ════ */}
       <RolesConnectedSection isDark={isDark} />
 
-      {/* ════ 4-TIER ARCHITECTURE SECTION ════ */}
-      <section style={{
-        background: isDark
-          ? 'linear-gradient(160deg, #07111f 0%, #0a1a30 60%, #060f1e 100%)'
-          : 'linear-gradient(160deg, #eef3fb 0%, #f5f8fd 60%, #e8eef8 100%)',
-        padding: '96px 40px',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
+      {/* ════ SYSTEM ARCHITECTURE SECTION ════ */}
+      <SystemArchitectureSection isDark={isDark} />
+
+
+      {/* ════ [REMOVED OLD INLINE ARCHITECTURE] ════ */}
+      <section style={{ display: 'none' }}>
         {/* Background decorative grid */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
