@@ -4,19 +4,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, AlertCircle, Lock, Mail, Shield, Zap, Sun, Moon, UserCheck } from 'lucide-react'
+import { Eye, EyeOff, AlertCircle, Lock, Mail, Zap, Sun, Moon, UserCheck } from 'lucide-react'
 import { useAuthStore, getRoleDefaultPath } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 
 export const ROLE_OPTIONS = [
-  { key: 'CENTRAL_ADMIN', label: 'Central Admin (MoRTH / Central Ministry)', email: 'central.admin@ladris.gov.in', pass: 'Password123!', scope: 'India-wide National Jurisdiction', target: 'National Dashboard' },
-  { key: 'STATE_ADMIN', label: 'State Admin (Telangana State Nodal Auth)', email: 'state.admin.tg@ladris.gov.in', pass: 'Password123!', scope: 'Telangana State Scope', target: 'State Dashboard' },
-  { key: 'DISTRICT_OFFICER', label: 'District Officer (Collector / LA Admin)', email: 'district.officer.sangareddy@ladris.gov.in', pass: 'Password123!', scope: 'Sangareddy District Scope', target: 'District Dashboard' },
-  { key: 'LA_OFFICER', label: 'LA Officer (Competent Authority)', email: 'la.officer@ladris.gov.in', pass: 'Password123!', scope: 'Assigned Packages Only', target: 'LA Workbench' },
-  { key: 'PROJECT_AGENCY', label: 'Project Agency (Implementing Body / NHAI)', email: 'project.agency@nhai.gov.in', pass: 'Password123!', scope: 'NHAI Project Scope', target: 'Agency Portal' },
-  { key: 'POLICY_ANALYST', label: 'Policy Analyst (NITI Aayog / Researcher)', email: 'policy.analyst@niti.gov.in', pass: 'Password123!', scope: 'Analytics & Simulations', target: 'Decision Hub' },
-  { key: 'VIEWER', label: 'Viewer (Senior Audit Observer)', email: 'viewer@ladris.gov.in', pass: 'Password123!', scope: 'Scoped Read-Only Observer', target: 'Read-Only View' },
-  { key: 'SUPER_ADMIN', label: 'Super Admin (Technical Admin)', email: 'admin@ladris.gov.in', pass: 'admin123', scope: 'Full Platform Technical Admin', target: 'Admin Panel' },
+  { key: 'CENTRAL_ADMIN', label: 'Central Ministry', email: 'central@ladris.gov.in', pass: 'Password123!', scope: 'India-wide', target: 'National Dashboard' },
+  { key: 'STATE_ADMIN', label: 'State Government', email: 'state@ladris.gov.in', pass: 'Password123!', scope: 'State-wide', target: 'State Dashboard' },
+  { key: 'DISTRICT_ADMIN', label: 'District Administration', email: 'district@ladris.gov.in', pass: 'Password123!', scope: 'District', target: 'District Dashboard' },
+  { key: 'LAND_AUTHORITY', label: 'Land Acquiring Authority', email: 'authority@ladris.gov.in', pass: 'Password123!', scope: 'Land Acquisition', target: 'Acquisition Dashboard' },
+  { key: 'LAND_REQUIRING_BODY', label: 'Land Requiring Body', email: 'lrb@ladris.gov.in', pass: 'Password123!', scope: 'Project', target: 'Project Dashboard' },
+  { key: 'PROJECT_AGENCY', label: 'Project Implementing Agency', email: 'agency@ladris.gov.in', pass: 'Password123!', scope: 'Project', target: 'Project Dashboard' },
+  { key: 'POLICY_MAKER', label: 'Policy Maker', email: 'policy@ladris.gov.in', pass: 'Password123!', scope: 'India-wide', target: 'Policy Dashboard' },
 ]
 
 export default function Login() {
@@ -179,12 +178,10 @@ export default function Login() {
           {isDark ? (
             <>
               <Sun size={16} color="#facc15" strokeWidth={2.2} />
-              <span>Light Mode</span>
             </>
           ) : (
             <>
               <Moon size={16} color="#003366" strokeWidth={2.2} />
-              <span>Dark Mode</span>
             </>
           )}
         </motion.button>
@@ -195,7 +192,7 @@ export default function Login() {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         padding: '52px 72px',
         position: 'relative',
         overflow: 'hidden',
@@ -260,57 +257,29 @@ export default function Login() {
           backgroundSize: '60px 60px',
         }} />
 
-        {/* Brand Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          style={{ position: 'relative', zIndex: 2 }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{
-              width: 56, height: 56,
-              borderRadius: 14,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-              background: 'rgba(14,22,40,0.85)',
-              border: '1px solid rgba(64,128,255,0.3)',
-              boxShadow: '0 4px 24px rgba(64,128,255,0.4)',
-              padding: 3,
-            }}>
-              <img
-                src="/logo.png"
-                alt="LADRIS Logo"
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
-            </div>
-            <div>
-              <div style={{
-                fontSize: '1.6rem',
-                fontWeight: 900,
-                color: '#ffffff',
-                letterSpacing: '-0.03em',
-                lineHeight: 1.1,
-                textShadow: '0 2px 8px rgba(0,0,0,0.7)',
-              }}>
-                LADRIS<span style={{ color: '#60a5fa' }}>·</span>AI
-              </div>
-              <div style={{
-                fontSize: '0.65rem',
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.9)',
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                marginTop: 2,
-                textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-              }}>
-                Intelligence Platform
-              </div>
-            </div>
+        {/* Logo top-left */}
+        <div style={{ position: 'absolute', top: 28, left: 36, zIndex: 3, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <img src="/logo.png" alt="LADRIS Logo" style={{ height: 48, width: 'auto', display: 'block' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <span style={{
+              fontSize: '1.35rem',
+              fontWeight: 800,
+              color: '#ffffff',
+              letterSpacing: '0.04em',
+              lineHeight: 1.1,
+              textShadow: '0 1px 6px rgba(0,0,0,0.6)',
+              fontFamily: 'inherit',
+            }}>LADRIS</span>
+            <span style={{
+              fontSize: '0.6rem',
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.75)',
+              letterSpacing: '0.02em',
+              lineHeight: 1.3,
+              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+            }}>Land Acquisition Delay Risk Intelligence System</span>
           </div>
-        </motion.div>
+        </div>
 
         {/* Hero Content */}
         <motion.div
@@ -319,35 +288,17 @@ export default function Login() {
           transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
           style={{ position: 'relative', zIndex: 2 }}
         >
-          <div style={{
-            fontSize: '0.72rem',
-            fontWeight: 800,
-            color: '#ffffff',
-            letterSpacing: '0.15em',
-            textTransform: 'uppercase',
-            marginBottom: 16,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            textShadow: '0 1px 4px rgba(0,0,0,0.7)',
-          }}>
-            <div style={{
-              width: 24, height: 2,
-              background: '#ffffff',
-              boxShadow: '0 0 8px rgba(255,255,255,0.8)',
-            }} />
-            Government Intelligence
-          </div>
+
           <h1 style={{
-            fontSize: '3.4rem',
-            fontWeight: 900,
+            fontSize: '2.4rem',
+            fontWeight: 800,
             lineHeight: 1.08,
-            letterSpacing: '-0.04em',
+            letterSpacing: '-0.02em',
             color: '#ffffff',
             marginBottom: 20,
             textShadow: '0 2px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.8)',
           }}>
-            Land Intelligence
+            Early  Detection  of  Land  Acquisition  Delays
           </h1>
           <p style={{
             fontSize: '1.05rem',
@@ -358,42 +309,10 @@ export default function Login() {
             fontWeight: 500,
             textShadow: '0 1px 8px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.8)',
           }}>
-            AI-powered land acquisition command center for
-            national infrastructure decision makers. Real-time
-            risk monitoring across all project corridors.
+            Identify projects likely to experience delays
+            before they occur.Monitor high-risk projects,
+            visualize delay trends,and prioritize interventions.
           </p>
-
-          {/* Feature Pills */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            {[
-              { icon: '⚡', label: 'Real-time Risk Scoring' },
-              { icon: '🗺️', label: 'GIS Spatial Analytics' },
-              { icon: '🧠', label: 'AI Decision Intelligence' },
-              { icon: '🔐', label: 'Secure Government Access' },
-            ].map((pill) => (
-              <div
-                key={pill.label}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 16px',
-                  background: 'rgba(8, 15, 28, 0.75)',
-                  border: '1px solid rgba(255,255,255,0.25)',
-                  borderRadius: 'var(--radius-full)',
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  color: '#ffffff',
-                  backdropFilter: 'blur(10px)',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-                }}
-              >
-                <span style={{ fontSize: '0.95rem' }}>{pill.icon}</span>
-                {pill.label}
-              </div>
-            ))}
-          </div>
         </motion.div>
 
         {/* Footer */}
@@ -460,40 +379,18 @@ export default function Login() {
         >
           {/* Form Header */}
           <div style={{ marginBottom: 36 }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '5px 12px',
-              background: isDark ? 'rgba(46,213,115,0.06)' : 'rgba(19,136,8,0.08)',
-              border: `1px solid ${isDark ? 'rgba(46,213,115,0.18)' : 'rgba(19,136,8,0.25)'}`,
-              borderRadius: 'var(--radius-full)',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              color: isDark ? '#2ed573' : '#138808',
-              letterSpacing: '0.04em',
-              marginBottom: 20,
-            }}>
-              <span style={{
-                width: 5, height: 5,
-                borderRadius: '50%',
-                background: isDark ? '#2ed573' : '#138808',
-                animation: 'pulse-glow 2s ease-in-out infinite',
-              }} />
-              SECURE ACCESS PORTAL
-            </div>
             <h2 style={{
-              fontSize: '1.6rem',
+              fontSize: '2.0rem',
               fontWeight: 800,
               color: isDark ? '#eef2ff' : '#0a1d37',
               letterSpacing: '-0.025em',
               lineHeight: 1.2,
               marginBottom: 10,
             }}>
-              Sign in to your<br />account
+              Welcome to LADRIS
             </h2>
             <p style={{ color: isDark ? '#4a5880' : '#5a7194', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Authorized personnel only. All access is monitored and logged.
+              Sign in to your account
             </p>
           </div>
 
@@ -568,7 +465,7 @@ export default function Login() {
                       : undefined,
                   }}
                 >
-                  <option value="">-- Select Role to Auto-Fill Credentials --</option>
+                  <option value="">-- Select Role--</option>
                   {ROLE_OPTIONS.map((r) => (
                     <option key={r.key} value={r.key}>
                       {r.label}
@@ -577,27 +474,7 @@ export default function Login() {
                 </select>
               </div>
 
-              {/* Selected Role Scope Preview Badge */}
-              {selectedRoleKey && (
-                <div style={{
-                  marginTop: 8,
-                  padding: '8px 12px',
-                  borderRadius: 8,
-                  background: isDark ? 'rgba(64,128,255,0.08)' : 'rgba(0,51,102,0.05)',
-                  border: `1px solid ${isDark ? 'rgba(64,128,255,0.2)' : 'rgba(0,51,102,0.15)'}`,
-                  fontSize: '0.75rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                  <span style={{ color: isDark ? '#8898b8' : '#2b4263' }}>
-                    Scope: <strong style={{ color: isDark ? '#7daaff' : '#003366' }}>{ROLE_OPTIONS.find(r => r.key === selectedRoleKey)?.scope}</strong>
-                  </span>
-                  <span className="badge badge-blue" style={{ fontSize: '0.65rem' }}>
-                    ➜ {ROLE_OPTIONS.find(r => r.key === selectedRoleKey)?.target}
-                  </span>
-                </div>
-              )}
+
             </div>
 
             {/* Email Field */}
@@ -640,8 +517,8 @@ export default function Login() {
                       : undefined,
                     boxShadow: focusedField === 'email'
                       ? (isDark
-                          ? '0 0 0 3px rgba(64,128,255,0.1), inset 0 2px 6px rgba(0,0,0,0.2)'
-                          : '0 0 0 3px rgba(0,51,102,0.1), inset 0 1px 3px rgba(0,0,0,0.05)')
+                        ? '0 0 0 3px rgba(64,128,255,0.1), inset 0 2px 6px rgba(0,0,0,0.2)'
+                        : '0 0 0 3px rgba(0,51,102,0.1), inset 0 1px 3px rgba(0,0,0,0.05)')
                       : (isDark ? 'inset 0 2px 6px rgba(0,0,0,0.3)' : 'var(--shadow-sm)'),
                   }}
                   placeholder="officer@department.gov.in"
@@ -695,8 +572,8 @@ export default function Login() {
                       : undefined,
                     boxShadow: focusedField === 'password'
                       ? (isDark
-                          ? '0 0 0 3px rgba(64,128,255,0.1), inset 0 2px 6px rgba(0,0,0,0.2)'
-                          : '0 0 0 3px rgba(0,51,102,0.1), inset 0 1px 3px rgba(0,0,0,0.05)')
+                        ? '0 0 0 3px rgba(64,128,255,0.1), inset 0 2px 6px rgba(0,0,0,0.2)'
+                        : '0 0 0 3px rgba(0,51,102,0.1), inset 0 1px 3px rgba(0,0,0,0.05)')
                       : (isDark ? 'inset 0 2px 6px rgba(0,0,0,0.3)' : 'var(--shadow-sm)'),
                   }}
                   placeholder="••••••••••••"
@@ -743,8 +620,8 @@ export default function Login() {
                 background: isLoading
                   ? (isDark ? 'rgba(64,128,255,0.5)' : 'rgba(0,51,102,0.5)')
                   : (isDark
-                      ? 'linear-gradient(135deg, #4080ff 0%, #7c5cfc 100%)'
-                      : 'linear-gradient(135deg, #003366 0%, #f47721 100%)'),
+                    ? 'linear-gradient(135deg, #4080ff 0%, #7c5cfc 100%)'
+                    : 'linear-gradient(135deg, #003366 0%, #f47721 100%)'),
                 border: 'none',
                 borderRadius: 'var(--radius-lg)',
                 color: 'white',
@@ -756,8 +633,8 @@ export default function Login() {
                 boxShadow: isLoading
                   ? 'none'
                   : (isDark
-                      ? '0 4px 20px rgba(64,128,255,0.35), inset 0 1px 0 rgba(255,255,255,0.15)'
-                      : '0 4px 16px rgba(0,51,102,0.25), inset 0 1px 0 rgba(255,255,255,0.2)'),
+                    ? '0 4px 20px rgba(64,128,255,0.35), inset 0 1px 0 rgba(255,255,255,0.15)'
+                    : '0 4px 16px rgba(0,51,102,0.25), inset 0 1px 0 rgba(255,255,255,0.2)'),
                 transition: 'all 0.2s',
                 marginTop: 4,
               }}
@@ -776,7 +653,7 @@ export default function Login() {
               ) : (
                 <>
                   <Zap size={17} strokeWidth={2.5} />
-                  Sign In to Command Center
+                  Sign In
                 </>
               )}
             </motion.button>
@@ -787,25 +664,15 @@ export default function Login() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            style={{
-              marginTop: 24,
-              padding: '14px 16px',
-              background: isDark ? 'rgba(14,22,40,0.8)' : 'rgba(240,244,249,0.8)',
-              border: `1px solid ${isDark ? 'rgba(64,128,255,0.1)' : 'rgba(0,51,102,0.12)'}`,
-              borderRadius: 'var(--radius-lg)',
-              display: 'flex',
-              gap: 12,
-              alignItems: 'flex-start',
-            }}
+            style={{ marginTop: 24 }}
           >
-            <Shield size={15} color={isDark ? 'rgba(64,128,255,0.6)' : '#003366'} style={{ flexShrink: 0, marginTop: 1 }} />
             <p style={{
               fontSize: '0.75rem',
               color: isDark ? '#4a5880' : '#5a7194',
               margin: 0,
               lineHeight: 1.6,
             }}>
-              <strong style={{ color: isDark ? '#8898b8' : '#0a1d37', fontWeight: 600 }}>Secure Access</strong> — Authorized government personnel only. All access is logged.
+              <strong style={{ color: isDark ? '#8898b8' : '#0a1d37', fontWeight: 600 }}>Note</strong> — As this is prototype, All roles currently use the same dashboard.
             </p>
           </motion.div>
 
@@ -814,5 +681,3 @@ export default function Login() {
     </div>
   )
 }
-
-

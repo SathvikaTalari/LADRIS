@@ -9,35 +9,38 @@ import {
   MapPin, ShieldCheck, Zap, Brain,
   ArrowRight, ChevronRight, Sun, Moon, Menu, X,
   AlertTriangle, TrendingUp,
-  User, Map, FileText, Briefcase, Building, Settings
+  Globe, Accessibility, HelpCircle, LayoutGrid,
 } from 'lucide-react'
 import { useThemeStore } from '@/store/themeStore'
+import KeyComponentsSection from './sections/KeyComponentsSection'
+import FeaturesRippleSection from './sections/FeaturesRippleSection'
+import RolesConnectedSection from './sections/RolesConnectedSection'
 
 /* ─── Feature cards data ────────────────────────────────────────────────── */
 const FEATURES = [
   {
     icon: <Zap size={28} strokeWidth={1.8} />,
     title: 'Real-time Risk Scoring',
-    desc: 'Live parcel-level risk telemetry with trend alerts, legal status tracking, and acquisition timeline forecasts across all corridors.',
-    color: '#f47721',
+    desc: 'Know the risk early. LADRIS AI checks project data and shows whether a project has low, medium, or high delay risk.',
+    color: '#4a6fa5',
   },
   {
     icon: <Brain size={28} strokeWidth={1.8} />,
     title: 'AI Decision Intelligence',
-    desc: 'Regression & policy models recommending optimal acquisition strategies while preserving project momentum and minimising disputes.',
-    color: '#4080ff',
+    desc: 'Get smarter decisions. AI studies past and current data to find risky patterns and help teams choose the right action early.',
+    color: '#4a6fa5',
   },
   {
     icon: <MapPin size={28} strokeWidth={1.8} />,
     title: 'GIS Spatial Analytics',
-    desc: 'Interactive multi-layer maps with cadastral overlays, satellite imagery, and district-level drill-down for national infrastructure packages.',
-    color: '#138808',
+    desc: 'See risk on the map. View project locations, high-risk areas, and district-wise patterns on an interactive GIS map for faster understanding.',
+    color: '#4a6fa5',
   },
   {
     icon: <AlertTriangle size={28} strokeWidth={1.8} />,
     title: 'Predictive Bottleneck Detection',
-    desc: 'Signature-based anomaly detection with litigation risk estimates, compensation delay windows, and maintenance alerts to reduce unplanned stoppages.',
-    color: '#ff4757',
+    desc: 'Find problems before they grow. LADRIS AI detects issues like approval, legal, compensation, and documentation delays before they seriously affect the project.',
+    color: '#4a6fa5',
   },
   {
     icon: <TrendingUp size={28} strokeWidth={1.8} />,
@@ -54,83 +57,50 @@ const FEATURES = [
 ]
 
 
-/* ─── Roles data ────────────────────────────────────────────────────────── */
-const ROLES = [
-  {
-    icon: <User size={24} />,
-    title: 'Field Surveyor',
-    desc: 'Capture on-ground parcel data, upload documents, verify boundaries, and flag local disputes in real-time.',
-  },
-  {
-    icon: <Map size={24} />,
-    title: 'GIS Analyst',
-    desc: 'Overlay satellite imagery, verify geospatial alignments, run proximity buffers, and map infrastructure corridors.',
-  },
-  {
-    icon: <FileText size={24} />,
-    title: 'Legal Officer',
-    desc: 'Review land titles, track litigation statuses, manage compensation calculations, and approve final awards.',
-  },
-  {
-    icon: <Briefcase size={24} />,
-    title: 'Project Manager',
-    desc: 'Monitor corridor acquisition progress, manage budgets, resolve bottlenecks, and oversee multi-district execution.',
-  },
-  {
-    icon: <Building size={24} />,
-    title: 'District Collector',
-    desc: 'Approve Section 11/19 notifications, coordinate with state nodal agencies, and oversee grievance redressal.',
-  },
-  {
-    icon: <Settings size={24} />,
-    title: 'System Admin / Auditor',
-    desc: 'View comprehensive audit logs, configure RBAC permissions, monitor platform health, and enforce compliance.',
-  },
-]
 
 /* ─── Hero Slideshow data ───────────────────────────────────────────────── */
 const HERO_SLIDES = [
   {
-    src: '/slide_highways.png',
+    src: '/slide_highway.jpg',
     ministry: 'Ministry of Road Transport & Highways (MoRTH)',
-    caption: 'Building World-Class Expressway Infrastructure',
-    tag: 'Highways & Roads',
+    caption: 'Keeping Highway Projects Moving',
+    tag: 'Land Acquisition & Highways',
   },
   {
-    src: '/slide_railways.png',
+    src: '/slide_railway.jpg',
     ministry: 'Ministry of Railways',
-    caption: 'Transforming Rail Connectivity Across India',
-    tag: 'Railways',
+    caption: 'Clearing the Way for Railway Projects',
+    tag: 'Land Acquisition & Railways',
   },
   {
-    src: '/slide_metro_urban.png',
+    src: '/slide_metro.jpg',
     ministry: 'Ministry of Housing & Urban Affairs (MoHUA)',
-    caption: 'Smart Cities, Metro Rail & Urban Development',
-    tag: 'Metro & Urban Housing',
+    caption: 'Supporting Faster Metro Development',
+    tag: 'Land Acquisition & Metro ',
   },
   {
-    src: '/slide_power.png',
+    src: '/slide_powergrid.jpg',
     ministry: 'Ministry of Power',
-    caption: 'Energising the Nation with Grid Infrastructure',
-    tag: 'Power Grids',
+    caption: 'Keeping Power Projects on Track',
+    tag: 'Land Acquisition & Power Grids',
   },
   {
-    src: '/slide_aviation.png',
+    src: '/slide_airport.jpg',
     ministry: 'Ministry of Civil Aviation',
-    caption: 'Expanding India\'s Aviation Network',
-    tag: 'Airports',
+    caption: 'Supporting Timely Airport Development',
+    tag: 'Land Acquisition & Airports',
   },
   {
-    src: '/slide_ports.png',
-    ministry: 'Ministry of Ports, Shipping & Waterways',
-    caption: 'Powering Maritime & Port Connectivity',
-    tag: 'Ship Ports',
+    src: '/slide_urban_const.jpg',
+    ministry: 'Ministry of Housing & Urban Affairs (MoHUA)',
+    caption: 'Enabling Timely Urban Development',
+    tag: 'Land Acquisition & Urban Projects',
   },
   {
-    src: '/slide_morth.png',
-    ministry: 'Ministry of Heavy Industries & Public Agencies',
-    caption: 'Industrial & Infrastructure Development Corridors',
-    tag: 'Industrial Zones',
+    src: '/slide_industrial.jpg',
+    ministry: 'Ministry of Commerce & Industry',
+    caption: 'Enabling Faster Industrial Development',
+    tag: 'Land Acquisition & Industrial Zones',
   },
 ]
 
@@ -141,6 +111,13 @@ export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSlide, setActiveSlide] = useState(0)
+  const [activePanel, setActivePanel] = useState<'sitemap' | 'language' | 'accessibility' | 'help' | null>(null)
+  const [language, setLanguage] = useState<'en' | 'hi'>('en')
+  const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal')
+  const [highContrast, setHighContrast] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const [helpQuery, setHelpQuery] = useState('')
+  const [helpAnswer, setHelpAnswer] = useState('')
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0])
@@ -165,6 +142,138 @@ export default function Landing() {
   const nextSlide = () => setActiveSlide(prev => (prev + 1) % HERO_SLIDES.length)
 
   const handleAccessDashboard = () => navigate('/login')
+
+  // Accessibility effects — applied globally via <html> attributes
+  useEffect(() => {
+    const root = document.documentElement
+    // Font size: sets root font-size so all rem-based elements scale proportionally
+    root.style.fontSize = fontSize === 'large' ? '18px' : fontSize === 'xlarge' ? '20px' : ''
+    // High contrast: toggles [data-high-contrast] CSS attribute
+    if (highContrast) { root.setAttribute('data-high-contrast', 'true') }
+    else { root.removeAttribute('data-high-contrast') }
+    // Reduced motion: toggles [data-reduced-motion] CSS attribute
+    if (reducedMotion) { root.setAttribute('data-reduced-motion', 'true') }
+    else { root.removeAttribute('data-reduced-motion') }
+    return () => {
+      root.style.fontSize = ''
+      root.removeAttribute('data-high-contrast')
+      root.removeAttribute('data-reduced-motion')
+    }
+  }, [fontSize, highContrast, reducedMotion])
+
+  const togglePanel = (panel: 'sitemap' | 'language' | 'accessibility' | 'help') =>
+    setActivePanel(prev => (prev === panel ? null : panel))
+
+  const handleHelpQuery = (q: string) => {
+    const query = q.toLowerCase().trim()
+    if (!query) { setHelpAnswer(''); return }
+    const matches: [string[], string][] = [
+      [['login', 'sign in', 'access', 'credentials', 'password'], 'To login, click the "Login" button on the top-right or the "Access Dashboard" button. Use your government credentials. Roles are pre-assigned — contact your ministry admin if you cannot log in.'],
+      [['role', 'permission', 'central', 'state', 'district', 'officer', 'la officer'], 'LADRIS supports four roles: Central, State, District, and LA Officer. Each role sees a tailored dashboard with data scoped to their jurisdiction and responsibilities.'],
+      [['project', 'track', 'monitor', 'stage', 'status', 'progress'], 'In the Projects section, you can see all land acquisition projects with current stage (SIA, notification, award, possession), risk score, and timeline status.'],
+      [['gis', 'map', 'location', 'spatial', 'district map', 'geography'], 'The GIS Map view shows all active projects plotted geographically. Use it to identify high-risk clusters, district-level patterns, and spatial delay concentrations.'],
+      [['alert', 'notification', 'flagged', 'warn', 'critical'], 'Alerts are generated when a project exceeds expected stage durations or shows escalating risk. You can view and acknowledge alerts from the Alerts section in the dashboard.'],
+      [['delay', 'delayed', 'bottleneck', 'slow', 'stuck', 'overdue'], 'Delays are detected using AI models trained on historical acquisition data. Key delay factors include SIA delays, incomplete documentation, legal disputes, compensation holdups, and coordination gaps.'],
+      [['sia', 'social impact', 'assessment'], 'Social Impact Assessment (SIA) is the first mandatory stage in land acquisition. Delays here cascade into all downstream stages. LADRIS tracks SIA duration and flags overruns early.'],
+      [['compensation', 'payment', 'award', 'disburse'], 'Compensation must be paid before possession can be taken. LADRIS monitors award and payment timelines and alerts when disbursement delays exceed allowed limits.'],
+      [['analytics', 'report', 'chart', 'graph', 'data', 'statistic'], 'The Analytics section provides charts on risk distribution, stage-wise delay trends, ministry/state comparisons, and AI-predicted outcomes.'],
+      [['dashboard', 'home', 'summary', 'overview'], 'The dashboard gives a high-level view of all projects, risk counts (high/medium/low), alerts, and key metrics. Navigate to Projects, GIS, or Analytics for deeper views.'],
+      [['sitemap', 'site map', 'pages', 'sections', 'navigate'], 'Use the Site Map icon (grid icon) in the top bar to navigate to all major sections. You can also visit /sitemap for the full platform structure.'],
+      [['language', 'hindi', 'english', 'translate'], 'Use the Globe icon in the top bar to switch between English and Hindi. All visible page content will be translated.'],
+      [['accessibility', 'contrast', 'font size', 'motion', 'visual'], 'Use the Accessibility icon (person icon) in the top bar to adjust text size, enable high contrast mode, or reduce animations.'],
+    ]
+    for (const [keywords, answer] of matches) {
+      if (keywords.some(k => query.includes(k))) { setHelpAnswer(answer); return }
+    }
+    setHelpAnswer('This question is outside the built-in help topics. For platform support, please contact your ministry\'s LADRIS administrator or refer to the official LADRIS Documentation section.')
+  }
+
+  const hi = language === 'hi'
+  const T = {
+    // Utility bar
+    skipToMain: hi ? 'मुख्य सामग्री पर जाएं' : 'Skip to main content',
+    language: hi ? 'भाषा' : 'Language',
+    // Top gov bar
+    govIndia: hi ? 'भारत सरकार' : 'भारत सरकार',
+    govIndiaEn: hi ? 'भारत सरकार' : 'Government of India',
+    ministry: hi ? 'ग्रामीण विकास मंत्रालय' : 'ग्रामीण विकास मंत्रालय',
+    ministryEn: hi ? 'ग्रामीण विकास मंत्रालय' : 'Ministry of Rural Development',
+    // Nav brand subtitle
+    brandSub1: hi ? 'भूमि अधिग्रहण विलंब जोखिम' : 'Land Acquisition Delay Risk',
+    brandSub2: hi ? 'बुद्धिमत्ता प्रणाली' : 'Intelligence System',
+    // Nav links
+    navFeatures: hi ? 'विशेषताएं' : 'Features',
+    navArchitecture: hi ? 'आर्किटेक्चर' : 'Architecture',
+    navAnalytics: hi ? 'विश्लेषण' : 'Analytics',
+    navAbout: hi ? 'के बारे में' : 'About',
+    navHelp: hi ? 'सहायता और प्रतिक्रिया' : 'Help & Feedback',
+    navDocuments: hi ? 'दस्तावेज़' : 'Documents',
+    navLogin: hi ? 'लॉगिन' : 'Login',
+    // Hero
+    heroTitle: hi ? 'LADRIS – भूमि अधिग्रहण विलंब जोखिम बुद्धिमत्ता प्रणाली' : 'LADRIS – Land Acquisition Delay Risk Intelligence System',
+    heroSub: hi
+      ? 'भूमि अधिग्रहण विलंबों का शीघ्र पता लगाने के लिए भविष्यवाणी विश्लेषण प्रणाली'
+      : 'Predictive Analytics System for Early Detection of Land Acquisition Delays',
+    heroCta1: hi ? 'डैशबोर्ड एक्सेस करें' : 'Access Dashboard',
+    heroCta2: hi ? 'अधिक जानें' : 'Read More',
+    // Carousel slide caption labels
+    slideMinistry: (m: string) => hi ? m : m,  // ministry names stay as-is
+    slideCaption: (c: string) => {
+      const map: Record<string, string> = {
+        'Keeping Highway Projects Moving': 'राजमार्ग परियोजनाएं सुचारू रखना',
+        'Clearing the Way for Railway Projects': 'रेलवे परियोजनाओं के लिए मार्ग प्रशस्त करना',
+        'Supporting Faster Metro Development': 'तेज़ मेट्रो विकास में सहायता',
+        'Keeping Power Projects on Track': 'बिजली परियोजनाओं को ट्रैक पर रखना',
+        'Supporting Timely Airport Development': 'समय पर हवाई अड्डा विकास में सहायता',
+        'Enabling Timely Urban Development': 'समय पर शहरी विकास सक्षम करना',
+        'Enabling Faster Industrial Development': 'तेज़ औद्योगिक विकास सक्षम करना',
+      }
+      return hi ? (map[c] || c) : c
+    },
+    // Overview section
+    overviewTitle: hi ? 'अवलोकन' : 'Overview',
+    overviewText: hi
+      ? 'LADRIS AI भूमि अधिग्रहण के लिए एक AI-संचालित निर्णय-सहायता मंच है। यह ऐतिहासिक और लाइव परियोजना डेटा का अध्ययन करता है, विलंब की संभावना की भविष्यवाणी करता है, मुख्य जोखिम कारकों की पहचान करता है, GIS मानचित्र पर जोखिम भरी परियोजनाएं दिखाता है, अलर्ट भेजता है और निवारक कार्रवाई की सिफारिश करता है।'
+      : 'LADRIS AI is an AI-powered decision-support platform for land acquisition. It studies historical and live project data, predicts delay probability, finds the main risk factors, shows risky projects on GIS maps, sends alerts and recommends preventive actions.',
+    overviewCta1: hi ? 'डैशबोर्ड एक्सेस करें' : 'Access Dashboard',
+    overviewCta2: hi ? 'अधिक जानें' : 'Read More',
+    // Challenges section
+    challengesTitle: hi ? 'भूमि अधिग्रहण में चुनौतियां' : 'Challenges in Land Acquisition',
+    challengesSub: hi
+      ? 'बुनियादी ढांचा परियोजनाओं के लिए भूमि अधिग्रहण को प्रशासन, कानून और समन्वय में गहरी चुनौतियों का सामना करना पड़ता है।'
+      : 'Land acquisition for infrastructure projects faces deep-rooted challenges across administration, law, and coordination.',
+    challenges: hi ? [
+      { title: 'अनुमोदन में देरी', desc: 'बहुत अधिक अनुमोदन और धीमी सरकारी प्रक्रियाएं भूमि अधिग्रहण में देरी कर सकती हैं।' },
+      { title: 'कानूनी और स्वामित्व विवाद', desc: 'भूमि विवाद और स्वामित्व संघर्ष अधिग्रहण को रोक सकते हैं और परियोजना प्रगति में दीर्घकालिक देरी कर सकते हैं।' },
+      { title: 'मुआवजे में देरी', desc: 'देर से मुआवजा भूमि कब्जे को धीमा कर सकता है और भूमि मालिकों, अधिकारियों और परियोजना टीमों के लिए कठिनाइयां पैदा कर सकता है।' },
+      { title: 'अधूरे दस्तावेज़', desc: 'लापता दस्तावेज और लंबित अधिसूचनाएं सत्यापन, अनुमोदन और भूमि अधिग्रहण प्रक्रिया को धीमा कर सकती हैं।' },
+      { title: 'पुनर्वास की चुनौतियां', desc: 'धीमा पुनर्वास परिवारों को प्रभावित कर सकता है और भूमि अधिग्रहण में देरी कर सकता है।' },
+      { title: 'समन्वय की कमी', desc: 'विभिन्न विभागों को मिलकर काम करना होता है, लेकिन धीमी संचार प्रतिक्रियाएं बाधाएं और देरी पैदा कर सकती हैं।' },
+    ] : [
+      { title: 'Approval Delays', desc: 'Too many approvals and slow government processes can hold up land acquisition and delay the overall infrastructure project.' },
+      { title: 'Legal & Ownership Issues', desc: 'Land disputes and ownership conflicts can stop acquisition, create uncertainty, and delay project progress for a long time.' },
+      { title: 'Compensation Delays', desc: 'Late compensation can slow land possession and create difficulties for landowners, authorities, and project teams during acquisition.' },
+      { title: 'Incomplete Documents', desc: 'Missing documents and pending notifications can slow verification, approvals, and other important steps in the land acquisition process.' },
+      { title: 'Rehabilitation Challenges', desc: 'Slow rehabilitation and resettlement can affect families and delay land acquisition, creating further impact on overall project implementation.' },
+      { title: 'Coordination Gaps', desc: 'Different departments and agencies must work together, but slow communication and responses can create bottlenecks and delay project progress.' },
+    ],
+    // Features
+    features: hi ? [
+      { title: 'वास्तविक समय जोखिम स्कोरिंग', desc: 'जोखिम जल्दी जानें। LADRIS AI परियोजना डेटा जांचता है और बताता है कि परियोजना में कम, मध्यम या उच्च विलंब जोखिम है।' },
+      { title: 'AI निर्णय बुद्धिमत्ता', desc: 'बेहतर निर्णय लें। AI पिछले और वर्तमान डेटा का अध्ययन करता है और टीमों को सही कार्रवाई जल्दी चुनने में मदद करता है।' },
+      { title: 'GIS स्थानिक विश्लेषण', desc: 'मानचित्र पर जोखिम देखें। परियोजना स्थान, उच्च जोखिम क्षेत्र और जिलावार पैटर्न देखें।' },
+      { title: 'भविष्य संबंधी बाधा पहचान', desc: 'समस्याएं बढ़ने से पहले खोजें। LADRIS AI अनुमोदन, कानूनी, मुआवजा और दस्तावेज़ीकरण विलंब का पता लगाता है।' },
+      { title: 'विश्लेषण और सिमुलेशन', desc: 'नीति परिवर्तन, बजट परिदृश्य और समयरेखा विकल्पों के सुरक्षित मूल्यांकन के लिए इंटरैक्टिव कॉरिडोर सिम्युलेटर।' },
+      { title: 'सुरक्षित सरकारी पहुंच', desc: 'मंत्रालय पदानुक्रम के अनुसार भूमिका-आधारित पहुंच नियंत्रण — केंद्र, राज्य, जिला और LA अधिकारी प्रत्येक को अनुकूलित दृश्य मिलता है।' },
+    ] : FEATURES.map(f => ({ title: f.title, desc: f.desc })),
+    // Mobile menu
+    mobileGitHub: hi ? 'GitHub' : 'GitHub',
+    // Footer
+    footerCopy: hi ? '© 2026 LADRIS. सर्वाधिकार सुरक्षित। | निर्मित: ग्रामीण विकास मंत्रालय, भारत सरकार' : '© 2026 LADRIS. All rights reserved. | Built for Ministry of Rural Development, GoI',
+    footerLinks: hi
+      ? ['गोपनीयता', 'शर्तें', 'पहुंच-क्षमता', 'कुकीज़']
+      : ['Privacy', 'Terms', 'Accessibility', 'Cookies'],
+  }
 
   /* ── Color tokens based on theme ── */
   const colors = {
@@ -210,29 +319,46 @@ export default function Landing() {
           background: isDark ? '#070c1b' : '#ffffff',
           borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : '#e2e8f0'}`,
           padding: '0 32px',
-          height: 42,
+          height: 80,
           display: 'flex', alignItems: 'center',
           justifyContent: 'space-between',
         }}>
 
           {/* Left: Flag + हिंदी/English govt label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 200 }}>
-            {/* Indian Tricolor Flag */}
-            <img
-              src="/indian-flag.png"
-              alt="Indian national flag"
-              style={{
-                width: 34, height: 'auto', borderRadius: 2,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#cbd5e1'}`,
-                flexShrink: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
-              }}
-            />
+
+            {/* Indian Tricolor Flag — inline SVG, no background padding */}
+            <svg width="30" height="48" viewBox="0 0 44 30" style={{ flexShrink: 0, borderRadius: 2, display: 'block' }} xmlns="http://www.w3.org/2000/svg">
+              {/* Saffron */}
+              <rect x="0" y="0" width="44" height="10" fill="#FF9933" />
+              {/* White */}
+              <rect x="0" y="10" width="44" height="10" fill="#FFFFFF" />
+              {/* Green */}
+              <rect x="0" y="20" width="44" height="10" fill="#138808" />
+              {/* Ashoka Chakra */}
+              <circle cx="22" cy="15" r="4.2" fill="none" stroke="#000080" strokeWidth="0.8" />
+              <circle cx="22" cy="15" r="0.7" fill="#000080" />
+              {[...Array(24)].map((_, i) => {
+                const angle = (i * 15 * Math.PI) / 180
+                return (
+                  <line
+                    key={i}
+                    x1={22 + 0.7 * Math.cos(angle)}
+                    y1={15 + 0.7 * Math.sin(angle)}
+                    x2={22 + 4.2 * Math.cos(angle)}
+                    y2={15 + 4.2 * Math.sin(angle)}
+                    stroke="#000080"
+                    strokeWidth="0.5"
+                  />
+                )
+              })}
+            </svg>
             <div>
               <div style={{ fontSize: '0.74rem', fontWeight: 700, color: isDark ? '#c9d8f0' : '#1a2e4a', lineHeight: 1.25 }}>
-                भारत सरकार
+                {T.govIndia}
               </div>
               <div style={{ fontSize: '0.65rem', fontWeight: 500, color: isDark ? '#5a7194' : '#5a7194' }}>
-                Government of India
+                {T.govIndiaEn}
               </div>
             </div>
           </div>
@@ -240,68 +366,232 @@ export default function Landing() {
           {/* Center: Ministry name (Hindi + English) */}
           <div style={{ textAlign: 'center', flex: 1 }}>
             <div style={{ fontSize: '0.8rem', fontWeight: 700, color: isDark ? '#c9d8f0' : '#1a2e4a', lineHeight: 1.3 }}>
-              ग्रामीण विकास मंत्रालय
+              {T.ministry}
             </div>
             <div style={{ fontSize: '0.68rem', fontWeight: 500, color: isDark ? '#5a7194' : '#5a7194' }}>
-              Ministry of Rural Development
+              {T.ministryEn}
             </div>
           </div>
 
           {/* Right: Skip link + utility icon buttons + theme toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 200, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end', flexWrap: 'wrap', position: 'relative' }}>
             <a href="#main-content" style={{
               fontSize: '0.68rem', fontWeight: 500, color: isDark ? '#4a6280' : '#64748b',
-              textDecoration: 'none', marginRight: 6, whiteSpace: 'nowrap', transition: 'color 0.15s',
+              textDecoration: 'none', marginRight: 4, whiteSpace: 'nowrap', transition: 'color 0.15s',
             }}
               onMouseEnter={e => (e.currentTarget.style.color = isDark ? '#7daaff' : '#003366')}
               onMouseLeave={e => (e.currentTarget.style.color = isDark ? '#4a6280' : '#64748b')}
             >
-              Skip to main content
+              {T.skipToMain}
             </a>
-            {/* Utility icon buttons matching reference */}
-            {([
-              { title: 'Site Map', path: 'M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z' },
-            ] as { title: string; path: string }[]).map(({ title, path }) => (
-              <button key={title} title={title} style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: 28, height: 28, borderRadius: 5, background: 'none',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
-                cursor: 'pointer', color: isDark ? '#6b84a8' : '#64748b', transition: 'all 0.15s',
-              }}
+
+            {/* ── Site Map ── */}
+            <div style={{ position: 'relative' }}>
+              <button id="util-sitemap" title="Site Map" onClick={() => togglePanel('sitemap')}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
+                  background: activePanel === 'sitemap' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,51,102,0.08)') : 'none',
+                  border: `1px solid ${activePanel === 'sitemap' ? (isDark ? 'rgba(255,255,255,0.28)' : '#003366') : (isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0')}`,
+                  color: activePanel === 'sitemap' ? (isDark ? '#c9d8f0' : '#003366') : (isDark ? '#6b84a8' : '#64748b'),
+                }}
                 onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c9d8f0' : '#003366'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.28)' : '#003366'; e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,51,102,0.05)' }}
-                onMouseLeave={e => { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={path} /></svg>
-              </button>
-            ))}
-            {/* Globe / Language */}
-            <button title="Language" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, background: 'none', border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`, cursor: 'pointer', color: isDark ? '#6b84a8' : '#64748b', transition: 'all 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c9d8f0' : '#003366'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.28)' : '#003366'; e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,51,102,0.05)' }}
-              onMouseLeave={e => { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
-            </button>
-            {/* Accessibility */}
-            <button title="Accessibility" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, background: 'none', border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`, cursor: 'pointer', color: isDark ? '#6b84a8' : '#64748b', transition: 'all 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c9d8f0' : '#003366'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.28)' : '#003366'; e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,51,102,0.05)' }}
-              onMouseLeave={e => { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="1.5" /><path d="m9 12 1.5 5.5M15 12l-1.5 5.5M9 12l-2-3.5M15 12l2-3.5M9 12h6" /></svg>
-            </button>
-            {/* Help */}
-            <button title="Help" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, background: 'none', border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`, cursor: 'pointer', color: isDark ? '#6b84a8' : '#64748b', transition: 'all 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c9d8f0' : '#003366'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.28)' : '#003366'; e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,51,102,0.05)' }}
-              onMouseLeave={e => { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><circle cx="12" cy="17" r="0.5" fill="currentColor" /></svg>
-            </button>
+                onMouseLeave={e => { if (activePanel !== 'sitemap') { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' } }}
+              ><LayoutGrid size={13} /></button>
+              {activePanel === 'sitemap' && (
+                <div style={{
+                  position: 'absolute', top: 34, right: 0, zIndex: 600, minWidth: 200,
+                  background: isDark ? '#0d1a2e' : '#ffffff', borderRadius: 10,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                  boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,51,102,0.14)', padding: '10px 0',
+                }}>
+                  <div style={{ padding: '4px 14px 8px', fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Site Map</div>
+                  {([
+                    { label: 'Landing Page', path: '/landing' },
+                    { label: 'Login', path: '/login' },
+                    { label: 'Full Site Map →', path: '/sitemap', bold: true },
+                  ] as { label: string; path: string; bold?: boolean }[]).map(item => (
+                    <button key={item.label} onClick={() => { navigate(item.path); setActivePanel(null) }}
+                      style={{
+                        display: 'block', width: '100%', padding: '7px 14px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.12s',
+                        fontSize: '0.78rem', fontWeight: item.bold ? 700 : 500,
+                        color: item.bold ? '#4080ff' : (isDark ? '#94a9c9' : '#334155'),
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)' }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'none' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ── Language ── */}
+            <div style={{ position: 'relative' }}>
+              <button id="util-language" title="Language" onClick={() => togglePanel('language')}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
+                  background: activePanel === 'language' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,51,102,0.08)') : 'none',
+                  border: `1px solid ${activePanel === 'language' ? (isDark ? 'rgba(255,255,255,0.28)' : '#003366') : (isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0')}`,
+                  color: activePanel === 'language' ? (isDark ? '#c9d8f0' : '#003366') : (isDark ? '#6b84a8' : '#64748b'),
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c9d8f0' : '#003366'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.28)' : '#003366'; e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,51,102,0.05)' }}
+                onMouseLeave={e => { if (activePanel !== 'language') { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' } }}
+              ><Globe size={13} /></button>
+              {activePanel === 'language' && (
+                <div style={{
+                  position: 'absolute', top: 34, right: 0, zIndex: 600, minWidth: 170,
+                  background: isDark ? '#0d1a2e' : '#ffffff', borderRadius: 10,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                  boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,51,102,0.14)', padding: '10px 0',
+                }}>
+                  <div style={{ padding: '4px 14px 8px', fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Language</div>
+                  {([{ code: 'en' as const, native: 'English' }, { code: 'hi' as const, native: 'हिंदी' }]).map(lang => (
+                    <button key={lang.code} onClick={() => { setLanguage(lang.code); setActivePanel(null) }}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '8px 14px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.12s',
+                        fontSize: '0.8rem', fontWeight: language === lang.code ? 700 : 500,
+                        background: language === lang.code ? (isDark ? 'rgba(64,128,255,0.12)' : 'rgba(0,51,102,0.07)') : 'none',
+                        color: language === lang.code ? (isDark ? '#7daaff' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                      }}
+                      onMouseEnter={e => { if (language !== lang.code) e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)' }}
+                      onMouseLeave={e => { if (language !== lang.code) e.currentTarget.style.background = 'none' }}
+                    >
+                      <span>{lang.native}</span>
+                      {language === lang.code && <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ── Accessibility ── */}
+            <div style={{ position: 'relative' }}>
+              <button id="util-accessibility" title="Accessibility" onClick={() => togglePanel('accessibility')}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
+                  background: activePanel === 'accessibility' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,51,102,0.08)') : 'none',
+                  border: `1px solid ${activePanel === 'accessibility' ? (isDark ? 'rgba(255,255,255,0.28)' : '#003366') : (isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0')}`,
+                  color: activePanel === 'accessibility' ? (isDark ? '#c9d8f0' : '#003366') : (isDark ? '#6b84a8' : '#64748b'),
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c9d8f0' : '#003366'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.28)' : '#003366'; e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,51,102,0.05)' }}
+                onMouseLeave={e => { if (activePanel !== 'accessibility') { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' } }}
+              ><Accessibility size={13} /></button>
+              {activePanel === 'accessibility' && (
+                <div style={{
+                  position: 'absolute', top: 34, right: 0, zIndex: 600, minWidth: 220,
+                  background: isDark ? '#0d1a2e' : '#ffffff', borderRadius: 10,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                  boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,51,102,0.14)', padding: '14px',
+                }}>
+                  <div style={{ fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>Accessibility</div>
+                  {/* Text Size */}
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: '0.74rem', fontWeight: 600, color: isDark ? '#94a9c9' : '#334155', marginBottom: 6 }}>Text Size</div>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      {(['normal', 'large', 'xlarge'] as const).map(size => (
+                        <button key={size} onClick={() => setFontSize(size)}
+                          style={{
+                            flex: 1, padding: '5px 0', borderRadius: 5, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
+                            fontSize: size === 'xlarge' ? '0.85rem' : size === 'large' ? '0.8rem' : '0.75rem',
+                            fontWeight: fontSize === size ? 700 : 500,
+                            background: fontSize === size ? (isDark ? 'rgba(64,128,255,0.18)' : 'rgba(0,51,102,0.1)') : (isDark ? 'rgba(255,255,255,0.04)' : '#f1f5f9'),
+                            border: `1px solid ${fontSize === size ? (isDark ? 'rgba(64,128,255,0.4)' : '#003366') : (isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0')}`,
+                            color: fontSize === size ? (isDark ? '#7daaff' : '#003366') : (isDark ? '#6b84a8' : '#64748b'),
+                          }}
+                        >{size === 'normal' ? 'A' : size === 'large' ? 'A+' : 'A++'}</button>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Toggles */}
+                  {([
+                    { label: 'High Contrast', value: highContrast, set: setHighContrast },
+                    { label: 'Reduced Motion', value: reducedMotion, set: setReducedMotion },
+                  ] as { label: string; value: boolean; set: (v: boolean) => void }[]).map(opt => (
+                    <div key={opt.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span style={{ fontSize: '0.78rem', color: isDark ? '#94a9c9' : '#334155' }}>{opt.label}</span>
+                      <button onClick={() => opt.set(!opt.value)}
+                        style={{
+                          width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', position: 'relative', flexShrink: 0, transition: 'background 0.2s',
+                          background: opt.value ? '#4080ff' : (isDark ? 'rgba(255,255,255,0.12)' : '#cbd5e1'),
+                        }}>
+                        <span style={{ position: 'absolute', top: 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block', left: opt.value ? 18 : 3 }} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ── Help ── */}
+            <div style={{ position: 'relative' }}>
+              <button id="util-help" title="Help" onClick={() => togglePanel('help')}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
+                  background: activePanel === 'help' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,51,102,0.08)') : 'none',
+                  border: `1px solid ${activePanel === 'help' ? (isDark ? 'rgba(255,255,255,0.28)' : '#003366') : (isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0')}`,
+                  color: activePanel === 'help' ? (isDark ? '#c9d8f0' : '#003366') : (isDark ? '#6b84a8' : '#64748b'),
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c9d8f0' : '#003366'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.28)' : '#003366'; e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,51,102,0.05)' }}
+                onMouseLeave={e => { if (activePanel !== 'help') { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' } }}
+              ><HelpCircle size={13} /></button>
+              {activePanel === 'help' && (
+                <div style={{
+                  position: 'absolute', top: 34, right: 0, zIndex: 600, minWidth: 260, maxWidth: 300,
+                  background: isDark ? '#0d1a2e' : '#ffffff', borderRadius: 10,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                  boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,51,102,0.14)', padding: '14px',
+                }}>
+                  <div style={{ fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>LADRIS Help</div>
+                  {[
+                    { q: 'How do I access the dashboard?', a: 'Click "Access Dashboard" or "Login" and sign in with your government credentials. Your view is role-based.' },
+                    { q: 'What do risk levels mean?', a: 'Low (green) = on track. Medium (yellow) = watch closely. High (red) = immediate intervention needed.' },
+                    { q: 'How do I view project status?', a: 'Go to Projects from the dashboard to see all acquisition projects with stage-wise status and delay indicators.' },
+                    { q: 'What causes delay flags?', a: 'Delays are flagged when SIA, notification, award, compensation or legal stages exceed expected timelines.' },
+                    { q: 'How is risk calculated?', a: 'LADRIS uses AI to score projects based on historical patterns, stage durations, pending approvals and legal disputes.' },
+                  ].map(item => (
+                    <div key={item.q} style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: '0.76rem', fontWeight: 600, color: isDark ? '#c9d8f0' : '#0a1d37', marginBottom: 3 }}>{item.q}</div>
+                      <div style={{ fontSize: '0.72rem', color: isDark ? '#5a7194' : '#64748b', lineHeight: 1.5 }}>{item.a}</div>
+                    </div>
+                  ))}
+
+                  {/* ── More Help ── */}
+                  <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : '#e2e8f0'}` }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: isDark ? '#7daaff' : '#003366', marginBottom: 6 }}>Ask another question</div>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <input
+                        type="text"
+                        placeholder="e.g. How do I use GIS map?"
+                        value={helpQuery}
+                        onChange={e => { setHelpQuery(e.target.value); if (!e.target.value) setHelpAnswer('') }}
+                        onKeyDown={e => { if (e.key === 'Enter') handleHelpQuery(helpQuery) }}
+                        style={{ flex: 1, padding: '6px 8px', borderRadius: 6, fontFamily: 'inherit', fontSize: '0.72rem', outline: 'none', background: isDark ? 'rgba(255,255,255,0.05)' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#e2e8f0'}`, color: isDark ? '#c9d8f0' : '#334155' }}
+                      />
+                      <button onClick={() => handleHelpQuery(helpQuery)} style={{ padding: '6px 10px', borderRadius: 6, border: 'none', cursor: 'pointer', background: '#4080ff', color: '#fff', fontFamily: 'inherit', fontSize: '0.72rem', fontWeight: 700 }}>Ask</button>
+                    </div>
+                    {helpAnswer && (
+                      <div style={{ marginTop: 8, padding: '8px 10px', borderRadius: 7, background: isDark ? 'rgba(64,128,255,0.08)' : 'rgba(0,51,102,0.05)', border: `1px solid ${isDark ? 'rgba(64,128,255,0.18)' : 'rgba(0,51,102,0.1)'}`, fontSize: '0.72rem', color: isDark ? '#94a9c9' : '#334155', lineHeight: 1.55 }}>
+                        {helpAnswer}
+                      </div>
+                    )}
+                    <div style={{ fontSize: '0.64rem', color: isDark ? '#3d5470' : '#94a3b8', marginTop: 6, lineHeight: 1.4 }}>Limited to LADRIS platform topics only.</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Theme toggle */}
-            <button title={isDark ? 'Light mode' : 'Dark mode'} onClick={toggleTheme} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, background: 'none', border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`, cursor: 'pointer', color: isDark ? '#6b84a8' : '#64748b', transition: 'all 0.15s' }}
+            <button title={isDark ? 'Light mode' : 'Dark mode'} onClick={toggleTheme}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 5, background: 'none', border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`, cursor: 'pointer', color: isDark ? '#6b84a8' : '#64748b', transition: 'all 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#facc15' : '#003366'; e.currentTarget.style.borderColor = isDark ? 'rgba(250,204,21,0.4)' : '#003366'; e.currentTarget.style.background = isDark ? 'rgba(250,204,21,0.08)' : 'rgba(0,51,102,0.05)' }}
               onMouseLeave={e => { e.currentTarget.style.color = isDark ? '#6b84a8' : '#64748b'; e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'; e.currentTarget.style.background = 'none' }}
             >
               {isDark ? <Sun size={13} /> : <Moon size={13} />}
             </button>
+
+            {/* Click-outside backdrop */}
+            {activePanel && (
+              <div style={{ position: 'fixed', inset: 0, zIndex: 599 }} onClick={() => setActivePanel(null)} />
+            )}
           </div>
         </div>
 
@@ -317,28 +607,31 @@ export default function Landing() {
         }}>
           <div style={{
             maxWidth: 1320, margin: '0 auto',
-            padding: '0 32px', height: 60,
+            padding: '0 32px', height: 85,
             display: 'flex', alignItems: 'center',
             justifyContent: 'space-between', gap: 16,
           }}>
 
             {/* Left: Emblem + Divider + Logo + Brand */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
-              {/* MoRTH Ashoka Emblem */}
-              <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src="/logo_morth.png" alt="MoRTH Emblem" style={{ width: 40, height: 40, objectFit: 'contain' }} />
-              </div>
+              {/* MoRTH Ashoka Emblem — pre-cropped: emblem + Hindi only, no English text */}
+              <img
+                src="/logo_morth_clean.png"
+                alt="MoRTH Emblem"
+                style={{ height: 40, width: 'auto', display: 'block', flexShrink: 0 }}
+              />
               {/* Vertical divider */}
-              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 12px', flexShrink: 0 }} />
+              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 2px', flexShrink: 0 }} />
               {/* logo.png + Brand text */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                 <img src="/logo.png" alt="LADRIS" style={{ width: 38, height: 38, objectFit: 'contain', flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-                    LADRIS<span style={{ color: '#4080ff' }}>·</span>AI
+                    LADRIS<span style={{ color: '#4080ff' }}></span>
                   </div>
-                  <div style={{ fontSize: '0.58rem', fontWeight: 600, color: isDark ? '#4a6280' : '#64748b', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 1 }}>
-                    Land Intelligence Platform
+                  <div style={{ fontSize: '0.45rem', fontWeight: 600, color: isDark ? '#4a6280' : '#64748b', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 1 }}>
+                    {T.brandSub1}<br />
+                    {T.brandSub2}
                   </div>
                 </div>
               </div>
@@ -347,12 +640,12 @@ export default function Landing() {
             {/* Center: Nav Links with dropdown chevrons */}
             <nav className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
               {[
-                { label: 'Features', dropdown: false },
-                { label: 'Architecture', dropdown: false },
-                { label: 'Analytics', dropdown: true },
-                { label: 'About', dropdown: true },
-                { label: 'Help & Feedback', dropdown: true },
-                { label: 'Documents', dropdown: true },
+                { label: T.navFeatures, dropdown: false },
+                { label: T.navArchitecture, dropdown: false },
+                { label: T.navAnalytics, dropdown: true },
+                { label: T.navAbout, dropdown: true },
+                { label: T.navHelp, dropdown: true },
+                { label: T.navDocuments, dropdown: true },
               ].map(({ label, dropdown }) => (
                 <button
                   key={label}
@@ -438,7 +731,7 @@ export default function Landing() {
                   boxShadow: isDark ? '0 3px 14px rgba(64,128,255,0.4)' : '0 3px 12px rgba(0,51,102,0.35)',
                 }}
               >
-                Login
+                {T.navLogin}
               </motion.button>
 
               {/* Mobile hamburger (hidden on desktop) */}
@@ -460,7 +753,7 @@ export default function Landing() {
               padding: '12px 24px 20px',
               display: 'flex', flexDirection: 'column', gap: 2,
             }}>
-              {['Features', 'Architecture', 'Analytics', 'About', 'Help & Feedback', 'Documents'].map(link => (
+              {[T.navFeatures, T.navArchitecture, T.navAnalytics, T.navAbout, T.navHelp, T.navDocuments].map(link => (
                 <button key={link} style={{
                   textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer',
                   padding: '10px 12px', borderRadius: 8,
@@ -470,7 +763,7 @@ export default function Landing() {
               ))}
               <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0'}`, display: 'flex', gap: 10 }}>
                 <button style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1'}`, color: isDark ? '#c9d8f0' : '#334155', fontWeight: 600, fontSize: '0.875rem' }}>GitHub</button>
-                <button onClick={handleAccessDashboard} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: '#003366', border: 'none', color: '#ffffff', fontWeight: 700, fontSize: '0.875rem' }}>Login</button>
+                <button onClick={handleAccessDashboard} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: '#003366', border: 'none', color: '#ffffff', fontWeight: 700, fontSize: '0.875rem' }}>{T.navLogin}</button>
               </div>
             </div>
           )}
@@ -478,7 +771,7 @@ export default function Landing() {
       </header>
 
       {/* ════ HERO SECTION ════ */}
-      <div ref={heroRef} style={{ position: 'relative', overflow: 'hidden' }}>
+      <div ref={heroRef} style={{ position: 'relative', overflow: 'hidden', minHeight: '440px' }}>
 
         {/* ── Slideshow background images (crossfade) ── */}
         {HERO_SLIDES.map((slide, i) => (
@@ -523,31 +816,25 @@ export default function Landing() {
           style={{ opacity: heroOpacity, y: heroY, position: 'relative', zIndex: 2 }}
         >
           <div style={{
-            maxWidth: 1280, margin: '0 auto', padding: '48px 40px 52px',
+            maxWidth: 1280, margin: '0 auto', minHeight: '440px', padding: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box',
           }}>
-            <div style={{ maxWidth: 680 }}>
+            <div style={{ textAlign: 'center' }}>
               {/* Main headline */}
               <motion.h1
                 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.75, delay: 0.1 }}
                 style={{
-                  fontSize: 'clamp(2rem, 4vw, 3rem)',
+                  fontSize: 'clamp(1.6rem, 3vw, 2.4rem)',
                   fontWeight: 900,
-                  lineHeight: 1.07,
-                  letterSpacing: '-0.04em',
+                  lineHeight: 1.15,
+                  letterSpacing: '-0.03em',
                   color: '#ffffff',
                   marginBottom: 16,
                   textShadow: '0 2px 20px rgba(0,0,0,0.7), 0 1px 4px rgba(0,0,0,0.9)',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                National Land Acquisition&nbsp;
-                <span style={{
-                  background: 'linear-gradient(135deg, #f47721 0%, #facc15 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}>Intelligence</span>
-                <br />Command Center
+                {T.heroTitle}
               </motion.h1>
 
               {/* Sub-headline */}
@@ -558,22 +845,20 @@ export default function Landing() {
                   fontSize: '1.1rem',
                   color: 'rgba(255,255,255,0.88)',
                   lineHeight: 1.75,
-                  maxWidth: 560,
                   marginBottom: 28,
                   fontWeight: 400,
                   textShadow: '0 1px 8px rgba(0,0,0,0.7)',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                LADRIS integrates real-time risk analytics, GIS spatial intelligence,
-                machine-learning models, and role-based governance into a single unified
-                platform for national infrastructure decision makers.
+                {T.heroSub}
               </motion.p>
 
               {/* CTA Buttons */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.65, delay: 0.3 }}
-                style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}
+                style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}
               >
                 <motion.button
                   id="hero-access-dashboard-btn"
@@ -593,33 +878,10 @@ export default function Landing() {
                     transition: 'all 0.2s',
                   }}
                 >
-                  Access Dashboard
+                  {T.heroCta1}
                   <ArrowRight size={18} strokeWidth={2.5} />
                 </motion.button>
 
-                <motion.button
-                  whileHover={{ scale: 1.03, translateY: -1 }}
-                  whileTap={{ scale: 0.97 }}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                    padding: '13px 28px',
-                    background: 'rgba(6,15,30,0.65)',
-                    border: '1.5px solid rgba(255,255,255,0.35)',
-                    borderRadius: 12,
-                    color: '#ffffff', fontWeight: 600,
-                    fontSize: '1rem', cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    backdropFilter: 'blur(12px)',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
-                    letterSpacing: '-0.01em',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(6,15,30,0.85)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'rgba(6,15,30,0.65)')}
-                >
-                  Read More
-                  <ChevronRight size={17} strokeWidth={2.5} />
-                </motion.button>
               </motion.div>
             </div>
           </div>
@@ -641,7 +903,7 @@ export default function Landing() {
             {HERO_SLIDES[activeSlide].ministry}
           </div>
           <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.88)', fontWeight: 600, lineHeight: 1.3 }}>
-            {HERO_SLIDES[activeSlide].caption}
+            {T.slideCaption(HERO_SLIDES[activeSlide].caption)}
           </div>
         </div>
 
@@ -722,20 +984,21 @@ export default function Landing() {
             initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }} transition={{ duration: 0.65 }}
           >
+
             <h2 style={{
               fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
               fontWeight: 900, letterSpacing: '-0.035em',
               color: colors.sectionTitle, lineHeight: 1.15,
               marginBottom: 20,
             }}>
-              Overview
+              {T.overviewTitle}
             </h2>
 
             <p style={{
               fontSize: '0.95rem', lineHeight: 1.8,
               color: colors.sectionText, marginBottom: 36,
             }}>
-              LADRIS AI is an AI-powered decision-support platform for land acquisition. It studies historical and live project data, predicts delay probability, finds the main risk factors, shows risky projects on GIS maps, sends alerts and recommends preventive actions.
+              {T.overviewText}
             </p>
 
             {/* CTA pair */}
@@ -761,7 +1024,7 @@ export default function Landing() {
                   letterSpacing: '-0.01em',
                 }}
               >
-                Access Dashboard
+                {T.overviewCta1}
                 <ArrowRight size={17} strokeWidth={2.5} />
               </motion.button>
 
@@ -786,7 +1049,7 @@ export default function Landing() {
                   e.currentTarget.style.background = 'transparent'
                 }}
               >
-                Read More
+                {T.overviewCta2}
                 <ChevronRight size={16} />
               </motion.button>
             </div>
@@ -800,7 +1063,7 @@ export default function Landing() {
               display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20,
             }}
           >
-            {FEATURES.slice(0, 4).map((feat, i) => (
+            {T.features.slice(0, 4).map((feat, i) => (
               <motion.div
                 key={feat.title}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -817,10 +1080,10 @@ export default function Landing() {
                   position: 'relative', overflow: 'hidden',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = `${feat.color}55`
+                  e.currentTarget.style.borderColor = `${FEATURES[i].color}55`
                   e.currentTarget.style.boxShadow = isDark
-                    ? `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px ${feat.color}22`
-                    : `0 6px 24px rgba(0,51,102,0.14), 0 0 0 1px ${feat.color}22`
+                    ? `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px ${FEATURES[i].color}22`
+                    : `0 6px 24px rgba(0,51,102,0.14), 0 0 0 1px ${FEATURES[i].color}22`
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = colors.cardBorder
@@ -830,27 +1093,16 @@ export default function Landing() {
                 {/* Top accent line */}
                 <div style={{
                   position: 'absolute', top: 0, left: 0, right: 0, height: 2,
-                  background: `linear-gradient(90deg, ${feat.color}, transparent)`,
+                  background: `linear-gradient(90deg, ${FEATURES[i].color}, transparent)`,
                   opacity: 0.6,
                 }} />
-
-                <div style={{
-                  color: feat.color, marginBottom: 14,
-                  display: 'flex', alignItems: 'center',
-                }}>
-                  {feat.icon}
+                <div style={{ color: FEATURES[i].color, marginBottom: 14, display: 'flex', alignItems: 'center' }}>
+                  {FEATURES[i].icon}
                 </div>
-                <div style={{
-                  fontSize: '0.9rem', fontWeight: 700,
-                  color: colors.sectionTitle,
-                  marginBottom: 8, lineHeight: 1.3,
-                }}>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: colors.sectionTitle, marginBottom: 8, lineHeight: 1.3 }}>
                   {feat.title}
                 </div>
-                <p style={{
-                  fontSize: '0.8rem', lineHeight: 1.65,
-                  color: colors.sectionText, margin: 0,
-                }}>
+                <p style={{ fontSize: '0.8rem', lineHeight: 1.65, color: colors.sectionText, margin: 0 }}>
                   {feat.desc}
                 </p>
               </motion.div>
@@ -859,172 +1111,137 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ════ ALL FEATURES SECTION ════ */}
+      {/* ════ CHALLENGES SECTION ════ */}
       <section style={{
-        background: isDark ? '#0a182e' : '#eaf0f8',
-        padding: '80px 40px',
-        borderTop: `1px solid ${isDark ? 'rgba(244,119,33,0.1)' : 'rgba(0,51,102,0.08)'}`,
-        borderBottom: `1px solid ${isDark ? 'rgba(244,119,33,0.1)' : 'rgba(0,51,102,0.08)'}`,
+        background: isDark ? '#07111f' : '#f5f8fc',
+        padding: '80px 40px 60px',
+        borderTop: `1px solid ${isDark ? 'rgba(74,111,165,0.12)' : 'rgba(74,111,165,0.1)'}`,
+        borderBottom: `1px solid ${isDark ? 'rgba(74,111,165,0.12)' : 'rgba(74,111,165,0.1)'}`,
+        overflow: 'hidden',
       }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+
+          {/* Section header */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            style={{ textAlign: 'center', marginBottom: 56 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            style={{ textAlign: 'center', marginBottom: 52 }}
           >
-            <p style={{
-              fontSize: '1rem', color: colors.sectionText,
-              maxWidth: 560, margin: '0 auto', lineHeight: 1.7,
+            <h2 style={{
+              fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800,
+              color: colors.sectionTitle, letterSpacing: '-0.03em',
+              lineHeight: 1.2, marginBottom: 14,
             }}>
-              A unified command center combining GIS intelligence, AI risk scoring,
-              and government-grade access control for every stakeholder.
+              {T.challengesTitle}
+            </h2>
+            <p style={{
+              fontSize: '0.92rem', color: colors.sectionText,
+              maxWidth: 560, margin: '0 auto', lineHeight: 1.75,
+            }}>
+              {T.challengesSub}
             </p>
           </motion.div>
 
+          {/* 6 Challenge cards — 3×2 grid */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: 24,
+            gap: 20,
           }}>
-            {FEATURES.map((feat, i) => (
+            {T.challenges.map((challenge, i) => (
               <motion.div
-                key={feat.title}
-                initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.07 }}
-                whileHover={{ translateY: -4 }}
-                style={{
-                  background: colors.cardBg,
-                  border: `1px solid ${colors.cardBorder}`,
-                  borderRadius: 18,
-                  padding: '28px 26px',
-                  boxShadow: isDark ? '0 4px 24px rgba(0,0,0,0.45)' : '0 2px 12px rgba(0,51,102,0.07)',
-                  transition: 'all 0.22s ease',
-                  position: 'relative', overflow: 'hidden',
-                }}
+                key={challenge.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, ease: 'easeOut', delay: i * 0.07 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = `${feat.color}55`
-                  e.currentTarget.style.boxShadow = isDark
-                    ? `0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px ${feat.color}22`
-                    : `0 8px 28px rgba(0,51,102,0.14), 0 0 0 1px ${feat.color}22`
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(74,111,165,0.4)'
+                    ; (e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+                      ? '0 8px 28px rgba(0,0,0,0.4), 0 0 0 1px rgba(74,111,165,0.2)'
+                      : '0 6px 22px rgba(74,111,165,0.12), 0 0 0 1px rgba(74,111,165,0.15)'
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = colors.cardBorder
-                  e.currentTarget.style.boxShadow = isDark ? '0 4px 24px rgba(0,0,0,0.45)' : '0 2px 12px rgba(0,51,102,0.07)'
+                  (e.currentTarget as HTMLDivElement).style.borderColor = isDark ? 'rgba(74,111,165,0.14)' : 'rgba(74,111,165,0.1)'
+                    ; (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'
+                }}
+                style={{
+                  background: colors.cardBg,
+                  border: `1px solid ${isDark ? 'rgba(74,111,165,0.14)' : 'rgba(74,111,165,0.1)'}`,
+                  borderRadius: 14, padding: '24px 22px',
+                  cursor: 'default',
+                  transition: 'border-color 0.25s ease, box-shadow 0.25s ease',
+                  position: 'relative', overflow: 'hidden',
                 }}
               >
-                {/* Accent corner */}
+                {/* Top accent bar */}
                 <div style={{
                   position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-                  background: `linear-gradient(90deg, ${feat.color}, transparent 60%)`,
-                  opacity: 0.7,
+                  background: 'linear-gradient(90deg, #4a6fa5, transparent)',
+                  borderRadius: '14px 14px 0 0',
                 }} />
 
+                {/* Number */}
                 <div style={{
-                  width: 52, height: 52, borderRadius: 14,
-                  background: `${feat.color}15`,
-                  border: `1px solid ${feat.color}30`,
+                  width: 36, height: 36, borderRadius: '50%',
+                  background: isDark ? 'rgba(74,111,165,0.15)' : 'rgba(74,111,165,0.1)',
+                  border: `1px solid ${isDark ? 'rgba(74,111,165,0.3)' : 'rgba(74,111,165,0.25)'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: feat.color, marginBottom: 18,
-                  boxShadow: `0 0 20px ${feat.color}18`,
+                  fontSize: '0.85rem', fontWeight: 800, color: '#4a6fa5',
+                  marginBottom: 14, flexShrink: 0,
                 }}>
-                  {feat.icon}
+                  {String(i + 1).padStart(2, '0')}
                 </div>
 
-                <div style={{
-                  fontSize: '1rem', fontWeight: 700,
-                  color: colors.sectionTitle, marginBottom: 10, lineHeight: 1.3,
+                {/* Title */}
+                <h3 style={{
+                  fontSize: '0.95rem', fontWeight: 700,
+                  color: colors.sectionTitle, marginBottom: 8,
+                  lineHeight: 1.3,
                 }}>
-                  {feat.title}
-                </div>
+                  {challenge.title}
+                </h3>
+
+                {/* Description */}
                 <p style={{
-                  fontSize: '0.875rem', lineHeight: 1.7,
-                  color: colors.sectionText, margin: 0,
+                  fontSize: '0.83rem', color: colors.sectionText,
+                  lineHeight: 1.7, margin: 0,
                 }}>
-                  {feat.desc}
+                  {challenge.desc}
                 </p>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ════ ROLES SECTION ════ */}
-      <section style={{
-        background: isDark ? '#060f1e' : '#f5f7f9',
-        padding: '80px 40px',
-      }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          {/* Bridge connector */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            style={{ textAlign: 'center', marginBottom: 56 }}
+            transition={{ duration: 0.55, ease: 'easeOut', delay: 0.45 }}
+            style={{ textAlign: 'center', marginTop: 52 }}
           >
-            <h2 style={{
-              fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
-              fontWeight: 900, letterSpacing: '-0.03em',
-              color: colors.sectionTitle, marginBottom: 14,
-            }}>
-              Built for Every Role in Infrastructure Acquisition
-            </h2>
-            <p style={{
-              fontSize: '1rem', color: colors.sectionText,
-              maxWidth: 600, margin: '0 auto', lineHeight: 1.7,
-            }}>
-              LADRIS provides actionable intelligence tailored to the decision-making needs of your entire team.
-            </p>
+            {/* Vertical line */}
+            <div style={{
+              width: 1, height: 40, background: `linear-gradient(to bottom, rgba(74,111,165,0.35), transparent)`,
+              margin: '0 auto 20px',
+            }} />
+
           </motion.div>
 
-          {/* Horizontal scrolling / wrapping container for cards */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: 16,
-          }}>
-            {ROLES.map((role, i) => (
-              <motion.div
-                key={role.title}
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.05 }}
-                whileHover={{ translateY: -3 }}
-                style={{
-                  background: colors.cardBg,
-                  border: `1px solid ${colors.cardBorder}`,
-                  borderRadius: 12,
-                  padding: '24px 20px',
-                  boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,51,102,0.05)',
-                  display: 'flex', flexDirection: 'column',
-                  transition: 'all 0.22s ease',
-                }}
-              >
-                {/* Icon box (light blue background as in reference) */}
-                <div style={{
-                  width: 44, height: 44, borderRadius: 8,
-                  background: isDark ? 'rgba(64,128,255,0.15)' : '#eef2ff',
-                  color: isDark ? '#7daaff' : '#3b82f6',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: 16,
-                }}>
-                  {role.icon}
-                </div>
-
-                <div style={{
-                  fontSize: '0.95rem', fontWeight: 800,
-                  color: colors.sectionTitle, marginBottom: 12,
-                }}>
-                  {role.title}
-                </div>
-
-                <div style={{
-                  fontSize: '0.8rem', lineHeight: 1.6,
-                  color: colors.sectionText,
-                }}>
-                  {role.desc}
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
+
+      {/* ════ KEY COMPONENTS SECTION ════ */}
+      <KeyComponentsSection isDark={isDark} />
+
+      {/* ════ ALL FEATURES SECTION ════ */}
+      <FeaturesRippleSection isDark={isDark} />
+
+      {/* ════ ROLES SECTION ════ */}
+      <RolesConnectedSection isDark={isDark} />
 
       {/* ════ 4-TIER ARCHITECTURE SECTION ════ */}
       <section style={{
@@ -1502,13 +1719,10 @@ export default function Landing() {
           gap: 12,
         }}>
           <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>
-            © 2026{' '}
-            <strong style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 700 }}>LADRIS</strong>
-            {'. '}All rights reserved. | Built for{' '}
-            <strong style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>Ministry of Rural Development, GoI</strong>
+            {T.footerCopy}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            {['Privacy', 'Terms', 'Accessibility', 'Cookies'].map((item, i, arr) => (
+            {T.footerLinks.map((item, i, arr) => (
               <span key={item} style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                 <a href="#" style={{
                   fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)',
@@ -1556,6 +1770,50 @@ export default function Landing() {
             grid-template-columns: 1fr 1fr !important;
             gap: 40px !important;
           }
+        }
+
+        /* ── Global Accessibility: High Contrast ── */
+        [data-high-contrast] * {
+          background-image: none !important;
+          text-shadow: none !important;
+          box-shadow: none !important;
+        }
+        [data-high-contrast] body,
+        [data-high-contrast] #root,
+        [data-high-contrast] header,
+        [data-high-contrast] footer,
+        [data-high-contrast] section,
+        [data-high-contrast] nav,
+        [data-high-contrast] div,
+        [data-high-contrast] main {
+          background: #000 !important;
+          color: #fff !important;
+          border-color: #fff !important;
+        }
+        [data-high-contrast] a,
+        [data-high-contrast] button {
+          color: #ffff00 !important;
+          border-color: #ffff00 !important;
+          background: #000 !important;
+        }
+        [data-high-contrast] img {
+          filter: contrast(1.4) brightness(1.1);
+        }
+        [data-high-contrast] input,
+        [data-high-contrast] textarea {
+          background: #000 !important;
+          color: #fff !important;
+          border: 2px solid #fff !important;
+        }
+
+        /* ── Global Accessibility: Reduced Motion ── */
+        [data-reduced-motion] *,
+        [data-reduced-motion] *::before,
+        [data-reduced-motion] *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
         }
       `}</style>
     </div>
