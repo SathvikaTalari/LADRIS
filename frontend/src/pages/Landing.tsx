@@ -1921,7 +1921,7 @@ export default function Landing() {
                   fontSize: '1.05rem', fontWeight: 800,
                   color: '#f0f6fc', letterSpacing: '-0.03em', lineHeight: 1.1,
                 }}>
-                  LADRIS<span style={{ color: '#4080ff' }}>·</span>AI
+                  LADRIS
                 </div>
                 <div style={{ fontSize: '0.6rem', fontWeight: 600, color: '#546e96', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 2 }}>
                   {T.footerIntelligence}
