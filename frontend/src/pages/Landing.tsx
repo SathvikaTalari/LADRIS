@@ -691,19 +691,17 @@ export default function Landing() {
             justifyContent: 'space-between', gap: 16,
           }}>
 
-            {/* Left: Emblem + Divider + Logo + Brand */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
+            {/* Left: Emblem + Gap + Logo + Brand */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
               {/* MoRTH Ashoka Emblem — pre-cropped: emblem + Hindi only, no English text */}
               <img
                 src="/logo_morth_clean.png"
                 alt="MoRTH Emblem"
-                style={{ height: 40, width: 'auto', display: 'block', flexShrink: 0 }}
+                style={{ height: 46, width: 'auto', display: 'block', flexShrink: 0 }}
               />
-              {/* Vertical divider */}
-              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 2px', flexShrink: 0 }} />
               {/* logo.png + Brand text */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <img src="/logo.png" alt="LADRIS" style={{ width: 38, height: 38, objectFit: 'contain', flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <img src="/logo.png" alt="LADRIS" style={{ width: 42, height: 42, objectFit: 'contain', flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
                     LADRIS<span style={{ color: '#4080ff' }}></span>
