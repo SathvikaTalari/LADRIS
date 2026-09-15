@@ -12,10 +12,10 @@ import { motion, useInView, useReducedMotion } from 'framer-motion'
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 // Single unified accent — all blocks share this colour
-const UNIFIED_COLOR      = '#003d6b'       // deep navy
+const UNIFIED_COLOR = '#003d6b'       // deep navy
 const UNIFIED_COLOR_DARK = '#4a7fd4'       // blue for dark mode
-const UNIFIED_GLOW       = 'rgba(0,61,107,0.14)'
-const UNIFIED_GLOW_DARK  = 'rgba(74,127,212,0.18)'
+const UNIFIED_GLOW = 'rgba(0,61,107,0.14)'
+const UNIFIED_GLOW_DARK = 'rgba(74,127,212,0.18)'
 
 /* ─── Block definitions ─────────────────────────────────────────────────── */
 const BLOCKS = [
@@ -26,9 +26,9 @@ const BLOCKS = [
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <ellipse cx="12" cy="5" rx="9" ry="3"/>
-        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+        <ellipse cx="12" cy="5" rx="9" ry="3" />
+        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
       </svg>
     ),
   },
@@ -39,19 +39,19 @@ const BLOCKS = [
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="4"/>
-        <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
       </svg>
     ),
   },
   {
     num: '03',
     title: 'API + SECURITY',
-    items: ['APIs', 'Role Access', 'Audit'],
+    items: ['APIs', 'Role Access', 'Audit', 'Authentication'],
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
     ),
   },
@@ -62,8 +62,8 @@ const BLOCKS = [
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="3" width="20" height="14" rx="2"/>
-        <path d="M8 21h8m-4-4v4"/>
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <path d="M8 21h8m-4-4v4" />
       </svg>
     ),
   },
@@ -100,14 +100,14 @@ function Connector({
       >
         <defs>
           <filter id={`glow-${idx}`} x="-60%" y="-600%" width="220%" height="1400%">
-            <feGaussianBlur stdDeviation="1.8" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            <feGaussianBlur stdDeviation="1.8" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
 
         {/* Ghost/background line */}
         <line x1="0" y1="1" x2="48" y2="1"
-          stroke={ghostStroke} strokeWidth="1" strokeDasharray="3 3"/>
+          stroke={ghostStroke} strokeWidth="1" strokeDasharray="3 3" />
 
         {/* Drawn line using clip trick: animated from left */}
         {lineDrawn && (
@@ -165,16 +165,16 @@ function ArchBlock({
   onMouseLeave: () => void
   isHovered: boolean
 }) {
-  const isVisible  = state !== 'ghost'
-  const isActive   = state === 'active'
+  const isVisible = state !== 'ghost'
+  const isActive = state === 'active'
   const isBuilding = state === 'building'
 
   // Unified accent — same for all blocks
-  const accent     = isDark ? UNIFIED_COLOR_DARK : UNIFIED_COLOR
-  const glowColor  = isDark ? UNIFIED_GLOW_DARK  : UNIFIED_GLOW
+  const accent = isDark ? UNIFIED_COLOR_DARK : UNIFIED_COLOR
+  const glowColor = isDark ? UNIFIED_GLOW_DARK : UNIFIED_GLOW
 
   const baseOpacity = state === 'ghost' ? 0.07 : state === 'dimmed' ? 0.55 : 1
-  const hoverLift   = isVisible ? (isHovered ? -3 : 0) : 0
+  const hoverLift = isVisible ? (isHovered ? -3 : 0) : 0
 
   const cardBg = isDark
     ? (isActive ? 'rgba(14,26,52,0.98)' : isBuilding ? 'rgba(10,20,42,0.94)' : 'rgba(8,16,34,0.55)')
@@ -277,7 +277,7 @@ function ArchBlock({
               width: 4, height: 4, borderRadius: '50%', flexShrink: 0,
               background: isActive ? accent : isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,61,107,0.2)',
               transition: 'background 0.3s ease',
-            }}/>
+            }} />
             <span style={{
               fontSize: '0.72rem', lineHeight: 1.4,
               color: isActive
@@ -310,17 +310,17 @@ function ArchBlock({
 
 /* ─── Main Component ─────────────────────────────────────────────────────── */
 export default function SystemArchitectureSection({ isDark }: { isDark: boolean }) {
-  const sectionRef  = useRef<HTMLElement>(null)
-  const isInView    = useInView(sectionRef, { once: true, margin: '-8% 0px' })
-  const reduced     = useReducedMotion() ?? false
+  const sectionRef = useRef<HTMLElement>(null)
+  const isInView = useInView(sectionRef, { once: true, margin: '-8% 0px' })
+  const reduced = useReducedMotion() ?? false
 
-  const [headingReady,    setHeadingReady]    = useState(false)
-  const [blockStates,     setBlockStates]     = useState<BlockState[]>(['ghost','ghost','ghost','ghost'])
-  const [linesDrawn,      setLinesDrawn]      = useState([false, false, false])
-  const [dotsActive,      setDotsActive]      = useState([false, false, false])
-  const [taglineVisible,  setTaglineVisible]  = useState(false)
+  const [headingReady, setHeadingReady] = useState(false)
+  const [blockStates, setBlockStates] = useState<BlockState[]>(['ghost', 'ghost', 'ghost', 'ghost'])
+  const [linesDrawn, setLinesDrawn] = useState([false, false, false])
+  const [dotsActive, setDotsActive] = useState([false, false, false])
+  const [taglineVisible, setTaglineVisible] = useState(false)
   const [subtitleVisible, setSubtitleVisible] = useState(false)
-  const [hoveredIdx,      setHoveredIdx]      = useState<number | null>(null)
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   const setBlock = useCallback((idx: number, st: BlockState) => {
     setBlockStates(prev => { const n = [...prev] as BlockState[]; n[idx] = st; return n })
@@ -350,9 +350,9 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
     if (reduced) {
       // Reduced motion: simple sequential fade, no movement
       t(() => setBlock(0, 'active'), 400)
-      t(() => { setLinesDrawn([true,false,false]); setBlock(1,'active') }, 600)
-      t(() => { setLinesDrawn([true,true,false]);  setBlock(2,'active') }, 800)
-      t(() => { setLinesDrawn([true,true,true]);   setBlock(3,'active') }, 1000)
+      t(() => { setLinesDrawn([true, false, false]); setBlock(1, 'active') }, 600)
+      t(() => { setLinesDrawn([true, true, false]); setBlock(2, 'active') }, 800)
+      t(() => { setLinesDrawn([true, true, true]); setBlock(3, 'active') }, 1000)
       t(() => setTaglineVisible(true), 1200)
       t(() => setSubtitleVisible(true), 1400)
     } else {
@@ -376,7 +376,7 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
       t(() => setBlock(3, 'active'), 5520)
 
       // Final sweep — all highlight, then reveal taglines
-      t(() => setBlockStates(['active','active','active','active']), 6000)
+      t(() => setBlockStates(['active', 'active', 'active', 'active']), 6000)
       t(() => setTaglineVisible(true), 6500)
       t(() => setSubtitleVisible(true), 6900)
     }
@@ -408,7 +408,7 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
           : 'radial-gradient(rgba(0,51,102,0.09) 1px, transparent 1px)',
         backgroundSize: '28px 28px',
         opacity: 0.65,
-      }}/>
+      }} />
 
       <div style={{ maxWidth: 1160, margin: '0 auto', position: 'relative' }}>
 
@@ -488,51 +488,6 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
 
         {/* ── Final tagline ─────────────────────────────────────────── */}
         <div style={{ textAlign: 'center', marginTop: 52 }}>
-          <motion.div
-            initial={{ opacity: 0, y: reduced ? 0 : 8 }}
-            animate={taglineVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, ease: EASE }}
-            style={{ marginBottom: 12 }}
-          >
-            {/* DATA → AI → SECURITY → ACTION pill */}
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 0,
-              padding: '7px 18px',
-              background: isDark ? 'rgba(74,127,212,0.07)' : 'rgba(0,51,102,0.05)',
-              border: `1px solid ${isDark ? 'rgba(74,127,212,0.18)' : 'rgba(0,51,102,0.12)'}`,
-              borderRadius: 100,
-            }}>
-              {(['DATA', 'AI', 'SECURITY', 'ACTION'] as const).map((label, idx) => (
-                <span key={label} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={taglineVisible ? { opacity: 1 } : {}}
-                    transition={{ duration: 0.3, delay: idx * 0.1 }}
-                    style={{
-                      fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.13em',
-                      color: isDark ? '#c0d4f0' : '#0a1d37',
-                    }}
-                  >
-                    {label}
-                  </motion.span>
-                  {idx < 3 && (
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={taglineVisible ? { opacity: 1 } : {}}
-                      transition={{ duration: 0.2, delay: idx * 0.1 + 0.08 }}
-                      style={{
-                        fontSize: '0.6rem', color: accentColor,
-                        margin: '0 6px', fontWeight: 700, opacity: 0.7,
-                      }}
-                    >
-                      →
-                    </motion.span>
-                  )}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-
           <motion.div
             initial={{ opacity: 0 }}
             animate={subtitleVisible ? { opacity: 1 } : {}}
