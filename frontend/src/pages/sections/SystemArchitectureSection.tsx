@@ -1,5 +1,5 @@
 /**
- * SystemArchitectureSection — LADRIS AI Landing Page
+ * SystemArchitectureSection — LADRIS Landing Page
  * Animation: HORIZONTAL BUILD FLOW
  * Blocks activate sequentially left→right with SVG connector lines
  * and a traveling glowing dot between them.
@@ -446,7 +446,7 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
               color: isDark ? '#7da0cc' : '#4a6280',
               margin: '0 0 6px', lineHeight: 1.7,
             }}>
-              LADRIS AI connects data, prediction, security, and action in one seamless flow.
+              LADRIS connects data, prediction, security, and action in one seamless flow.
             </p>
             <p style={{
               fontSize: '0.85rem', fontWeight: 400,

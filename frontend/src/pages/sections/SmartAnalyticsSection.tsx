@@ -1,5 +1,5 @@
 /**
- * SmartAnalyticsSection — LADRIS AI Landing Page
+ * SmartAnalyticsSection — LADRIS Landing Page
  * Animation: LIVE ANALYTICS DRAW
  * Sequence: DATA → PATTERN → INSIGHT
  * Uses Framer Motion (already installed). Zero new deps.
@@ -38,53 +38,6 @@ const SMOOTH_PATH = buildSmoothPath(PTS)
 // Calculated manually for this path (~340px). We use Framer's pathLength instead.
 
 /* ─── Analytics area cards ─────────────────────────────────────────────── */
-const AREAS = [
-  {
-    num: '01', title: 'Risk Trends',
-    desc: 'See High, Medium and Low risk projects.',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-      </svg>
-    ),
-  },
-  {
-    num: '02', title: 'Delay Trends',
-    desc: 'Track how delays change across projects.',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-    ),
-  },
-  {
-    num: '03', title: 'Project Performance',
-    desc: 'Compare timelines and project progress.',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
-        <line x1="6" y1="20" x2="6" y2="14"/>
-      </svg>
-    ),
-  },
-  {
-    num: '04', title: 'District & State View',
-    desc: 'Spot delay patterns across regions.',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="2" y1="12" x2="22" y2="12"/>
-        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-      </svg>
-    ),
-  },
-] as const
-
 /* ─── Hoverable area card ─────────────────────────────────────────────────── */
 function AreaCard({ area, visible, delay, isDark }: {
   area: typeof AREAS[number]; visible: boolean; delay: number; isDark: boolean
@@ -166,7 +119,32 @@ function AreaCard({ area, visible, delay, isDark }: {
 }
 
 /* ─── Main Section ───────────────────────────────────────────────────────── */
-export default function SmartAnalyticsSection({ isDark }: { isDark: boolean }) {
+export default function SmartAnalyticsSection({ isDark, language }: { isDark: boolean; language: 'en' | 'hi' }) {
+  const hi = language === 'hi'
+
+  const AREAS = [
+    {
+      num: '01', title: hi ? 'जोखिम प्रवृत्तियां' : 'Risk Trends',
+      desc: hi ? 'उच्च, मध्यम और निम्न जोखिम वाले प्रोजेक्ट देखें।' : 'See High, Medium and Low risk projects.',
+      icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>),
+    },
+    {
+      num: '02', title: hi ? 'विलंब प्रवृत्तियां' : 'Delay Trends',
+      desc: hi ? 'प्रोजेक्टों में विलंब किस तरह बदलता है यह देखें।' : 'Track how delays change across projects.',
+      icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>),
+    },
+    {
+      num: '03', title: hi ? 'प्रोजेक्ट प्रदर्शन' : 'Project Performance',
+      desc: hi ? 'समयसीमा और प्रोजेक्ट प्रगति की तुलना करें।' : 'Compare timelines and project progress.',
+      icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>),
+    },
+    {
+      num: '04', title: hi ? 'जिला और राज्य दृश्य' : 'District & State View',
+      desc: hi ? 'क्षेत्रों में विलंब पैटर्न देखें।' : 'Spot delay patterns across regions.',
+      icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>),
+    },
+  ]
+
   const sectionRef = useRef<HTMLElement>(null)
   const isInView   = useInView(sectionRef, { once: true, margin: '-8% 0px' })
   const reduced    = useReducedMotion() ?? false
@@ -279,13 +257,13 @@ export default function SmartAnalyticsSection({ isDark }: { isDark: boolean }) {
               fontWeight: 900, letterSpacing: '-0.035em',
               color: textPrimary, margin: '0 0 12px', lineHeight: 1.15,
             }}>
-              Smart Analytics
+              {hi ? 'स्मार्ट विश्लेषण' : 'Smart Analytics'}
             </h2>
             <p style={{
               fontSize: '0.97rem', fontWeight: 500,
               color: textSec, margin: 0,
             }}>
-              Turn project data into clear insights.
+              {hi ? 'प्रोजेक्ट डेटा को स्पष्ट जानकारी में बदलें।' : 'Turn project data into clear insights.'}
             </p>
           </motion.div>
         </div>
@@ -323,7 +301,7 @@ export default function SmartAnalyticsSection({ isDark }: { isDark: boolean }) {
                 color: textSec, marginBottom: 14, textTransform: 'uppercase',
                 flexShrink: 0,
               }}>
-                Delay Trend
+                {hi ? 'विलंब प्रवृत्ति' : 'Delay Trend'}
               </div>
 
               {/* SVG Chart — flex:1 so it fills the remaining height */}
@@ -443,13 +421,13 @@ export default function SmartAnalyticsSection({ isDark }: { isDark: boolean }) {
                   fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em',
                   color: textSec, marginBottom: 12, textTransform: 'uppercase',
                 }}>
-                  Risk Distribution
+                  {hi ? 'जोखिम वितरण' : 'Risk Distribution'}
                 </div>
 
                 {([
-                  { label: 'HIGH',   pct: 28, opacity: 1,    idx: 0 },
-                  { label: 'MEDIUM', pct: 45, opacity: 0.65, idx: 1 },
-                  { label: 'LOW',    pct: 27, opacity: 0.38, idx: 2 },
+                  { label: hi ? 'उच्च' : 'HIGH',   pct: 28, opacity: 1,    idx: 0 },
+                  { label: hi ? 'मध्यम' : 'MEDIUM', pct: 45, opacity: 0.65, idx: 1 },
+                  { label: hi ? 'निम्न' : 'LOW',    pct: 27, opacity: 0.38, idx: 2 },
                 ] as const).map(({ label, pct, opacity, idx }) => (
                   <motion.div
                     key={label}
@@ -493,13 +471,13 @@ export default function SmartAnalyticsSection({ isDark }: { isDark: boolean }) {
                   fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em',
                   color: textSec, marginBottom: 12, textTransform: 'uppercase',
                 }}>
-                  Project Performance
+                  {hi ? 'प्रोजेक्ट प्रदर्शन' : 'Project Performance'}
                 </div>
 
                 {([
-                  { label: 'On Schedule', pct: 72, opacity: 1    },
-                  { label: 'At Risk',     pct: 19, opacity: 0.62 },
-                  { label: 'Delayed',     pct: 9,  opacity: 0.38 },
+                  { label: hi ? 'निर्धारित समय पर' : 'On Schedule', pct: 72, opacity: 1    },
+                  { label: hi ? 'जोखिम में'     : 'At Risk',     pct: 19, opacity: 0.62 },
+                  { label: hi ? 'विलंबित'     : 'Delayed',     pct: 9,  opacity: 0.38 },
                 ] as const).map(({ label, pct, opacity }, i) => (
                   <div key={label} style={{ marginBottom: 8 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -539,12 +517,12 @@ export default function SmartAnalyticsSection({ isDark }: { isDark: boolean }) {
                   fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em',
                   color: textSec, marginBottom: 12, textTransform: 'uppercase',
                 }}>
-                  District & State View
+                  {hi ? 'जिला और राज्य दृश्य' : 'District & State View'}
                 </div>
 
                 {([
-                  { label: 'DISTRICT avg delay', val: '14 days', pct: 58, idx: 0 },
-                  { label: 'STATE avg delay',    val: '21 days', pct: 84, idx: 1 },
+                  { label: hi ? 'जिले का औसत विलंब' : 'DISTRICT avg delay', val: hi ? '14 दिन' : '14 days', pct: 58, idx: 0 },
+                  { label: hi ? 'राज्य का औसत विलंब' : 'STATE avg delay',    val: hi ? '21 दिन' : '21 days', pct: 84, idx: 1 },
                 ] as const).map(({ label, val, pct, idx }) => (
                   <motion.div
                     key={label}
@@ -596,7 +574,7 @@ export default function SmartAnalyticsSection({ isDark }: { isDark: boolean }) {
             color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,51,102,0.28)',
             textAlign: 'right',
           }}>
-            Values shown are prototype indicators for demonstration.
+            {hi ? 'मूल्य केवल प्रदर्शन के लिए प्रोटोटाइप संकेतक हैं।' : 'Values shown are prototype indicators for demonstration.'}
           </div>
         </motion.div>
 
@@ -629,7 +607,7 @@ export default function SmartAnalyticsSection({ isDark }: { isDark: boolean }) {
             textTransform: 'uppercase',
             color: isDark ? ACCENT_D : ACCENT,
           }}>
-            See the trend. Spot the risk. Make the move.
+            {hi ? 'प्रवृत्ति देखें। जोखिम पहचानें। कार्रवाई करें।' : 'See the trend. Spot the risk. Make the move.'}
           </span>
         </motion.div>
 

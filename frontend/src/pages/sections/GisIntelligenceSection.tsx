@@ -1,5 +1,5 @@
 /**
- * GisIntelligenceSection — LADRIS AI Landing Page
+ * GisIntelligenceSection — LADRIS Landing Page
  * Animation: MAP PIN DROP — markers drop one-by-one, each activates matching card.
  * Map: react-leaflet v5 + leaflet v1.9 (already installed)
  */
@@ -52,7 +52,7 @@ function MapController({ activeId }: { activeId: number|null }) {
 }
 
 /* Map Legend — absolute positioned */
-function MapLegend() {
+function MapLegend({ hi }: { hi: boolean }) {
   return (
     <div style={{
       position:"absolute", bottom:28, left:14, zIndex:800,
@@ -60,11 +60,11 @@ function MapLegend() {
       borderRadius:10, padding:"8px 12px",
       boxShadow:"0 4px 16px rgba(0,0,0,0.12)", backdropFilter:"blur(6px)",
     }}>
-      <div style={{ fontSize:"0.56rem", fontWeight:800, letterSpacing:"0.1em", color:"#475569", marginBottom:6, textTransform:"uppercase" }}>Risk Level</div>
+      <div style={{ fontSize:"0.56rem", fontWeight:800, letterSpacing:"0.1em", color:"#475569", marginBottom:6, textTransform:"uppercase" }}>{hi ? 'जोखिम स्तर' : 'Risk Level'}</div>
       {(Object.entries(RISK_COLOR) as [RiskLevel,string][]).map(([label, color]) => (
         <div key={label} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
           <div style={{ width:9, height:9, borderRadius:"50%", background:color, flexShrink:0 }} />
-          <span style={{ fontSize:"0.67rem", fontWeight:600, color:"#334155" }}>{label} Risk</span>
+          <span style={{ fontSize:"0.67rem", fontWeight:600, color:"#334155" }}>{hi ? (label === 'High' ? 'उच्च जोखिम' : label === 'Medium' ? 'मध्यम जोखिम' : 'निम्न जोखिम') : `${label} Risk`}</span>
         </div>
       ))}
     </div>
@@ -128,14 +128,14 @@ const ProjectCard = memo(function ProjectCard({
 })
 
 /* Detail Panel */
-function DetailPanel({ proj, isDark }: { proj:Project|null; isDark:boolean }) {
+function DetailPanel({ proj, isDark, hi }: { proj:Project|null; isDark:boolean; hi:boolean }) {
   if (!proj) return null
   const color = RISK_COLOR[proj.risk]
   const fields = [
-    ["Risk Score", `${proj.riskScore}%`],
-    ["Delay Probability", proj.delayProb],
-    ["Main Risk", proj.mainRisk],
-    ["Current Stage", proj.stage],
+    [hi ? 'जोखिम स्कोर' : 'Risk Score', `${proj.riskScore}%`],
+    [hi ? 'विलंब संभावना' : 'Delay Probability', proj.delayProb],
+    [hi ? 'मुख्य जोखिम' : 'Main Risk', proj.mainRisk],
+    [hi ? 'वर्तमान चरण' : 'Current Stage', proj.stage],
   ] as const
   return (
     <motion.div key={proj.id} initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
@@ -166,7 +166,17 @@ function DetailPanel({ proj, isDark }: { proj:Project|null; isDark:boolean }) {
 }
 
 /* Main Export */
-export default function GisIntelligenceSection({ isDark }: { isDark: boolean }) {
+export default function GisIntelligenceSection({ isDark, language }: { isDark: boolean; language: 'en' | 'hi' }) {
+  const hi = language === 'hi'
+
+  const PROJECTS = [
+    { id:1, name: hi ? 'राजमार्ग प्रोजेक्ट A'        : 'Highway Project A',        state: hi ? 'तेलंगाना'       : 'Telangana',       risk:'High'   as const, riskScore:84, delayProb: hi ? 'उच्च'     : 'High',     mainRisk: hi ? 'लंबित अनुमोदन'     : 'Pending Approval',     stage: hi ? 'भूमि अधिग्रहण'    : 'Land Acquisition',    coords:[17.385,78.4867], Icon:Building2 },
+    { id:2, name: hi ? 'अवसंरचना प्रोजेक्ट B'      : 'Infrastructure Project B', state: hi ? 'आंध्र प्रदेश'  : 'Andhra Pradesh',  risk:'Medium' as const, riskScore:56, delayProb: hi ? 'मध्यम'   : 'Moderate', mainRisk: hi ? 'मुआवज़ा विलंब'   : 'Compensation Delay',   stage: hi ? 'धारा 11 नोटिस'   : 'Section 11 Notice',   coords:[15.9129,79.74],  Icon:Landmark  },
+    { id:3, name: hi ? 'औद्योगिक गलियारा C'    : 'Industrial Corridor C',    state: hi ? 'महाराष्ट्र'     : 'Maharashtra',     risk:'High'   as const, riskScore:78, delayProb: hi ? 'उच्च'     : 'High',     mainRisk: hi ? 'कानूनी विवाद'        : 'Legal Dispute',        stage: hi ? 'पुरस्कार घोषणा'   : 'Award Declaration',   coords:[19.7515,75.7139],Icon:Factory   },
+    { id:4, name: hi ? 'प्रोजेक्ट D'                : 'Project D',                state: hi ? 'कर्नाटक'       : 'Karnataka',       risk:'Low'    as const, riskScore:22, delayProb: hi ? 'निम्न'     : 'Low',      mainRisk: hi ? 'आंशिक दस्तावेज़'  : 'Minor Documentation',  stage: hi ? 'कब्जा'            : 'Possession',          coords:[15.3173,75.7139],Icon:TreePine  },
+    { id:5, name: hi ? 'प्रोजेक्ट E'                : 'Project E',                state: hi ? 'ओड़िशा'          : 'Odisha',          risk:'Medium' as const, riskScore:51, delayProb: hi ? 'मध्यम'   : 'Moderate', mainRisk: hi ? 'पुनर्वास समस्या' : 'Rehabilitation Issue', stage: hi ? 'मुआवज़ा भुगतान' : 'Compensation Payment', coords:[20.9517,85.0985],Icon:HardHat  },
+  ]
+
   const sectionRef = useRef<HTMLElement>(null)
   const isInView   = useInView(sectionRef, { once:true, margin:"-8% 0px" })
   const reduced    = useReducedMotion() ?? false
@@ -224,7 +234,7 @@ export default function GisIntelligenceSection({ isDark }: { isDark: boolean }) 
           transition={{ duration:0.6, ease:EASE }} style={{ textAlign:"center", marginBottom:44 }}>
           <h2 style={{ fontSize:"clamp(1.6rem,3vw,2.2rem)", fontWeight:900, letterSpacing:"-0.03em",
             color: isDark?"#f0f6fc":"#0a1d37", marginBottom:10, lineHeight:1.2 }}>
-            LADRIS AI GIS Intelligence
+            LADRIS GIS Intelligence
           </h2>
           <motion.p initial={{ opacity:0, y: reduced?0:10 }} animate={headingVisible?{opacity:1,y:0}:{}}
             transition={{ duration:0.5, delay:0.14, ease:EASE }}
@@ -322,7 +332,7 @@ export default function GisIntelligenceSection({ isDark }: { isDark: boolean }) 
                   )
                 })}
 
-                <MapLegend />
+                <MapLegend hi={hi} />
               </MapContainer>
             )}
           </motion.div>
