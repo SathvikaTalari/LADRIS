@@ -6,6 +6,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { TopNav } from './TopNav'
+import { SaarthiWidget } from '@/components/chatbot/SaarthiWidget'
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Command Dashboard',
@@ -55,6 +56,7 @@ export function AppShell() {
           <Outlet />
         </div>
       </motion.main>
+      <SaarthiWidget />
     </div>
   )
 }

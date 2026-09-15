@@ -16,6 +16,7 @@ from app.models.user import User, UserRole
 from app.services.auth_service import decode_token
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
@@ -46,6 +47,29 @@ async def get_current_user(
         raise credentials_exception
 
     return user
+
+
+async def get_current_user_optional(
+    credentials: HTTPAuthorizationCredentials | None = Depends(optional_security),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """
+    Dependency: Optional user check. Returns User if valid token present, else None.
+    """
+    if not credentials:
+        return None
+    try:
+        payload = decode_token(credentials.credentials)
+        user_id = UUID(payload.user_id)
+        result = await db.execute(
+            select(User).where(User.id == user_id, User.deleted_at.is_(None))
+        )
+        user = result.scalar_one_or_none()
+        if user and user.is_active:
+            return user
+    except Exception:
+        pass
+    return None
 
 
 def require_roles(*roles: UserRole):

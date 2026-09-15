@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Pause, Play, Square } from 'lucide-react'
+import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Pause, Play, Square, Sparkles } from 'lucide-react'
 import { voiceEngine } from '@/components/voice/voiceEngine'
 import { collectPageContent } from '@/components/voice/pageContentCollector'
 import { useAuthStore } from '@/store/authStore'
@@ -204,6 +204,13 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
           }} />
           Live
         </div>
+
+        {/* Saarthi AI Assistant Trigger */}
+        <NavIconButton
+          icon={<Sparkles size={16} strokeWidth={2.2} color="#f47721" />}
+          onClick={() => window.dispatchEvent(new CustomEvent('open-saarthi'))}
+          title="Ask Saarthi AI Assistant"
+        />
 
         {/* Alerts Button */}
         <NavIconButton
