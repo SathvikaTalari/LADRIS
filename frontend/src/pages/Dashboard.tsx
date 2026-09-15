@@ -218,7 +218,7 @@ export default function Dashboard() {
           value={isLoading ? null : (kpis?.total_active_projects ?? 66)}
           icon={<FolderKanban size={16} />}
           accent="var(--color-accent-navy)"
-          description="National portfolio count"
+          description="Total projects"
           isLoading={isLoading}
         />
         <MetricCard
@@ -226,7 +226,7 @@ export default function Dashboard() {
           value={isLoading ? null : `${(kpis?.total_land_required_ha ?? 18450).toLocaleString()} ha`}
           icon={<MapIcon size={16} />}
           accent="var(--color-accent-primary)"
-          description="Acquisition footprint"
+          description="Land needed"
           isLoading={isLoading}
         />
         <MetricCard
@@ -234,7 +234,7 @@ export default function Dashboard() {
           value={isLoading ? null : `₹${(kpis?.financial_outlay_cr ?? 24600).toLocaleString()} Cr`}
           icon={<DollarSign size={16} />}
           accent="var(--color-accent-tertiary)"
-          description="Estimated compensation"
+          description="Expected compensation"
           isLoading={isLoading}
         />
         <MetricCard
@@ -242,7 +242,7 @@ export default function Dashboard() {
           value={isLoading ? null : (kpis?.high_critical_projects ?? 17)}
           icon={<AlertTriangle size={16} />}
           accent="var(--color-risk-critical)"
-          description="Structural timeline divergence"
+          description="High delay risk"
           isLoading={isLoading}
         />
         <MetricCard
@@ -250,7 +250,7 @@ export default function Dashboard() {
           value={isLoading ? null : (kpis?.projects_delayed ?? 15)}
           icon={<Flame size={16} />}
           accent="var(--color-risk-high)"
-          description="Exceeding baseline timeline"
+          description="Past the planned time"
           isLoading={isLoading}
         />
         <MetricCard
@@ -258,7 +258,7 @@ export default function Dashboard() {
           value={isLoading ? null : (kpis?.active_alerts ?? 23)}
           icon={<AlertCircle size={16} />}
           accent="var(--color-accent-primary)"
-          description="Automated system triggers"
+          description="System alerts"
           isLoading={isLoading}
         />
       </div>
@@ -276,14 +276,14 @@ export default function Dashboard() {
         fontSize: '0.82rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <span>Projects Requiring Intervention: <strong style={{ color: 'var(--color-risk-critical)' }}>{kpis?.projects_requiring_intervention ?? 17}</strong></span>
+          <span>Projects Needing Action: <strong style={{ color: 'var(--color-risk-critical)' }}>{kpis?.projects_requiring_intervention ?? 17}</strong></span>
           <span>•</span>
-          <span>Average Data Completeness: <strong style={{ color: 'var(--color-accent-primary)' }}>{kpis?.avg_data_completeness ?? 81.5}%</strong></span>
+          <span>Average Data Complete: <strong style={{ color: 'var(--color-accent-primary)' }}>{kpis?.avg_data_completeness ?? 81.5}%</strong></span>
           <span>•</span>
           <span>Data Trust Score: <strong style={{ color: 'var(--color-accent-tertiary)' }}>{kpis?.data_trust_score ?? 81}/100</strong></span>
         </div>
         <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
-          * IsolationForest Anomaly Engine v2.4 Active
+          * Anomaly Detection On
         </span>
       </div>
 
@@ -380,7 +380,7 @@ export default function Dashboard() {
             </div>
 
             <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
-              Quantifies timeline congestion across RFCTLARR / NH Act acquisition stages.
+              Shows which project stages are taking more time.
             </p>
           </div>
 
@@ -451,11 +451,11 @@ export default function Dashboard() {
                 </h3>
               </div>
               <Link to="/priority-intelligence" style={{ fontSize: '0.7rem', color: 'var(--color-accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
-                Full Queue →
+                View All →
               </Link>
             </div>
             <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: 10 }}>
-              Urgent intervention queue ranked by risk signal & bottleneck.
+              Shows projects that need attention first.
             </p>
           </div>
 

@@ -32,7 +32,7 @@ export default function Analytics() {
             project_count: projs.length,
             high_risk_count: highRiskCount,
             projects: projs,
-            sample_size_note: projs.length < 5 ? `Sample size: ${projs.length} project(s) — Patterns may not be statistically robust.` : `Sample size: ${projs.length} project(s).`,
+            sample_size_note: projs.length < 5 ? `Sample: ${projs.length} project(s) (small sample)` : `Sample: ${projs.length} project(s)`,
             sufficient_sample: projs.length >= 3,
           }
         })
@@ -49,7 +49,7 @@ export default function Analytics() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
       <PageHeader
         title="Land Acquisition & District Intelligence Analytics"
-        subtitle="Cross-district and state-wide performance indicators, stage bottlenecks, and sample-size-verified signals"
+        subtitle="Compare project performance across districts and states."
       />
 
       {/* ── PHASE 4 DISTRICT INTELLIGENCE SECTION ──────────────────────── */}
@@ -61,8 +61,7 @@ export default function Analytics() {
         </div>
 
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 20, lineHeight: 1.6 }}>
-          District intelligence metrics aggregate real project signals from the active database.
-          To prevent misleading policy conclusions from small sample sizes, every district metric displays its sample size explicitly.
+          This section shows project data for each district. Sample sizes are shown to help you understand the data.
         </p>
 
         {isLoading ? (
@@ -224,8 +223,7 @@ export default function Analytics() {
             <div style={{ marginTop: 16, padding: '10px 14px', background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.2)', borderRadius: 6, fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 8 }}>
               <AlertTriangle size={14} color="#eab308" style={{ flexShrink: 0 }} />
               <span>
-                <strong>Sample Size Safeguard:</strong> Do not make broad policy claims from small district samples.
-                All risk scores reflect available verified database records only.
+                <strong>Note on Sample Size:</strong> Small sample sizes may be limited. Risk scores reflect available verified project data.
               </span>
             </div>
           </>
@@ -233,7 +231,7 @@ export default function Analytics() {
           <EmptyState
             icon={<Building2 size={28} />}
             title="No District Records Found"
-            description="District intelligence will populate automatically as projects are created."
+            description="District data will appear here as projects are added."
           />
         )}
       </div>

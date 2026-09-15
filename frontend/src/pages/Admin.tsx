@@ -21,7 +21,7 @@ export default function Admin() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
       <PageHeader
         title="Administration & Governance Center"
-        subtitle="Manage user roles, jurisdiction assignments, alert thresholds, and model registry"
+        subtitle="Manage users, alerts, and models."
       />
 
       {/* Styled Admin Navigation Tabs */}
@@ -88,7 +88,7 @@ export default function Admin() {
                 <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>Audit Compliance</span>
               </div>
               <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.5 }}>
-                Comprehensive audit middleware actively recording IP, user agent, action, and request payload.
+                Logs user actions, IP address, and requests.
               </p>
             </div>
           </div>
@@ -145,7 +145,7 @@ export default function Admin() {
                 style={{ height: 38, fontSize: '0.875rem' }}
               />
               <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                Triggers alert when structural anomaly score exceeds this value.
+                Alerts when the anomaly score is above this value.
               </span>
             </div>
 
@@ -160,7 +160,7 @@ export default function Admin() {
                 style={{ height: 38, fontSize: '0.875rem' }}
               />
               <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                Triggers priority intervention review when decision score exceeds value.
+                Alerts when the priority score is above this value.
               </span>
             </div>
 
@@ -175,7 +175,7 @@ export default function Admin() {
                 style={{ height: 38, fontSize: '0.875rem' }}
               />
               <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                Triggers data quality alert if record completeness falls below floor.
+                Alerts when data completeness falls below this level.
               </span>
             </div>
           </div>
@@ -228,7 +228,7 @@ export default function Admin() {
               Supervised Delay Prediction Status & Limitations
             </h4>
             <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.6 }}>
-              Supervised delay model training remains <strong>DEFERRED</strong> until a minimum of N=200 project completion outcome records are verified from official government sources. Unsupervised IsolationForest structural anomaly scoring is active and evaluated against the national baseline.
+              Delay model training is <strong>DEFERRED</strong> until 200 project records are available. Anomaly detection is currently active.
             </p>
           </div>
         </div>

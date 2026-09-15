@@ -1,6 +1,6 @@
 {
   "title": "LandPulse AI — Phase 3 Data Gap Report & Supervised Target Specification",
-  "generated_at": "2026-09-10T16:28:12.611085+00:00",
+  "generated_at": "2026-09-10T07:50:30.234549+00:00",
   "version": "1.1.0",
   "summary": "Supervised delay prediction training remains DEFERRED. Although 10 real delayed project records with delay_months labels were ingested from DataGov.in (2023-2025), this sample size is far below the 200-record statistically defensible minimum required for supervised classification. No fake labels were generated. An unsupervised IsolationForest anomaly risk scorer and a stage-risk proxy engine are active instead.",
   "data_sources_investigated": [

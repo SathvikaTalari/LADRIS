@@ -55,7 +55,7 @@ export default function Alerts() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <PageHeader
         title="Alerts & Early-Warning Command Center"
-        subtitle="Automated real-time notifications for risk escalations, data quality degradation, and high-priority interventions"
+        subtitle="Get alerts when risk is high or data has problems."
       />
 
       {/* KPI Cards */}
@@ -65,7 +65,7 @@ export default function Alerts() {
             <Bell size={14} className="text-amber-400" /> Active Early Warnings
           </div>
           <div className="metric-value text-amber-400">{activeCount}</div>
-          <div className="text-xs text-slate-400">Requires officer review</div>
+          <div className="text-xs text-slate-400">Needs officer review</div>
         </div>
 
         <div className="metric-card">
@@ -73,7 +73,7 @@ export default function Alerts() {
             <AlertTriangle size={14} className="text-rose-400" /> Critical Severity
           </div>
           <div className="metric-value text-rose-400">{criticalCount}</div>
-          <div className="text-xs text-slate-400">Critical anomaly signals</div>
+          <div className="text-xs text-slate-400">Critical risk issues</div>
         </div>
 
         <div className="metric-card">
@@ -81,7 +81,7 @@ export default function Alerts() {
             <Info size={14} className="text-blue-400" /> Acknowledged
           </div>
           <div className="metric-value text-blue-400">{ackCount}</div>
-          <div className="text-xs text-slate-400">Under officer investigation</div>
+          <div className="text-xs text-slate-400">Being reviewed</div>
         </div>
 
         <div className="metric-card">
@@ -137,13 +137,13 @@ export default function Alerts() {
         {isLoading ? (
           <div style={{ textAlign: 'center', padding: 40, color: 'var(--color-text-muted)' }}>
             <div className="spinner" style={{ margin: '0 auto 12px' }} />
-            Evaluating automated early-warning alert triggers...
+            Checking for new alerts...
           </div>
         ) : filteredAlerts.length === 0 ? (
           <EmptyState
             icon={<Bell size={32} />}
             title="No Matching Alerts"
-            description="No alerts match the selected status and severity filters."
+            description="No alerts match the selected filters."
           />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -226,7 +226,7 @@ export default function Alerts() {
 
                       <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 12 }}>
                         <span>Triggered: {new Date(alert.triggered_at).toLocaleString()}</span>
-                        <span>Type: Early-warning signal detected</span>
+                        <span>Type: Early warning</span>
                         {alert.alert_metadata?.project_code && (
                           <code style={{ color: 'var(--color-accent-primary)', fontFamily: 'var(--font-mono)' }}>
                             {alert.alert_metadata.project_code}

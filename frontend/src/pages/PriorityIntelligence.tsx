@@ -135,6 +135,9 @@ export default function PriorityIntelligence() {
             <h1 style={{ fontSize: '1.375rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
               Global Priority Intelligence Center
             </h1>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '3px 0 0 0' }}>
+              Find and rank projects that need attention first.
+            </p>
           </div>
         </div>
       </div>

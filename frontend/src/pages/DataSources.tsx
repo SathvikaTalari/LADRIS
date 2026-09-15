@@ -19,7 +19,7 @@ export default function DataSources() {
     setError(null)
     dataSourcesAPI.list()
       .then((res) => setSources(res.data_sources))
-      .catch(() => setError('Failed to load data sources from registry.'))
+      .catch(() => setError('Could not load data sources.'))
       .finally(() => setIsLoading(false))
   }
 
@@ -31,7 +31,7 @@ export default function DataSources() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <PageHeader
         title="DATA TRUST & PROVENANCE"
-        subtitle="Manage official government datasets, data lineage, retrieval metadata, and classification status"
+        subtitle="Manage official government data and check its source."
         actions={
           <button className="btn btn-secondary btn-sm" onClick={fetchSources}>
             <RefreshCw size={14} /> Refresh Registry
@@ -55,7 +55,7 @@ export default function DataSources() {
         <EmptyState
           icon={<Database size={28} />}
           title="No Data Sources Registered"
-          description="Run the ML data ingestion scripts to populate the registry with verified public datasets."
+          description="Add data sources to view them here."
         />
       ) : (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>

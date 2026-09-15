@@ -47,35 +47,35 @@ export default function DataQuality() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <PageHeader
-        title="DATA QUALITY COMMAND CENTER"
-        subtitle="Real-time data integrity metrics, null rates, and prediction-eligibility computed strictly from ingested public datasets"
+        title="DATA QUALITY DASHBOARD"
+        subtitle="Check if the data is complete, correct, and ready for prediction."
       />
 
       {/* Summary KPI Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24, width: '100%' }}>
         <KpiCard
           icon={<FileSpreadsheet size={18} color="var(--color-accent-primary)" />}
-          label="Total Real Records"
+          label="Total Records"
           value={summary.total_real_records.toLocaleString('en-IN')}
-          subtitle="Ingested & Verified"
+          subtitle="Loaded & Verified"
         />
         <KpiCard
           icon={<CheckCircle2 size={18} color="var(--color-status-success)" />}
           label="Valid Records"
           value={summary.valid_records.toLocaleString('en-IN')}
-          subtitle={`${((summary.valid_records / Math.max(1, summary.total_real_records)) * 100).toFixed(1)}% Schema Compliant`}
+          subtitle="All fields match"
         />
         <KpiCard
           icon={<AlertOctagon size={18} color="var(--color-status-warning)" />}
-          label="Missing Value Rate"
+          label="Missing Data"
           value={`${(summary.missing_value_rate * 100).toFixed(1)}%`}
           subtitle="Across all fields"
         />
         <KpiCard
           icon={<Layers size={18} color="var(--color-status-info)" />}
-          label="Prediction Eligible"
+          label="Ready for Prediction"
           value={summary.prediction_eligible_records.toLocaleString('en-IN')}
-          subtitle="Meets model threshold"
+          subtitle="Meets data requirements"
         />
       </div>
 
@@ -114,7 +114,7 @@ export default function DataQuality() {
           
           <div style={{ paddingTop: 14, borderTop: '1px solid rgba(46, 213, 115, 0.2)', display: 'flex', flexDirection: 'column', gap: 10, fontSize: '0.75rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Primary Source:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Main Source:</span>
               <strong style={{ color: 'var(--color-text-primary)', textAlign: 'right' }}>Bhoomi / Gati Shakti</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -122,15 +122,15 @@ export default function DataQuality() {
               <strong style={{ color: 'var(--color-text-primary)' }}>2 hours ago</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Records Scanned:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Records Checked:</span>
               <strong style={{ color: 'var(--color-text-primary)' }}>{summary.total_real_records.toLocaleString('en-IN')}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Missing Fields Avg:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Average Missing Data:</span>
               <strong style={{ color: 'var(--color-text-primary)' }}>{(summary.missing_value_rate * 100).toFixed(1)}%</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Prediction Eligible:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Ready for Prediction:</span>
               <strong style={{ color: '#2563eb' }}>{summary.prediction_eligible_records.toLocaleString('en-IN')}</strong>
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function DataQuality() {
         {/* Field Null Rates */}
         <div className="card">
           <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: 16 }}>
-            Field Missing-Value Rates (Null Fraction)
+            Missing Values by Field
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {Object.entries(field_null_rates).map(([field, rate]) => (
@@ -163,7 +163,7 @@ export default function DataQuality() {
         {/* Source Coverage */}
         <div className="card">
           <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: 16 }}>
-            Ingested Sources & Record Coverage
+            Data Sources & Records
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {sources.map((src, i) => (
@@ -180,7 +180,7 @@ export default function DataQuality() {
                     {src.name}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                    Status: {src.status}
+                    Official Public Source
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>

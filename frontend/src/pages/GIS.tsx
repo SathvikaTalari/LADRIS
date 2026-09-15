@@ -303,7 +303,7 @@ export default function GIS() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
       <PageHeader
         title="GIS Risk Map & Predictive Risk Heatmap"
-        subtitle="National land acquisition risk visualization — project markers, multi-signal heatmap, and district-level risk intelligence"
+        subtitle="View land acquisition risks on the map."
       />
 
       {/* ── View Mode Toggle ───────────────────────────────────────────────── */}
@@ -612,8 +612,8 @@ export default function GIS() {
               {viewMode === 'risk_map' ? `${visibleProjects.length} Projects Mapped` : `${heatmapData.length} Districts — Acquisition Risk Pressure Active`}
             </div>
             {viewMode === 'risk_map'
-              ? 'Click markers for project risk details, bottleneck, and priority score.'
-              : 'Click heatmap circles to drill down into district-level risk intelligence.'}
+              ? 'Click a marker to see project details and risk scores.'
+              : 'Click a circle to see district risk details.'}
           </div>
 
           {/* Loading overlay for heatmap */}
@@ -624,8 +624,8 @@ export default function GIS() {
             }}>
               <div style={{ textAlign: 'center' }}>
                 <Thermometer size={32} color="#dc2626" style={{ marginBottom: 8 }} />
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>Computing Acquisition Risk Pressure...</div>
-                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Aggregating multi-signal district risk</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>Loading risk heatmap...</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Calculating district risk scores</div>
               </div>
             </div>
           )}
@@ -889,8 +889,8 @@ export default function GIS() {
                     <span style={{ color: 'var(--color-text-muted)' }}>Low → Critical Pressure</span>
                   </div>
                   <div style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-                    Bubble size = pressure magnitude<br />
-                    Click districts to drill down into risk signals
+                    Larger circles mean higher risk.<br />
+                    Click a circle to see details.
                   </div>
                   <div style={{ paddingTop: 6, borderTop: '1px solid var(--color-border-subtle)' }}>
                     <div style={{ fontWeight: 600, fontSize: '0.7rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>Signals Used:</div>
