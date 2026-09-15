@@ -50,7 +50,7 @@ Follow these instructions to clone, configure, and run **LADRIS** from scratch o
 
 #### Step 1: Clone Repository & Create `.env`
 ```bash
-git clone https://github.com/SathvikaTalari/LADRIS---Land-Acquisition-Delay-Risk-Intelligence-Platform.git
+git clone https://github.com/SathvikaTalari/LADRIS---Land-Acquisition.git
 cd LandPulse_AI
 
 # Create .env file from template

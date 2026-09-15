@@ -93,12 +93,21 @@ async def register(
 
 DEMO_USERS = {
     "admin@ladris.gov.in": {
-        "password": "admin123",
+        "password": "Password123!",
         "full_name": "Super System Admin",
         "role": UserRole.SUPER_ADMIN,
         "state_code": None,
         "district_code": None,
         "agency_name": None,
+    },
+    # Central Ministry
+    "central@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "MoRTH National Director",
+        "role": UserRole.CENTRAL_ADMIN,
+        "state_code": None,
+        "district_code": None,
+        "agency_name": "MoRTH / Central Ministry",
     },
     "central.admin@ladris.gov.in": {
         "password": "Password123!",
@@ -108,6 +117,15 @@ DEMO_USERS = {
         "district_code": None,
         "agency_name": "MoRTH / Central Ministry",
     },
+    # State Government
+    "state@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "Telangana State Nodal Officer",
+        "role": UserRole.STATE_ADMIN,
+        "state_code": "TG",
+        "district_code": None,
+        "agency_name": "Telangana Revenue Dept",
+    },
     "state.admin.tg@ladris.gov.in": {
         "password": "Password123!",
         "full_name": "Telangana State Nodal Officer",
@@ -115,6 +133,15 @@ DEMO_USERS = {
         "state_code": "TG",
         "district_code": None,
         "agency_name": "Telangana Revenue Dept",
+    },
+    # District Administration
+    "district@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "District Collector Sangareddy",
+        "role": UserRole.DISTRICT_OFFICER,
+        "state_code": "TG",
+        "district_code": "TG-SR",
+        "agency_name": "Sangareddy District Admin",
     },
     "district.officer.sangareddy@ladris.gov.in": {
         "password": "Password123!",
@@ -124,6 +151,15 @@ DEMO_USERS = {
         "district_code": "TG-SR",
         "agency_name": "Sangareddy District Admin",
     },
+    # Land Acquiring Authority
+    "authority@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "Land Acquisition Officer A",
+        "role": UserRole.LA_OFFICER,
+        "state_code": "TG",
+        "district_code": "TG-SR",
+        "agency_name": "Competent Authority LA",
+    },
     "la.officer@ladris.gov.in": {
         "password": "Password123!",
         "full_name": "Land Acquisition Officer A",
@@ -132,6 +168,24 @@ DEMO_USERS = {
         "district_code": "TG-SR",
         "agency_name": "Competent Authority LA",
     },
+    # Land Requiring Body
+    "lrb@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "Land Requiring Body Officer",
+        "role": UserRole.PROJECT_OFFICER,
+        "state_code": "TG",
+        "district_code": None,
+        "agency_name": "National Highways Authority of India (NHAI)",
+    },
+    # Project Implementing Agency
+    "agency@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "NHAI Project Manager",
+        "role": UserRole.PROJECT_AGENCY,
+        "state_code": "TG",
+        "district_code": None,
+        "agency_name": "National Highways Authority of India (NHAI)",
+    },
     "project.agency@nhai.gov.in": {
         "password": "Password123!",
         "full_name": "NHAI Project Manager",
@@ -139,6 +193,15 @@ DEMO_USERS = {
         "state_code": "TG",
         "district_code": None,
         "agency_name": "National Highways Authority of India (NHAI)",
+    },
+    # Policy Maker
+    "policy@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "NITI Aayog Policy Lead",
+        "role": UserRole.POLICY_ANALYST,
+        "state_code": None,
+        "district_code": None,
+        "agency_name": "NITI Aayog Research Cell",
     },
     "policy.analyst@niti.gov.in": {
         "password": "Password123!",
