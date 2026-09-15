@@ -344,8 +344,8 @@ export default function Landing() {
     footerLocation: hi ? 'नई दिल्ली, भारत' : 'New Delhi, India',
     footerPlatformTitle: hi ? 'प्लेटफ़ॉर्म' : 'Platform',
     footerPlatformLinks: hi
-      ? ['विशेषताएं', 'आर्किटेक्चर', 'विश्लेषण', 'GIS इंटेलिजेंस', 'दस्तावेज़ीकरण', 'सहायता और प्रतिक्रिया', 'रिलीज़ नोट्स']
-      : ['Features', 'Architecture', 'Analytics', 'GIS Intelligence', 'Documentation', 'Help & Feedback', 'Release Notes'],
+      ? ['विशेषताएं', 'आर्किटेक्चर', 'विश्लेषण', 'GIS इंटेलिजेंस', 'दस्तावेज़ीकरण', 'सहायता और प्रतिक्रिया',]
+      : ['Features', 'Architecture', 'Analytics', 'GIS Intelligence', 'Documentation', 'Help & Feedback'],
     footerPartnersTitle: hi ? 'आधिकारिक साझेदार' : 'Official Partners',
     footerPartners: hi ? [
       { name: 'रेल मंत्रालय', sub: 'भारत सरकार' },
@@ -770,6 +770,7 @@ export default function Landing() {
               {/* GitHub — outlined button */}
               <motion.button
                 whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => window.open('https://github.com/SathvikaTalari/LADRIS', '_blank', 'noopener,noreferrer')}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 7,
                   padding: '7px 16px',
@@ -859,7 +860,7 @@ export default function Landing() {
                 >{label}</button>
               ))}
               <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0'}`, display: 'flex', gap: 10 }}>
-                <button style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1'}`, color: isDark ? '#c9d8f0' : '#334155', fontWeight: 600, fontSize: '0.875rem' }}>GitHub</button>
+                <button onClick={() => window.open('https://github.com/SathvikaTalari/LADRIS', '_blank', 'noopener,noreferrer')} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1'}`, color: isDark ? '#c9d8f0' : '#334155', fontWeight: 600, fontSize: '0.875rem' }}>GitHub</button>
                 <button onClick={handleAccessDashboard} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: '#003366', border: 'none', color: '#ffffff', fontWeight: 700, fontSize: '0.875rem' }}>{T.navLogin}</button>
               </div>
             </div>
@@ -951,35 +952,7 @@ export default function Landing() {
                 {T.heroSub}
               </motion.p>
 
-              {/* CTA Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 0.3 }}
-                style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <motion.button
-                  id="hero-access-dashboard-btn"
-                  whileHover={{ scale: 1.04, translateY: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleAccessDashboard}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                    padding: '14px 32px',
-                    background: 'linear-gradient(135deg, #f47721 0%, #d97706 100%)',
-                    border: 'none', borderRadius: 12,
-                    color: '#ffffff', fontWeight: 800,
-                    fontSize: '1rem', cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    boxShadow: '0 6px 28px rgba(244,119,33,0.55), inset 0 1px 0 rgba(255,255,255,0.2)',
-                    letterSpacing: '-0.01em',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  {T.heroCta1}
-                  <ArrowRight size={18} strokeWidth={2.5} />
-                </motion.button>
 
-              </motion.div>
             </div>
           </div>
         </motion.div>
