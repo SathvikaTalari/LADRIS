@@ -43,6 +43,13 @@ export default function DataQuality() {
   }
 
   const { summary, field_null_rates, sources } = metrics
+  const completeness = Math.max(0, 100 - summary.missing_value_rate * 100)
+  const consistency = summary.total_real_records
+    ? (summary.valid_records / summary.total_real_records) * 100
+    : null
+  const generatedAt = summary.generated_at
+    ? new Date(summary.generated_at).toLocaleString('en-IN')
+    : 'Unavailable'
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
@@ -89,37 +96,37 @@ export default function DataQuality() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid rgba(46, 213, 115, 0.2)', paddingBottom: 14 }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Trust Score</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: '1.6rem', fontWeight: 800, color: '#16a34a', fontFamily: 'var(--font-mono)' }}>86<span style={{ fontSize: '1rem', color: 'rgba(22, 163, 74, 0.6)' }}>/100</span></span>
+              <span style={{ fontSize: '1.6rem', fontWeight: 800, color: '#16a34a', fontFamily: 'var(--font-mono)' }}>{completeness.toFixed(0)}<span style={{ fontSize: '1rem', color: 'rgba(22, 163, 74, 0.6)' }}>/100</span></span>
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: '0.8rem', marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Completeness</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>86%</strong>
+              <strong style={{ color: 'var(--color-text-primary)' }}>{completeness.toFixed(1)}%</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Freshness</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>79%</strong>
+              <strong style={{ color: 'var(--color-text-primary)' }}>Unavailable</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Consistency</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>92%</strong>
+              <strong style={{ color: 'var(--color-text-primary)' }}>{consistency === null ? 'Unavailable' : `${consistency.toFixed(1)}%`}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Official Source</span>
-              <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>Verified</span>
+              <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>{sources.length ? 'Ingested' : 'Unavailable'}</span>
             </div>
           </div>
           
           <div style={{ paddingTop: 14, borderTop: '1px solid rgba(46, 213, 115, 0.2)', display: 'flex', flexDirection: 'column', gap: 10, fontSize: '0.75rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--color-text-muted)' }}>Primary Source:</span>
-              <strong style={{ color: 'var(--color-text-primary)', textAlign: 'right' }}>Bhoomi / Gati Shakti</strong>
+              <strong style={{ color: 'var(--color-text-primary)', textAlign: 'right' }}>{sources.map((source) => source.name).join(', ') || 'Unavailable'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--color-text-muted)' }}>Last Updated:</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>2 hours ago</strong>
+              <strong style={{ color: 'var(--color-text-primary)' }}>{generatedAt}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--color-text-muted)' }}>Records Scanned:</span>
@@ -185,7 +192,7 @@ export default function DataQuality() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{src.records}</div>
-                  <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>Verified</span>
+                  <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>{src.quality || 'Ingested'}</span>
                 </div>
               </div>
             ))}

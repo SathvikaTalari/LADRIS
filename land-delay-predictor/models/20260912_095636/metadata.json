@@ -1,0 +1,37 @@
+{
+  "feature_columns": [
+    "project_type",
+    "state",
+    "district",
+    "implementing_agency",
+    "land_area_hectares",
+    "affected_families_count",
+    "days_since_notification",
+    "days_to_expected_completion",
+    "compensation_sanctioned",
+    "compensation_disbursed",
+    "compensation_disbursement_pct",
+    "days_since_last_disbursement",
+    "legal_dispute_count",
+    "open_legal_dispute_count",
+    "max_dispute_pendency_days",
+    "rehabilitation_progress_pct",
+    "resettlement_site_ready",
+    "stakeholder_update_count_90d",
+    "avg_days_between_updates",
+    "stage_count_recorded",
+    "current_stage",
+    "district_historical_delay_rate",
+    "agency_historical_delay_rate"
+  ],
+  "categorical_columns": [
+    "project_type",
+    "state",
+    "district",
+    "implementing_agency",
+    "current_stage"
+  ],
+  "has_regressor": true,
+  "training_timestamp": "2026-09-12T09:56:36.627434",
+  "evaluation": {}
+}

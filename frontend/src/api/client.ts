@@ -142,13 +142,16 @@ export const projectsAPI = {
 
 export const predictionsAPI = {
   get: (projectId: string) =>
-    apiClient.get<PredictionResult>(`/api/v1/predictions/${projectId}`).then((r) => r.data),
+    apiClient.get<PredictionResult>(`/api/ml/prediction/${projectId}`).then((r) => r.data),
+
+  generate: (projectId: string, snapshotDate?: string) =>
+    apiClient.post<PredictionResult>(`/api/ml/predict/${projectId}`, null, { params: snapshotDate ? { snapshot_date: snapshotDate } : undefined }).then((r) => r.data),
 
   stages: (projectId: string) =>
-    apiClient.get<RiskFingerprint>(`/api/v1/predictions/${projectId}/stages`).then((r) => r.data),
+    apiClient.get<RiskFingerprint>(`/api/ml/stages/${projectId}`).then((r) => r.data),
 
   explanation: (projectId: string) =>
-    apiClient.get<ExplanationResult>(`/api/v1/predictions/${projectId}/explanation`).then((r) => r.data),
+    apiClient.get<ExplanationResult>(`/api/ml/explanation/${projectId}`).then((r) => r.data),
 
   confidence: (projectId: string) =>
     apiClient.get<PredictionConfidence>(`/api/v1/predictions/${projectId}/confidence`).then((r) => r.data),

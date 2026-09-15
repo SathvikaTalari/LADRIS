@@ -28,7 +28,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { PageHeader } from '@/components/common'
-import { projectsAPI, intelligenceAPI } from '@/api/client'
+import { projectsAPI, intelligenceAPI, predictionsAPI } from '@/api/client'
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap, Tooltip } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -156,47 +156,25 @@ export default function GIS() {
         const res = await projectsAPI.list({ page_size: 100 })
         const items = res.items || []
 
-        const mapped = items.map((p: any, idx: number) => {
-          const rawState = (p.state_code || '').toUpperCase().trim()
-          const stateObj = STATE_COORDINATES[rawState]
-          const baseCoords = stateObj ? stateObj.coords : [20.5937, 78.9629] as [number, number]
-          const hash = p.id.split('-').reduce((acc: number, c: string) => acc + c.charCodeAt(0), 0)
-          const latOffset = (((hash * 17 + idx * 31) % 100) / 100 - 0.5) * 1.8
-          const lngOffset = (((hash * 23 + idx * 47) % 100) / 100 - 0.5) * 1.8
-          const lat = p.latitude ? Number(p.latitude) : (baseCoords[0] + latOffset)
-          const lng = p.longitude ? Number(p.longitude) : (baseCoords[1] + lngOffset)
-
-          // Priority score by risk level
-          const priorityMap: Record<string, number> = { CRITICAL: 88.5, HIGH: 74.2, MEDIUM: 52.0, LOW: 28.5, UNKNOWN: 40 }
-          const priorityScore = priorityMap[p.risk_level] ?? 40
-
-          // Dynamic top bottleneck based on project data
-          let topBottleneck = 'Pending Assessment'
-          if (p.legal_case_count > 5) {
-            topBottleneck = 'Severe Legal Disputes Blocking Possession'
-          } else if (p.delay_months > 12) {
-            topBottleneck = 'Prolonged Notification (3A/3D) Delays'
-          } else if ((p.area_in_possession_ha || 0) < (p.area_acquired_ha || 0) * 0.5 && p.area_acquired_ha > 0) {
-            topBottleneck = 'Physical Possession Halted'
-          } else if (p.risk_level === 'CRITICAL') {
-            topBottleneck = 'Compensation Disbursement Stalled'
-          } else if (p.risk_level === 'HIGH') {
-            topBottleneck = 'Legal Disputes Blocking Possession'
-          } else if (p.risk_level === 'MEDIUM') {
-            topBottleneck = 'Notification Stage Delays'
-          } else if (p.risk_level === 'LOW') {
-            topBottleneck = 'Minor R&R Compliance Gap'
-          }
+        const predictionRows = await Promise.all(items.map((project: any) =>
+          predictionsAPI.get(project.id).catch(() => null)
+        ))
+        const mapped = items.map((p: any, index: number) => {
+          const lat = p.latitude == null ? null : Number(p.latitude)
+          const lng = p.longitude == null ? null : Number(p.longitude)
+          const prediction = predictionRows[index]
+          const driver = prediction?.top_drivers?.find((item: any) => item.contribution > 0)
 
           return {
             ...p,
             lat,
             lng,
-            priorityScore,
-            topBottleneck,
-            stateLabel: stateObj?.name ?? rawState,
+            risk_level: prediction?.risk_category || 'UNKNOWN',
+            priorityScore: prediction?.risk_score ?? null,
+            topBottleneck: driver?.feature || 'Risk driver unavailable',
+            stateLabel: p.state_code || 'Unknown',
           }
-        })
+        }).filter((p: any) => Number.isFinite(p.lat) && Number.isFinite(p.lng))
         setProjects(mapped)
       } catch (err) {
         console.error('GIS load error:', err)
@@ -540,7 +518,7 @@ export default function GIS() {
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span style={{ color: '#64748b' }}>Priority Score:</span>
                             <strong style={{ color: getRiskLevelColor(p.risk_level), fontFamily: 'monospace', fontSize: '0.85rem' }}>
-                              {p.priorityScore.toFixed(1)}/100
+                              {p.priorityScore == null ? 'Unavailable' : `${p.priorityScore.toFixed(1)}/100`}
                             </strong>
                           </div>
 

@@ -13,7 +13,7 @@ from app.api.v1.predictions import (
 from app.api.v1.data_sources import data_sources_router
 from app.api.v1.monitoring import monitoring_router
 from app.api.v1.interventions import interventions_router  # Phase 4 — real implementation
-from app.api.v1.intelligence import intelligence_router    # Phase 7 — Decision Intelligence
+from app.api.v1.production_intelligence import intelligence_router
 from app.api.v1.alerts import router as alerts_router
 from app.api.v1.search import router as search_router
 from app.api.v1.reports import router as reports_router

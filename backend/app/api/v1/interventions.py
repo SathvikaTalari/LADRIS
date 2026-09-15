@@ -72,7 +72,7 @@ async def get_intervention_catalog(
     Return the full structured intervention catalog.
     Each entry includes intervention rules, evidence, provenance, and non-causal notes.
     """
-    from app.services.intervention_service import get_intervention_catalog
+    from app.services.production_intervention_service import get_intervention_catalog
     try:
         return get_intervention_catalog()
     except Exception as e:
@@ -104,9 +104,9 @@ async def list_interventions(
     NOT causal predictions or legal orders.
     """
     project = await _get_project_or_404(project_id, db)
-    from app.services.intervention_service import get_interventions_for_project
+    from app.services.production_intervention_service import get_interventions_for_project
     try:
-        return await get_interventions_for_project(project)
+        return await get_interventions_for_project(project, db)
     except Exception as e:
         log.error("Intervention list error for %s: %s", project_id, e)
         raise HTTPException(
@@ -136,9 +136,9 @@ async def get_intervention_priority(
     Labeled: "Decision-Support Priority Score" — NOT a causal optimization score.
     """
     project = await _get_project_or_404(project_id, db)
-    from app.services.intervention_service import get_intervention_priority
+    from app.services.production_intervention_service import get_intervention_priority
     try:
-        return await get_intervention_priority(project)
+        return await get_intervention_priority(project, db)
     except Exception as e:
         log.error("Priority score error for %s: %s", project_id, e)
         raise HTTPException(
@@ -165,9 +165,9 @@ async def get_intervention_evidence(
     No evidence is fabricated.
     """
     project = await _get_project_or_404(project_id, db)
-    from app.services.intervention_service import get_intervention_evidence
+    from app.services.production_intervention_service import get_intervention_evidence
     try:
-        return await get_intervention_evidence(project)
+        return await get_intervention_evidence(project, db)
     except Exception as e:
         log.error("Evidence fetch error for %s: %s", project_id, e)
         raise HTTPException(
@@ -197,14 +197,10 @@ async def get_eligible_simulation_fields(
     Only fields that exist in the real project dataset are eligible.
     """
     project = await _get_project_or_404(project_id, db)
-    from app.services.ml_service import calculate_project_completeness
-    completeness_pct, _ = calculate_project_completeness(project)
-
-    from app.services.intervention_service import _extract_extended_features
-    from ml.scenario.engine import get_eligible_simulation_fields
-
-    features = _extract_extended_features(project)
-    eligible = get_eligible_simulation_fields(features, completeness_pct)
+    from app.services.production_intervention_service import _features, _completeness, eligible_fields
+    features = await _features(db, project)
+    completeness_pct = _completeness(features)
+    eligible = eligible_fields(features)
 
     return {
         "project_id": project_id,
@@ -241,7 +237,7 @@ async def simulate_intervention_scenario(
     - Non-simulatable fields (state_code, notifications, etc.) are rejected.
     """
     project = await _get_project_or_404(project_id, db)
-    from app.services.intervention_service import simulate_scenario
+    from app.services.production_intervention_service import simulate_scenario
     try:
         return await simulate_scenario(
             project=project,
@@ -250,6 +246,11 @@ async def simulate_intervention_scenario(
             db=db,
             user_id=str(current_user.id),
         )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e),
+        ) from e
     except Exception as e:
         log.error("Simulation error for %s: %s", project_id, e)
         raise HTTPException(
@@ -288,7 +289,7 @@ async def compare_intervention_scenarios(
         )
 
     project = await _get_project_or_404(project_id, db)
-    from app.services.intervention_service import compare_scenarios
+    from app.services.production_intervention_service import compare_scenarios
 
     scenario_list = [
         {"name": sc.scenario_name, "inputs": sc.inputs}

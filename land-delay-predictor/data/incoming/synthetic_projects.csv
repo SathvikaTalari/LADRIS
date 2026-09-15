@@ -1,0 +1,801 @@
+Project ID,Project Name,Project Type,Implementing Agency,State,District,Land Area (ha),Affected Families,Notification Date,Expected Completion,Actual Completion,Current Stage,Delayed (Y/N),Delay (days),Compensation Sanctioned,Compensation Disbursed,Open Disputes,R&R Progress %,Stakeholder Updates (90d),Legal Dispute Count
+SYN0001,Canal Network Expansion 1,irrigation,State Irrigation Dept,Rajasthan,Pali,260.4,196,2020-04-05,2024-05-14,2024-05-01,completed,N,0,121299761,92066519,0,95.4,5,2
+SYN0002,Lift Irrigation Scheme Warangal-2,irrigation,Central Water Commission,Telangana,Warangal,15.9,779,2024-11-11,2026-12-01,2028-01-04,completed,Y,399,102614292,70855169,0,94.8,2,0
+SYN0003,Dam & Reservoir Project 3,irrigation,State Irrigation Dept,Uttar Pradesh,Varanasi,279.8,354,2022-09-01,2027-04-08,2028-01-05,completed,Y,272,115634604,91837002,0,70.4,2,0
+SYN0004,Special Economic Zone Amravati-4,industrial,KIADB,Maharashtra,Amravati,155.9,403,2020-09-28,2022-10-18,,completed,,,138452191,64684864,3,81.3,5,3
+SYN0005,Special Economic Zone Indore-5,industrial,MIDC,Madhya Pradesh,Indore,21.3,412,2018-06-01,2020-11-17,2021-05-14,completed,Y,178,364059605,194262205,0,49.1,1,1
+SYN0006,Canal Network Expansion 6,irrigation,State PWD,Uttar Pradesh,Mathura,137.8,473,2019-08-26,2023-04-07,2023-04-06,completed,N,0,136306087,127364408,0,81.3,5,0
+SYN0007,Special Economic Zone Kurnool-7,industrial,MIDC,Andhra Pradesh,Kurnool,177.4,88,2022-08-05,2024-08-24,2024-08-07,completed,N,0,57205317,45403860,0,66.7,2,1
+SYN0008,Metro Extension 8 Varanasi,urban,BBMP,Uttar Pradesh,Varanasi,2.1,119,2021-04-28,2022-08-21,,completed,,,79486707,7861235,0,86.4,7,0
+SYN0009,BRTS Corridor Gwalior-9,urban,GHMC,Madhya Pradesh,Gwalior,4.7,169,2019-01-19,2020-10-10,2020-09-24,completed,N,0,19956109,18511287,0,80.5,3,2
+SYN0010,NH Extension Package 10,highway,State PWD,Andhra Pradesh,Kurnool,82.3,319,2022-04-19,2024-11-04,2024-10-29,completed,N,0,102110266,86078954,0,92.8,3,0
+SYN0011,Irrigation Canal Sikar 11,irrigation,State Irrigation Dept,Rajasthan,Sikar,75.7,311,2018-08-20,2023-01-26,,completed,,,73056723,25708661,0,86.7,4,0
+SYN0012,NH Extension Package 12,highway,MORTH,Rajasthan,Pali,39.1,84,2023-09-10,2026-05-27,2027-05-24,completed,Y,362,45854659,24275456,2,72.8,2,3
+SYN0013,Rail Electrification Project Warangal-13,railway,RVNL,Telangana,Warangal,196.4,215,2024-05-02,2025-10-24,2025-10-11,completed,N,0,172662991,172662991,0,100.0,7,0
+SYN0014,Ring Road Project 14,urban,JNURM,Telangana,Karimnagar,45.1,73,2021-03-02,2022-04-26,2022-08-30,completed,Y,126,38599470,2431767,4,40.0,2,4
+SYN0015,Bypass Road Project 15 (Varanasi),highway,NHAI,Uttar Pradesh,Varanasi,83.7,157,2018-03-24,2020-01-13,,completed,,,119169304,57999700,0,100.0,8,0
+SYN0016,Metro Rail Phase 16 Ghaziabad,railway,DFCCIL,Uttar Pradesh,Ghaziabad,70.1,121,2024-04-08,2025-09-30,2026-04-02,completed,Y,184,196029704,9801485,0,88.2,0,0
+SYN0017,4-Lane Highway Udaipur-17,highway,MORTH,Rajasthan,Udaipur,58.0,291,2018-02-20,2020-03-11,2020-03-05,completed,N,0,41934763,36827109,0,81.2,8,2
+SYN0018,Irrigation Canal Allahabad 18,irrigation,State Irrigation Dept,Uttar Pradesh,Allahabad,271.5,559,2023-06-20,2026-08-03,2028-04-09,completed,Y,615,83468075,37351964,0,65.0,2,0
+SYN0019,BRTS Corridor Raigad-19,urban,JNURM,Maharashtra,Raigad,39.7,175,2021-09-27,2022-07-24,2023-03-07,completed,Y,226,47005181,25208879,0,77.1,2,0
+SYN0020,4-Lane Highway Mysuru-20,highway,NHAI,Karnataka,Mysuru,103.5,67,2019-04-05,2020-03-30,2020-03-12,completed,N,0,33193109,27673095,0,65.5,3,8
+SYN0021,State Highway Widening Warangal Sec 21,highway,State PWD,Telangana,Warangal,103.3,263,2019-12-17,2022-02-04,2022-01-19,completed,N,0,148244406,94505809,0,61.3,5,0
+SYN0022,Dam & Reservoir Project 22,irrigation,State Irrigation Dept,Gujarat,Junagadh,94.0,573,2023-08-15,2026-05-31,,completed,,,51652943,1523762,2,90.7,3,2
+SYN0023,State Highway Widening Vijayapura Sec 23,highway,NHAI,Karnataka,Vijayapura,55.6,199,2019-04-13,2022-01-27,2022-05-30,completed,Y,123,34990986,2155445,0,75.9,2,0
+SYN0024,Rail Electrification Project Karimnagar-24,railway,DFCCIL,Telangana,Karimnagar,181.6,549,2024-07-18,2027-11-30,,legal_resolution,,,136392433,92474070,2,11.3,2,2
+SYN0025,Industrial Corridor Phase 25,industrial,MIDC,Maharashtra,Amravati,176.0,143,2021-10-19,2022-10-14,2022-10-08,completed,N,0,192785744,144782094,0,100.0,4,0
+SYN0026,Manufacturing Hub 26 Gandhinagar,industrial,APIIC,Gujarat,Gandhinagar,137.0,449,2018-12-18,2020-01-12,,completed,,,35298092,12739081,0,84.2,8,0
+SYN0027,Bypass Road Project 27 (Aurangabad),highway,NHAI,Maharashtra,Aurangabad,50.6,340,2023-02-19,2024-08-12,2024-08-09,completed,N,0,117779823,109935687,0,93.1,6,0
+SYN0028,Bypass Road Project 28 (Pali),highway,MORTH,Rajasthan,Pali,36.7,386,2021-12-07,2023-01-31,2023-01-12,completed,N,0,121801555,112593357,0,63.4,2,2
+SYN0029,Metro Rail Phase 29 Anand,railway,Indian Railways,Gujarat,Anand,147.3,495,2018-07-27,2021-04-12,2022-02-07,completed,Y,301,198632650,22107814,7,25.1,1,7
+SYN0030,Rail Corridor Bikaner Segment 30,railway,Indian Railways,Rajasthan,Bikaner,88.2,79,2020-08-08,2024-01-20,2024-06-18,completed,Y,150,151389480,56907306,1,67.2,2,1
+SYN0031,Special Economic Zone Bharatpur-31,industrial,APIIC,Rajasthan,Bharatpur,144.3,380,2018-04-24,2020-05-13,2020-07-30,completed,Y,78,26552439,11112196,0,74.6,1,2
+SYN0032,Lift Irrigation Scheme Tumkur-32,irrigation,Central Water Commission,Karnataka,Tumkur,102.4,276,2021-12-18,2025-03-02,2026-02-13,completed,Y,348,28313175,3301316,0,47.4,0,1
+SYN0033,4-Lane Highway Ujjain-33,highway,MORTH,Madhya Pradesh,Ujjain,87.9,94,2018-04-10,2019-11-01,2019-10-15,completed,N,0,47359813,47359813,0,74.6,8,0
+SYN0034,Rail Electrification Project Suryapet-34,railway,DFCCIL,Telangana,Suryapet,175.1,166,2021-08-11,2023-07-02,,completed,,,126205158,55391444,0,91.5,2,0
+SYN0035,NH Extension Package 35,highway,NHAI,Rajasthan,Jodhpur,67.5,260,2022-07-20,2025-02-04,,completed,,,48116204,5542987,0,73.6,6,0
+SYN0036,Dam & Reservoir Project 36,irrigation,Central Water Commission,Andhra Pradesh,Kurnool,59.6,458,2020-11-03,2023-02-21,2023-02-22,completed,Y,1,61795561,32133692,1,86.1,0,1
+SYN0037,Dam & Reservoir Project 37,irrigation,Central Water Commission,Rajasthan,Pali,250.6,113,2021-02-18,2023-10-06,2023-09-17,completed,N,0,151046756,119357147,0,76.8,2,3
+SYN0038,Rail Electrification Project Alwar-38,railway,DFCCIL,Rajasthan,Alwar,128.7,76,2021-02-20,2022-09-13,,completed,,,288954220,101394036,2,65.2,2,2
+SYN0039,Ring Road Project 39,urban,HMDA,Rajasthan,Pali,30.1,182,2021-09-21,2023-02-13,,completed,,,97060247,9608964,0,84.9,4,0
+SYN0040,Canal Network Expansion 40,irrigation,State Irrigation Dept,Maharashtra,Solapur,86.9,158,2020-11-13,2025-03-22,2025-03-23,completed,Y,1,105346269,84403431,0,52.8,1,0
+SYN0041,Bypass Road Project 41 (Kalaburagi),highway,State PWD,Karnataka,Kalaburagi,58.2,387,2024-01-07,2025-08-29,2025-12-19,completed,Y,112,96353230,56414816,2,25.0,2,3
+SYN0042,NH Extension Package 42,highway,NHAI,Gujarat,Surat,66.0,169,2021-02-21,2022-06-16,2022-08-13,completed,Y,58,73471868,26560080,0,58.0,2,2
+SYN0043,Canal Network Expansion 43,irrigation,State Irrigation Dept,Maharashtra,Nagpur,182.3,715,2020-09-09,2022-03-03,2023-02-28,completed,Y,362,110023213,35548500,0,75.9,1,0
+SYN0044,Metro Extension 44 Kanpur,urban,JNURM,Uttar Pradesh,Kanpur,40.9,118,2019-07-02,2020-09-24,,completed,,,80277398,16071535,2,75.0,2,2
+SYN0045,NH Extension Package 45,highway,State PWD,Karnataka,Mysuru,116.7,68,2022-08-01,2025-06-16,2025-06-06,completed,N,0,95372613,80179756,0,85.7,4,3
+SYN0046,Industrial Corridor Phase 46,industrial,GIDC,Gujarat,Anand,98.1,100,2022-02-08,2023-10-31,,completed,,,287478515,92855560,2,87.3,4,2
+SYN0047,BRTS Corridor Karimnagar-47,urban,HMDA,Telangana,Karimnagar,34.7,66,2020-06-14,2021-06-09,2021-08-07,completed,Y,59,87729762,31644125,0,44.9,0,0
+SYN0048,Rail Corridor Sikar Segment 48,railway,DFCCIL,Rajasthan,Sikar,190.1,356,2024-08-10,2027-10-24,2027-11-01,completed,Y,8,82528485,46438779,0,44.0,1,0
+SYN0049,4-Lane Highway Botad-49,highway,State PWD,Gujarat,Botad,105.2,55,2023-05-01,2026-01-15,2025-12-20,completed,N,0,136102517,113169243,0,100.0,6,0
+SYN0050,Industrial Park Kanpur 50,industrial,KIADB,Uttar Pradesh,Kanpur,136.3,208,2023-12-25,2025-04-18,2025-12-25,completed,Y,251,158647269,128044211,2,87.2,2,3
+SYN0051,Metro Rail Phase 51 Varanasi,railway,RVNL,Uttar Pradesh,Varanasi,190.0,352,2022-09-09,2026-04-21,2026-10-24,completed,Y,186,43399215,25948391,1,52.5,2,3
+SYN0052,Industrial Corridor Phase 52,industrial,RIICO,Gujarat,Junagadh,141.1,394,2024-07-01,2026-02-21,2026-06-27,completed,Y,126,262648722,66187478,1,76.7,0,1
+SYN0053,Irrigation Canal Kalaburagi 53,irrigation,State PWD,Karnataka,Kalaburagi,27.9,78,2023-08-23,2026-09-06,2026-09-21,completed,Y,15,23952440,13657681,0,48.0,1,0
+SYN0054,Dam & Reservoir Project 54,irrigation,Central Water Commission,Gujarat,Botad,24.3,419,2021-11-04,2025-11-13,2026-05-23,completed,Y,191,51041964,3950648,2,95.0,2,6
+SYN0055,BRTS Corridor Bangalore Urban-55,urban,BBMP,Karnataka,Bangalore Urban,32.8,172,2019-02-28,2021-01-18,2021-06-28,completed,Y,161,36683370,31764130,0,52.5,0,1
+SYN0056,Special Economic Zone Jhansi-56,industrial,MIDC,Uttar Pradesh,Jhansi,117.2,458,2020-03-26,2021-03-21,2021-03-21,completed,N,0,70085227,52353665,0,100.0,6,5
+SYN0057,Freight Corridor Extension 57,railway,Indian Railways,Maharashtra,Thane,160.0,575,2023-07-17,2025-04-07,,completed,,,141081572,40476303,1,100.0,7,1
+SYN0058,Industrial Corridor Phase 58,industrial,APIIC,Rajasthan,Sikar,33.2,91,2021-07-14,2022-10-07,2022-10-23,completed,Y,16,67952804,18530730,2,36.3,1,3
+SYN0059,Metro Extension 59 Sikar,urban,JNURM,Rajasthan,Sikar,28.5,75,2018-12-04,2020-10-24,2020-10-11,completed,N,0,37198504,28300622,0,86.5,2,3
+SYN0060,Freight Corridor Extension 60,railway,DFCCIL,Karnataka,Mangaluru,37.4,431,2023-08-03,2025-03-25,,completed,,,171347513,14581673,0,72.0,4,0
+SYN0061,Canal Network Expansion 61,irrigation,Central Water Commission,Gujarat,Anand,179.7,257,2024-12-02,2027-11-17,2028-11-26,completed,Y,375,170218595,53618857,0,75.6,1,0
+SYN0062,Irrigation Canal Junagadh 62,irrigation,Central Water Commission,Gujarat,Junagadh,232.3,387,2022-11-27,2025-10-12,2026-04-09,completed,Y,179,32934041,14296667,0,48.7,0,0
+SYN0063,Manufacturing Hub 63 Bareilly,industrial,GIDC,Uttar Pradesh,Bareilly,122.2,93,2020-03-12,2021-12-02,,completed,,,79120363,19882947,2,77.2,2,2
+SYN0064,Bypass Road Project 64 (Bharuch),highway,MORTH,Gujarat,Bharuch,22.2,377,2021-05-07,2024-04-21,2024-03-31,completed,N,0,49720812,46926502,0,100.0,2,0
+SYN0065,4-Lane Highway Kota-65,highway,NHAI,Rajasthan,Kota,24.2,302,2020-06-04,2021-05-30,2021-10-21,completed,Y,144,125836359,64101041,0,47.7,1,0
+SYN0066,Bypass Road Project 66 (Chittoor),highway,MORTH,Andhra Pradesh,Chittoor,12.3,196,2022-07-23,2025-03-09,2025-02-23,completed,N,0,125643757,116233040,0,78.9,8,0
+SYN0067,NH Extension Package 67,highway,State PWD,Gujarat,Botad,18.4,354,2021-05-24,2023-03-15,2023-06-30,completed,Y,107,136358796,37171408,2,81.2,0,2
+SYN0068,State Highway Widening Thane Sec 68,highway,NHAI,Maharashtra,Thane,95.0,282,2022-03-25,2025-03-09,2026-04-15,completed,Y,402,89022873,25754317,0,17.5,2,0
+SYN0069,Rail Electrification Project Indore-69,railway,DFCCIL,Madhya Pradesh,Indore,33.4,522,2023-05-26,2025-07-14,2026-02-16,completed,Y,217,251192023,218411464,0,73.5,2,0
+SYN0070,Irrigation Canal Bharuch 70,irrigation,Central Water Commission,Gujarat,Bharuch,58.0,103,2021-10-21,2024-04-08,2024-03-13,completed,N,0,71970366,61059659,0,64.7,3,1
+SYN0071,State Highway Widening Satna Sec 71,highway,MORTH,Madhya Pradesh,Satna,75.8,353,2020-06-10,2022-05-31,2022-07-23,completed,Y,53,18703362,7515011,0,40.3,1,0
+SYN0072,Bypass Road Project 72 (Solapur),highway,State PWD,Maharashtra,Solapur,97.1,95,2019-10-23,2020-12-16,2020-11-23,completed,N,0,149588796,138414513,0,78.5,7,0
+SYN0073,Metro Rail Phase 73 Bangalore Urban,railway,DFCCIL,Karnataka,Bangalore Urban,200.0,208,2019-04-11,2023-03-21,,completed,,,254884233,116533071,0,97.3,8,0
+SYN0074,Special Economic Zone Karimnagar-74,industrial,KIADB,Telangana,Karimnagar,132.5,134,2022-07-05,2023-11-27,2024-06-08,completed,Y,194,158433777,58557124,1,10.0,2,1
+SYN0075,Industrial Park Mathura 75,industrial,MIDC,Uttar Pradesh,Mathura,103.1,194,2024-08-27,2026-02-18,2026-02-28,completed,Y,10,179091114,99771660,2,66.4,1,7
+SYN0076,NH Extension Package 76,highway,MORTH,Madhya Pradesh,Sagar,40.0,292,2023-09-28,2024-12-21,2025-07-14,completed,Y,205,142229923,74258243,1,76.6,0,2
+SYN0077,Freight Corridor Extension 77,railway,DFCCIL,Gujarat,Junagadh,162.4,190,2021-02-12,2023-03-04,2023-02-17,completed,N,0,211860877,211860877,0,100.0,5,6
+SYN0078,Dam & Reservoir Project 78,irrigation,State Irrigation Dept,Andhra Pradesh,Guntur,97.1,348,2024-03-18,2028-10-23,2028-10-24,completed,Y,1,129595588,54844853,0,50.0,2,0
+SYN0079,Canal Network Expansion 79,irrigation,State Irrigation Dept,Uttar Pradesh,Varanasi,205.4,576,2018-10-12,2021-06-28,2021-08-01,completed,Y,34,107581592,5379080,0,52.3,1,0
+SYN0080,Industrial Park Nizamabad 80,industrial,RIICO,Telangana,Nizamabad,133.1,445,2023-01-12,2024-03-07,2024-03-03,completed,N,0,36847562,24658388,0,74.2,3,2
+SYN0081,Special Economic Zone Satna-81,industrial,MIDC,Madhya Pradesh,Satna,162.4,71,2018-12-25,2021-02-12,2021-06-29,completed,Y,137,171325141,99282919,0,34.2,2,0
+SYN0082,4-Lane Highway Bangalore Urban-82,highway,MORTH,Karnataka,Bangalore Urban,58.4,227,2020-02-26,2022-01-16,2022-10-11,completed,Y,268,105349931,22723980,0,81.5,0,0
+SYN0083,Special Economic Zone West Godavari-83,industrial,KIADB,Andhra Pradesh,West Godavari,75.2,358,2022-05-11,2023-08-04,2023-12-17,completed,Y,135,188685185,27359352,1,65.5,2,1
+SYN0084,Metro Extension 84 Jaipur,urban,HMDA,Rajasthan,Jaipur,42.7,193,2020-09-26,2022-06-18,2022-11-03,completed,Y,138,11387169,5892860,3,36.2,2,5
+SYN0085,4-Lane Highway Amravati-85,highway,State PWD,Maharashtra,Amravati,81.5,157,2021-02-19,2022-06-14,2022-11-04,completed,Y,143,31976967,1598848,0,50.1,1,0
+SYN0086,Industrial Park Jabalpur 86,industrial,KIADB,Madhya Pradesh,Jabalpur,51.1,415,2023-08-07,2024-10-30,2024-10-31,completed,Y,1,279133119,164409407,0,40.5,2,0
+SYN0087,State Highway Widening Ajmer Sec 87,highway,NHAI,Rajasthan,Ajmer,25.3,282,2024-06-17,2026-01-08,2025-12-28,completed,N,0,72773847,68618460,0,81.2,2,0
+SYN0088,Bypass Road Project 88 (Bharuch),highway,MORTH,Gujarat,Bharuch,59.5,378,2024-07-27,2027-01-13,2027-04-16,completed,Y,93,125212791,25318026,1,46.6,1,4
+SYN0089,Dam & Reservoir Project 89,irrigation,Central Water Commission,Telangana,Warangal,285.0,571,2020-03-06,2023-04-20,,completed,,,169957073,42353303,0,100.0,6,0
+SYN0090,NH Extension Package 90,highway,MORTH,Rajasthan,Pali,82.5,398,2022-11-06,2025-04-24,,completed,,,53954840,15571367,0,80.0,8,0
+SYN0091,State Highway Widening Suryapet Sec 91,highway,State PWD,Telangana,Suryapet,79.0,178,2024-10-14,2027-05-02,2027-09-03,completed,Y,124,40507297,22651680,1,35.9,0,1
+SYN0092,Canal Network Expansion 92,irrigation,State Irrigation Dept,Maharashtra,Amravati,106.0,393,2021-04-11,2025-11-16,2027-04-11,completed,Y,511,77255339,23284759,3,48.4,0,3
+SYN0093,NH Extension Package 93,highway,NHAI,Uttar Pradesh,Varanasi,99.5,325,2020-07-28,2023-02-13,2023-09-22,completed,Y,221,28104650,20423649,2,54.4,1,5
+SYN0094,State Highway Widening Junagadh Sec 94,highway,State PWD,Gujarat,Junagadh,107.1,364,2019-10-12,2020-11-05,2020-11-06,completed,Y,1,6185724,3538853,1,61.7,2,1
+SYN0095,Rail Electrification Project Anand-95,railway,Indian Railways,Gujarat,Anand,89.5,511,2018-10-18,2020-10-07,2021-07-02,completed,Y,268,296836303,128559803,0,45.9,1,0
+SYN0096,Freight Corridor Extension 96,railway,DFCCIL,Karnataka,Vijayapura,44.7,391,2019-10-17,2022-04-04,2022-03-31,completed,N,0,185815551,143728329,0,80.7,6,0
+SYN0097,Metro Rail Phase 97 Botad,railway,RVNL,Gujarat,Botad,121.3,536,2022-06-17,2026-01-27,2026-07-08,completed,Y,162,205403854,157935023,0,51.7,2,1
+SYN0098,Rail Electrification Project Lucknow-98,railway,RVNL,Uttar Pradesh,Lucknow,46.6,298,2019-09-21,2023-02-02,2023-01-30,completed,N,0,65327455,49877512,0,87.7,5,2
+SYN0099,Canal Network Expansion 99,irrigation,Central Water Commission,Gujarat,Junagadh,174.9,718,2024-12-24,2026-09-15,,legal_resolution,,,78480831,56011769,1,7.6,2,1
+SYN0100,Rail Electrification Project Mangaluru-100,railway,RVNL,Karnataka,Mangaluru,158.8,262,2019-04-09,2022-02-22,2022-06-20,completed,Y,118,149142993,7457150,5,37.7,1,6
+SYN0101,State Highway Widening Mehsana Sec 101,highway,State PWD,Gujarat,Mehsana,82.2,275,2020-01-10,2022-10-26,2022-10-18,completed,N,0,140288470,120423623,0,74.3,6,3
+SYN0102,Special Economic Zone Kanpur-102,industrial,APIIC,Uttar Pradesh,Kanpur,38.1,444,2023-04-02,2024-06-25,2024-05-27,completed,N,0,80017609,59068999,0,56.7,5,2
+SYN0103,Metro Rail Phase 103 Meerut,railway,DFCCIL,Uttar Pradesh,Meerut,153.0,88,2023-01-25,2024-09-16,2025-07-24,completed,Y,311,265851042,186654017,0,95.0,1,0
+SYN0104,4-Lane Highway Jaipur-104,highway,NHAI,Rajasthan,Jaipur,67.7,98,2022-10-04,2024-07-25,2025-05-24,completed,Y,303,32957653,19098960,7,62.7,2,8
+SYN0105,4-Lane Highway Pune-105,highway,MORTH,Maharashtra,Pune,104.2,237,2024-05-19,2027-02-03,,possession,,,79715696,73912393,0,93.6,3,0
+SYN0106,Urban Flyover Sagar 106,urban,GHMC,Madhya Pradesh,Sagar,30.0,166,2020-07-08,2021-11-30,,completed,,,67099920,15506792,6,77.0,2,6
+SYN0107,Metro Rail Phase 107 Kolhapur,railway,RVNL,Maharashtra,Kolhapur,59.8,186,2023-02-21,2027-01-01,,possession,,,141943815,127252630,0,81.0,7,0
+SYN0108,Dam & Reservoir Project 108,irrigation,Central Water Commission,Madhya Pradesh,Ratlam,142.3,760,2024-04-22,2028-11-27,,compensation,,,183862718,144552869,0,46.3,6,0
+SYN0109,Bypass Road Project 109 (Nashik),highway,State PWD,Maharashtra,Nashik,66.1,58,2018-11-07,2021-08-23,2021-08-09,completed,N,0,86767122,61838928,0,73.9,4,0
+SYN0110,Special Economic Zone Gandhinagar-110,industrial,APIIC,Gujarat,Gandhinagar,198.9,85,2022-02-02,2024-02-22,2024-09-12,completed,Y,203,129094469,68484616,0,64.8,1,0
+SYN0111,Metro Extension 111 Bharuch,urban,BBMP,Gujarat,Bharuch,18.7,65,2018-11-22,2020-10-12,2020-12-17,completed,Y,66,17097973,15282168,0,49.9,1,1
+SYN0112,Freight Corridor Extension 112,railway,DFCCIL,Gujarat,Junagadh,25.8,479,2019-08-12,2021-06-02,2021-05-05,completed,N,0,14537281,13012320,0,88.7,2,4
+SYN0113,Rail Corridor Khammam Segment 113,railway,RVNL,Telangana,Khammam,30.2,565,2021-08-08,2024-06-23,2024-12-13,completed,Y,173,275755140,61658849,2,42.9,0,3
+SYN0114,Rail Electrification Project Nanded-114,railway,Indian Railways,Maharashtra,Nanded,184.1,487,2020-05-02,2023-03-18,,completed,,,23596388,3058092,3,99.9,5,3
+SYN0115,Special Economic Zone Ballari-115,industrial,GIDC,Karnataka,Ballari,74.1,412,2020-07-06,2022-11-23,2023-04-21,completed,Y,149,41897095,11949051,2,65.8,0,2
+SYN0116,Rail Corridor Kota Segment 116,railway,DFCCIL,Rajasthan,Kota,68.3,90,2021-06-03,2024-04-18,,completed,,,64567355,17284681,0,58.0,6,0
+SYN0117,NH Extension Package 117,highway,State PWD,Uttar Pradesh,Allahabad,110.6,386,2019-04-24,2020-07-17,,completed,,,34654406,14336528,2,72.3,8,2
+SYN0118,4-Lane Highway Ratlam-118,highway,MORTH,Madhya Pradesh,Ratlam,98.3,399,2020-05-12,2022-08-30,,completed,,,126761021,47408622,1,74.6,5,1
+SYN0119,4-Lane Highway Varanasi-119,highway,NHAI,Uttar Pradesh,Varanasi,46.3,224,2022-10-19,2025-09-03,2026-06-27,completed,Y,297,84843167,56607361,0,48.7,2,0
+SYN0120,Lift Irrigation Scheme Satna-120,irrigation,State PWD,Madhya Pradesh,Satna,169.5,697,2019-03-24,2023-07-01,2024-01-21,completed,Y,204,168618356,142077827,0,71.6,0,3
+SYN0121,Freight Corridor Extension 121,railway,RVNL,Uttar Pradesh,Agra,140.0,544,2018-04-17,2020-12-02,2021-06-12,completed,Y,192,164341621,73247060,1,56.9,2,1
+SYN0122,Ring Road Project 122,urban,BBMP,Telangana,Sangareddy,14.1,110,2018-02-17,2019-02-12,2019-03-23,completed,Y,39,40439900,9875424,0,69.4,1,1
+SYN0123,Canal Network Expansion 123,irrigation,State PWD,Andhra Pradesh,Guntur,63.8,551,2021-07-18,2025-06-27,2025-06-17,completed,N,0,115342042,105388024,0,76.8,6,0
+SYN0124,Metro Extension 124 Kanpur,urban,JNURM,Uttar Pradesh,Kanpur,29.0,28,2020-01-03,2021-08-25,,completed,,,85790622,30172562,3,83.0,3,3
+SYN0125,Special Economic Zone Surat-125,industrial,RIICO,Gujarat,Surat,89.1,428,2022-04-19,2024-04-08,2024-03-16,completed,N,0,49802523,43666852,0,68.2,2,1
+SYN0126,Rail Electrification Project Chittoor-126,railway,RVNL,Andhra Pradesh,Chittoor,61.1,434,2024-06-01,2027-07-16,2027-08-25,completed,Y,40,201594853,149623700,3,69.2,2,7
+SYN0127,State Highway Widening Udaipur Sec 127,highway,State PWD,Rajasthan,Udaipur,43.9,214,2023-07-11,2025-05-31,2026-03-04,completed,Y,277,17658099,3978370,0,65.7,0,0
+SYN0128,4-Lane Highway Vijayapura-128,highway,NHAI,Karnataka,Vijayapura,89.7,316,2024-07-01,2026-03-23,2026-03-05,completed,N,0,80560157,68564750,0,73.6,4,2
+SYN0129,Freight Corridor Extension 129,railway,Indian Railways,Madhya Pradesh,Gwalior,65.3,302,2021-05-14,2023-08-02,2024-09-28,completed,Y,423,188833950,68999925,0,57.8,1,0
+SYN0130,Metro Rail Phase 130 Anand,railway,DFCCIL,Gujarat,Anand,145.2,540,2021-11-20,2023-09-11,2023-08-12,completed,N,0,102549923,88592878,0,60.9,6,1
+SYN0131,Manufacturing Hub 131 Ballari,industrial,RIICO,Karnataka,Ballari,142.7,331,2020-02-19,2021-08-12,2021-07-13,completed,N,0,289179479,227815594,0,86.7,7,1
+SYN0132,4-Lane Highway Bharuch-132,highway,NHAI,Gujarat,Bharuch,18.1,336,2019-05-22,2020-09-13,,completed,,,63116739,1262335,2,80.6,7,2
+SYN0133,Rail Corridor Karimnagar Segment 133,railway,RVNL,Telangana,Karimnagar,28.0,459,2018-04-22,2021-07-05,2022-01-30,completed,Y,209,240907009,134618837,0,60.6,2,1
+SYN0134,Manufacturing Hub 134 Ghaziabad,industrial,RIICO,Uttar Pradesh,Ghaziabad,38.8,262,2021-11-19,2024-03-08,2024-10-04,completed,Y,210,335900743,152734068,5,36.6,1,7
+SYN0135,Industrial Corridor Phase 135,industrial,GIDC,Madhya Pradesh,Sagar,165.8,108,2021-12-23,2024-02-11,2024-07-12,completed,Y,152,61557819,39206175,0,11.1,2,0
+SYN0136,Bypass Road Project 136 (Solapur),highway,MORTH,Maharashtra,Solapur,82.3,232,2021-04-26,2023-04-16,2023-04-10,completed,N,0,70188377,61049850,0,82.6,3,0
+SYN0137,State Highway Widening SPSR Nellore Sec 137,highway,NHAI,Andhra Pradesh,SPSR Nellore,63.8,357,2020-06-07,2022-07-27,2022-11-06,completed,Y,102,61918881,39281338,1,67.3,2,1
+SYN0138,NH Extension Package 138,highway,MORTH,Rajasthan,Pali,51.1,102,2023-03-11,2024-06-03,2025-01-12,completed,Y,223,24990758,9371534,0,63.6,2,0
+SYN0139,4-Lane Highway Udaipur-139,highway,NHAI,Rajasthan,Udaipur,25.0,226,2024-08-20,2025-09-14,,completed,,,78288513,1738005,7,82.7,5,7
+SYN0140,Industrial Corridor Phase 140,industrial,MIDC,Madhya Pradesh,Satna,116.8,136,2022-01-26,2023-08-19,2023-07-26,completed,N,0,311049431,256304731,0,79.7,2,0
+SYN0141,Bypass Road Project 141 (Vijayapura),highway,NHAI,Karnataka,Vijayapura,37.2,46,2022-04-14,2023-07-08,,completed,,,55543662,17535134,1,67.3,2,1
+SYN0142,Industrial Park Kanpur 142,industrial,KIADB,Uttar Pradesh,Kanpur,57.2,155,2024-12-20,2027-01-09,2026-12-23,completed,N,0,126812307,98533163,0,78.8,7,0
+SYN0143,NH Extension Package 143,highway,MORTH,Rajasthan,Bharatpur,105.3,157,2019-07-02,2021-02-21,,completed,,,51704023,13153503,0,100.0,5,0
+SYN0144,Rail Electrification Project Alwar-144,railway,DFCCIL,Rajasthan,Alwar,155.0,427,2018-11-26,2022-09-06,,completed,,,151532899,3030658,0,67.1,8,0
+SYN0145,Manufacturing Hub 145 Sagar,industrial,APIIC,Madhya Pradesh,Sagar,71.0,330,2019-07-27,2021-01-17,2021-01-02,completed,N,0,319555388,319555388,0,66.3,2,0
+SYN0146,State Highway Widening Bhopal Sec 146,highway,NHAI,Madhya Pradesh,Bhopal,24.5,362,2021-08-01,2023-08-21,2023-07-24,completed,N,0,44732821,37065615,0,72.6,4,1
+SYN0147,Lift Irrigation Scheme Pune-147,irrigation,State Irrigation Dept,Maharashtra,Pune,42.1,258,2023-12-25,2026-08-11,2028-04-09,completed,Y,607,49107218,22942892,0,52.5,0,0
+SYN0148,Urban Flyover Vadodara 148,urban,BBMP,Gujarat,Vadodara,19.6,96,2019-07-03,2021-03-24,,completed,,,78478746,19745252,0,74.0,7,0
+SYN0149,State Highway Widening Suryapet Sec 149,highway,MORTH,Telangana,Suryapet,55.3,381,2021-06-24,2022-12-16,2023-06-09,completed,Y,175,135005977,74509799,0,62.9,1,0
+SYN0150,BRTS Corridor Hubballi-150,urban,GHMC,Karnataka,Hubballi,15.7,196,2023-02-08,2024-08-01,2024-07-04,completed,N,0,33656687,24828538,0,80.0,7,2
+SYN0151,Rail Electrification Project Khammam-151,railway,DFCCIL,Telangana,Khammam,196.0,419,2018-04-16,2021-05-30,2022-08-27,completed,Y,454,259636061,75112712,0,47.1,1,1
+SYN0152,Urban Flyover Guntur 152,urban,JNURM,Andhra Pradesh,Guntur,26.3,180,2018-05-07,2019-03-03,,completed,,,77875450,8955677,7,89.0,7,7
+SYN0153,Lift Irrigation Scheme Thane-153,irrigation,State PWD,Maharashtra,Thane,195.8,705,2018-09-07,2020-11-25,2020-11-26,completed,Y,1,141241797,60239626,0,16.6,0,0
+SYN0154,NH Extension Package 154,highway,State PWD,Gujarat,Surat,87.9,389,2020-11-24,2023-08-11,,completed,,,76979875,11292948,0,96.9,8,0
+SYN0155,Industrial Park Solapur 155,industrial,MIDC,Maharashtra,Solapur,114.3,184,2023-02-25,2024-02-20,2024-02-18,completed,N,0,208536076,175086889,0,81.7,8,0
+SYN0156,Irrigation Canal Hubballi 156,irrigation,State Irrigation Dept,Karnataka,Hubballi,27.6,52,2022-11-24,2024-12-13,2026-03-22,completed,Y,464,79680998,62063529,0,92.4,2,1
+SYN0157,Special Economic Zone Rajkot-157,industrial,RIICO,Gujarat,Rajkot,41.5,394,2021-12-11,2023-08-03,,completed,,,88150853,34537504,1,42.1,5,1
+SYN0158,4-Lane Highway Ujjain-158,highway,State PWD,Madhya Pradesh,Ujjain,96.3,348,2018-09-15,2019-09-10,2020-03-18,completed,Y,190,145919373,125563620,0,54.5,0,0
+SYN0159,4-Lane Highway Ahmedabad-159,highway,NHAI,Gujarat,Ahmedabad,103.4,187,2023-12-01,2025-09-21,2026-02-12,completed,Y,144,39534301,15924416,0,55.4,2,1
+SYN0160,Bypass Road Project 160 (Khammam),highway,MORTH,Telangana,Khammam,24.7,231,2023-06-15,2026-04-30,2026-04-17,completed,N,0,101054370,95789437,0,91.1,8,0
+SYN0161,Rail Electrification Project Anand-161,railway,DFCCIL,Gujarat,Anand,125.2,209,2020-04-03,2024-03-13,2024-11-01,completed,Y,233,101069653,63714309,0,68.0,1,2
+SYN0162,Freight Corridor Extension 162,railway,Indian Railways,Rajasthan,Jodhpur,58.7,385,2024-11-10,2028-06-22,,legal_resolution,,,216235646,150716245,1,8.4,0,1
+SYN0163,Canal Network Expansion 163,irrigation,State PWD,Rajasthan,Udaipur,244.1,183,2024-08-18,2028-12-25,2028-12-26,completed,Y,1,157287199,79477222,1,68.1,1,1
+SYN0164,Lift Irrigation Scheme SPSR Nellore-164,irrigation,Central Water Commission,Andhra Pradesh,SPSR Nellore,245.7,134,2024-02-01,2025-11-22,2025-11-12,completed,N,0,28892894,26471669,0,80.3,6,1
+SYN0165,Rail Electrification Project Bharuch-165,railway,Indian Railways,Gujarat,Bharuch,70.4,202,2023-07-06,2025-11-22,2025-11-15,completed,N,0,197710736,124854330,0,82.2,5,0
+SYN0166,Bypass Road Project 166 (Alwar),highway,NHAI,Rajasthan,Alwar,97.4,225,2019-11-26,2022-03-15,2022-08-15,completed,Y,153,83955082,4197754,8,59.2,1,8
+SYN0167,Freight Corridor Extension 167,railway,DFCCIL,Maharashtra,Pune,158.0,288,2018-05-02,2021-11-12,,completed,,,39038958,7214399,1,72.2,8,1
+SYN0168,Manufacturing Hub 168 Khammam,industrial,KIADB,Telangana,Khammam,145.6,352,2020-03-06,2021-09-27,2021-08-28,completed,N,0,235707519,235707519,0,100.0,8,2
+SYN0169,Ring Road Project 169,urban,NMMC,Madhya Pradesh,Ratlam,27.3,20,2021-01-03,2021-10-30,2021-10-05,completed,N,0,17396507,14343420,0,49.1,8,0
+SYN0170,Special Economic Zone Hyderabad-170,industrial,MIDC,Telangana,Hyderabad,146.8,389,2024-02-28,2026-06-17,,completed,,,58392225,13079858,6,89.7,3,6
+SYN0171,Special Economic Zone Bharuch-171,industrial,RIICO,Gujarat,Bharuch,51.6,207,2023-09-23,2025-08-13,2026-01-12,completed,Y,152,87529150,71975220,1,55.4,2,1
+SYN0172,NH Extension Package 172,highway,NHAI,Karnataka,Kalaburagi,45.1,355,2021-03-11,2024-01-25,2025-01-16,completed,Y,357,107800043,19986128,0,23.0,0,0
+SYN0173,4-Lane Highway Agra-173,highway,State PWD,Uttar Pradesh,Agra,56.2,115,2024-02-24,2025-02-18,2025-06-15,completed,Y,117,59913323,22916846,0,52.4,2,0
+SYN0174,Irrigation Canal Varanasi 174,irrigation,State Irrigation Dept,Uttar Pradesh,Varanasi,112.4,424,2024-01-10,2025-08-02,2025-12-18,completed,Y,138,188657658,127891026,4,52.5,1,4
+SYN0175,Manufacturing Hub 175 Vadodara,industrial,KIADB,Gujarat,Vadodara,145.5,419,2019-01-04,2020-10-25,2020-10-04,completed,N,0,126978768,112122252,0,86.8,6,0
+SYN0176,Lift Irrigation Scheme Gwalior-176,irrigation,State PWD,Madhya Pradesh,Gwalior,151.9,139,2018-07-03,2021-06-17,,completed,,,38312277,8961242,1,88.0,8,1
+SYN0177,4-Lane Highway Bharuch-177,highway,State PWD,Gujarat,Bharuch,50.6,258,2018-11-18,2020-11-07,2021-03-06,completed,Y,119,43193117,27103681,1,33.0,2,3
+SYN0178,Canal Network Expansion 178,irrigation,Central Water Commission,Andhra Pradesh,Chittoor,163.9,588,2024-10-08,2029-02-14,2029-01-27,completed,N,0,176922505,147181832,0,82.9,8,0
+SYN0179,Special Economic Zone Nagpur-179,industrial,GIDC,Maharashtra,Nagpur,197.9,272,2019-04-26,2020-10-17,2020-10-13,completed,N,0,336961085,292111565,0,100.0,8,0
+SYN0180,4-Lane Highway Junagadh-180,highway,State PWD,Gujarat,Junagadh,87.0,330,2024-05-17,2026-07-06,,completed,,,65841106,11653876,0,86.4,6,0
+SYN0181,Irrigation Canal Krishna 181,irrigation,Central Water Commission,Andhra Pradesh,Krishna,90.3,710,2024-05-28,2028-09-04,,legal_resolution,,,123747620,81190813,3,11.5,0,3
+SYN0182,Lift Irrigation Scheme Ahmedabad-182,irrigation,State Irrigation Dept,Gujarat,Ahmedabad,20.8,350,2023-04-02,2027-03-12,,legal_resolution,,,169355081,117041296,3,0.5,0,3
+SYN0183,Bypass Road Project 183 (Sagar),highway,State PWD,Madhya Pradesh,Sagar,54.8,278,2022-11-03,2024-04-26,2024-03-31,completed,N,0,13149844,11721771,0,76.7,7,3
+SYN0184,Irrigation Canal Nanded 184,irrigation,Central Water Commission,Maharashtra,Nanded,145.1,409,2019-04-27,2021-10-13,,completed,,,58425612,19239554,0,66.1,7,0
+SYN0185,Metro Extension 185 Khammam,urban,NMMC,Telangana,Khammam,18.5,86,2022-08-06,2024-06-26,2024-06-17,completed,N,0,7607797,7607797,0,91.0,8,1
+SYN0186,BRTS Corridor Kanpur-186,urban,GHMC,Uttar Pradesh,Kanpur,24.8,53,2023-07-17,2024-05-12,,completed,,,62108485,22619910,4,82.6,8,4
+SYN0187,BRTS Corridor Alwar-187,urban,BBMP,Rajasthan,Alwar,31.9,169,2021-05-07,2022-09-29,2022-09-08,completed,N,0,96816118,93137106,0,65.7,6,1
+SYN0188,Irrigation Canal Jodhpur 188,irrigation,State Irrigation Dept,Rajasthan,Jodhpur,217.7,707,2020-05-21,2023-07-05,,completed,,,34236213,9627223,0,50.0,8,0
+SYN0189,Industrial Corridor Phase 189,industrial,MIDC,Gujarat,Anand,152.6,348,2023-08-10,2025-04-01,,completed,,,237376125,80470506,0,100.0,3,0
+SYN0190,Lift Irrigation Scheme Sagar-190,irrigation,Central Water Commission,Madhya Pradesh,Sagar,42.8,171,2024-03-27,2029-03-01,,compensation,,,146411394,14641139,0,16.0,7,0
+SYN0191,Special Economic Zone Kurnool-191,industrial,RIICO,Andhra Pradesh,Kurnool,103.5,110,2023-05-14,2025-03-04,2025-02-14,completed,N,0,240518981,187965584,0,70.3,3,1
+SYN0192,Canal Network Expansion 192,irrigation,State Irrigation Dept,Gujarat,Junagadh,55.8,772,2018-03-05,2020-08-21,2021-12-17,completed,Y,483,69862742,46815023,0,53.5,0,7
+SYN0193,Freight Corridor Extension 193,railway,RVNL,Uttar Pradesh,Varanasi,97.2,538,2021-02-05,2024-02-20,2024-11-15,completed,Y,269,67830133,30801663,0,57.4,2,0
+SYN0194,4-Lane Highway Khammam-194,highway,NHAI,Telangana,Khammam,17.2,53,2020-03-04,2022-02-22,2022-06-18,completed,Y,116,110535627,34907151,0,44.7,1,0
+SYN0195,Ring Road Project 195,urban,GHMC,Madhya Pradesh,Sagar,37.2,170,2024-07-01,2025-07-26,2026-02-12,completed,Y,201,72555459,38875215,5,36.3,1,5
+SYN0196,Industrial Corridor Phase 196,industrial,APIIC,Telangana,Suryapet,118.5,292,2023-01-02,2024-03-27,2024-08-02,completed,Y,128,280581211,199100427,0,56.2,2,0
+SYN0197,Irrigation Canal Kolhapur 197,irrigation,State PWD,Maharashtra,Kolhapur,236.7,575,2020-02-26,2022-02-15,2023-06-23,completed,Y,493,84902465,53318748,0,76.3,2,1
+SYN0198,Urban Flyover Belagavi 198,urban,HMDA,Karnataka,Belagavi,47.6,150,2023-02-04,2024-12-25,2024-11-27,completed,N,0,29309750,27035313,0,100.0,4,1
+SYN0199,NH Extension Package 199,highway,NHAI,Telangana,Warangal,20.4,53,2024-05-12,2027-01-27,2027-05-02,completed,Y,95,98843801,25570891,2,92.3,1,2
+SYN0200,Special Economic Zone Chittoor-200,industrial,RIICO,Andhra Pradesh,Chittoor,173.1,459,2018-07-13,2020-08-31,2020-08-26,completed,N,0,62961491,54537244,0,77.1,8,0
+SYN0201,Bypass Road Project 201 (Botad),highway,State PWD,Gujarat,Botad,85.3,96,2019-10-13,2022-09-27,2022-08-30,completed,N,0,64636218,62671277,0,85.3,4,0
+SYN0202,NH Extension Package 202,highway,MORTH,Uttar Pradesh,Allahabad,80.6,106,2021-11-24,2023-06-17,2023-11-04,completed,Y,140,148229786,115248659,0,64.7,2,1
+SYN0203,Manufacturing Hub 203 Gwalior,industrial,APIIC,Madhya Pradesh,Gwalior,135.8,256,2020-04-11,2021-12-02,2022-02-24,completed,Y,84,188791773,74629388,0,51.2,1,0
+SYN0204,Rail Electrification Project Bhopal-204,railway,Indian Railways,Madhya Pradesh,Bhopal,128.8,361,2021-01-18,2023-12-04,2023-11-14,completed,N,0,204727568,202373201,0,77.6,2,0
+SYN0205,Manufacturing Hub 205 Sagar,industrial,KIADB,Madhya Pradesh,Sagar,59.9,224,2023-11-12,2025-12-31,2025-12-06,completed,N,0,130953754,91012859,0,78.8,2,2
+SYN0206,Industrial Corridor Phase 206,industrial,GIDC,Madhya Pradesh,Gwalior,58.8,472,2020-10-07,2022-03-31,2022-03-28,completed,N,0,307716750,307716750,0,88.1,7,3
+SYN0207,Dam & Reservoir Project 207,irrigation,Central Water Commission,Madhya Pradesh,Satna,181.8,560,2021-01-17,2022-10-09,2022-09-17,completed,N,0,117818105,102772733,0,74.2,5,0
+SYN0208,Canal Network Expansion 208,irrigation,State Irrigation Dept,Karnataka,Vijayapura,144.1,176,2022-12-25,2025-09-10,2025-09-17,completed,Y,7,177855187,10297815,4,52.0,1,6
+SYN0209,Industrial Park Kanpur 209,industrial,MIDC,Uttar Pradesh,Kanpur,192.5,307,2023-06-22,2024-10-14,,completed,,,262013425,49127517,1,57.4,6,1
+SYN0210,Rail Electrification Project Junagadh-210,railway,DFCCIL,Gujarat,Junagadh,140.6,254,2024-01-17,2025-10-08,2025-09-29,completed,N,0,208183195,188613975,0,86.3,8,0
+SYN0211,NH Extension Package 211,highway,State PWD,Telangana,Karimnagar,71.7,151,2022-11-24,2025-04-12,,completed,,,120540879,20913843,2,60.3,2,2
+SYN0212,Urban Flyover Mehsana 212,urban,NMMC,Gujarat,Mehsana,43.8,77,2018-12-09,2020-01-03,2019-12-14,completed,N,0,39935406,28473944,0,69.0,3,2
+SYN0213,Special Economic Zone Meerut-213,industrial,GIDC,Uttar Pradesh,Meerut,27.3,192,2023-02-06,2024-06-30,,completed,,,69425281,10455447,0,76.2,4,0
+SYN0214,Metro Rail Phase 214 Pune,railway,Indian Railways,Maharashtra,Pune,74.2,416,2022-01-25,2025-12-05,2025-11-19,completed,N,0,73788984,66277265,0,87.2,6,2
+SYN0215,State Highway Widening Surat Sec 215,highway,State PWD,Gujarat,Surat,92.8,301,2019-11-11,2021-09-01,2022-04-04,completed,Y,215,114059395,47425896,0,47.0,1,0
+SYN0216,4-Lane Highway Lucknow-216,highway,MORTH,Uttar Pradesh,Lucknow,110.2,221,2021-02-13,2022-10-06,2023-05-05,completed,Y,211,75586683,29335192,0,82.8,2,0
+SYN0217,NH Extension Package 217,highway,MORTH,Andhra Pradesh,Vishakhapatnam,85.4,83,2023-02-07,2025-10-24,2025-09-26,completed,N,0,146552469,132967055,0,60.6,2,0
+SYN0218,Industrial Park Pune 218,industrial,GIDC,Maharashtra,Pune,32.7,470,2018-02-03,2019-02-28,2019-06-28,completed,Y,120,167452389,53551274,0,39.4,1,0
+SYN0219,Irrigation Canal Suryapet 219,irrigation,State PWD,Telangana,Suryapet,100.9,128,2023-02-12,2027-03-23,2027-03-11,completed,N,0,82047085,66261226,0,67.6,6,2
+SYN0220,State Highway Widening Junagadh Sec 220,highway,State PWD,Gujarat,Junagadh,70.9,314,2020-11-26,2023-10-12,2024-03-11,completed,Y,151,88044196,23076384,0,70.6,1,4
+SYN0221,State Highway Widening Belagavi Sec 221,highway,State PWD,Karnataka,Belagavi,29.9,320,2019-03-08,2021-09-23,,completed,,,128451220,77070732,0,62.1,5,0
+SYN0222,Irrigation Canal Anantapur 222,irrigation,Central Water Commission,Andhra Pradesh,Anantapur,51.5,711,2020-02-07,2024-08-14,2024-08-30,completed,Y,16,18612733,10575755,0,76.6,2,0
+SYN0223,Lift Irrigation Scheme Raigad-223,irrigation,Central Water Commission,Maharashtra,Raigad,78.1,797,2024-06-14,2026-10-02,2027-05-05,completed,Y,215,75099770,29701959,0,38.8,1,0
+SYN0224,Rail Corridor Sikar Segment 224,railway,RVNL,Rajasthan,Sikar,45.2,251,2019-11-20,2021-07-12,,completed,,,267037391,80832218,3,84.7,2,3
+SYN0225,Manufacturing Hub 225 Suryapet,industrial,KIADB,Telangana,Suryapet,199.8,291,2024-10-07,2025-11-01,2026-01-29,completed,Y,89,169149371,119740840,1,38.2,0,1
+SYN0226,Rail Corridor West Godavari Segment 226,railway,DFCCIL,Andhra Pradesh,West Godavari,49.9,576,2023-04-28,2027-04-07,,legal_resolution,,,56174501,14818833,1,5.8,0,1
+SYN0227,Special Economic Zone Sagar-227,industrial,APIIC,Madhya Pradesh,Sagar,140.3,315,2024-08-08,2025-10-02,2025-11-18,completed,Y,47,198476207,82347778,0,56.7,0,0
+SYN0228,Special Economic Zone Ajmer-228,industrial,KIADB,Rajasthan,Ajmer,34.0,178,2021-11-13,2023-10-04,2023-09-18,completed,N,0,174220037,161205800,0,69.4,8,3
+SYN0229,Rail Electrification Project Sangareddy-229,railway,Indian Railways,Telangana,Sangareddy,53.6,420,2019-04-03,2022-01-17,2021-12-27,completed,N,0,76800436,73098655,0,59.8,5,0
+SYN0230,Dam & Reservoir Project 230,irrigation,Central Water Commission,Madhya Pradesh,Jabalpur,60.9,684,2023-07-01,2026-03-17,2026-03-13,completed,N,0,15902841,13932479,0,91.4,5,1
+SYN0231,Dam & Reservoir Project 231,irrigation,State PWD,Telangana,Medak,186.2,636,2021-10-16,2025-09-25,2026-06-19,completed,Y,267,133631506,59840188,1,87.0,1,2
+SYN0232,Canal Network Expansion 232,irrigation,State Irrigation Dept,Andhra Pradesh,Kurnool,210.0,193,2019-02-01,2021-07-20,2022-08-04,completed,Y,380,180813603,20757402,0,30.9,0,3
+SYN0233,Rail Corridor Raigad Segment 233,railway,RVNL,Maharashtra,Raigad,27.8,592,2024-11-21,2027-06-09,2027-05-25,completed,N,0,238971120,182215479,0,95.6,7,0
+SYN0234,BRTS Corridor West Godavari-234,urban,GHMC,Andhra Pradesh,West Godavari,21.6,68,2021-04-28,2022-03-24,2022-03-24,completed,N,0,59908779,53354759,0,83.2,7,3
+SYN0235,NH Extension Package 235,highway,State PWD,Karnataka,Ballari,56.6,217,2019-07-21,2022-01-06,2021-12-25,completed,N,0,114470926,80175437,0,95.6,5,3
+SYN0236,4-Lane Highway Ujjain-236,highway,State PWD,Madhya Pradesh,Ujjain,23.1,147,2024-12-13,2027-10-29,2028-12-08,completed,Y,406,28460292,15064033,2,74.7,2,3
+SYN0237,Irrigation Canal Nalgonda 237,irrigation,State Irrigation Dept,Telangana,Nalgonda,40.1,309,2024-02-27,2026-05-17,2027-04-16,completed,Y,334,12362291,618115,1,93.3,2,1
+SYN0238,Metro Extension 238 Nalgonda,urban,BBMP,Telangana,Nalgonda,11.3,173,2018-04-28,2019-12-19,,completed,,,71352725,5829518,1,67.1,4,1
+SYN0239,4-Lane Highway Nalgonda-239,highway,NHAI,Telangana,Nalgonda,67.0,390,2024-07-12,2027-03-29,2027-10-25,completed,Y,210,46251599,33056018,1,16.1,1,1
+SYN0240,Ring Road Project 240,urban,JNURM,Rajasthan,Kota,7.1,38,2021-07-19,2022-05-15,2022-10-04,completed,Y,142,16115855,5008808,0,53.7,2,0
+SYN0241,Freight Corridor Extension 241,railway,DFCCIL,Gujarat,Botad,175.2,543,2024-06-25,2027-02-10,2027-02-11,completed,Y,1,193761921,157044037,1,53.9,1,3
+SYN0242,Rail Corridor Vijayapura Segment 242,railway,RVNL,Karnataka,Vijayapura,167.8,127,2023-05-08,2025-07-26,2026-02-27,completed,Y,216,101023106,54188794,0,80.6,2,1
+SYN0243,Dam & Reservoir Project 243,irrigation,Central Water Commission,Uttar Pradesh,Ghaziabad,86.2,673,2019-12-08,2022-09-23,2022-09-20,completed,N,0,184436685,147623123,0,62.2,6,0
+SYN0244,4-Lane Highway Adilabad-244,highway,State PWD,Telangana,Adilabad,40.8,143,2021-10-28,2023-06-20,2023-12-24,completed,Y,187,81231639,4061582,0,77.0,2,8
+SYN0245,Rail Electrification Project Amravati-245,railway,Indian Railways,Maharashtra,Amravati,38.1,420,2020-12-01,2022-05-25,2024-01-04,completed,Y,589,169083386,84558601,0,77.5,1,0
+SYN0246,4-Lane Highway Rajkot-246,highway,State PWD,Gujarat,Rajkot,73.3,147,2020-07-09,2022-08-28,2022-08-03,completed,N,0,39191750,30295223,0,88.1,3,0
+SYN0247,Special Economic Zone Amravati-247,industrial,APIIC,Maharashtra,Amravati,107.6,178,2021-08-05,2023-11-23,2023-11-11,completed,N,0,57610424,53191704,0,90.9,4,0
+SYN0248,Metro Rail Phase 248 East Godavari,railway,RVNL,Andhra Pradesh,East Godavari,81.9,471,2020-06-12,2023-04-28,2023-03-29,completed,N,0,185617049,134757978,0,71.9,6,2
+SYN0249,Bypass Road Project 249 (Bikaner),highway,State PWD,Rajasthan,Bikaner,79.5,104,2024-12-15,2026-02-08,2026-01-10,completed,N,0,53921305,41729698,0,67.7,8,0
+SYN0250,Ring Road Project 250,urban,NMMC,Andhra Pradesh,Vishakhapatnam,21.0,133,2020-06-21,2021-08-15,,completed,,,94183134,23319744,1,63.8,5,1
+SYN0251,Freight Corridor Extension 251,railway,Indian Railways,Maharashtra,Pune,91.5,147,2023-05-24,2026-09-05,,completed,,,264820383,57439541,0,81.0,5,0
+SYN0252,Dam & Reservoir Project 252,irrigation,State Irrigation Dept,Andhra Pradesh,Krishna,141.3,169,2018-11-13,2021-11-27,2021-11-27,completed,N,0,11855221,8466999,0,100.0,8,2
+SYN0253,Freight Corridor Extension 253,railway,DFCCIL,Rajasthan,Bharatpur,134.5,495,2023-09-06,2026-08-21,2027-02-28,completed,Y,191,99801785,32225996,0,75.4,1,1
+SYN0254,Metro Rail Phase 254 Gandhinagar,railway,Indian Railways,Gujarat,Gandhinagar,71.6,597,2018-01-17,2021-08-29,,completed,,,277405635,114124678,0,76.4,2,0
+SYN0255,Industrial Corridor Phase 255,industrial,MIDC,Rajasthan,Pali,65.0,416,2022-06-07,2024-06-26,,completed,,,168094843,27802887,0,90.1,5,0
+SYN0256,Lift Irrigation Scheme Ajmer-256,irrigation,Central Water Commission,Rajasthan,Ajmer,196.5,672,2021-04-28,2023-02-17,2023-02-02,completed,N,0,41618941,38206188,0,82.6,6,0
+SYN0257,State Highway Widening Anantapur Sec 257,highway,State PWD,Andhra Pradesh,Anantapur,64.3,205,2023-08-24,2024-08-18,2024-08-03,completed,N,0,149704700,100751263,0,88.0,4,0
+SYN0258,Bypass Road Project 258 (Pune),highway,State PWD,Maharashtra,Pune,99.9,36,2018-09-16,2020-02-08,2020-02-01,completed,N,0,60795695,58929267,0,80.2,2,2
+SYN0259,State Highway Widening Prakasam Sec 259,highway,MORTH,Andhra Pradesh,Prakasam,90.1,311,2021-07-22,2023-04-13,,completed,,,41730347,7745152,0,74.4,2,0
+SYN0260,Manufacturing Hub 260 Agra,industrial,MIDC,Uttar Pradesh,Agra,63.8,71,2020-01-06,2021-08-28,2021-08-06,completed,N,0,246560668,208121860,0,86.7,3,0
+SYN0261,Metro Rail Phase 261 Bangalore Urban,railway,Indian Railways,Karnataka,Bangalore Urban,61.9,405,2023-03-23,2026-02-05,,completed,,,137228480,45340290,0,100.0,4,0
+SYN0262,Manufacturing Hub 262 Jaipur,industrial,GIDC,Rajasthan,Jaipur,82.6,424,2022-05-18,2024-08-05,2024-07-17,completed,N,0,367500121,307707851,0,80.1,3,0
+SYN0263,Rail Electrification Project Bharatpur-263,railway,DFCCIL,Rajasthan,Bharatpur,131.6,422,2018-11-17,2021-05-05,,completed,,,79248102,16657951,3,60.4,6,3
+SYN0264,Special Economic Zone Mathura-264,industrial,GIDC,Uttar Pradesh,Mathura,114.2,84,2022-05-11,2024-05-30,2024-05-25,completed,N,0,351927255,324125002,0,98.5,2,0
+SYN0265,4-Lane Highway Bharuch-265,highway,MORTH,Gujarat,Bharuch,111.3,365,2018-06-08,2020-12-24,,completed,,,134016262,65158707,0,95.0,2,0
+SYN0266,Rail Corridor Anand Segment 266,railway,RVNL,Gujarat,Anand,74.7,271,2024-10-09,2027-07-26,2028-04-16,completed,Y,265,220299861,74946013,0,52.4,2,0
+SYN0267,Canal Network Expansion 267,irrigation,Central Water Commission,Maharashtra,Nanded,215.2,477,2023-02-25,2027-12-01,2028-09-19,completed,Y,293,40177325,12748265,0,65.5,2,1
+SYN0268,BRTS Corridor Sagar-268,urban,NMMC,Madhya Pradesh,Sagar,17.5,81,2024-06-14,2026-04-05,2026-05-08,completed,Y,33,77742281,49024282,1,48.1,1,2
+SYN0269,Urban Flyover Hyderabad 269,urban,NMMC,Telangana,Hyderabad,43.1,25,2022-03-10,2023-01-04,2022-12-09,completed,N,0,31215928,22962437,0,75.7,6,0
+SYN0270,State Highway Widening Adilabad Sec 270,highway,State PWD,Telangana,Adilabad,43.0,322,2019-05-12,2021-10-28,2021-10-05,completed,N,0,16194227,13242019,0,97.4,5,0
+SYN0271,Industrial Corridor Phase 271,industrial,RIICO,Andhra Pradesh,SPSR Nellore,80.2,500,2023-10-13,2024-12-06,,completed,,,178278251,80991809,3,59.6,3,3
+SYN0272,Industrial Park Nizamabad 272,industrial,APIIC,Telangana,Nizamabad,145.6,128,2022-01-11,2024-05-30,2024-05-18,completed,N,0,388995293,343405045,0,62.4,2,0
+SYN0273,State Highway Widening Alwar Sec 273,highway,NHAI,Rajasthan,Alwar,38.9,234,2020-02-16,2022-08-04,,completed,,,117204645,35759137,1,87.9,6,1
+SYN0274,State Highway Widening Botad Sec 274,highway,NHAI,Gujarat,Botad,73.4,87,2019-02-09,2022-01-24,2022-12-07,completed,Y,317,55504639,19593138,0,79.2,1,1
+SYN0275,State Highway Widening Kalaburagi Sec 275,highway,State PWD,Karnataka,Kalaburagi,93.4,73,2021-01-27,2022-08-20,2023-05-17,completed,Y,270,142596433,125085591,0,37.1,0,0
+SYN0276,Rail Electrification Project Anantapur-276,railway,DFCCIL,Andhra Pradesh,Anantapur,114.2,314,2018-06-07,2021-10-19,2021-10-15,completed,N,0,211570632,174059159,0,69.3,7,0
+SYN0277,Lift Irrigation Scheme Udaipur-277,irrigation,State PWD,Rajasthan,Udaipur,17.4,437,2019-12-20,2022-11-04,2024-02-05,completed,Y,458,183009412,75564586,1,62.4,2,1
+SYN0278,Rail Corridor Junagadh Segment 278,railway,RVNL,Gujarat,Junagadh,110.1,518,2020-08-28,2023-09-12,2023-09-11,completed,N,0,81743721,63245117,0,79.5,5,0
+SYN0279,Industrial Park Karimnagar 279,industrial,RIICO,Telangana,Karimnagar,66.4,248,2023-05-08,2025-08-25,2025-08-25,completed,N,0,378771945,364189225,0,78.6,4,0
+SYN0280,Special Economic Zone Nagpur-280,industrial,GIDC,Maharashtra,Nagpur,129.0,279,2021-04-19,2022-08-12,2022-09-19,completed,Y,38,72659080,7156919,0,45.8,1,0
+SYN0281,Dam & Reservoir Project 281,irrigation,State PWD,Maharashtra,Kolhapur,105.5,189,2020-02-18,2024-05-27,,completed,,,154259827,56011743,0,71.4,5,0
+SYN0282,Rail Corridor Udaipur Segment 282,railway,Indian Railways,Rajasthan,Udaipur,129.0,286,2019-03-01,2022-08-12,,completed,,,76964590,23874416,1,83.0,8,1
+SYN0283,Rail Electrification Project Sagar-283,railway,Indian Railways,Madhya Pradesh,Sagar,157.6,65,2021-08-05,2023-06-26,2023-06-19,completed,N,0,225286332,225286332,0,80.1,2,0
+SYN0284,4-Lane Highway Morena-284,highway,State PWD,Madhya Pradesh,Morena,90.9,224,2024-08-08,2026-08-28,2027-08-11,completed,Y,348,141175174,33133813,0,44.2,2,0
+SYN0285,Bypass Road Project 285 (Bhopal),highway,NHAI,Madhya Pradesh,Bhopal,15.4,179,2023-01-18,2025-01-07,2024-12-14,completed,N,0,125005046,94741324,0,85.8,6,1
+SYN0286,Urban Flyover Amravati 286,urban,BBMP,Maharashtra,Amravati,8.5,125,2023-09-04,2024-08-29,,completed,,,7366651,147333,8,91.2,3,8
+SYN0287,Special Economic Zone Anantapur-287,industrial,RIICO,Andhra Pradesh,Anantapur,85.3,318,2023-12-04,2025-01-27,2025-01-11,completed,N,0,252587563,242837683,0,98.0,2,0
+SYN0288,Special Economic Zone Kalaburagi-288,industrial,MIDC,Karnataka,Kalaburagi,158.4,278,2024-03-06,2025-03-31,2025-04-01,completed,Y,1,361445927,179963927,0,54.6,0,0
+SYN0289,Rail Electrification Project Ratlam-289,railway,Indian Railways,Madhya Pradesh,Ratlam,34.3,56,2019-04-19,2022-07-02,2022-06-13,completed,N,0,192304273,175939179,0,72.7,3,0
+SYN0290,NH Extension Package 290,highway,NHAI,Karnataka,Bangalore Urban,15.4,243,2023-10-27,2026-05-14,2027-01-19,completed,Y,250,46235179,13815071,1,28.7,1,3
+SYN0291,Industrial Park Bangalore Urban 291,industrial,APIIC,Karnataka,Bangalore Urban,31.7,291,2020-06-13,2021-08-07,,completed,,,283955387,63009700,2,100.0,6,2
+SYN0292,NH Extension Package 292,highway,NHAI,Uttar Pradesh,Jhansi,85.8,391,2022-12-21,2025-04-09,,completed,,,93282468,16389730,1,98.7,6,1
+SYN0293,Rail Electrification Project Raigad-293,railway,RVNL,Maharashtra,Raigad,129.7,347,2022-12-21,2025-09-06,2027-03-08,completed,Y,548,16956171,6821468,0,47.9,2,0
+SYN0294,BRTS Corridor Ahmedabad-294,urban,NMMC,Gujarat,Ahmedabad,14.2,37,2022-11-07,2023-09-03,2023-10-23,completed,Y,50,35772765,29136917,1,56.2,1,1
+SYN0295,Industrial Park Nalgonda 295,industrial,MIDC,Telangana,Nalgonda,136.2,296,2024-06-22,2026-09-10,,completed,,,195034816,89989064,2,58.1,5,2
+SYN0296,Industrial Park Ahmedabad 296,industrial,KIADB,Gujarat,Ahmedabad,123.9,219,2022-12-22,2024-10-12,2024-10-01,completed,N,0,45160956,45160956,0,100.0,4,0
+SYN0297,Metro Extension 297 Raigad,urban,JNURM,Maharashtra,Raigad,43.2,28,2019-10-04,2021-08-24,,completed,,,13245790,4682387,0,71.9,8,0
+SYN0298,Ring Road Project 298,urban,NMMC,Uttar Pradesh,Mathura,23.3,26,2018-06-26,2019-04-22,,completed,,,90970801,29792937,3,93.3,5,3
+SYN0299,Industrial Corridor Phase 299,industrial,MIDC,Rajasthan,Bikaner,89.8,492,2024-09-22,2026-01-15,2026-03-25,completed,Y,69,374288191,137026907,0,30.2,1,0
+SYN0300,Metro Rail Phase 300 Warangal,railway,RVNL,Telangana,Warangal,56.1,343,2018-10-25,2021-01-12,2021-09-03,completed,Y,234,137923531,78961221,0,62.7,0,0
+SYN0301,4-Lane Highway Kurnool-301,highway,MORTH,Andhra Pradesh,Kurnool,73.1,117,2022-06-09,2023-10-02,,completed,,,93923118,15412784,2,95.8,3,2
+SYN0302,NH Extension Package 302,highway,State PWD,Telangana,Warangal,79.2,383,2018-07-13,2019-12-05,,completed,,,94365724,13607537,3,100.0,7,3
+SYN0303,Special Economic Zone East Godavari-303,industrial,KIADB,Andhra Pradesh,East Godavari,147.8,288,2018-12-15,2020-03-09,2020-03-05,completed,N,0,347216585,237253093,0,59.8,5,1
+SYN0304,Bypass Road Project 304 (Davangere),highway,State PWD,Karnataka,Davangere,28.8,208,2018-02-16,2019-05-12,2019-09-08,completed,Y,119,19925170,12785982,1,22.5,2,1
+SYN0305,Canal Network Expansion 305,irrigation,State Irrigation Dept,Rajasthan,Bharatpur,152.5,107,2022-07-08,2027-03-14,2027-02-24,completed,N,0,89073957,89073957,0,79.6,4,0
+SYN0306,Irrigation Canal Varanasi 306,irrigation,Central Water Commission,Uttar Pradesh,Varanasi,107.7,139,2023-12-19,2027-12-28,2027-12-29,completed,Y,1,191397272,110168270,1,59.1,1,1
+SYN0307,Freight Corridor Extension 307,railway,Indian Railways,Telangana,Warangal,101.5,348,2022-11-26,2024-05-19,,completed,,,177600110,57897636,1,100.0,4,1
+SYN0308,4-Lane Highway Alwar-308,highway,MORTH,Rajasthan,Alwar,24.0,180,2018-10-01,2021-04-18,,completed,,,135655976,34727930,0,81.9,6,0
+SYN0309,Industrial Corridor Phase 309,industrial,RIICO,Karnataka,Mysuru,88.9,245,2019-07-23,2022-01-08,2022-05-14,completed,Y,126,85895840,56674075,0,74.5,1,0
+SYN0310,NH Extension Package 310,highway,NHAI,Maharashtra,Nashik,117.2,99,2023-01-05,2025-11-20,,completed,,,98125220,10509211,1,90.3,8,1
+SYN0311,Canal Network Expansion 311,irrigation,State PWD,Gujarat,Botad,136.1,47,2022-07-18,2026-04-28,2026-04-21,completed,N,0,143865350,121839565,0,100.0,6,0
+SYN0312,Metro Rail Phase 312 Suryapet,railway,DFCCIL,Telangana,Suryapet,151.6,336,2018-10-16,2022-09-25,2022-11-24,completed,Y,60,268075489,185347393,0,66.9,2,0
+SYN0313,Lift Irrigation Scheme Pali-313,irrigation,State PWD,Rajasthan,Pali,224.1,471,2022-01-16,2025-11-26,2025-11-17,completed,N,0,61395646,61395646,0,89.5,7,1
+SYN0314,Rail Electrification Project Jaipur-314,railway,RVNL,Rajasthan,Jaipur,152.7,77,2022-03-19,2023-10-10,2024-07-27,completed,Y,291,156622872,91718354,0,42.0,2,0
+SYN0315,NH Extension Package 315,highway,MORTH,Rajasthan,Jaipur,98.9,163,2022-03-19,2025-02-01,2025-04-11,completed,Y,69,31217333,13229906,0,54.1,0,0
+SYN0316,Canal Network Expansion 316,irrigation,State Irrigation Dept,Maharashtra,Amravati,254.9,95,2019-11-15,2024-08-20,2024-08-17,completed,N,0,15242023,11385791,0,85.8,5,1
+SYN0317,Manufacturing Hub 317 Bareilly,industrial,GIDC,Uttar Pradesh,Bareilly,100.8,397,2020-03-17,2022-04-06,2022-12-21,completed,Y,259,383230884,268913111,2,69.1,1,3
+SYN0318,Lift Irrigation Scheme Bikaner-318,irrigation,State Irrigation Dept,Rajasthan,Bikaner,207.5,287,2024-02-09,2028-12-14,2029-05-06,completed,Y,143,43010509,13083797,0,81.1,1,1
+SYN0319,Canal Network Expansion 319,irrigation,State PWD,Telangana,Warangal,86.8,74,2018-09-04,2022-06-15,2023-02-05,completed,Y,235,188008566,46738930,2,23.4,2,2
+SYN0320,State Highway Widening Krishna Sec 320,highway,MORTH,Andhra Pradesh,Krishna,86.5,159,2021-11-25,2024-07-12,2025-04-15,completed,Y,277,15978555,798928,3,73.9,2,4
+SYN0321,Urban Flyover Mangaluru 321,urban,GHMC,Karnataka,Mangaluru,47.9,87,2020-01-13,2021-05-07,2021-06-02,completed,Y,26,98045088,53630663,0,74.0,0,0
+SYN0322,NH Extension Package 322,highway,MORTH,Gujarat,Rajkot,90.0,258,2021-12-09,2023-03-04,2023-09-27,completed,Y,207,99665473,53928987,0,55.0,1,0
+SYN0323,NH Extension Package 323,highway,MORTH,Karnataka,Ballari,90.1,65,2022-12-25,2025-03-14,2026-02-13,completed,Y,336,143352525,83789551,0,34.1,1,0
+SYN0324,Irrigation Canal Ahmedabad 324,irrigation,Central Water Commission,Gujarat,Ahmedabad,233.5,703,2020-09-28,2023-12-12,2023-12-13,completed,Y,1,193665027,73863841,1,40.7,0,1
+SYN0325,Canal Network Expansion 325,irrigation,State PWD,Karnataka,Tumkur,184.0,540,2023-04-05,2024-11-25,2025-10-27,completed,Y,336,130464489,6523224,1,55.1,0,2
+SYN0326,NH Extension Package 326,highway,MORTH,Telangana,Karimnagar,84.6,304,2021-02-07,2023-09-25,2024-04-23,completed,Y,211,139098293,83222509,0,57.5,1,1
+SYN0327,Urban Flyover Khammam 327,urban,GHMC,Telangana,Khammam,23.9,63,2019-11-02,2021-10-22,2022-06-07,completed,Y,228,82659688,58101495,2,72.7,0,2
+SYN0328,Bypass Road Project 328 (Bareilly),highway,State PWD,Uttar Pradesh,Bareilly,116.1,139,2020-02-22,2022-08-10,2022-09-10,completed,Y,31,53648041,30477452,0,62.6,0,0
+SYN0329,Irrigation Canal Amravati 329,irrigation,State PWD,Maharashtra,Amravati,19.5,538,2019-02-26,2023-12-02,2024-01-06,completed,Y,35,185596706,74368600,1,29.1,1,2
+SYN0330,Dam & Reservoir Project 330,irrigation,State PWD,Madhya Pradesh,Gwalior,212.1,650,2023-05-17,2027-02-25,2028-04-04,completed,Y,404,190308123,40345322,5,30.0,1,8
+SYN0331,NH Extension Package 331,highway,NHAI,Uttar Pradesh,Kanpur,61.1,350,2022-06-28,2025-06-12,,completed,,,45081855,15449552,1,100.0,7,1
+SYN0332,Special Economic Zone Satna-332,industrial,MIDC,Madhya Pradesh,Satna,80.2,462,2023-01-02,2024-11-22,2024-11-19,completed,N,0,301358416,285235741,0,77.8,8,0
+SYN0333,Bypass Road Project 333 (Krishna),highway,NHAI,Andhra Pradesh,Krishna,45.8,86,2022-10-11,2024-10-30,2025-06-02,completed,Y,215,111973441,70095374,0,40.8,0,1
+SYN0334,Freight Corridor Extension 334,railway,DFCCIL,Madhya Pradesh,Bhopal,149.6,417,2019-10-15,2021-09-04,2022-05-19,completed,Y,257,46891412,21223053,0,48.4,0,0
+SYN0335,Industrial Park Rewa 335,industrial,MIDC,Madhya Pradesh,Rewa,130.1,137,2019-05-20,2020-10-11,,completed,,,230047142,62043714,1,97.3,6,1
+SYN0336,Rail Electrification Project Jhansi-336,railway,DFCCIL,Uttar Pradesh,Jhansi,78.9,277,2020-01-24,2022-08-11,,completed,,,181613773,66506964,0,97.8,2,0
+SYN0337,Rail Corridor Hyderabad Segment 337,railway,DFCCIL,Telangana,Hyderabad,37.6,557,2021-09-13,2024-05-30,,completed,,,171961220,84708097,1,83.9,3,1
+SYN0338,NH Extension Package 338,highway,MORTH,Rajasthan,Kota,72.7,328,2018-08-22,2020-05-13,2020-12-20,completed,Y,221,116916076,74569073,1,40.5,2,1
+SYN0339,Metro Rail Phase 339 Warangal,railway,DFCCIL,Telangana,Warangal,130.3,262,2022-01-10,2024-07-28,,completed,,,33478122,14372158,1,65.3,2,1
+SYN0340,Canal Network Expansion 340,irrigation,State PWD,Karnataka,Bangalore Urban,174.3,108,2020-08-20,2022-04-12,2022-04-08,completed,N,0,196344066,173607423,0,89.3,5,0
+SYN0341,Industrial Park Kanpur 341,industrial,RIICO,Uttar Pradesh,Kanpur,82.1,298,2020-09-22,2022-10-12,2022-09-27,completed,N,0,289733610,236277759,0,65.3,4,0
+SYN0342,Rail Electrification Project Mysuru-342,railway,Indian Railways,Karnataka,Mysuru,39.7,332,2018-02-13,2021-11-24,2022-03-21,completed,Y,117,53644440,33994482,0,95.0,1,4
+SYN0343,Rail Electrification Project Amravati-343,railway,DFCCIL,Maharashtra,Amravati,176.9,287,2021-12-21,2023-06-14,2023-06-04,completed,N,0,129390602,101545744,0,100.0,4,0
+SYN0344,Freight Corridor Extension 344,railway,DFCCIL,Madhya Pradesh,Satna,194.7,98,2024-05-06,2027-11-17,2028-07-28,completed,Y,254,287302018,110410166,1,47.0,0,1
+SYN0345,Urban Flyover Nashik 345,urban,GHMC,Maharashtra,Nashik,11.8,28,2018-06-19,2019-06-14,2019-06-10,completed,N,0,40426919,32774103,0,79.8,4,0
+SYN0346,State Highway Widening Nizamabad Sec 346,highway,State PWD,Telangana,Nizamabad,65.8,361,2021-06-05,2022-05-31,,completed,,,73717048,11853701,1,100.0,6,1
+SYN0347,Irrigation Canal Sagar 347,irrigation,Central Water Commission,Madhya Pradesh,Sagar,22.1,672,2023-08-02,2025-09-20,2026-09-13,completed,Y,358,23033821,17883459,0,64.7,1,0
+SYN0348,NH Extension Package 348,highway,State PWD,Andhra Pradesh,Prakasam,113.8,371,2022-07-07,2024-09-24,2024-12-27,completed,Y,94,128801590,43135652,1,69.1,1,1
+SYN0349,Freight Corridor Extension 349,railway,Indian Railways,Madhya Pradesh,Ratlam,165.0,484,2023-08-24,2026-03-11,,completed,,,130116198,46009088,0,64.6,3,0
+SYN0350,NH Extension Package 350,highway,State PWD,Madhya Pradesh,Ratlam,55.6,314,2022-07-03,2023-06-28,2024-08-04,completed,Y,403,137656456,84011735,2,90.9,2,3
+SYN0351,Rail Electrification Project Pali-351,railway,DFCCIL,Rajasthan,Pali,67.3,533,2022-12-15,2025-01-03,2024-12-25,completed,N,0,130975464,91302996,0,83.2,3,0
+SYN0352,4-Lane Highway Sikar-352,highway,NHAI,Rajasthan,Sikar,62.4,385,2022-08-19,2024-09-07,,completed,,,59114321,14601237,1,79.2,4,1
+SYN0353,Bypass Road Project 353 (Nalgonda),highway,State PWD,Telangana,Nalgonda,80.0,212,2023-03-12,2024-08-03,2025-03-27,completed,Y,236,97647246,59359761,0,61.1,0,0
+SYN0354,Lift Irrigation Scheme Nanded-354,irrigation,State Irrigation Dept,Maharashtra,Nanded,118.3,587,2024-11-26,2027-12-11,2028-02-10,completed,Y,61,7515044,2020044,1,52.8,1,1
+SYN0355,Freight Corridor Extension 355,railway,Indian Railways,Maharashtra,Nagpur,144.1,588,2022-04-27,2024-04-16,,completed,,,216638667,36871901,1,56.2,5,1
+SYN0356,Rail Corridor Krishna Segment 356,railway,Indian Railways,Andhra Pradesh,Krishna,180.2,585,2021-06-10,2024-09-22,2025-08-06,completed,Y,318,215869516,189382326,0,61.6,0,2
+SYN0357,Special Economic Zone Aurangabad-357,industrial,RIICO,Maharashtra,Aurangabad,34.0,446,2019-03-03,2021-03-22,2021-04-23,completed,Y,32,94613377,75331171,2,61.0,0,2
+SYN0358,Metro Rail Phase 358 Jaipur,railway,Indian Railways,Rajasthan,Jaipur,57.0,254,2023-01-25,2024-10-16,,completed,,,111944763,55323102,3,97.7,4,3
+SYN0359,Ring Road Project 359,urban,GHMC,Karnataka,Davangere,27.4,69,2022-10-03,2023-08-29,,completed,,,21318479,5338147,2,80.6,7,2
+SYN0360,Bypass Road Project 360 (Mathura),highway,MORTH,Uttar Pradesh,Mathura,101.8,224,2020-12-19,2022-05-13,2023-02-11,completed,Y,274,64098806,31645581,3,37.7,0,5
+SYN0361,Lift Irrigation Scheme Sagar-361,irrigation,Central Water Commission,Madhya Pradesh,Sagar,95.8,654,2022-12-02,2024-10-22,2024-09-26,completed,N,0,91571395,71993431,0,77.9,8,0
+SYN0362,Metro Rail Phase 362 East Godavari,railway,RVNL,Andhra Pradesh,East Godavari,114.1,137,2019-01-22,2021-10-08,2022-11-05,completed,Y,393,211560764,177351388,0,50.4,0,0
+SYN0363,Rail Electrification Project Allahabad-363,railway,Indian Railways,Uttar Pradesh,Allahabad,148.4,329,2018-04-27,2020-11-12,,completed,,,242285427,92528805,0,77.1,7,0
+SYN0364,Lift Irrigation Scheme Bharuch-364,irrigation,Central Water Commission,Gujarat,Bharuch,194.1,177,2019-08-04,2021-08-23,2021-07-28,completed,N,0,18304591,13543567,0,45.9,5,1
+SYN0365,Irrigation Canal Hubballi 365,irrigation,State Irrigation Dept,Karnataka,Hubballi,72.6,717,2024-02-22,2028-05-01,,legal_resolution,,,103434977,15380781,2,6.2,2,2
+SYN0366,Canal Network Expansion 366,irrigation,State PWD,Telangana,Nizamabad,65.4,715,2021-06-28,2024-12-09,2025-04-23,completed,Y,135,142681545,51636451,0,55.6,1,0
+SYN0367,Manufacturing Hub 367 Ratlam,industrial,KIADB,Madhya Pradesh,Ratlam,109.0,243,2021-09-28,2023-02-20,2023-09-14,completed,Y,206,391557519,179137565,0,59.3,0,0
+SYN0368,Industrial Park Kalaburagi 368,industrial,APIIC,Karnataka,Kalaburagi,30.2,175,2021-02-14,2023-01-05,,completed,,,266271473,5325429,0,63.9,2,0
+SYN0369,Industrial Corridor Phase 369,industrial,MIDC,Andhra Pradesh,Chittoor,112.7,265,2022-06-02,2024-07-21,2024-07-03,completed,N,0,28449852,23234994,0,99.8,4,0
+SYN0370,Dam & Reservoir Project 370,irrigation,Central Water Commission,Madhya Pradesh,Indore,118.6,486,2020-08-17,2025-07-22,2026-08-08,completed,Y,382,194950916,167989204,0,72.8,1,1
+SYN0371,State Highway Widening Pali Sec 371,highway,State PWD,Rajasthan,Pali,47.1,64,2022-12-03,2025-09-18,,completed,,,82004230,10307932,0,88.1,2,0
+SYN0372,Canal Network Expansion 372,irrigation,State Irrigation Dept,Rajasthan,Bharatpur,161.9,727,2023-09-11,2026-02-27,2027-06-06,completed,Y,464,8627648,3048148,0,16.8,0,0
+SYN0373,Canal Network Expansion 373,irrigation,Central Water Commission,Madhya Pradesh,Ujjain,57.1,194,2022-12-21,2024-09-11,2024-08-15,completed,N,0,89900813,70617089,0,100.0,2,0
+SYN0374,Dam & Reservoir Project 374,irrigation,State Irrigation Dept,Gujarat,Gandhinagar,69.7,291,2020-11-20,2023-08-07,2025-06-16,completed,Y,679,99649559,70751187,0,53.9,0,0
+SYN0375,4-Lane Highway Pune-375,highway,State PWD,Maharashtra,Pune,96.0,58,2023-09-06,2026-04-23,,completed,,,17169783,343396,7,64.0,5,7
+SYN0376,Special Economic Zone West Godavari-376,industrial,MIDC,Andhra Pradesh,West Godavari,169.2,446,2018-10-24,2021-02-10,,completed,,,115687062,38500654,1,74.7,2,1
+SYN0377,Manufacturing Hub 377 Davangere,industrial,KIADB,Karnataka,Davangere,39.2,159,2024-12-24,2026-07-17,,completed,,,187000657,45740361,0,100.0,5,0
+SYN0378,Canal Network Expansion 378,irrigation,Central Water Commission,Andhra Pradesh,Chittoor,150.4,416,2021-11-08,2024-09-23,,completed,,,9109471,4101084,6,77.8,8,6
+SYN0379,Manufacturing Hub 379 Khammam,industrial,RIICO,Telangana,Khammam,116.3,171,2020-11-23,2022-10-14,,completed,,,167618986,63091786,1,74.0,4,1
+SYN0380,Freight Corridor Extension 380,railway,Indian Railways,Uttar Pradesh,Meerut,162.1,330,2021-11-11,2025-08-22,,completed,,,248727356,101381270,1,75.8,5,1
+SYN0381,Ring Road Project 381,urban,HMDA,Karnataka,Ballari,41.0,103,2023-05-17,2024-04-11,2024-08-14,completed,Y,125,9949388,2831596,0,33.1,0,1
+SYN0382,Rail Corridor Bikaner Segment 382,railway,RVNL,Rajasthan,Bikaner,136.9,183,2018-03-08,2020-12-22,,completed,,,208868480,59485743,2,69.3,5,2
+SYN0383,Industrial Park Thane 383,industrial,MIDC,Maharashtra,Thane,177.8,477,2024-05-07,2025-07-01,2025-08-22,completed,Y,52,380281503,289470280,0,41.6,0,0
+SYN0384,Urban Flyover Meerut 384,urban,GHMC,Uttar Pradesh,Meerut,19.7,165,2021-10-14,2023-05-07,2023-04-24,completed,N,0,78469135,78469135,0,69.8,5,0
+SYN0385,4-Lane Highway Kanpur-385,highway,State PWD,Uttar Pradesh,Kanpur,33.7,174,2023-08-13,2024-12-05,2025-02-16,completed,Y,73,31153631,15389894,0,50.3,0,0
+SYN0386,Canal Network Expansion 386,irrigation,Central Water Commission,Uttar Pradesh,Allahabad,210.8,770,2018-01-16,2020-03-06,,completed,,,87541735,17692185,7,78.6,6,7
+SYN0387,4-Lane Highway Belagavi-387,highway,State PWD,Karnataka,Belagavi,10.6,288,2022-11-26,2025-06-13,,completed,,,48863567,6650331,2,90.9,6,2
+SYN0388,Bypass Road Project 388 (Thane),highway,NHAI,Maharashtra,Thane,25.6,89,2020-08-05,2021-09-29,2021-09-14,completed,N,0,131393536,128923338,0,60.6,5,1
+SYN0389,4-Lane Highway Pali-389,highway,State PWD,Rajasthan,Pali,26.6,366,2021-03-11,2024-01-25,,completed,,,68798492,18493035,2,86.7,3,2
+SYN0390,Bypass Road Project 390 (Udaipur),highway,MORTH,Rajasthan,Udaipur,63.4,282,2021-02-16,2022-03-13,2022-03-09,completed,N,0,22929864,22929864,0,98.7,3,8
+SYN0391,Special Economic Zone Pali-391,industrial,KIADB,Rajasthan,Pali,64.3,305,2022-01-17,2024-07-05,2024-07-05,completed,N,0,128026876,120447685,0,81.1,4,3
+SYN0392,Irrigation Canal Chittoor 392,irrigation,State PWD,Andhra Pradesh,Chittoor,91.8,713,2018-08-27,2023-08-01,2023-07-12,completed,N,0,126361147,75980958,0,92.6,7,1
+SYN0393,BRTS Corridor Aurangabad-393,urban,HMDA,Maharashtra,Aurangabad,6.4,85,2020-01-24,2020-12-19,2020-11-22,completed,N,0,42897140,41237021,0,83.3,5,1
+SYN0394,Industrial Park Udaipur 394,industrial,APIIC,Rajasthan,Udaipur,84.6,99,2021-07-24,2023-04-15,,completed,,,214808226,4296165,1,84.0,5,1
+SYN0395,4-Lane Highway Surat-395,highway,State PWD,Gujarat,Surat,47.6,267,2022-03-14,2024-10-29,2024-10-07,completed,N,0,27485107,19541911,0,82.6,6,0
+SYN0396,Bypass Road Project 396 (Rewa),highway,NHAI,Madhya Pradesh,Rewa,67.5,181,2020-03-05,2022-11-20,,completed,,,84894178,34492505,2,73.1,6,2
+SYN0397,Metro Rail Phase 397 East Godavari,railway,RVNL,Andhra Pradesh,East Godavari,153.3,523,2020-05-19,2022-01-09,,completed,,,62840359,12637196,0,85.9,7,0
+SYN0398,4-Lane Highway Satna-398,highway,MORTH,Madhya Pradesh,Satna,105.9,84,2020-03-07,2021-07-30,2021-10-20,completed,Y,82,62265407,49824779,3,57.4,2,6
+SYN0399,Metro Rail Phase 399 Ujjain,railway,RVNL,Madhya Pradesh,Ujjain,42.5,64,2023-11-23,2027-02-05,2027-01-14,completed,N,0,291450905,271632243,0,74.0,7,0
+SYN0400,State Highway Widening Bareilly Sec 400,highway,MORTH,Uttar Pradesh,Bareilly,22.8,108,2018-05-25,2020-07-13,2020-12-30,completed,Y,170,75331791,54133425,0,57.7,0,0
+SYN0401,NH Extension Package 401,highway,State PWD,Gujarat,Ahmedabad,64.5,326,2018-11-28,2021-09-13,2022-04-21,completed,Y,220,47162307,10701127,0,56.8,0,0
+SYN0402,Industrial Park Nizamabad 402,industrial,KIADB,Telangana,Nizamabad,132.1,380,2022-02-09,2024-02-29,,completed,,,285055487,106211674,0,83.6,3,0
+SYN0403,Freight Corridor Extension 403,railway,RVNL,Madhya Pradesh,Jabalpur,138.3,184,2022-11-11,2026-09-21,2026-09-09,completed,N,0,288342977,279548516,0,62.6,7,2
+SYN0404,Freight Corridor Extension 404,railway,RVNL,Madhya Pradesh,Gwalior,55.9,553,2020-12-24,2022-08-16,2023-05-04,completed,Y,261,298192498,128252593,0,67.9,0,0
+SYN0405,Freight Corridor Extension 405,railway,RVNL,Rajasthan,Bikaner,131.2,173,2019-09-02,2023-03-15,2023-03-05,completed,N,0,237616883,215043279,0,56.5,6,0
+SYN0406,NH Extension Package 406,highway,MORTH,Maharashtra,Nanded,117.2,342,2023-01-15,2025-03-05,,completed,,,129466174,52394961,2,93.5,6,2
+SYN0407,State Highway Widening Kurnool Sec 407,highway,State PWD,Andhra Pradesh,Kurnool,105.8,108,2023-05-23,2025-07-11,,completed,,,53518091,23489090,1,100.0,5,1
+SYN0408,BRTS Corridor Khammam-408,urban,BBMP,Telangana,Khammam,21.9,181,2020-09-06,2021-08-02,2022-03-22,completed,Y,232,76583181,26068915,1,61.8,1,2
+SYN0409,Urban Flyover Ratlam 409,urban,NMMC,Madhya Pradesh,Ratlam,5.3,106,2021-03-25,2022-01-19,,completed,,,98284768,27264195,1,86.6,8,1
+SYN0410,4-Lane Highway Raigad-410,highway,NHAI,Maharashtra,Raigad,91.7,206,2021-07-22,2024-05-07,2024-11-04,completed,Y,181,81529802,63568787,0,40.1,2,0
+SYN0411,Bypass Road Project 411 (Sagar),highway,MORTH,Madhya Pradesh,Sagar,89.8,94,2024-04-10,2025-06-04,2025-05-29,completed,N,0,18458837,13696457,0,76.2,8,0
+SYN0412,Lift Irrigation Scheme Hyderabad-412,irrigation,Central Water Commission,Telangana,Hyderabad,32.1,421,2019-05-24,2023-02-02,,completed,,,103962379,44662238,0,99.7,2,0
+SYN0413,Freight Corridor Extension 413,railway,DFCCIL,Telangana,Adilabad,172.0,289,2024-12-19,2027-12-04,,legal_resolution,,,92515294,52613448,8,0.0,2,8
+SYN0414,State Highway Widening Junagadh Sec 414,highway,MORTH,Gujarat,Junagadh,60.0,105,2018-06-17,2020-12-03,2020-12-01,completed,N,0,18376049,15134514,0,85.6,3,2
+SYN0415,Rail Electrification Project Vijayapura-415,railway,DFCCIL,Karnataka,Vijayapura,151.7,476,2024-05-19,2027-02-03,2028-04-16,completed,Y,438,46865954,21183411,1,44.8,2,7
+SYN0416,State Highway Widening Bhopal Sec 416,highway,MORTH,Madhya Pradesh,Bhopal,50.7,178,2022-06-04,2024-12-20,,completed,,,27229154,544583,0,100.0,4,0
+SYN0417,Bypass Road Project 417 (Nalgonda),highway,NHAI,Telangana,Nalgonda,10.2,310,2018-05-10,2019-11-01,2019-10-19,completed,N,0,74770583,62194171,0,97.3,4,2
+SYN0418,Special Economic Zone Morena-418,industrial,MIDC,Madhya Pradesh,Morena,151.0,95,2022-11-15,2025-01-03,2024-12-21,completed,N,0,167149346,161867427,0,74.0,2,0
+SYN0419,Ring Road Project 419,urban,HMDA,Madhya Pradesh,Ujjain,28.9,51,2023-01-19,2024-09-10,,completed,,,13089443,5628460,2,76.8,8,2
+SYN0420,NH Extension Package 420,highway,MORTH,Uttar Pradesh,Ghaziabad,32.6,391,2018-11-18,2020-04-11,,completed,,,89035149,36477701,0,91.4,4,0
+SYN0421,Metro Rail Phase 421 Adilabad,railway,Indian Railways,Telangana,Adilabad,66.3,167,2021-03-14,2022-09-05,,completed,,,167115989,38269561,0,91.3,8,0
+SYN0422,State Highway Widening Alwar Sec 422,highway,MORTH,Rajasthan,Alwar,52.9,193,2018-10-11,2020-03-04,2020-02-25,completed,N,0,59449408,54015732,0,75.3,3,0
+SYN0423,Bypass Road Project 423 (Ghaziabad),highway,MORTH,Uttar Pradesh,Ghaziabad,63.3,238,2018-05-02,2020-02-21,2020-02-21,completed,N,0,44028162,44028162,0,76.9,3,0
+SYN0424,Manufacturing Hub 424 Thane,industrial,KIADB,Maharashtra,Thane,117.3,136,2021-02-28,2023-06-18,2023-09-22,completed,Y,96,181025934,123984662,0,43.4,1,6
+SYN0425,Urban Flyover Udaipur 425,urban,HMDA,Rajasthan,Udaipur,18.9,181,2021-05-20,2022-07-14,,completed,,,84864998,19739599,0,90.7,6,0
+SYN0426,Irrigation Canal Jodhpur 426,irrigation,State Irrigation Dept,Rajasthan,Jodhpur,75.1,556,2024-03-24,2028-07-31,,legal_resolution,,,67069269,28450784,3,3.3,1,3
+SYN0427,BRTS Corridor Ujjain-427,urban,GHMC,Madhya Pradesh,Ujjain,8.4,20,2020-04-15,2021-11-06,2023-01-02,completed,Y,422,5909968,3602125,3,77.6,1,3
+SYN0428,Canal Network Expansion 428,irrigation,State PWD,Andhra Pradesh,Prakasam,65.5,753,2023-02-12,2026-07-26,,completed,,,29328954,5352534,0,89.1,2,0
+SYN0429,4-Lane Highway Medak-429,highway,MORTH,Telangana,Medak,34.3,282,2019-02-27,2021-09-14,2022-05-27,completed,Y,255,76461492,30164059,0,28.8,0,2
+SYN0430,Metro Extension 430 Surat,urban,NMMC,Gujarat,Surat,30.9,64,2019-09-07,2021-04-29,,completed,,,17183408,6129322,1,86.6,6,1
+SYN0431,Industrial Park Kota 431,industrial,APIIC,Rajasthan,Kota,189.8,76,2023-09-15,2024-09-09,,completed,,,142739721,47917724,1,69.3,2,1
+SYN0432,Irrigation Canal Satna 432,irrigation,State Irrigation Dept,Madhya Pradesh,Satna,105.1,441,2023-04-02,2026-02-15,,completed,,,20952736,4597030,1,80.5,7,1
+SYN0433,State Highway Widening Surat Sec 433,highway,NHAI,Gujarat,Surat,62.8,42,2019-06-10,2020-08-03,2020-07-24,completed,N,0,126873600,111953265,0,99.0,4,0
+SYN0434,Industrial Corridor Phase 434,industrial,MIDC,Karnataka,Vijayapura,124.2,93,2024-10-20,2026-12-09,,legal_resolution,,,368351464,73080930,1,21.7,2,1
+SYN0435,NH Extension Package 435,highway,State PWD,Maharashtra,Pune,71.5,180,2020-10-21,2022-11-10,2023-01-26,completed,Y,77,94508787,10102989,0,76.2,1,1
+SYN0436,Rail Corridor Botad Segment 436,railway,RVNL,Gujarat,Botad,125.8,160,2020-11-22,2024-06-04,2024-06-02,completed,N,0,181937085,181937085,0,54.6,3,1
+SYN0437,Canal Network Expansion 437,irrigation,State Irrigation Dept,Rajasthan,Bikaner,32.2,359,2023-10-15,2026-03-03,2026-05-27,completed,Y,85,132082471,39307743,2,75.6,0,2
+SYN0438,4-Lane Highway Pali-438,highway,State PWD,Rajasthan,Pali,36.1,316,2020-01-17,2022-07-05,2023-02-27,completed,Y,237,33334034,20920440,0,95.0,1,0
+SYN0439,4-Lane Highway Satna-439,highway,MORTH,Madhya Pradesh,Satna,27.9,262,2024-10-19,2026-08-10,2026-07-26,completed,N,0,36813853,35532731,0,82.2,3,0
+SYN0440,Metro Rail Phase 440 Kanpur,railway,DFCCIL,Uttar Pradesh,Kanpur,21.2,60,2024-12-13,2026-12-03,2027-06-07,completed,Y,186,43404895,19250071,2,67.7,1,2
+SYN0441,4-Lane Highway Khammam-441,highway,NHAI,Telangana,Khammam,37.1,130,2019-04-09,2022-02-22,2022-01-24,completed,N,0,19672581,17939427,0,74.9,7,2
+SYN0442,Industrial Park Chittoor 442,industrial,MIDC,Andhra Pradesh,Chittoor,178.7,499,2021-04-12,2023-03-03,2023-09-03,completed,Y,184,355434786,205121415,8,64.5,1,8
+SYN0443,Dam & Reservoir Project 443,irrigation,State Irrigation Dept,Karnataka,Kalaburagi,57.3,293,2018-10-19,2021-04-06,,completed,,,160144324,72753566,0,61.0,6,0
+SYN0444,Industrial Corridor Phase 444,industrial,GIDC,Uttar Pradesh,Agra,52.2,414,2019-09-13,2021-12-31,2021-12-09,completed,N,0,383185719,277349823,0,85.2,7,1
+SYN0445,Ring Road Project 445,urban,GHMC,Telangana,Khammam,29.4,115,2021-04-13,2022-05-08,2022-11-21,completed,Y,197,76404161,30997168,1,78.2,2,3
+SYN0446,Bypass Road Project 446 (Ballari),highway,State PWD,Karnataka,Ballari,29.8,149,2021-07-12,2023-09-30,2024-03-19,completed,Y,171,135713998,55412025,0,77.7,1,0
+SYN0447,BRTS Corridor Krishna-447,urban,HMDA,Andhra Pradesh,Krishna,16.5,194,2018-09-07,2019-12-01,2020-02-04,completed,Y,65,62383234,47411258,0,84.9,0,0
+SYN0448,Manufacturing Hub 448 Bikaner,industrial,GIDC,Rajasthan,Bikaner,157.0,126,2024-10-25,2025-10-20,2025-10-21,completed,Y,1,294867638,153331172,1,69.1,2,1
+SYN0449,Special Economic Zone Mysuru-449,industrial,RIICO,Karnataka,Mysuru,25.4,121,2021-12-14,2023-06-07,2023-08-25,completed,Y,79,378474520,333246815,2,57.2,1,3
+SYN0450,4-Lane Highway Mehsana-450,highway,MORTH,Gujarat,Mehsana,26.9,199,2020-10-01,2023-03-20,,completed,,,120876138,50514138,3,71.9,5,3
+SYN0451,Metro Extension 451 Bareilly,urban,HMDA,Uttar Pradesh,Bareilly,44.9,43,2019-08-04,2020-10-27,2020-10-22,completed,N,0,8045620,6661773,0,65.9,3,1
+SYN0452,State Highway Widening Gandhinagar Sec 452,highway,NHAI,Gujarat,Gandhinagar,11.2,197,2020-11-17,2022-01-11,2022-10-20,completed,Y,282,27770141,19144735,0,70.9,2,0
+SYN0453,4-Lane Highway Varanasi-453,highway,NHAI,Uttar Pradesh,Varanasi,44.1,133,2021-12-22,2024-03-11,2024-03-03,completed,N,0,34246896,34246896,0,81.1,8,1
+SYN0454,Rail Electrification Project Mathura-454,railway,DFCCIL,Uttar Pradesh,Mathura,178.6,517,2021-08-19,2023-03-12,,completed,,,254365447,73587924,0,67.6,8,0
+SYN0455,Special Economic Zone Kolhapur-455,industrial,MIDC,Maharashtra,Kolhapur,145.7,98,2022-12-14,2025-02-01,2025-01-25,completed,N,0,356505891,356505891,0,100.0,6,1
+SYN0456,Bypass Road Project 456 (Kurnool),highway,State PWD,Andhra Pradesh,Kurnool,94.3,196,2024-09-04,2026-07-26,2027-02-16,completed,Y,205,35068954,18558490,0,56.3,1,0
+SYN0457,Rail Corridor Rajkot Segment 457,railway,DFCCIL,Gujarat,Rajkot,154.8,546,2018-05-04,2021-08-16,,completed,,,33939103,4045541,0,62.2,5,0
+SYN0458,NH Extension Package 458,highway,NHAI,Rajasthan,Udaipur,28.5,373,2022-02-06,2023-10-29,2023-10-25,completed,N,0,68895409,66353168,0,100.0,7,2
+SYN0459,Irrigation Canal Bhopal 459,irrigation,Central Water Commission,Madhya Pradesh,Bhopal,235.1,246,2021-12-10,2025-09-20,2025-11-09,completed,Y,50,51515363,34685294,0,66.4,1,0
+SYN0460,Special Economic Zone Kurnool-460,industrial,APIIC,Andhra Pradesh,Kurnool,78.1,370,2023-03-02,2025-03-21,2025-08-03,completed,Y,135,225847008,131781729,0,51.2,0,2
+SYN0461,Metro Rail Phase 461 Pune,railway,DFCCIL,Maharashtra,Pune,70.1,427,2018-07-07,2021-02-21,2021-02-08,completed,N,0,97444932,58583893,0,57.1,2,1
+SYN0462,Industrial Park Thane 462,industrial,APIIC,Maharashtra,Thane,179.1,212,2023-12-13,2025-04-06,2025-04-04,completed,N,0,147339983,111447963,0,69.5,5,1
+SYN0463,Irrigation Canal Mathura 463,irrigation,Central Water Commission,Uttar Pradesh,Mathura,230.8,674,2019-01-20,2021-02-08,2022-02-20,completed,Y,377,102251664,55563554,2,73.5,0,2
+SYN0464,4-Lane Highway Sagar-464,highway,NHAI,Madhya Pradesh,Sagar,55.6,177,2020-11-26,2023-11-11,2024-01-23,completed,Y,73,111266604,44261855,0,66.3,2,2
+SYN0465,BRTS Corridor Jhansi-465,urban,BBMP,Uttar Pradesh,Jhansi,47.8,33,2019-08-21,2020-06-16,2020-11-28,completed,Y,165,24400901,17744335,0,69.6,0,1
+SYN0466,Dam & Reservoir Project 466,irrigation,State Irrigation Dept,Gujarat,Bharuch,96.3,499,2023-04-08,2026-12-18,2027-10-25,completed,Y,311,173172978,8658649,0,60.8,1,0
+SYN0467,Rail Electrification Project Satna-467,railway,DFCCIL,Madhya Pradesh,Satna,88.7,135,2024-03-27,2028-03-06,,compensation,,,277244425,112228543,0,23.1,7,0
+SYN0468,Bypass Road Project 468 (Bharuch),highway,State PWD,Gujarat,Bharuch,88.6,130,2020-07-18,2023-02-03,2023-03-17,completed,Y,42,6860969,866540,0,54.9,1,0
+SYN0469,Metro Extension 469 Anand,urban,BBMP,Gujarat,Anand,46.2,118,2020-11-19,2021-10-15,2022-04-18,completed,Y,185,77480331,65408895,0,45.9,2,0
+SYN0470,Manufacturing Hub 470 Bangalore Urban,industrial,GIDC,Karnataka,Bangalore Urban,133.6,396,2023-04-08,2025-06-26,2025-06-22,completed,N,0,119305665,84182077,0,88.3,4,2
+SYN0471,NH Extension Package 471,highway,NHAI,Maharashtra,Pune,67.0,126,2023-12-13,2025-12-02,,completed,,,29044423,1269241,4,92.2,6,4
+SYN0472,Metro Extension 472 Botad,urban,NMMC,Gujarat,Botad,40.3,56,2024-12-28,2025-11-23,2026-06-17,completed,Y,206,76087574,35920944,0,52.8,1,1
+SYN0473,Bypass Road Project 473 (West Godavari),highway,MORTH,Andhra Pradesh,West Godavari,87.4,131,2023-05-24,2025-06-12,2025-06-09,completed,N,0,70345814,64035794,0,73.2,2,0
+SYN0474,Manufacturing Hub 474 Meerut,industrial,GIDC,Uttar Pradesh,Meerut,42.4,82,2023-10-04,2025-02-25,2025-02-10,completed,N,0,204373854,180073803,0,79.9,4,0
+SYN0475,Industrial Corridor Phase 475,industrial,APIIC,Telangana,Suryapet,193.2,186,2019-09-26,2020-09-20,2020-09-10,completed,N,0,249661189,196233695,0,100.0,4,1
+SYN0476,Metro Extension 476 Allahabad,urban,BBMP,Uttar Pradesh,Allahabad,23.9,198,2022-01-12,2023-12-03,2023-11-04,completed,N,0,18191988,12479704,0,63.9,4,0
+SYN0477,Metro Extension 477 Allahabad,urban,BBMP,Uttar Pradesh,Allahabad,47.2,102,2022-07-22,2023-08-16,2024-04-30,completed,Y,258,9346657,5132249,1,38.4,0,1
+SYN0478,Lift Irrigation Scheme Botad-478,irrigation,State PWD,Gujarat,Botad,70.6,186,2021-08-22,2023-08-12,,completed,,,175865631,53076247,0,58.7,2,0
+SYN0479,Bypass Road Project 479 (Anantapur),highway,MORTH,Andhra Pradesh,Anantapur,33.3,367,2019-08-04,2021-10-22,2022-08-24,completed,Y,306,149037413,141585542,0,63.4,1,0
+SYN0480,Industrial Corridor Phase 480,industrial,GIDC,Uttar Pradesh,Meerut,176.9,344,2023-03-18,2025-06-05,2025-05-16,completed,N,0,150425796,150425796,0,68.8,7,1
+SYN0481,Metro Rail Phase 481 Rajkot,railway,Indian Railways,Gujarat,Rajkot,188.7,168,2018-05-03,2020-01-23,2020-02-05,completed,Y,13,100877964,21951045,1,77.3,0,2
+SYN0482,Lift Irrigation Scheme Bareilly-482,irrigation,State Irrigation Dept,Uttar Pradesh,Bareilly,78.3,444,2024-06-26,2026-08-15,2026-08-05,completed,N,0,33216653,33216653,0,72.0,5,1
+SYN0483,Dam & Reservoir Project 483,irrigation,State Irrigation Dept,Maharashtra,Raigad,297.2,166,2023-11-28,2025-07-20,2025-07-02,completed,N,0,98265136,93017778,0,66.6,7,0
+SYN0484,Ring Road Project 484,urban,GHMC,Telangana,Karimnagar,43.5,65,2024-12-26,2026-01-20,,completed,,,74102569,12323257,0,100.0,8,0
+SYN0485,4-Lane Highway Sangareddy-485,highway,State PWD,Telangana,Sangareddy,68.1,174,2021-11-16,2023-10-07,,completed,,,138844249,26769171,0,64.0,2,0
+SYN0486,State Highway Widening Medak Sec 486,highway,State PWD,Telangana,Medak,33.1,130,2022-03-15,2024-12-29,2025-03-06,completed,Y,67,110263839,20442916,1,41.2,1,3
+SYN0487,Urban Flyover Vadodara 487,urban,HMDA,Gujarat,Vadodara,18.2,131,2020-08-06,2021-06-02,2021-05-21,completed,N,0,28275095,27387257,0,92.2,4,1
+SYN0488,Irrigation Canal Kolhapur 488,irrigation,Central Water Commission,Maharashtra,Kolhapur,141.9,51,2024-08-28,2029-07-03,2030-08-10,completed,Y,403,100397596,35309835,0,34.2,2,1
+SYN0489,Irrigation Canal Ujjain 489,irrigation,Central Water Commission,Madhya Pradesh,Ujjain,138.6,625,2024-10-06,2028-03-19,2029-04-25,completed,Y,402,144184789,94743825,1,36.1,2,1
+SYN0490,NH Extension Package 490,highway,MORTH,Madhya Pradesh,Indore,29.8,314,2024-04-22,2025-07-16,2026-03-14,completed,Y,241,10675758,2081773,0,41.8,2,1
+SYN0491,4-Lane Highway Warangal-491,highway,NHAI,Telangana,Warangal,37.3,53,2020-09-06,2022-09-26,,completed,,,80319245,23694177,1,60.5,5,1
+SYN0492,4-Lane Highway Sagar-492,highway,MORTH,Madhya Pradesh,Sagar,14.9,48,2022-09-17,2024-03-10,2025-12-12,completed,Y,642,125731032,96574006,0,47.8,2,1
+SYN0493,Rail Corridor Raigad Segment 493,railway,DFCCIL,Maharashtra,Raigad,102.1,310,2022-05-09,2024-10-25,2024-10-21,completed,N,0,165412253,165412253,0,92.5,7,0
+SYN0494,Dam & Reservoir Project 494,irrigation,Central Water Commission,Uttar Pradesh,Allahabad,37.1,167,2021-03-11,2024-11-20,2026-01-08,completed,Y,414,84322347,36646492,2,62.6,1,5
+SYN0495,NH Extension Package 495,highway,NHAI,Uttar Pradesh,Meerut,67.9,186,2021-04-13,2022-07-07,,completed,,,121985734,44488197,0,89.8,6,0
+SYN0496,Industrial Corridor Phase 496,industrial,APIIC,Rajasthan,Pali,142.0,453,2019-06-25,2021-06-14,2021-05-18,completed,N,0,173007479,138803900,0,75.6,7,2
+SYN0497,Canal Network Expansion 497,irrigation,State PWD,Maharashtra,Nashik,120.5,295,2022-12-09,2024-08-30,,completed,,,86557531,8171031,1,86.2,4,1
+SYN0498,Special Economic Zone Ajmer-498,industrial,GIDC,Rajasthan,Ajmer,76.3,96,2020-11-28,2022-01-22,,completed,,,49143421,12492258,0,88.6,6,0
+SYN0499,NH Extension Package 499,highway,State PWD,Rajasthan,Bharatpur,85.4,376,2021-11-17,2024-10-02,2025-08-14,completed,Y,316,63793360,7636065,0,25.6,2,1
+SYN0500,Rail Corridor Belagavi Segment 500,railway,RVNL,Karnataka,Belagavi,182.7,229,2022-08-06,2025-10-19,,completed,,,253428591,5068572,2,78.8,5,2
+SYN0501,Metro Rail Phase 501 Solapur,railway,Indian Railways,Maharashtra,Solapur,72.2,544,2023-04-27,2026-03-12,,completed,,,71789124,16899160,3,62.6,3,3
+SYN0502,Metro Extension 502 Adilabad,urban,JNURM,Telangana,Adilabad,7.1,109,2018-06-01,2019-12-23,2020-08-24,completed,Y,245,38680571,26531004,0,68.8,2,0
+SYN0503,Canal Network Expansion 503,irrigation,State PWD,Maharashtra,Kolhapur,121.7,413,2018-03-25,2023-02-27,2024-05-02,completed,Y,430,163251052,108300748,1,68.6,0,1
+SYN0504,State Highway Widening Ahmedabad Sec 504,highway,State PWD,Gujarat,Ahmedabad,46.4,46,2018-04-10,2019-05-05,2019-09-24,completed,Y,142,74497773,29218027,0,41.5,1,0
+SYN0505,Canal Network Expansion 505,irrigation,State Irrigation Dept,Maharashtra,Solapur,18.9,740,2019-02-04,2020-08-27,2020-08-17,completed,N,0,88784685,77020714,0,80.9,5,0
+SYN0506,State Highway Widening Indore Sec 506,highway,State PWD,Madhya Pradesh,Indore,22.7,164,2022-03-24,2024-07-11,2025-04-08,completed,Y,271,123988365,73115939,0,84.7,2,0
+SYN0507,Special Economic Zone Aurangabad-507,industrial,KIADB,Maharashtra,Aurangabad,96.7,365,2019-02-05,2021-01-25,2021-01-13,completed,N,0,174772932,143488577,0,100.0,3,5
+SYN0508,Bypass Road Project 508 (Bharuch),highway,NHAI,Gujarat,Bharuch,48.6,244,2023-01-10,2024-04-04,2024-03-30,completed,N,0,10928924,10928924,0,90.0,3,0
+SYN0509,Bypass Road Project 509 (Pali),highway,NHAI,Rajasthan,Pali,83.6,379,2019-05-16,2021-04-05,2021-03-26,completed,N,0,57282463,54584459,0,59.0,6,0
+SYN0510,Lift Irrigation Scheme Belagavi-510,irrigation,Central Water Commission,Karnataka,Belagavi,226.6,163,2019-10-13,2021-09-02,,completed,,,193824385,88461449,0,63.6,3,0
+SYN0511,Industrial Park Krishna 511,industrial,KIADB,Andhra Pradesh,Krishna,43.0,264,2020-12-16,2022-06-09,2022-07-29,completed,Y,50,353288630,272032245,0,20.3,1,0
+SYN0512,Rail Electrification Project West Godavari-512,railway,Indian Railways,Andhra Pradesh,West Godavari,145.4,182,2021-09-17,2025-03-30,2025-03-29,completed,N,0,240373210,195134972,0,58.9,5,1
+SYN0513,Rail Electrification Project Vishakhapatnam-513,railway,DFCCIL,Andhra Pradesh,Vishakhapatnam,48.8,273,2022-07-13,2025-07-27,2026-01-27,completed,Y,184,279301918,61558143,0,53.1,1,0
+SYN0514,Industrial Corridor Phase 514,industrial,KIADB,Rajasthan,Ajmer,46.7,192,2019-04-02,2021-08-19,2021-11-03,completed,Y,76,320436101,120419887,0,43.2,2,0
+SYN0515,4-Lane Highway Kalaburagi-515,highway,State PWD,Karnataka,Kalaburagi,77.3,196,2018-12-18,2020-08-09,,completed,,,95763519,37376501,0,82.9,7,0
+SYN0516,Urban Flyover Thane 516,urban,HMDA,Maharashtra,Thane,32.1,174,2023-12-23,2025-04-16,,completed,,,82600468,22450807,0,93.7,6,0
+SYN0517,Dam & Reservoir Project 517,irrigation,State Irrigation Dept,Gujarat,Vadodara,156.3,510,2023-12-14,2027-04-27,2027-04-21,completed,N,0,116083307,110395225,0,78.7,4,1
+SYN0518,State Highway Widening Nashik Sec 518,highway,State PWD,Maharashtra,Nashik,116.7,81,2018-03-03,2020-03-22,2020-09-27,completed,Y,189,113814409,66080646,3,55.7,0,3
+SYN0519,State Highway Widening Hyderabad Sec 519,highway,NHAI,Telangana,Hyderabad,97.2,34,2024-02-09,2025-06-03,,completed,,,20419147,4861799,1,68.4,7,1
+SYN0520,Bypass Road Project 520 (Amravati),highway,MORTH,Maharashtra,Amravati,69.8,166,2024-03-10,2025-12-30,2027-04-01,completed,Y,457,124614111,78182893,0,65.1,0,0
+SYN0521,Bypass Road Project 521 (Lucknow),highway,NHAI,Uttar Pradesh,Lucknow,85.3,381,2021-03-12,2023-10-28,2023-10-29,completed,Y,1,21299257,11320555,0,63.5,1,3
+SYN0522,Rail Corridor Mysuru Segment 522,railway,DFCCIL,Karnataka,Mysuru,52.6,485,2018-10-05,2020-08-25,2020-08-16,completed,N,0,191179899,157455765,0,100.0,4,0
+SYN0523,Urban Flyover Mangaluru 523,urban,HMDA,Karnataka,Mangaluru,23.4,142,2024-03-25,2025-11-15,2026-06-21,completed,Y,218,45608050,21075480,0,43.9,0,0
+SYN0524,Bypass Road Project 524 (Anand),highway,State PWD,Gujarat,Anand,25.2,364,2021-08-23,2023-09-12,2023-09-13,completed,Y,1,84654193,19580515,0,49.4,1,1
+SYN0525,State Highway Widening Junagadh Sec 525,highway,MORTH,Gujarat,Junagadh,49.9,272,2023-02-08,2024-12-29,2024-12-28,completed,N,0,137147480,100145090,0,100.0,8,4
+SYN0526,Manufacturing Hub 526 Sikar,industrial,MIDC,Rajasthan,Sikar,193.2,410,2019-04-27,2020-11-17,2020-10-26,completed,N,0,386667013,290348260,0,98.8,7,0
+SYN0527,Irrigation Canal Morena 527,irrigation,State PWD,Madhya Pradesh,Morena,251.9,466,2019-06-05,2021-04-25,2021-11-16,completed,Y,205,149993798,71382048,0,24.0,1,0
+SYN0528,Rail Corridor Tumkur Segment 528,railway,RVNL,Karnataka,Tumkur,155.2,565,2020-02-05,2021-08-28,,completed,,,124953300,2499066,0,98.9,5,0
+SYN0529,Lift Irrigation Scheme Pali-529,irrigation,Central Water Commission,Rajasthan,Pali,122.6,168,2023-04-14,2025-08-01,2026-12-31,completed,Y,517,15919380,2564612,0,78.3,2,0
+SYN0530,Freight Corridor Extension 530,railway,DFCCIL,Karnataka,Ballari,34.0,393,2018-06-21,2021-01-06,2021-08-23,completed,Y,229,167054695,125625131,0,65.8,0,0
+SYN0531,Irrigation Canal Khammam 531,irrigation,State Irrigation Dept,Telangana,Khammam,28.7,135,2022-10-02,2027-03-10,,legal_resolution,,,6653353,2653357,1,15.1,1,1
+SYN0532,Lift Irrigation Scheme Ballari-532,irrigation,Central Water Commission,Karnataka,Ballari,158.5,554,2019-12-22,2021-12-11,2022-03-05,completed,Y,84,119499224,31583645,0,72.9,1,3
+SYN0533,NH Extension Package 533,highway,MORTH,Madhya Pradesh,Indore,27.7,286,2023-04-07,2025-12-22,2026-03-26,completed,Y,94,99452263,65847343,0,47.2,1,2
+SYN0534,Bypass Road Project 534 (Ahmedabad),highway,MORTH,Gujarat,Ahmedabad,79.1,284,2019-04-20,2021-11-05,2022-07-24,completed,Y,261,116116011,36959726,0,92.4,1,0
+SYN0535,State Highway Widening Hubballi Sec 535,highway,State PWD,Karnataka,Hubballi,88.2,265,2018-05-19,2020-04-08,2020-07-09,completed,Y,92,42123814,29815236,0,34.7,0,0
+SYN0536,BRTS Corridor Bhopal-536,urban,NMMC,Madhya Pradesh,Bhopal,19.6,179,2021-07-28,2023-02-18,,completed,,,40499894,7144181,0,65.8,4,0
+SYN0537,Special Economic Zone Suryapet-537,industrial,APIIC,Telangana,Suryapet,48.5,254,2023-09-01,2024-12-24,,completed,,,104759490,42626636,0,66.1,4,0
+SYN0538,Freight Corridor Extension 538,railway,Indian Railways,Madhya Pradesh,Indore,31.6,400,2023-02-13,2026-07-27,2027-04-05,completed,Y,252,213664343,65018060,0,57.4,2,0
+SYN0539,State Highway Widening Gwalior Sec 539,highway,MORTH,Madhya Pradesh,Gwalior,98.9,250,2020-10-02,2023-04-20,,completed,,,35946021,9263290,0,85.1,8,0
+SYN0540,Dam & Reservoir Project 540,irrigation,Central Water Commission,Rajasthan,Ajmer,218.0,469,2018-03-03,2021-01-16,2021-01-08,completed,N,0,40895267,40895267,0,92.5,5,0
+SYN0541,Metro Rail Phase 541 Udaipur,railway,Indian Railways,Rajasthan,Udaipur,145.4,413,2021-08-16,2024-07-01,2024-06-05,completed,N,0,12880138,11764718,0,62.2,2,0
+SYN0542,Industrial Corridor Phase 542,industrial,RIICO,Maharashtra,Solapur,194.6,258,2019-08-05,2021-10-23,,completed,,,294468694,176681216,0,79.3,8,0
+SYN0543,NH Extension Package 543,highway,NHAI,Madhya Pradesh,Morena,76.1,140,2019-12-07,2021-12-26,2021-12-05,completed,N,0,88641282,88641282,0,84.5,2,2
+SYN0544,Rail Electrification Project Bharatpur-544,railway,Indian Railways,Rajasthan,Bharatpur,96.7,393,2023-08-14,2026-03-01,2026-10-13,completed,Y,226,134231248,82028716,2,79.1,1,2
+SYN0545,Rail Corridor Gandhinagar Segment 545,railway,RVNL,Gujarat,Gandhinagar,109.4,152,2018-02-03,2021-03-19,2021-07-19,completed,Y,122,243702487,65190415,1,21.0,0,4
+SYN0546,Manufacturing Hub 546 Surat,industrial,MIDC,Gujarat,Surat,146.7,429,2018-06-26,2020-08-14,2020-07-20,completed,N,0,105095908,87050941,0,100.0,4,2
+SYN0547,Rail Electrification Project Rajkot-547,railway,Indian Railways,Gujarat,Rajkot,113.4,375,2018-01-01,2019-10-23,,completed,,,288156572,104168601,2,81.5,5,2
+SYN0548,Bypass Road Project 548 (Ahmedabad),highway,MORTH,Gujarat,Ahmedabad,66.9,253,2019-11-13,2022-09-28,2023-12-09,completed,Y,437,23317891,16145308,3,72.8,2,3
+SYN0549,Urban Flyover Solapur 549,urban,GHMC,Maharashtra,Solapur,3.3,159,2018-01-14,2018-11-10,2019-06-11,completed,Y,213,41328461,19606222,1,44.4,2,1
+SYN0550,Dam & Reservoir Project 550,irrigation,State PWD,Karnataka,Hubballi,122.8,306,2020-04-18,2023-01-03,,completed,,,58618141,25991284,2,73.6,7,2
+SYN0551,Urban Flyover Krishna 551,urban,BBMP,Andhra Pradesh,Krishna,25.7,112,2018-03-10,2019-05-04,,completed,,,24757383,11524562,0,97.8,5,0
+SYN0552,Bypass Road Project 552 (Kurnool),highway,MORTH,Andhra Pradesh,Kurnool,11.1,121,2021-06-21,2023-08-10,,completed,,,96525943,28552374,0,76.1,4,0
+SYN0553,Urban Flyover Morena 553,urban,JNURM,Madhya Pradesh,Morena,3.4,25,2019-09-24,2020-11-17,,completed,,,77291293,21641562,0,96.0,3,0
+SYN0554,State Highway Widening Aurangabad Sec 554,highway,NHAI,Maharashtra,Aurangabad,70.7,180,2020-05-16,2021-11-07,,completed,,,122306701,2446134,0,96.2,3,0
+SYN0555,NH Extension Package 555,highway,State PWD,Uttar Pradesh,Meerut,57.7,258,2022-10-10,2024-03-03,,completed,,,113326494,37885047,7,62.8,6,7
+SYN0556,Metro Rail Phase 556 Jhansi,railway,DFCCIL,Uttar Pradesh,Jhansi,125.6,350,2023-02-15,2025-01-05,,completed,,,264403107,112529962,6,76.3,5,6
+SYN0557,State Highway Widening Solapur Sec 557,highway,State PWD,Maharashtra,Solapur,95.7,92,2020-04-03,2021-09-25,2021-09-03,completed,N,0,52686061,35368153,0,87.8,3,0
+SYN0558,Dam & Reservoir Project 558,irrigation,Central Water Commission,Gujarat,Gandhinagar,266.8,727,2022-04-04,2026-08-11,2026-07-29,completed,N,0,138015725,93588463,0,92.9,3,1
+SYN0559,4-Lane Highway Satna-559,highway,NHAI,Madhya Pradesh,Satna,52.1,325,2021-02-04,2023-03-26,2023-03-27,completed,Y,1,118579317,54676923,0,54.1,1,0
+SYN0560,NH Extension Package 560,highway,MORTH,Gujarat,Ahmedabad,55.7,184,2020-11-01,2021-12-26,2022-07-16,completed,Y,202,63049930,18990639,2,49.0,0,2
+SYN0561,Rail Corridor Satna Segment 561,railway,RVNL,Madhya Pradesh,Satna,21.9,157,2024-06-20,2026-03-12,2026-02-17,completed,N,0,136347914,125112846,0,90.6,8,0
+SYN0562,Rail Corridor Hyderabad Segment 562,railway,DFCCIL,Telangana,Hyderabad,162.5,438,2018-01-10,2019-09-02,2019-12-31,completed,Y,120,49951364,18442044,0,57.5,2,1
+SYN0563,Special Economic Zone Bharuch-563,industrial,APIIC,Gujarat,Bharuch,151.6,165,2022-08-22,2024-11-09,,completed,,,311156753,67334321,0,68.4,8,0
+SYN0564,Manufacturing Hub 564 Agra,industrial,APIIC,Uttar Pradesh,Agra,107.8,224,2018-04-01,2019-09-23,2019-09-07,completed,N,0,215292380,165387606,0,100.0,7,0
+SYN0565,Freight Corridor Extension 565,railway,Indian Railways,Maharashtra,Nanded,160.4,242,2019-06-13,2022-01-28,,completed,,,132697255,14079179,1,48.0,6,1
+SYN0566,Irrigation Canal Amravati 566,irrigation,State PWD,Maharashtra,Amravati,166.3,400,2019-01-15,2021-06-03,2021-06-01,completed,N,0,74113233,67331872,0,96.7,5,1
+SYN0567,Lift Irrigation Scheme Adilabad-567,irrigation,State Irrigation Dept,Telangana,Adilabad,98.8,452,2018-01-21,2021-07-04,,completed,,,58805511,6374517,0,70.7,2,0
+SYN0568,Irrigation Canal Agra 568,irrigation,State PWD,Uttar Pradesh,Agra,93.5,675,2018-01-19,2020-12-04,2022-03-19,completed,Y,470,81612658,45466412,1,91.6,1,1
+SYN0569,4-Lane Highway Allahabad-569,highway,MORTH,Uttar Pradesh,Allahabad,109.9,348,2023-10-10,2026-08-25,2026-11-17,completed,Y,84,136466826,67373672,0,72.4,0,0
+SYN0570,Bypass Road Project 570 (Gwalior),highway,NHAI,Madhya Pradesh,Gwalior,28.8,34,2021-06-01,2022-10-24,,completed,,,145583522,14485560,3,73.3,3,3
+SYN0571,Metro Rail Phase 571 Hyderabad,railway,RVNL,Telangana,Hyderabad,36.9,361,2024-04-17,2027-02-01,2027-08-22,completed,Y,202,152291937,48200398,0,75.3,1,0
+SYN0572,Metro Rail Phase 572 Karimnagar,railway,DFCCIL,Telangana,Karimnagar,40.3,581,2022-11-28,2026-08-09,,completed,,,16010911,8690722,1,78.0,7,1
+SYN0573,Ring Road Project 573,urban,HMDA,Karnataka,Tumkur,11.3,116,2022-12-23,2024-04-16,2024-03-19,completed,N,0,64554712,40391883,0,72.8,6,2
+SYN0574,Bypass Road Project 574 (Davangere),highway,State PWD,Karnataka,Davangere,101.8,92,2020-05-07,2021-06-01,2022-01-27,completed,Y,240,145382190,76718182,0,39.1,1,2
+SYN0575,BRTS Corridor Amravati-575,urban,GHMC,Maharashtra,Amravati,40.4,23,2022-09-22,2023-09-17,2024-05-10,completed,Y,236,83419707,55215504,0,71.2,1,0
+SYN0576,Freight Corridor Extension 576,railway,DFCCIL,Telangana,Hyderabad,47.9,138,2020-05-26,2024-02-05,2024-03-15,completed,Y,39,222585409,11129270,4,73.5,0,8
+SYN0577,Bypass Road Project 577 (Belagavi),highway,MORTH,Karnataka,Belagavi,29.1,253,2021-07-04,2023-02-24,,completed,,,51759586,2556924,1,71.3,3,1
+SYN0578,4-Lane Highway Junagadh-578,highway,NHAI,Gujarat,Junagadh,30.2,253,2020-02-10,2022-07-29,,completed,,,81352852,15367554,1,65.3,7,1
+SYN0579,Manufacturing Hub 579 Sagar,industrial,GIDC,Madhya Pradesh,Sagar,158.0,95,2021-07-15,2022-07-10,,completed,,,253779249,54258003,0,92.6,6,0
+SYN0580,Freight Corridor Extension 580,railway,DFCCIL,Rajasthan,Jaipur,102.8,105,2021-11-01,2024-06-18,,completed,,,88350705,28369411,3,81.4,6,3
+SYN0581,4-Lane Highway Pali-581,highway,State PWD,Rajasthan,Pali,88.9,389,2024-01-04,2026-11-19,2027-04-07,completed,Y,139,112361497,36360180,0,55.4,1,1
+SYN0582,Dam & Reservoir Project 582,irrigation,Central Water Commission,Telangana,Adilabad,42.6,249,2018-02-01,2020-04-21,2020-11-12,completed,Y,205,103631878,9503043,0,83.9,1,0
+SYN0583,Metro Rail Phase 583 Aurangabad,railway,RVNL,Maharashtra,Aurangabad,97.8,72,2024-10-22,2027-06-09,,rehabilitation,,,247379529,189591671,1,74.3,7,1
+SYN0584,Lift Irrigation Scheme Ghaziabad-584,irrigation,State Irrigation Dept,Uttar Pradesh,Ghaziabad,126.5,754,2020-11-04,2025-05-12,2025-10-28,completed,Y,169,163631253,96084272,0,68.1,2,1
+SYN0585,Rail Electrification Project Jaipur-585,railway,RVNL,Rajasthan,Jaipur,21.6,212,2018-06-05,2021-01-20,,completed,,,258193476,28685295,1,81.7,7,1
+SYN0586,Dam & Reservoir Project 586,irrigation,Central Water Commission,Andhra Pradesh,Vishakhapatnam,239.2,325,2020-11-24,2025-05-02,2027-02-14,completed,Y,653,185078003,159648285,1,70.9,1,2
+SYN0587,BRTS Corridor Raigad-587,urban,JNURM,Maharashtra,Raigad,31.6,123,2019-12-11,2021-07-03,,completed,,,7804575,1859830,0,71.2,7,0
+SYN0588,State Highway Widening Sagar Sec 588,highway,NHAI,Madhya Pradesh,Sagar,17.1,343,2018-03-24,2020-03-13,,completed,,,10425650,2605370,0,65.8,4,0
+SYN0589,Irrigation Canal Nalgonda 589,irrigation,State Irrigation Dept,Telangana,Nalgonda,71.9,298,2023-08-13,2025-10-01,,completed,,,137375559,39550423,1,100.0,5,1
+SYN0590,Industrial Corridor Phase 590,industrial,KIADB,Uttar Pradesh,Agra,20.9,446,2023-11-04,2025-04-27,2025-04-25,completed,N,0,149470299,112924811,0,47.6,7,0
+SYN0591,Canal Network Expansion 591,irrigation,State PWD,Madhya Pradesh,Jabalpur,243.5,489,2022-06-12,2027-02-16,,legal_resolution,,,78343054,44874901,3,11.4,2,3
+SYN0592,NH Extension Package 592,highway,NHAI,Andhra Pradesh,East Godavari,52.9,213,2022-09-11,2023-09-06,2023-08-07,completed,N,0,46770004,37083936,0,79.6,6,6
+SYN0593,Urban Flyover Alwar 593,urban,JNURM,Rajasthan,Alwar,14.6,27,2022-12-04,2024-06-26,2025-01-02,completed,Y,190,24048569,12954964,1,50.5,2,3
+SYN0594,Manufacturing Hub 594 Bangalore Urban,industrial,MIDC,Karnataka,Bangalore Urban,94.9,428,2018-10-20,2019-11-14,2019-11-20,completed,Y,6,229541596,148054329,0,49.8,0,0
+SYN0595,Bypass Road Project 595 (Allahabad),highway,State PWD,Uttar Pradesh,Allahabad,31.6,341,2020-04-01,2021-04-26,2022-02-10,completed,Y,290,111998918,46132354,1,52.9,2,2
+SYN0596,NH Extension Package 596,highway,NHAI,Gujarat,Junagadh,111.0,151,2021-02-20,2023-01-11,2023-01-04,completed,N,0,64894495,57334286,0,54.8,6,0
+SYN0597,Irrigation Canal Khammam 597,irrigation,State PWD,Telangana,Khammam,186.7,290,2018-03-15,2020-08-01,2022-07-26,completed,Y,724,82574637,25061402,0,30.6,1,0
+SYN0598,Ring Road Project 598,urban,NMMC,Uttar Pradesh,Ghaziabad,33.4,154,2021-12-10,2023-03-05,,completed,,,35291600,6419542,0,80.2,4,0
+SYN0599,Ring Road Project 599,urban,HMDA,Madhya Pradesh,Ujjain,19.9,56,2019-09-08,2020-11-01,,completed,,,27334998,546700,0,91.3,2,0
+SYN0600,Bypass Road Project 600 (Medak),highway,State PWD,Telangana,Medak,12.1,225,2020-02-02,2021-09-24,,completed,,,11440255,3160942,0,91.2,5,0
+SYN0601,Lift Irrigation Scheme Jaipur-601,irrigation,Central Water Commission,Rajasthan,Jaipur,245.9,645,2018-10-25,2022-01-07,,completed,,,10332302,2255542,3,61.3,8,3
+SYN0602,Rail Electrification Project Warangal-602,railway,RVNL,Telangana,Warangal,96.3,581,2023-11-10,2027-07-22,,rehabilitation,,,288488452,144244226,1,91.6,3,1
+SYN0603,4-Lane Highway Medak-603,highway,MORTH,Telangana,Medak,14.2,170,2018-04-25,2020-09-11,2021-07-11,completed,Y,303,118451812,70040556,0,29.6,1,1
+SYN0604,Canal Network Expansion 604,irrigation,State PWD,Karnataka,Mangaluru,196.8,609,2021-01-15,2022-07-09,2022-07-10,completed,Y,1,188072680,80871252,5,82.1,0,7
+SYN0605,Rail Electrification Project Ajmer-605,railway,DFCCIL,Rajasthan,Ajmer,28.9,167,2019-04-21,2021-03-11,2021-08-05,completed,Y,147,156948564,47257213,0,61.4,0,1
+SYN0606,BRTS Corridor Ajmer-606,urban,HMDA,Rajasthan,Ajmer,26.3,48,2022-12-02,2024-06-24,2025-03-27,completed,Y,276,35949959,7092927,0,81.9,0,0
+SYN0607,Lift Irrigation Scheme Udaipur-607,irrigation,State PWD,Rajasthan,Udaipur,283.6,341,2022-06-11,2026-01-21,,completed,,,36261000,21129285,0,91.6,6,0
+SYN0608,4-Lane Highway Allahabad-608,highway,MORTH,Uttar Pradesh,Allahabad,51.9,362,2019-07-27,2022-01-12,2022-04-17,completed,Y,95,140650091,73334957,2,78.4,2,2
+SYN0609,Irrigation Canal Junagadh 609,irrigation,Central Water Commission,Gujarat,Junagadh,163.3,364,2024-09-26,2026-06-18,2026-06-09,completed,N,0,182658557,142108357,0,100.0,4,1
+SYN0610,State Highway Widening Mysuru Sec 610,highway,MORTH,Karnataka,Mysuru,18.4,215,2021-12-14,2023-11-04,2023-10-21,completed,N,0,119014101,108124311,0,100.0,3,1
+SYN0611,Ring Road Project 611,urban,JNURM,Uttar Pradesh,Bareilly,21.6,149,2022-05-26,2023-07-20,2023-06-30,completed,N,0,88736918,80235921,0,90.9,5,0
+SYN0612,Bypass Road Project 612 (West Godavari),highway,State PWD,Andhra Pradesh,West Godavari,28.4,67,2023-02-05,2024-03-01,,completed,,,130697598,69714099,0,66.1,4,0
+SYN0613,4-Lane Highway Meerut-613,highway,NHAI,Uttar Pradesh,Meerut,18.1,211,2024-06-19,2027-01-05,2026-12-16,completed,N,0,70214289,65327374,0,71.3,5,4
+SYN0614,Industrial Corridor Phase 614,industrial,KIADB,Maharashtra,Raigad,88.3,274,2019-01-19,2021-07-07,2021-06-29,completed,N,0,379011878,364874735,0,89.2,4,1
+SYN0615,Bypass Road Project 615 (Gandhinagar),highway,State PWD,Gujarat,Gandhinagar,118.8,137,2020-03-05,2021-03-30,,completed,,,45347153,15635698,2,73.1,4,2
+SYN0616,Bypass Road Project 616 (Anantapur),highway,State PWD,Andhra Pradesh,Anantapur,76.7,84,2021-04-06,2022-12-27,,completed,,,101632874,31973702,0,89.9,8,0
+SYN0617,Irrigation Canal Pune 617,irrigation,Central Water Commission,Maharashtra,Pune,22.3,248,2022-09-26,2025-03-14,2025-03-01,completed,N,0,147757437,96884551,0,78.3,4,2
+SYN0618,Metro Extension 618 East Godavari,urban,BBMP,Andhra Pradesh,East Godavari,7.6,110,2020-02-28,2021-02-22,,completed,,,75706366,19698796,2,87.8,3,2
+SYN0619,Irrigation Canal Sikar 619,irrigation,Central Water Commission,Rajasthan,Sikar,105.5,611,2023-12-11,2025-08-02,2025-08-01,completed,N,0,190090596,155342035,0,73.9,6,8
+SYN0620,Rail Electrification Project Kanpur-620,railway,DFCCIL,Uttar Pradesh,Kanpur,55.7,140,2019-08-27,2021-07-17,,completed,,,258575471,64643868,0,80.8,2,0
+SYN0621,Rail Electrification Project Varanasi-621,railway,Indian Railways,Uttar Pradesh,Varanasi,82.8,593,2023-05-20,2025-11-05,2026-08-18,completed,Y,286,97029166,48592206,0,71.5,1,0
+SYN0622,Manufacturing Hub 622 Botad,industrial,RIICO,Gujarat,Botad,157.5,264,2020-02-08,2021-05-03,,completed,,,143650878,30324700,3,75.7,5,3
+SYN0623,Ring Road Project 623,urban,BBMP,Andhra Pradesh,Chittoor,35.0,27,2024-08-27,2026-06-18,,completed,,,53211303,24040867,1,65.3,2,1
+SYN0624,Lift Irrigation Scheme Mangaluru-624,irrigation,Central Water Commission,Karnataka,Mangaluru,30.6,537,2021-07-26,2025-05-06,2026-08-03,completed,Y,454,164612294,65647383,0,74.2,2,0
+SYN0625,4-Lane Highway SPSR Nellore-625,highway,MORTH,Andhra Pradesh,SPSR Nellore,51.7,390,2019-10-18,2020-10-12,,completed,,,56141592,14344177,0,76.6,2,0
+SYN0626,Dam & Reservoir Project 626,irrigation,State PWD,Karnataka,Vijayapura,121.6,463,2024-09-13,2027-05-01,2027-04-01,completed,N,0,7659973,7611715,0,61.2,6,0
+SYN0627,State Highway Widening Bharuch Sec 627,highway,NHAI,Gujarat,Bharuch,13.7,93,2020-05-01,2021-11-22,2022-01-29,completed,Y,68,63108886,42112560,0,17.8,0,1
+SYN0628,State Highway Widening Ahmedabad Sec 628,highway,NHAI,Gujarat,Ahmedabad,44.3,195,2018-12-19,2020-12-08,2021-05-29,completed,Y,172,48812327,18670715,1,57.3,1,1
+SYN0629,4-Lane Highway Kurnool-629,highway,State PWD,Andhra Pradesh,Kurnool,119.2,231,2021-05-23,2023-10-10,2023-09-18,completed,N,0,20704123,19314876,0,100.0,5,0
+SYN0630,Industrial Corridor Phase 630,industrial,GIDC,Madhya Pradesh,Sagar,121.0,156,2023-05-11,2024-09-02,,completed,,,206128356,51532089,4,90.3,6,4
+SYN0631,Industrial Park Lucknow 631,industrial,GIDC,Uttar Pradesh,Lucknow,144.0,356,2021-05-24,2023-03-15,,completed,,,22117272,3494529,0,58.6,8,0
+SYN0632,Freight Corridor Extension 632,railway,RVNL,Madhya Pradesh,Sagar,198.7,133,2020-08-23,2023-05-10,2023-05-11,completed,Y,1,32476289,16413516,0,57.4,0,3
+SYN0633,Bypass Road Project 633 (Guntur),highway,State PWD,Andhra Pradesh,Guntur,70.2,234,2019-11-26,2022-03-15,2022-05-11,completed,Y,57,149382925,58991317,1,14.5,2,2
+SYN0634,Freight Corridor Extension 634,railway,RVNL,Karnataka,Kalaburagi,148.6,581,2019-05-17,2022-07-30,2023-01-28,completed,Y,182,71078968,21608006,0,84.0,0,1
+SYN0635,Canal Network Expansion 635,irrigation,State Irrigation Dept,Madhya Pradesh,Bhopal,214.9,244,2019-03-16,2021-01-04,,completed,,,109857641,24608112,0,86.7,5,0
+SYN0636,Dam & Reservoir Project 636,irrigation,Central Water Commission,Andhra Pradesh,Chittoor,262.4,638,2020-11-01,2023-04-20,2023-06-09,completed,Y,50,154562824,114160102,2,44.7,2,2
+SYN0637,State Highway Widening Nagpur Sec 637,highway,MORTH,Maharashtra,Nagpur,74.6,226,2020-03-09,2022-08-26,2022-08-08,completed,N,0,92692405,92692405,0,76.9,6,2
+SYN0638,Irrigation Canal Jabalpur 638,irrigation,State PWD,Madhya Pradesh,Jabalpur,55.8,526,2024-04-07,2026-02-26,,completed,,,68050886,19666706,1,79.0,6,1
+SYN0639,Industrial Park Bharuch 639,industrial,RIICO,Gujarat,Bharuch,147.1,231,2022-02-08,2024-06-27,2024-06-11,completed,N,0,49715871,40483634,0,75.6,3,2
+SYN0640,Metro Extension 640 Udaipur,urban,BBMP,Rajasthan,Udaipur,22.9,109,2021-12-26,2023-02-19,2023-01-23,completed,N,0,49277209,38766380,0,60.8,3,1
+SYN0641,Dam & Reservoir Project 641,irrigation,State Irrigation Dept,Uttar Pradesh,Bareilly,182.1,376,2023-01-07,2026-10-18,2028-07-05,completed,Y,626,54483264,40579135,0,42.1,2,0
+SYN0642,4-Lane Highway Rewa-642,highway,NHAI,Madhya Pradesh,Rewa,112.0,341,2020-11-02,2023-04-21,,completed,,,76093570,1521871,3,87.1,8,3
+SYN0643,Irrigation Canal Guntur 643,irrigation,State Irrigation Dept,Andhra Pradesh,Guntur,134.6,162,2022-12-05,2025-04-23,,completed,,,129308240,40447617,0,84.6,6,0
+SYN0644,NH Extension Package 644,highway,MORTH,Uttar Pradesh,Jhansi,118.5,399,2020-11-28,2022-09-19,,completed,,,79869365,31300804,0,76.4,8,0
+SYN0645,Dam & Reservoir Project 645,irrigation,State PWD,Telangana,Warangal,71.6,557,2023-05-03,2025-09-19,2025-08-24,completed,N,0,168382641,164341458,0,82.2,4,0
+SYN0646,NH Extension Package 646,highway,MORTH,Madhya Pradesh,Morena,19.5,192,2022-08-03,2023-10-27,,completed,,,145036011,40276500,0,55.7,3,0
+SYN0647,Dam & Reservoir Project 647,irrigation,Central Water Commission,Madhya Pradesh,Indore,103.5,428,2020-11-21,2023-05-10,,completed,,,39710787,13223692,2,92.1,3,2
+SYN0648,Industrial Park Kota 648,industrial,MIDC,Rajasthan,Kota,85.5,445,2020-12-15,2022-08-07,2022-07-18,completed,N,0,281075152,281075152,0,100.0,6,0
+SYN0649,Metro Rail Phase 649 Bareilly,railway,DFCCIL,Uttar Pradesh,Bareilly,163.0,142,2019-06-23,2023-06-02,2023-06-07,completed,Y,5,73293927,32703750,2,95.0,2,2
+SYN0650,Lift Irrigation Scheme Gwalior-650,irrigation,State Irrigation Dept,Madhya Pradesh,Gwalior,214.9,684,2020-10-13,2025-09-17,2025-09-12,completed,N,0,87174514,69042215,0,100.0,2,0
+SYN0651,Bypass Road Project 651 (Mangaluru),highway,NHAI,Karnataka,Mangaluru,75.3,385,2022-03-25,2023-03-20,2023-07-25,completed,Y,127,125943980,60024901,1,74.3,1,1
+SYN0652,Irrigation Canal Jaipur 652,irrigation,State PWD,Rajasthan,Jaipur,23.1,564,2021-07-25,2024-06-09,,completed,,,63613639,3791373,0,68.7,6,0
+SYN0653,4-Lane Highway Nashik-653,highway,MORTH,Maharashtra,Nashik,48.1,232,2024-01-03,2025-09-24,,completed,,,5122265,2236381,0,100.0,4,0
+SYN0654,Rail Electrification Project Aurangabad-654,railway,Indian Railways,Maharashtra,Aurangabad,87.4,538,2018-12-08,2020-09-28,2021-05-25,completed,Y,239,169450431,61069935,1,63.5,2,2
+SYN0655,Rail Electrification Project Jabalpur-655,railway,Indian Railways,Madhya Pradesh,Jabalpur,181.6,484,2019-06-25,2023-05-05,2024-07-14,completed,Y,436,110591484,21963469,0,10.0,0,2
+SYN0656,Industrial Park Aurangabad 656,industrial,RIICO,Maharashtra,Aurangabad,184.6,380,2020-09-27,2021-09-22,2021-09-21,completed,N,0,100268291,78169160,0,87.4,7,2
+SYN0657,Bypass Road Project 657 (Thane),highway,State PWD,Maharashtra,Thane,28.0,379,2023-08-02,2025-03-24,,completed,,,20432431,6086821,0,69.0,7,0
+SYN0658,4-Lane Highway Ahmedabad-658,highway,NHAI,Gujarat,Ahmedabad,81.9,373,2019-10-17,2021-10-06,2021-09-27,completed,N,0,66622274,58427734,0,74.6,8,0
+SYN0659,Manufacturing Hub 659 Ratlam,industrial,RIICO,Madhya Pradesh,Ratlam,52.2,267,2023-06-28,2025-11-14,,completed,,,165719293,34966771,0,74.4,4,0
+SYN0660,Metro Extension 660 Kota,urban,JNURM,Rajasthan,Kota,24.1,32,2021-01-15,2022-03-11,2022-03-03,completed,N,0,45441741,35762650,0,59.2,2,3
+SYN0661,Canal Network Expansion 661,irrigation,State Irrigation Dept,Maharashtra,Thane,116.8,77,2018-08-11,2021-08-25,2021-09-06,completed,Y,12,39170561,14434352,0,52.7,2,1
+SYN0662,Freight Corridor Extension 662,railway,DFCCIL,Rajasthan,Bikaner,78.8,89,2024-12-27,2027-10-13,2027-09-23,completed,N,0,245618179,244586583,0,92.7,7,0
+SYN0663,NH Extension Package 663,highway,State PWD,Rajasthan,Alwar,102.1,251,2019-12-09,2022-10-24,2022-10-06,completed,N,0,42841483,35674103,0,99.0,8,3
+SYN0664,Manufacturing Hub 664 Karimnagar,industrial,KIADB,Telangana,Karimnagar,128.8,142,2019-07-09,2020-11-30,2021-07-12,completed,Y,224,174729461,123358999,0,57.4,1,1
+SYN0665,State Highway Widening Mysuru Sec 665,highway,NHAI,Karnataka,Mysuru,88.3,265,2018-12-11,2020-07-03,2020-06-23,completed,N,0,83511399,60838054,0,84.9,4,0
+SYN0666,Rail Electrification Project Tumkur-666,railway,Indian Railways,Karnataka,Tumkur,90.2,462,2024-12-16,2026-12-06,2026-11-06,completed,N,0,32796470,18038058,0,85.7,2,0
+SYN0667,4-Lane Highway Mangaluru-667,highway,State PWD,Karnataka,Mangaluru,78.7,319,2021-11-15,2022-11-10,2022-11-10,completed,N,0,113951319,95502600,0,100.0,3,1
+SYN0668,Rail Corridor Kolhapur Segment 668,railway,RVNL,Maharashtra,Kolhapur,52.2,212,2018-07-07,2020-06-26,,completed,,,295470986,129386745,1,79.5,4,1
+SYN0669,Industrial Park Botad 669,industrial,RIICO,Gujarat,Botad,134.0,375,2024-06-21,2025-09-14,2025-09-02,completed,N,0,105537701,75332811,0,96.3,4,1
+SYN0670,Manufacturing Hub 670 Gwalior,industrial,MIDC,Madhya Pradesh,Gwalior,143.0,100,2020-01-18,2021-11-08,,completed,,,268179612,107835022,1,79.5,7,1
+SYN0671,NH Extension Package 671,highway,MORTH,Uttar Pradesh,Varanasi,37.5,321,2022-10-24,2024-11-12,,completed,,,104232644,29258103,0,81.0,6,0
+SYN0672,Special Economic Zone Junagadh-672,industrial,KIADB,Gujarat,Junagadh,105.0,414,2024-03-15,2026-02-03,,completed,,,142635197,23549071,0,100.0,3,0
+SYN0673,Canal Network Expansion 673,irrigation,Central Water Commission,Madhya Pradesh,Jabalpur,253.8,203,2019-03-15,2023-04-23,2024-02-19,completed,Y,302,18619243,8883241,1,24.7,2,2
+SYN0674,BRTS Corridor Surat-674,urban,BBMP,Gujarat,Surat,27.6,26,2023-09-04,2025-05-26,,completed,,,83636614,42236490,1,92.1,8,1
+SYN0675,Manufacturing Hub 675 Karimnagar,industrial,GIDC,Telangana,Karimnagar,124.4,455,2021-02-04,2022-05-30,,completed,,,84202317,11224169,2,89.1,3,2
+SYN0676,Industrial Park Meerut 676,industrial,APIIC,Uttar Pradesh,Meerut,64.1,183,2023-12-03,2026-01-21,,completed,,,281893764,48006508,1,96.3,4,1
+SYN0677,Lift Irrigation Scheme Nalgonda-677,irrigation,State PWD,Telangana,Nalgonda,284.3,202,2018-04-12,2022-09-18,2022-12-30,completed,Y,103,144050373,60630802,0,44.7,0,0
+SYN0678,Dam & Reservoir Project 678,irrigation,Central Water Commission,Gujarat,Gandhinagar,118.8,560,2018-04-19,2021-05-03,2021-04-21,completed,N,0,98009995,98009995,0,58.4,7,0
+SYN0679,Bypass Road Project 679 (Vijayapura),highway,State PWD,Karnataka,Vijayapura,63.2,224,2024-08-21,2026-01-13,,completed,,,142307497,25501503,1,92.8,3,1
+SYN0680,Bypass Road Project 680 (Kurnool),highway,State PWD,Andhra Pradesh,Kurnool,96.1,298,2021-10-21,2022-10-16,,completed,,,112499790,25267453,2,84.9,7,2
+SYN0681,4-Lane Highway Vijayapura-681,highway,NHAI,Karnataka,Vijayapura,97.8,258,2022-09-28,2025-08-13,2026-04-05,completed,Y,235,42130451,19283107,0,24.5,0,0
+SYN0682,Lift Irrigation Scheme Gwalior-682,irrigation,State PWD,Madhya Pradesh,Gwalior,273.3,175,2022-05-03,2024-10-19,,completed,,,16868697,4687811,3,100.0,6,3
+SYN0683,Metro Rail Phase 683 Prakasam,railway,Indian Railways,Andhra Pradesh,Prakasam,105.7,152,2024-11-03,2026-10-24,2027-06-30,completed,Y,249,151296894,32786037,0,43.9,2,0
+SYN0684,Manufacturing Hub 684 Jhansi,industrial,KIADB,Uttar Pradesh,Jhansi,51.8,309,2018-05-25,2020-06-13,2020-08-17,completed,Y,65,265206263,120881015,1,79.6,1,1
+SYN0685,Dam & Reservoir Project 685,irrigation,State PWD,Rajasthan,Sikar,33.7,482,2021-01-11,2025-02-19,2025-12-29,completed,Y,313,173095829,51236365,0,80.5,0,0
+SYN0686,Industrial Park Kanpur 686,industrial,RIICO,Uttar Pradesh,Kanpur,57.9,394,2020-09-16,2021-12-10,2022-03-05,completed,Y,85,311231005,179269059,1,16.9,1,3
+SYN0687,BRTS Corridor Morena-687,urban,BBMP,Madhya Pradesh,Morena,9.0,105,2019-05-16,2021-05-05,,completed,,,83776973,16638107,0,93.8,6,0
+SYN0688,Rail Corridor Ahmedabad Segment 688,railway,DFCCIL,Gujarat,Ahmedabad,69.4,257,2021-06-21,2025-01-01,2025-08-26,completed,Y,237,95491098,32868036,1,67.6,1,1
+SYN0689,Canal Network Expansion 689,irrigation,Central Water Commission,Uttar Pradesh,Kanpur,151.7,778,2024-05-04,2026-02-23,2026-01-24,completed,N,0,13969990,10914753,0,62.7,7,0
+SYN0690,Rail Electrification Project Pali-690,railway,RVNL,Rajasthan,Pali,98.9,341,2018-02-02,2021-03-18,2022-01-31,completed,Y,319,227449600,70145457,1,85.8,0,1
+SYN0691,Industrial Corridor Phase 691,industrial,MIDC,Rajasthan,Pali,120.2,468,2021-04-11,2023-09-28,2024-06-16,completed,Y,262,313398272,260590663,1,69.6,1,1
+SYN0692,BRTS Corridor Jabalpur-692,urban,GHMC,Madhya Pradesh,Jabalpur,35.8,85,2021-04-15,2022-07-09,2022-07-05,completed,N,0,16323092,12697733,0,90.0,5,1
+SYN0693,Industrial Corridor Phase 693,industrial,RIICO,Telangana,Sangareddy,117.0,194,2022-07-02,2024-10-19,,completed,,,261062061,60331442,0,62.7,6,0
+SYN0694,Manufacturing Hub 694 Nanded,industrial,APIIC,Maharashtra,Nanded,69.8,281,2022-11-07,2024-01-01,,completed,,,397852878,130296818,0,93.0,3,0
+SYN0695,Canal Network Expansion 695,irrigation,Central Water Commission,Karnataka,Tumkur,20.4,270,2018-07-19,2021-07-03,2021-08-24,completed,Y,52,171837053,26755029,2,37.7,1,2
+SYN0696,Dam & Reservoir Project 696,irrigation,State Irrigation Dept,Uttar Pradesh,Jhansi,186.5,80,2019-03-07,2022-03-21,2024-03-16,completed,Y,726,191158816,74628402,0,70.4,2,0
+SYN0697,4-Lane Highway Udaipur-697,highway,State PWD,Rajasthan,Udaipur,113.9,93,2019-04-25,2021-03-15,2021-03-16,completed,Y,1,69373107,32348680,3,22.2,0,3
+SYN0698,Rail Electrification Project Rajkot-698,railway,Indian Railways,Gujarat,Rajkot,113.0,216,2022-02-03,2023-12-25,2024-07-09,completed,Y,197,151841444,28925795,1,34.6,1,1
+SYN0699,Bypass Road Project 699 (Prakasam),highway,State PWD,Andhra Pradesh,Prakasam,56.2,81,2020-09-04,2022-10-24,2022-09-28,completed,N,0,14469312,14469312,0,74.7,3,0
+SYN0700,Urban Flyover West Godavari 700,urban,BBMP,Andhra Pradesh,West Godavari,14.0,164,2020-12-21,2022-12-11,2022-12-07,completed,N,0,71031670,62742274,0,76.7,8,0
+SYN0701,Bypass Road Project 701 (Bikaner),highway,MORTH,Rajasthan,Bikaner,26.7,372,2024-03-14,2025-08-06,2025-08-03,completed,N,0,119050733,114241083,0,83.9,5,1
+SYN0702,Irrigation Canal Pali 702,irrigation,State Irrigation Dept,Rajasthan,Pali,263.5,457,2024-01-11,2025-08-03,,completed,,,78522170,7922887,0,71.4,3,0
+SYN0703,Bypass Road Project 703 (Belagavi),highway,NHAI,Karnataka,Belagavi,69.0,98,2018-02-16,2020-04-06,,completed,,,122366642,51467410,3,82.1,4,3
+SYN0704,NH Extension Package 704,highway,MORTH,Karnataka,Kalaburagi,24.3,103,2021-08-24,2024-02-10,2024-10-17,completed,Y,250,18744433,1911932,0,78.7,0,0
+SYN0705,Bypass Road Project 705 (Thane),highway,State PWD,Maharashtra,Thane,93.6,97,2023-10-17,2026-02-03,2026-09-04,completed,Y,213,26057045,11553694,3,16.1,2,3
+SYN0706,State Highway Widening Varanasi Sec 706,highway,NHAI,Uttar Pradesh,Varanasi,72.9,277,2023-01-27,2024-08-19,2024-12-02,completed,Y,105,131081247,91835522,0,51.3,1,0
+SYN0707,Lift Irrigation Scheme Indore-707,irrigation,Central Water Commission,Madhya Pradesh,Indore,112.2,539,2023-09-11,2026-11-24,,possession,,,93981621,90391523,0,98.8,8,0
+SYN0708,Irrigation Canal Chittoor 708,irrigation,State Irrigation Dept,Andhra Pradesh,Chittoor,49.3,769,2022-03-04,2024-10-19,,completed,,,175294814,33954605,2,97.0,2,2
+SYN0709,Ring Road Project 709,urban,JNURM,Maharashtra,Kolhapur,19.0,173,2019-11-08,2021-08-29,2021-08-13,completed,N,0,54879296,50236508,0,68.5,3,2
+SYN0710,Irrigation Canal Solapur 710,irrigation,State PWD,Maharashtra,Solapur,280.2,773,2023-03-21,2027-12-25,,rehabilitation,,,188727438,122182143,0,63.1,4,0
+SYN0711,Bypass Road Project 711 (Gandhinagar),highway,State PWD,Gujarat,Gandhinagar,18.2,392,2021-08-11,2022-12-04,,completed,,,50182776,21729142,0,72.4,2,0
+SYN0712,Bypass Road Project 712 (Vadodara),highway,NHAI,Gujarat,Vadodara,56.1,332,2024-03-25,2025-10-16,2025-10-14,completed,N,0,37814235,35647479,0,79.4,5,0
+SYN0713,State Highway Widening Aurangabad Sec 713,highway,State PWD,Maharashtra,Aurangabad,44.2,82,2023-05-25,2025-03-15,2025-03-08,completed,N,0,100761108,86785542,0,89.4,7,0
+SYN0714,Lift Irrigation Scheme Nagpur-714,irrigation,Central Water Commission,Maharashtra,Nagpur,181.7,766,2020-01-13,2022-10-29,2023-07-14,completed,Y,258,152899609,75884076,1,64.2,0,1
+SYN0715,Industrial Corridor Phase 715,industrial,GIDC,Madhya Pradesh,Rewa,182.9,377,2023-02-28,2024-10-20,,completed,,,179465236,84546073,2,45.3,2,2
+SYN0716,Bypass Road Project 716 (Jabalpur),highway,MORTH,Madhya Pradesh,Jabalpur,71.7,319,2019-10-14,2022-06-30,2022-10-28,completed,Y,120,139160248,36056420,1,73.3,2,7
+SYN0717,Bypass Road Project 717 (Allahabad),highway,MORTH,Uttar Pradesh,Allahabad,58.4,265,2024-07-23,2027-06-08,2027-09-25,completed,Y,109,141328565,84740608,1,29.1,2,1
+SYN0718,Urban Flyover Jhansi 718,urban,GHMC,Uttar Pradesh,Jhansi,37.0,84,2023-06-04,2024-07-28,,completed,,,69886111,1397722,2,100.0,4,2
+SYN0719,Metro Rail Phase 719 Karimnagar,railway,DFCCIL,Telangana,Karimnagar,77.9,460,2024-03-07,2027-01-21,,legal_resolution,,,236480785,144418815,1,18.3,0,1
+SYN0720,Rail Corridor Allahabad Segment 720,railway,DFCCIL,Uttar Pradesh,Allahabad,53.5,441,2023-02-21,2025-08-09,2025-07-25,completed,N,0,111672232,108076386,0,52.0,8,1
+SYN0721,NH Extension Package 721,highway,NHAI,Maharashtra,Solapur,93.2,305,2019-10-10,2022-01-27,,completed,,,94678292,29255592,1,85.0,7,1
+SYN0722,Lift Irrigation Scheme Gandhinagar-722,irrigation,State PWD,Gujarat,Gandhinagar,287.5,340,2022-06-13,2024-08-01,,completed,,,194295328,39267086,0,91.6,8,0
+SYN0723,Bypass Road Project 723 (Thane),highway,NHAI,Maharashtra,Thane,99.3,104,2019-12-08,2021-06-30,,completed,,,40333629,18339701,0,84.7,8,0
+SYN0724,Rail Electrification Project Bareilly-724,railway,Indian Railways,Uttar Pradesh,Bareilly,85.5,319,2023-10-13,2027-02-24,2028-02-06,completed,Y,347,278396691,140952245,0,79.8,2,2
+SYN0725,State Highway Widening Mathura Sec 725,highway,MORTH,Uttar Pradesh,Mathura,100.9,146,2018-09-23,2020-12-11,2020-11-21,completed,N,0,146591487,134409734,0,72.4,4,0
+SYN0726,Canal Network Expansion 726,irrigation,Central Water Commission,Telangana,Adilabad,174.6,612,2021-10-14,2023-08-05,,completed,,,179689118,3593782,0,85.4,2,0
+SYN0727,Lift Irrigation Scheme Anantapur-727,irrigation,Central Water Commission,Andhra Pradesh,Anantapur,283.7,445,2023-01-23,2027-08-30,2028-09-04,completed,Y,371,109987162,42916991,2,39.1,2,2
+SYN0728,BRTS Corridor Nanded-728,urban,JNURM,Maharashtra,Nanded,7.7,38,2024-01-20,2024-11-15,,completed,,,55328338,12172234,0,57.8,3,0
+SYN0729,Metro Extension 729 Nashik,urban,HMDA,Maharashtra,Nashik,35.6,195,2023-02-11,2024-01-07,2023-12-16,completed,N,0,50068718,46253482,0,74.2,4,0
+SYN0730,Rail Corridor Gandhinagar Segment 730,railway,DFCCIL,Gujarat,Gandhinagar,81.1,146,2019-05-13,2021-05-02,2021-08-26,completed,Y,116,185786234,103352882,2,54.2,0,4
+SYN0731,Bypass Road Project 731 (Hyderabad),highway,State PWD,Telangana,Hyderabad,115.1,126,2020-01-26,2022-07-14,2023-04-27,completed,Y,287,82606029,47762806,1,53.6,2,3
+SYN0732,Freight Corridor Extension 732,railway,RVNL,Maharashtra,Amravati,188.4,173,2022-03-27,2025-11-06,2026-07-30,completed,Y,266,94514974,37720926,0,65.3,0,1
+SYN0733,Rail Electrification Project Raigad-733,railway,DFCCIL,Maharashtra,Raigad,31.8,302,2023-09-27,2026-03-15,,completed,,,79440893,23029915,8,73.2,5,8
+SYN0734,NH Extension Package 734,highway,MORTH,Telangana,Adilabad,71.9,389,2024-09-03,2027-05-21,2028-02-22,completed,Y,277,84225263,45372149,3,71.7,0,3
+SYN0735,Bypass Road Project 735 (Mehsana),highway,State PWD,Gujarat,Mehsana,77.1,186,2018-08-01,2020-10-19,2020-10-10,completed,N,0,116772197,97341303,0,64.6,2,1
+SYN0736,State Highway Widening Anantapur Sec 736,highway,MORTH,Andhra Pradesh,Anantapur,43.3,126,2023-06-24,2024-07-18,2025-03-30,completed,Y,255,124443189,47997738,0,35.5,2,0
+SYN0737,Rail Electrification Project Khammam-737,railway,Indian Railways,Telangana,Khammam,57.2,65,2019-04-23,2021-08-10,2021-11-13,completed,Y,95,271093003,166911962,0,66.1,2,0
+SYN0738,Special Economic Zone Hubballi-738,industrial,GIDC,Karnataka,Hubballi,140.3,266,2020-07-02,2021-10-25,2021-09-27,completed,N,0,257952356,244770991,0,100.0,7,0
+SYN0739,Metro Extension 739 Ahmedabad,urban,BBMP,Gujarat,Ahmedabad,14.2,22,2021-05-27,2023-05-17,2023-08-18,completed,Y,93,71120168,12232669,0,64.3,0,2
+SYN0740,Irrigation Canal Vishakhapatnam 740,irrigation,State Irrigation Dept,Andhra Pradesh,Vishakhapatnam,209.1,751,2019-09-11,2021-12-29,,completed,,,109570717,22768795,0,100.0,2,0
+SYN0741,Manufacturing Hub 741 Rajkot,industrial,APIIC,Gujarat,Rajkot,61.2,476,2019-03-17,2020-04-10,2020-10-14,completed,Y,187,283574381,196970765,0,63.8,1,0
+SYN0742,Special Economic Zone Morena-742,industrial,APIIC,Madhya Pradesh,Morena,47.5,490,2024-04-24,2026-02-13,2026-02-02,completed,N,0,195573462,178617243,0,79.0,5,0
+SYN0743,State Highway Widening Bharatpur Sec 743,highway,NHAI,Rajasthan,Bharatpur,105.8,65,2019-11-07,2021-08-28,2021-08-19,completed,N,0,85743704,85743704,0,100.0,2,0
+SYN0744,NH Extension Package 744,highway,MORTH,Andhra Pradesh,West Godavari,25.8,83,2022-12-06,2025-10-21,,completed,,,5855733,1768431,0,82.1,5,0
+SYN0745,Industrial Corridor Phase 745,industrial,APIIC,Andhra Pradesh,Kurnool,70.8,365,2018-11-27,2021-02-14,,completed,,,365891611,96412439,1,99.4,4,1
+SYN0746,Rail Electrification Project Satna-746,railway,Indian Railways,Madhya Pradesh,Satna,193.3,447,2022-06-08,2024-03-29,2024-03-18,completed,N,0,224601617,176963614,0,87.3,2,2
+SYN0747,Metro Rail Phase 747 Bareilly,railway,Indian Railways,Uttar Pradesh,Bareilly,99.9,447,2019-07-14,2023-04-24,2024-02-29,completed,Y,311,202958293,134196023,0,73.2,0,2
+SYN0748,Manufacturing Hub 748 Jhansi,industrial,RIICO,Uttar Pradesh,Jhansi,39.6,383,2022-07-12,2024-04-02,2024-03-03,completed,N,0,314339511,267911565,0,78.6,3,0
+SYN0749,Rail Electrification Project Kolhapur-749,railway,RVNL,Maharashtra,Kolhapur,51.0,209,2019-08-01,2022-11-13,2022-10-19,completed,N,0,67364827,51567775,0,90.9,8,1
+SYN0750,Industrial Corridor Phase 750,industrial,KIADB,Madhya Pradesh,Sagar,175.2,77,2023-02-26,2024-04-21,2024-08-17,completed,Y,118,373993806,95181424,0,80.9,1,0
+SYN0751,Manufacturing Hub 751 Kalaburagi,industrial,RIICO,Karnataka,Kalaburagi,121.1,500,2021-06-23,2022-11-15,2023-03-25,completed,Y,130,222275969,85554020,0,47.1,2,0
+SYN0752,Metro Extension 752 Agra,urban,GHMC,Uttar Pradesh,Agra,10.2,25,2018-01-05,2019-12-26,2019-12-15,completed,N,0,93439507,76106478,0,77.2,2,0
+SYN0753,BRTS Corridor Davangere-753,urban,HMDA,Karnataka,Davangere,9.2,191,2018-03-05,2019-09-26,2019-09-17,completed,N,0,72583777,67314195,0,80.0,6,0
+SYN0754,Metro Extension 754 Bhopal,urban,JNURM,Madhya Pradesh,Bhopal,27.0,26,2019-06-28,2020-08-21,2020-08-20,completed,N,0,66693486,56776165,0,70.8,5,0
+SYN0755,Rail Corridor Sikar Segment 755,railway,RVNL,Rajasthan,Sikar,21.9,69,2020-09-02,2022-06-24,,completed,,,67896295,7054425,3,84.8,7,3
+SYN0756,Canal Network Expansion 756,irrigation,State Irrigation Dept,Gujarat,Anand,172.4,540,2021-12-11,2024-01-30,,completed,,,21244695,788178,2,88.9,8,2
+SYN0757,Irrigation Canal Vijayapura 757,irrigation,State PWD,Karnataka,Vijayapura,33.5,625,2024-03-26,2026-03-16,2026-02-17,completed,N,0,19705251,16690348,0,57.9,4,0
+SYN0758,Manufacturing Hub 758 Vishakhapatnam,industrial,KIADB,Andhra Pradesh,Vishakhapatnam,45.0,431,2023-06-26,2024-09-18,2025-05-10,completed,Y,234,292936673,198200953,0,66.6,0,0
+SYN0759,State Highway Widening West Godavari Sec 759,highway,State PWD,Andhra Pradesh,West Godavari,41.7,376,2021-04-23,2023-07-12,2023-06-28,completed,N,0,31814538,30370158,0,82.4,3,0
+SYN0760,NH Extension Package 760,highway,MORTH,Uttar Pradesh,Agra,53.4,333,2019-03-28,2021-01-16,,completed,,,64780888,11867859,0,73.9,4,0
+SYN0761,Industrial Park Mathura 761,industrial,APIIC,Uttar Pradesh,Mathura,151.9,367,2020-03-03,2021-03-28,2021-06-02,completed,Y,66,276133310,185616811,0,42.1,1,0
+SYN0762,Irrigation Canal Kalaburagi 762,irrigation,Central Water Commission,Karnataka,Kalaburagi,151.9,551,2022-05-24,2025-07-07,2026-08-20,completed,Y,409,111453796,52940553,0,40.6,0,2
+SYN0763,Lift Irrigation Scheme Bharuch-763,irrigation,State Irrigation Dept,Gujarat,Bharuch,228.9,469,2024-07-15,2028-05-25,2028-04-30,completed,N,0,66761082,66761082,0,80.6,5,0
+SYN0764,Freight Corridor Extension 764,railway,Indian Railways,Gujarat,Vadodara,55.6,559,2019-02-01,2021-07-20,2022-01-25,completed,Y,189,287006771,94540030,0,50.6,2,0
+SYN0765,Manufacturing Hub 765 Mehsana,industrial,MIDC,Gujarat,Mehsana,105.8,198,2023-01-12,2024-04-06,2024-03-22,completed,N,0,325376378,280864889,0,83.2,4,0
+SYN0766,Canal Network Expansion 766,irrigation,Central Water Commission,Karnataka,Mangaluru,121.4,745,2022-02-20,2024-04-10,2024-12-22,completed,Y,256,194233988,136138602,0,63.4,0,0
+SYN0767,Bypass Road Project 767 (Belagavi),highway,State PWD,Karnataka,Belagavi,31.4,95,2024-05-18,2026-03-09,2026-02-19,completed,N,0,145814674,131408184,0,100.0,3,0
+SYN0768,Manufacturing Hub 768 Ghaziabad,industrial,KIADB,Uttar Pradesh,Ghaziabad,77.9,320,2018-06-17,2019-09-10,2019-08-13,completed,N,0,379914828,331969577,0,76.5,5,0
+SYN0769,Industrial Corridor Phase 769,industrial,RIICO,Rajasthan,Udaipur,106.9,124,2021-04-08,2022-04-03,2022-03-19,completed,N,0,394408136,300657322,0,70.6,8,2
+SYN0770,Industrial Corridor Phase 770,industrial,KIADB,Uttar Pradesh,Jhansi,64.7,242,2020-12-02,2022-05-26,2022-05-26,completed,N,0,133307265,121109650,0,94.1,2,1
+SYN0771,Canal Network Expansion 771,irrigation,State Irrigation Dept,Gujarat,Surat,141.6,361,2024-03-15,2028-12-19,2030-05-22,completed,Y,519,58810143,24370923,0,33.8,2,0
+SYN0772,4-Lane Highway Warangal-772,highway,NHAI,Telangana,Warangal,70.5,351,2022-08-12,2023-12-05,2024-09-09,completed,Y,279,30809773,6100335,2,32.9,1,2
+SYN0773,Freight Corridor Extension 773,railway,Indian Railways,Telangana,Sangareddy,189.2,290,2021-02-03,2022-11-25,2023-11-02,completed,Y,342,113553500,74513807,0,64.0,1,1
+SYN0774,Rail Electrification Project Sangareddy-774,railway,DFCCIL,Telangana,Sangareddy,48.6,317,2023-03-18,2026-10-28,2027-12-17,completed,Y,415,208221362,164932141,0,59.4,1,0
+SYN0775,State Highway Widening Kanpur Sec 775,highway,NHAI,Uttar Pradesh,Kanpur,12.1,178,2022-06-11,2024-05-31,,completed,,,102098101,19214863,1,64.1,2,1
+SYN0776,Bypass Road Project 776 (Khammam),highway,NHAI,Telangana,Khammam,108.8,114,2018-06-23,2019-08-17,2020-02-15,completed,Y,182,6065742,1616520,0,34.9,2,0
+SYN0777,Metro Rail Phase 777 Vadodara,railway,Indian Railways,Gujarat,Vadodara,71.4,79,2020-04-11,2024-01-21,2023-12-31,completed,N,0,158423481,129336930,0,87.4,2,0
+SYN0778,Metro Rail Phase 778 Kurnool,railway,Indian Railways,Andhra Pradesh,Kurnool,85.0,105,2024-12-22,2026-12-12,,legal_resolution,,,76644914,61093661,2,0.2,0,2
+SYN0779,Dam & Reservoir Project 779,irrigation,State PWD,Rajasthan,Jaipur,108.3,440,2024-06-07,2028-06-16,,compensation,,,37225171,9075497,0,29.0,4,0
+SYN0780,Industrial Corridor Phase 780,industrial,KIADB,Uttar Pradesh,Agra,74.6,245,2018-01-20,2019-02-14,,completed,,,385259191,141659805,4,90.2,7,4
+SYN0781,4-Lane Highway Anand-781,highway,NHAI,Gujarat,Anand,43.2,164,2021-11-01,2023-07-24,,completed,,,140175618,81428016,3,78.5,2,3
+SYN0782,Urban Flyover Adilabad 782,urban,GHMC,Telangana,Adilabad,35.4,89,2018-02-24,2019-03-21,2019-03-06,completed,N,0,11011965,9361271,0,72.2,5,3
+SYN0783,Canal Network Expansion 783,irrigation,State Irrigation Dept,Telangana,Hyderabad,27.5,104,2024-08-14,2027-01-01,,legal_resolution,,,175893286,73980716,1,0.0,0,1
+SYN0784,Special Economic Zone Medak-784,industrial,MIDC,Telangana,Medak,121.4,488,2023-08-26,2024-08-20,,completed,,,381815644,53988732,0,82.8,8,0
+SYN0785,Industrial Park Bikaner 785,industrial,APIIC,Rajasthan,Bikaner,150.7,326,2021-08-18,2023-01-10,2022-12-30,completed,N,0,174660625,135990763,0,75.0,4,3
+SYN0786,Manufacturing Hub 786 Amravati,industrial,KIADB,Maharashtra,Amravati,84.6,288,2020-07-03,2022-02-23,,completed,,,224900482,26200906,0,53.5,4,0
+SYN0787,Dam & Reservoir Project 787,irrigation,State Irrigation Dept,Maharashtra,Raigad,249.7,154,2024-10-05,2027-04-23,,rehabilitation,,,111079364,74434282,0,79.6,4,0
+SYN0788,Metro Extension 788 Aurangabad,urban,NMMC,Maharashtra,Aurangabad,21.0,188,2018-06-24,2020-05-14,,completed,,,25811785,4098911,1,94.4,8,1
+SYN0789,Ring Road Project 789,urban,GHMC,Uttar Pradesh,Ghaziabad,46.0,197,2023-01-26,2024-07-19,,completed,,,27974168,559483,1,97.6,6,1
+SYN0790,Irrigation Canal Lucknow 790,irrigation,State PWD,Uttar Pradesh,Lucknow,34.1,503,2020-02-07,2022-06-26,,completed,,,87273918,13501275,1,93.9,7,1
+SYN0791,Dam & Reservoir Project 791,irrigation,State Irrigation Dept,Karnataka,Ballari,184.1,735,2020-07-20,2025-01-25,,completed,,,11146017,2608168,1,85.4,7,1
+SYN0792,Rail Electrification Project Junagadh-792,railway,Indian Railways,Gujarat,Junagadh,199.0,439,2023-10-20,2027-07-31,2028-06-17,completed,Y,322,272703870,56667864,1,58.9,0,7
+SYN0793,Industrial Park East Godavari 793,industrial,GIDC,Andhra Pradesh,East Godavari,146.7,281,2019-10-16,2020-11-09,2021-02-09,completed,Y,92,23911701,18732427,0,83.8,2,1
+SYN0794,Rail Electrification Project Amravati-794,railway,DFCCIL,Maharashtra,Amravati,145.7,552,2024-09-21,2028-02-03,2028-10-28,completed,Y,268,257530968,198041314,1,61.7,0,1
+SYN0795,Canal Network Expansion 795,irrigation,State Irrigation Dept,Andhra Pradesh,Kurnool,27.5,227,2019-01-13,2023-11-18,,completed,,,173785290,17135230,2,73.2,7,2
+SYN0796,Freight Corridor Extension 796,railway,Indian Railways,Andhra Pradesh,Krishna,163.0,490,2019-12-20,2022-12-04,2023-06-22,completed,Y,200,211205506,86784342,1,47.9,0,1
+SYN0797,NH Extension Package 797,highway,NHAI,Gujarat,Surat,109.7,100,2020-11-12,2023-01-31,2023-08-10,completed,Y,191,87710991,31382993,2,36.3,2,3
+SYN0798,Bypass Road Project 798 (Vishakhapatnam),highway,MORTH,Andhra Pradesh,Vishakhapatnam,92.1,230,2018-09-02,2020-03-25,2020-12-01,completed,Y,251,119272628,86758910,0,74.3,1,0
+SYN0799,Manufacturing Hub 799 Solapur,industrial,MIDC,Maharashtra,Solapur,51.0,333,2024-04-07,2026-06-26,2026-06-01,completed,N,0,46949045,35775172,0,56.3,3,0
+SYN0800,Industrial Corridor Phase 800,industrial,KIADB,Andhra Pradesh,East Godavari,60.6,184,2022-03-08,2024-03-27,,completed,,,305900961,115355252,0,85.5,5,0

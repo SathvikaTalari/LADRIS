@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { AlertTriangle, Filter, ChevronRight, Zap, Search } from 'lucide-react'
-import { projectsAPI, interventionsAPI } from '@/api/client'
+import { projectsAPI, predictionsAPI } from '@/api/client'
 import { useNavigate } from 'react-router-dom'
 import { RiskBadge, StatusBadge } from '@/components/common'
 
@@ -23,62 +23,27 @@ export default function PriorityIntelligence() {
         const res = await projectsAPI.list({ page_size: 50 })
         const items = res.items || []
 
-        // Compute baseline priority score immediately so UI renders instantly without hanging
-        const baseEnriched = items.map((p: any) => {
-          let score = 30.0
-          if (p.risk_level === 'CRITICAL') score = 92.5
-          else if (p.risk_level === 'HIGH') score = 78.4
-          else if (p.risk_level === 'MEDIUM') score = 54.2
-          else if (p.risk_level === 'LOW') score = 28.0
-
-          const areaBonus = Math.min(10, ((p.total_area_ha || 50) / 100) * 2)
-          score = Math.min(99.5, Math.max(10.0, score + areaBonus))
-
+        const predictions = await Promise.all(items.map((project: any) =>
+          predictionsAPI.get(project.id).catch(() => null)
+        ))
+        const enriched = items.map((project: any, index: number) => {
+          const prediction = predictions[index]
           return {
-            ...p,
-            priorityScore: score,
-            priorityLabel: score > 75 ? 'CRITICAL PRIORITY' : score > 50 ? 'HIGH PRIORITY' : 'MEDIUM PRIORITY',
-            topIntervention: {
-              display_name: 'Expedite Gazette Notification 3A -> 3D',
-              category: 'ADMINISTRATIVE',
-              action_description: 'High anomaly risk detected in acquisition timeline divergence. Direct district collector review recommended.',
-              score_components: {
-                risk_severity: { label: 'Current Risk (35%)', value: p.risk_level === 'HIGH' || p.risk_level === 'CRITICAL' ? 0.85 : 0.4, weight: 0.35 },
-                urgency: { label: 'Stage Urgency (20%)', value: 0.80, weight: 0.20 },
-                impact: { label: 'Project Impact (15%)', value: 0.75, weight: 0.15 },
-                risk_velocity: { label: 'Risk Velocity (10%)', value: 0.85, weight: 0.10 },
-                feasibility: { label: 'Actionability (10%)', value: 0.90, weight: 0.10 },
-                data_confidence: { label: 'Data Confidence (10%)', value: 0.85, weight: 0.10 },
-              }
-            }
+            ...project,
+            risk_level: prediction?.risk_category || 'UNKNOWN',
+            priorityScore: prediction?.risk_score ?? null,
+            priorityLabel: prediction ? `${prediction.risk_category} ML RISK` : 'PREDICTION UNAVAILABLE',
+            topIntervention: prediction ? {
+              display_name: prediction.recommendations?.[0] || 'Manual review recommended',
+              category: 'MODEL_RECOMMENDATION',
+              action_description: prediction.recommendations?.[0] || 'No recommendation returned by the production model.',
+              score_components: {},
+            } : null,
           }
         })
-
-        // Sort descending by priority score
-        baseEnriched.sort((a, b) => b.priorityScore - a.priorityScore)
-        setProjects(baseEnriched)
+        enriched.sort((a: any, b: any) => (b.priorityScore ?? -1) - (a.priorityScore ?? -1))
+        setProjects(enriched)
         setIsLoading(false)
-
-        // Asynchronously fetch exact Phase 4 priority scores for top 10 items in background
-        const top10 = baseEnriched.slice(0, 10)
-        Promise.all(
-          top10.map(p => interventionsAPI.priority(p.id).catch(() => null))
-        ).then(priorityResults => {
-          setProjects(prev => {
-            const updated = [...prev]
-            priorityResults.forEach((res, idx) => {
-              if (res && updated[idx]) {
-                updated[idx] = {
-                  ...updated[idx],
-                  priorityScore: res.priority_score ?? updated[idx].priorityScore,
-                  priorityLabel: res.priority_label ?? updated[idx].priorityLabel,
-                  topIntervention: res.top_intervention ?? updated[idx].topIntervention,
-                }
-              }
-            })
-            return updated
-          })
-        })
 
       } catch (err) {
         console.error('Failed to load priority projects', err)
@@ -293,7 +258,7 @@ export default function PriorityIntelligence() {
                     WHY THIS PROJECT IS PRIORITIZED:
                   </div>
                   <p style={{ fontSize: '0.85rem', color: 'var(--color-text-primary)', margin: 0, marginBottom: 14, lineHeight: 1.5 }}>
-                    {topInt ? topInt.action_description : 'High anomaly risk detected in acquisition timeline divergence. Direct district collector review recommended.'}
+                    {topInt ? topInt.action_description : 'Prediction unavailable. Generate a production ML prediction after completing required source data.'}
                   </p>
 
                   {/* Component Formula Breakdown Grid */}

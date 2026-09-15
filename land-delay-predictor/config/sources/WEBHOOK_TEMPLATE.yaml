@@ -1,0 +1,39 @@
+# Webhook Data Source Configuration Template
+# For event-based ingestion from partner systems
+
+source_name: "YOUR_WEBHOOK_SOURCE_NAME"
+connector_type: "webhook"
+
+# Webhook endpoint: POST /webhooks/{source_name}
+# Payload structure:
+# {
+#   "external_project_id": "...",
+#   "project_name": "...",
+#   "project_type": "...",
+#   "state": "...",
+#   "district": "...",
+#   ...
+# }
+
+# Field mapping: canonical field name -> webhook JSON key
+field_mapping:
+  external_project_id: "external_project_id"
+  project_name: "project_name"
+  project_type: "project_type"
+  state: "state"
+  district: "district"
+  notification_date: "notification_date"
+  expected_completion_date: "expected_completion_date"
+  actual_completion_date: "actual_completion_date"
+  current_stage: "current_stage"
+  is_delayed: "is_delayed"
+  delay_days: "delay_days"
+  compensation_sanctioned: "compensation_sanctioned"
+  compensation_disbursed: "compensation_disbursed"
+  legal_dispute_count: "legal_dispute_count"
+  rehabilitation_progress_pct: "rehabilitation_progress_pct"
+
+# Security:
+# - Add HMAC verification in production
+# - Keep webhook source inactive until verified
+# - Use X-Webhook-Signature header for authenticity

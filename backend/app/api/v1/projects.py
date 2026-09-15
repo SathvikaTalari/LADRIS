@@ -22,6 +22,8 @@ from app.models.user import User, UserRole
 from app.schemas.common import PaginatedResponse
 from app.schemas.project import ProjectCreate, ProjectListResponse, ProjectResponse, ProjectUpdate
 from app.services.audit_service import record_audit_log
+from app.services.ml_feature_service import validate_project_consistency
+from app.services.production_ml_service import latest_prediction, latest_predictions
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -90,8 +92,21 @@ async def list_projects(
     projects = result.scalars().all()
 
 
+    # The persisted ML prediction is authoritative. Avoid displaying the
+    # legacy denormalized project risk when a newer model result exists.
+    prediction_by_project = {
+        row.project_id: row for row in await latest_predictions(db)
+    }
+    items = []
+    for project in projects:
+        item = ProjectListResponse.model_validate(project)
+        prediction = prediction_by_project.get(project.id)
+        if prediction is not None:
+            item.risk_level = RiskLevel(prediction.risk_category)
+        items.append(item)
+
     return PaginatedResponse(
-        items=[ProjectListResponse.model_validate(p) for p in projects],
+        items=items,
         total=total,
         page=page,
         page_size=page_size,
@@ -163,20 +178,10 @@ async def get_project(
             detail="Project not found.",
         )
 
-    # Dynamically align project.risk_level with active ML model evaluation
-    try:
-        from app.services.ml_service import get_prediction_for_project
-        pred = get_prediction_for_project(project)
-        if pred.get("prediction_status") == "AVAILABLE" and pred.get("risk_level"):
-            raw_risk = pred["risk_level"]
-            new_risk = RiskLevel(raw_risk) if isinstance(raw_risk, str) else raw_risk
-            current_risk = project.risk_level.value if hasattr(project.risk_level, "value") else str(project.risk_level)
-            if current_risk != raw_risk:
-                project.risk_level = new_risk
-                await db.commit()
-                await db.refresh(project)
-    except Exception:
-        await db.rollback()
+    # The immutable production prediction is the only source for displayed risk.
+    prediction = await latest_prediction(db, project.id)
+    if prediction is not None:
+        project.risk_level = RiskLevel(prediction.risk_category)
 
     return project
 
@@ -209,6 +214,10 @@ async def update_project(
 
     for key, value in update_data.items():
         setattr(project, key, value)
+
+    consistency_errors = validate_project_consistency(project)
+    if consistency_errors:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=consistency_errors)
 
     await db.commit()
     await db.refresh(project)

@@ -4,6 +4,7 @@ Loads all settings from environment variables / .env file.
 """
 from functools import lru_cache
 from typing import List
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -95,6 +96,19 @@ class Settings(BaseSettings):
     # ─── ETL Settings ─────────────────────────────────────────────────────────
     ETL_BATCH_SIZE: int = 50                        # DB upsert batch size
     ETL_DATA_DIR: str = "data"                      # relative to backend/
+
+    # Existing trained LightGBM module (never retrained by request handlers)
+    ML_MODULE_PATH: str = str(Path(__file__).resolve().parents[2] / "land-delay-predictor" / "app")
+    MODELS_DIR: str = str(Path(__file__).resolve().parents[2] / "land-delay-predictor" / "models")
+    ML_PREDICTION_STALE_HOURS: int = 24
+
+    # ─── Project CSV Source ─────────────────────────────────────────────────
+    # Runtime project inputs. Training data remains separate and read-only.
+    PROJECT_DATA_CSV: str = str(
+        Path(__file__).resolve().parents[2] / "land-delay-predictor" / "my_raw_projects.csv"
+    )
+    SYNC_PROJECTS_FROM_CSV: bool = True
+    PROJECT_CSV_EXCLUSIVE: bool = True
 
     # ─── First Admin Seed ─────────────────────────────────────────────────────
     FIRST_ADMIN_EMAIL: str = "admin@ladris.gov.in"

@@ -1,0 +1,5 @@
+project_type,state,district,implementing_agency,land_area_hectares,affected_families_count,days_since_notification,days_to_expected_completion,compensation_sanctioned,compensation_disbursed,compensation_disbursement_pct,days_since_last_disbursement,legal_dispute_count,open_legal_dispute_count,max_dispute_pendency_days,rehabilitation_progress_pct,resettlement_site_ready,stakeholder_update_count_90d,avg_days_between_updates,stage_count_recorded,current_stage,district_historical_delay_rate,agency_historical_delay_rate
+highway,Telangana,Karimnagar,NHAI,64.5,150,190,410,150000000,144000000,96.0,6,1,0,20,92.0,1,9,9.0,8,possession,0.14,0.17
+railway,Maharashtra,Nagpur,RVNL,118.0,315,365,210,220000000,138600000,63.0,32,3,2,150,58.0,1,4,22.0,6,rehabilitation,0.34,0.37
+highway,Uttar Pradesh,Varanasi,NHAI,112.0,445,520,40,300000000,84000000,28.0,115,7,6,330,20.0,0,1,65.0,4,compensation,0.60,0.56
+railway,Maharashtra,Nagpur,RVNL,118.0,315,365,240,220000000,154000000,70.0,24,2,1,90,68.0,1,5,18.0,7,rehabilitation,0.28,0.30

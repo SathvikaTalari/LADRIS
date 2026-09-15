@@ -216,7 +216,7 @@ export default function Alerts() {
                           flexWrap: 'wrap',
                         }}>
                           <div>Risk: <strong style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono)' }}>{Math.round(alert.alert_metadata.previous_score ?? 57)} → {Math.round(alert.alert_metadata.current_score ?? 79)}</strong></div>
-                          <div>7d Change: <strong style={{ color: 'var(--color-risk-critical)', fontFamily: 'var(--font-mono)' }}>+{Math.round(alert.alert_metadata.change_7d ?? 22)} pts</strong></div>
+                          <div>7d Change: <strong style={{ color: 'var(--color-risk-critical)', fontFamily: 'var(--font-mono)' }}>{alert.alert_metadata.change_7d == null ? 'Unavailable' : `${alert.alert_metadata.change_7d > 0 ? '+' : ''}${Math.round(alert.alert_metadata.change_7d)} pts`}</strong></div>
                           <div>Velocity: <span className="badge badge-red">↑↑ {alert.alert_metadata.velocity_label || 'Rapidly Rising'}</span></div>
                           {alert.alert_metadata.critical_stage && (
                             <div>Critical Stage: <strong style={{ color: 'var(--color-risk-critical)' }}>{alert.alert_metadata.critical_stage}</strong></div>

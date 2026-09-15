@@ -1,0 +1,167 @@
+"""Pure, database-agnostic inference API for the production LADRIS bundle.
+
+This module is the supported integration boundary for other applications.  It
+uses the persisted model metadata, input validator, calibrated classifier,
+quantile regressors, and SHAP-based recommendation policy already shipped in
+this project.  It never trains or promotes a model.
+"""
+from __future__ import annotations
+
+import time
+from functools import lru_cache
+from typing import Any
+
+import numpy as np
+import pandas as pd
+import shap
+
+from .input_validation import REQUIRED_COLUMNS, validate_single_row
+from .model_store import load_model
+
+DEFAULT_RECOMMENDATION = "Review this project's status manually; no single dominant driver identified."
+
+
+def _rec(feature: str, value: Any) -> str:
+    """Existing recommendation policy expressed against actual SHAP drivers."""
+    if feature == "compensation_disbursement_pct":
+        return f"Compensation disbursement is {float(value):.1f}%; expedite the remaining sanctioned payment."
+    if feature == "open_legal_dispute_count":
+        return f"Resolve or fast-track the {int(value)} open legal dispute(s)."
+    if feature == "max_dispute_pendency_days":
+        return f"The oldest open dispute is {int(value)} days old; escalate it for legal resolution."
+    if feature == "rehabilitation_progress_pct":
+        return f"R&R progress is {float(value):.1f}%; accelerate relocation and site readiness."
+    if feature == "days_since_last_disbursement":
+        return f"No disbursement was recorded for {int(value)} days; investigate the payment stall."
+    if feature == "stakeholder_update_count_90d":
+        return f"Only {int(value)} stakeholder update(s) were recorded in 90 days; increase reporting cadence."
+    if feature == "avg_days_between_updates":
+        return f"Stakeholder updates average {float(value):.0f} days apart; require more frequent updates."
+    if feature == "district_historical_delay_rate":
+        return f"District historical delay rate is {float(value) * 100:.1f}%; apply district contingency measures."
+    if feature == "agency_historical_delay_rate":
+        return f"Agency historical delay rate is {float(value) * 100:.1f}%; review agency bottlenecks."
+    return DEFAULT_RECOMMENDATION
+
+
+@lru_cache(maxsize=1)
+def get_bundle() -> dict[str, Any]:
+    """Load production artifacts once per application process."""
+    return load_model()
+
+
+def warm_model() -> dict[str, Any]:
+    bundle = get_bundle()
+    return {"model_version": bundle["version"], "feature_columns": bundle["feature_columns"]}
+
+
+def _frame(cleaned: dict[str, Any], bundle: dict[str, Any]) -> pd.DataFrame:
+    columns = bundle["feature_columns"]
+    if columns != REQUIRED_COLUMNS:
+        raise ValueError(f"Model feature contract mismatch: metadata={columns}, validator={REQUIRED_COLUMNS}")
+    frame = pd.DataFrame([{name: cleaned.get(name) for name in columns}], columns=columns)
+    for column in columns:
+        if column in bundle["categorical_columns"]:
+            frame[column] = frame[column].astype("category")
+        else:
+            frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    return frame
+
+
+def _underlying_classifier(classifier: Any) -> Any:
+    if hasattr(classifier, "calibrated_classifiers_"):
+        return classifier.calibrated_classifiers_[0].estimator
+    return classifier
+
+
+def _drivers(classifier: Any, frame: pd.DataFrame, raw: dict[str, Any], limit: int = 5) -> list[dict[str, Any]]:
+    explainer = shap.TreeExplainer(_underlying_classifier(classifier))
+    values = explainer.shap_values(frame)
+    if isinstance(values, list):
+        values = values[1]
+    row = np.asarray(values)[0]
+    ranked = sorted(zip(frame.columns, row), key=lambda pair: abs(float(pair[1])), reverse=True)
+    result = []
+    for feature, contribution in ranked[:limit]:
+        value = raw.get(feature)
+        if pd.isna(value):
+            value = None
+        result.append({
+            "feature": feature,
+            "value": value.item() if hasattr(value, "item") else value,
+            "contribution": round(float(contribution), 6),
+            "direction": "increases_risk" if contribution > 0 else "decreases_risk",
+            "recommendation": _rec(feature, value) if contribution > 0 and value is not None else None,
+        })
+    return result
+
+
+def predict_features(features: dict[str, Any]) -> dict[str, Any]:
+    """Validate and score one point-in-time, 23-feature snapshot."""
+    started = time.perf_counter()
+    cleaned, validation = validate_single_row(features, strict=True)
+    if not validation.is_valid:
+        raise ValueError("; ".join(validation.errors))
+
+    bundle = get_bundle()
+    frame = _frame(cleaned, bundle)
+    probability = float(bundle["classifier"].predict_proba(frame)[0, 1])
+    score = round(probability * 100.0, 2)
+    low = float(bundle["risk_threshold_low"])
+    high = float(bundle["risk_threshold_high"])
+    category = "HIGH" if score >= high else "MEDIUM" if score >= low else "LOW"
+
+    predicted = float(bundle["regressor"].predict(frame)[0]) if bundle.get("regressor") else None
+    p10 = float(bundle["regressor_p10"].predict(frame)[0]) if bundle.get("regressor_p10") else None
+    p90 = float(bundle["regressor_p90"].predict(frame)[0]) if bundle.get("regressor_p90") else None
+    clamp = lambda value: None if value is None else round(float(np.clip(value, 0, 2000)), 2)
+    drivers = _drivers(bundle["classifier"], frame, cleaned)
+
+    return {
+        "model_version": bundle["version"],
+        "delay_probability": round(probability, 6),
+        "risk_score": score,
+        "risk_category": category,
+        "predicted_delay_days": clamp(predicted),
+        "prediction_interval": {"p10": clamp(p10), "p90": clamp(p90)},
+        "top_drivers": drivers,
+        "recommendations": [d["recommendation"] for d in drivers if d["recommendation"]],
+        "validation": validation.summary(),
+        "latency_ms": round((time.perf_counter() - started) * 1000, 2),
+    }
+
+
+def predict_stages(features: dict[str, Any]) -> list[dict[str, Any]]:
+    """Counterfactually score every lifecycle category with the production model.
+
+    The active artifact does not contain standalone per-stage model files, so
+    this method never claims that it does.
+    """
+    stages = ["notification", "survey", "approval", "compensation", "legal_resolution", "rehabilitation", "possession", "completed"]
+    results = []
+    for stage in stages:
+        row = dict(features)
+        row["current_stage"] = stage
+        prediction = predict_features(row)
+        results.append({
+            "stage": stage,
+            "delay_probability": prediction["delay_probability"],
+            "risk_score": prediction["risk_score"],
+            "risk_category": prediction["risk_category"],
+            "prediction_method": "overall_model_stage_counterfactual",
+        })
+    return results
+
+
+def model_info() -> dict[str, Any]:
+    bundle = get_bundle()
+    return {
+        "model_version": bundle["version"],
+        "model_type": "calibrated_lightgbm_classifier_and_quantile_regressors",
+        "feature_columns": bundle["feature_columns"],
+        "categorical_columns": bundle["categorical_columns"],
+        "risk_thresholds": {"low_medium": bundle["risk_threshold_low"], "medium_high": bundle["risk_threshold_high"]},
+        "training_timestamp": bundle["training_timestamp"],
+        "evaluation": bundle["evaluation"],
+        "data_hash": bundle["data_hash"],
+    }

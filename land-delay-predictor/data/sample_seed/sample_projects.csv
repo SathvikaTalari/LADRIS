@@ -1,0 +1,21 @@
+Project ID,Project Name,Project Type,Implementing Agency,State,District,Land Area (ha),Affected Families,Notification Date,Expected Completion,Actual Completion,Current Stage,Delayed (Y/N),Delay (days),Compensation Sanctioned,Compensation Disbursed,Open Disputes,R&R Progress %
+P001,NH-44 Widening Sec 3,highway,NHAI,Telangana,Nalgonda,45.2,120,2021-03-01,2022-09-01,2023-05-15,completed,Y,256,45000000,45000000,0,100
+P002,Rail Corridor Ext A,railway,Indian Railways,Telangana,Warangal,32.8,80,2020-11-15,2022-05-15,2022-04-20,completed,N,0,30000000,30000000,0,100
+P003,Irrigation Canal B,irrigation,State PWD,Andhra Pradesh,Krishna,18.5,60,2021-06-01,2022-12-01,2023-11-01,completed,Y,335,15000000,14000000,1,90
+P004,Industrial Corridor C,industrial,APIIC,Andhra Pradesh,Guntur,60.0,200,2020-01-10,2021-07-10,2021-06-25,completed,N,0,80000000,80000000,0,100
+P005,NH-65 Bypass,highway,NHAI,Telangana,Karimnagar,25.0,90,2022-02-01,2023-08-01,,approval,,,20000000,10000000,1,50
+P006,Metro Extension D,urban,HMDA,Telangana,Hyderabad,12.0,45,2021-09-01,2023-03-01,2023-10-10,completed,Y,224,50000000,50000000,2,100
+P007,Rural Road Package E,highway,PMGSY,Andhra Pradesh,Kurnool,8.0,20,2022-05-01,2023-05-01,2023-04-15,completed,N,0,5000000,5000000,0,100
+P008,Irrigation Dam F,irrigation,State PWD,Telangana,Khammam,90.0,300,2019-08-01,2021-08-01,2022-12-01,completed,Y,488,120000000,95000000,3,70
+P009,Industrial Park G,industrial,APIIC,Andhra Pradesh,Anantapur,55.0,150,2021-01-15,2022-07-15,2022-06-30,completed,N,0,60000000,60000000,0,100
+P010,NH-16 Widening,highway,NHAI,Andhra Pradesh,Vishakhapatnam,38.0,110,2022-08-01,2024-02-01,,compensation,,,35000000,12000000,0,40
+P011,Rail Freight Corridor,railway,DFCCIL,Telangana,Medak,42.0,95,2020-06-01,2022-06-01,2023-02-10,completed,Y,254,40000000,40000000,1,100
+P012,Urban Flyover H,urban,GHMC,Telangana,Hyderabad,6.0,25,2021-11-01,2022-11-01,2022-10-20,completed,N,0,8000000,8000000,0,100
+P013,Irrigation Lift Scheme,irrigation,State PWD,Telangana,Nizamabad,22.0,70,2020-03-01,2021-09-01,2022-11-15,completed,Y,441,18000000,16000000,2,80
+P014,Industrial Corridor I,industrial,APIIC,Andhra Pradesh,Chittoor,48.0,140,2022-01-01,2023-07-01,,legal_resolution,,,55000000,20000000,4,30
+P015,NH-563 Extension,highway,NHAI,Telangana,Adilabad,29.0,85,2021-04-01,2022-10-01,2022-09-05,completed,N,0,25000000,25000000,0,100
+P016,Rural Road Package J,highway,PMGSY,Andhra Pradesh,Prakasam,7.5,18,2022-03-01,2023-03-01,2023-06-20,completed,Y,111,4500000,4500000,0,100
+P017,Metro Extension K,urban,HMDA,Telangana,Hyderabad,14.0,50,2020-10-01,2022-04-01,2023-01-30,completed,Y,304,55000000,55000000,2,100
+P018,Irrigation Canal L,irrigation,State PWD,Andhra Pradesh,West Godavari,20.0,65,2021-07-01,2023-01-01,2022-12-10,completed,N,0,16000000,16000000,0,100
+P019,Industrial Park M,industrial,APIIC,Telangana,Sangareddy,52.0,145,2019-12-01,2021-06-01,2022-08-01,completed,Y,427,65000000,60000000,3,75
+P020,NH-30 Widening,highway,NHAI,Andhra Pradesh,Guntur,33.0,95,2022-06-01,2023-12-01,,survey,,,,,0,0

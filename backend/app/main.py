@@ -10,6 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1.router import api_router
+from app.api.ml import router as ml_router
+from app.services.production_ml_service import warm_production_model
 from app.config import get_settings
 from app.database import Base, engine, check_db_connection
 from app.models import *  # ensure all models registered
@@ -98,12 +100,15 @@ async def lifespan(app: FastAPI):
                     ADD COLUMN IF NOT EXISTS delay_reason TEXT,
                     ADD COLUMN IF NOT EXISTS legal_case_count INTEGER DEFAULT 0,
                     ADD COLUMN IF NOT EXISTS legal_case_status VARCHAR(50) DEFAULT 'NONE',
-                    ADD COLUMN IF NOT EXISTS milestone_data_status VARCHAR(50) DEFAULT 'SYNTHETIC_DEMO',
+                    ADD COLUMN IF NOT EXISTS rehabilitation_progress_pct NUMERIC(5, 2),
+                    ADD COLUMN IF NOT EXISTS milestone_data_status VARCHAR(50) DEFAULT 'USER_ENTERED',
                     ADD COLUMN IF NOT EXISTS latitude NUMERIC(9, 6),
                     ADD COLUMN IF NOT EXISTS longitude NUMERIC(9, 6),
                     ADD COLUMN IF NOT EXISTS lacrris_integration_status VARCHAR(50) DEFAULT 'PLANNED'
             """))
             await conn.execute(text("ALTER TABLE projects ALTER COLUMN district_codes TYPE TEXT[]"))
+            await conn.execute(text("ALTER TABLE projects ALTER COLUMN milestone_data_status SET DEFAULT 'USER_ENTERED'"))
+            await conn.execute(text("ALTER TABLE rr_records ADD COLUMN IF NOT EXISTS resettlement_site_ready BOOLEAN"))
         print("   ✅ Database tables & PostGIS schema verified")
     except Exception as e:
         print(f"   ⚠️  Database auto-migration warning: {e}")
@@ -113,6 +118,37 @@ async def lifespan(app: FastAPI):
         await ensure_default_users()
     else:
         print("   ⚠️  Database connection: FAILED — check DB service")
+    model_ready = False
+    try:
+        info = warm_production_model()
+        model_ready = True
+        print(f"   ✅ Production ML model loaded: {info['model_version']}")
+    except Exception as exc:
+        print(f"   ⚠️  Production ML model unavailable: {exc}")
+    if db_ok and settings.SYNC_PROJECTS_FROM_CSV:
+        try:
+            from app.services.project_csv_service import sync_projects_from_csv
+            from app.services.production_ml_service import ensure_current_prediction, sync_model_registry
+
+            async with AsyncSessionLocal() as session:
+                await sync_model_registry(session)
+                imported_ids = await sync_projects_from_csv(
+                    session,
+                    settings.PROJECT_DATA_CSV,
+                    exclusive=settings.PROJECT_CSV_EXCLUSIVE,
+                )
+                await session.commit()
+                if model_ready:
+                    for project_id in imported_ids:
+                        try:
+                            await ensure_current_prediction(session, project_id)
+                            await session.commit()
+                        except Exception as prediction_exc:
+                            await session.rollback()
+                            print(f"   ⚠️  Prediction failed for {project_id}: {prediction_exc}")
+            print(f"   ✅ Project CSV synchronized: {len(imported_ids)} project(s)")
+        except Exception as exc:
+            print(f"   ⚠️  Project CSV synchronization failed: {exc}")
     yield
     print(f"🛑 {settings.APP_NAME} shutting down...")
 
@@ -122,7 +158,7 @@ app = FastAPI(
     title=settings.APP_NAME,
     description=(
         "AI-Powered Land Acquisition Early-Warning & Intervention Intelligence Platform. "
-        "Phase 1: Technical Foundation. ML prediction engine available in Phase 2."
+        "Production calibrated LightGBM delay prediction, explanations, monitoring, and decision support."
     ),
     version=settings.APP_VERSION,
     docs_url="/docs",
@@ -199,3 +235,4 @@ async def root():
 
 # ─── Mount API Router ─────────────────────────────────────────────────────────
 app.include_router(api_router)
+app.include_router(ml_router)
