@@ -1,7 +1,7 @@
 /**
- * FeaturesRippleSection � LADRIS AI
+ * FeaturesRippleSection — LADRIS
  * "Everything You Need for Land Acquisition"
- * Animation: RIPPLE REVEAL � one central signal activates all 6 cards.
+ * Animation: RIPPLE REVEAL — one central signal activates all 6 cards.
  * Library: Framer Motion (already installed)
  */
 import { useEffect, useRef, useState } from "react"
@@ -16,45 +16,6 @@ const EASE_SMOOTH: [number, number, number, number] = [0.22, 1, 0.36, 1]
  *         3   4   5
  */
 const RIPPLE_DELAYS = [0.22, 0.08, 0.30, 0.30, 0.08, 0.44]
-
-const CARDS = [
-  {
-    num: "01",
-    Icon: Zap,
-    title: "Real-time Risk Scoring",
-    desc: "Know the risk early. LADRIS AI checks project data and shows whether the project has Low, Medium, or High risk.",
-  },
-  {
-    num: "02",
-    Icon: Brain,
-    title: "AI Decision Intelligence",
-    desc: "Make better decisions with AI. AI studies project data and finds patterns that may cause future delays.",
-  },
-  {
-    num: "03",
-    Icon: MapPin,
-    title: "GIS Spatial Analytics",
-    desc: "See project risks on the map. View high-risk projects and delay trends across different districts and states.",
-  },
-  {
-    num: "04",
-    Icon: AlertTriangle,
-    title: "Predictive Bottleneck Detection",
-    desc: "Find problems before they grow. Detect risks from approvals, legal issues, compensation, documents, rehabilitation and other delays.",
-  },
-  {
-    num: "05",
-    Icon: BarChart2,
-    title: "Smart Dashboards & Analytics",
-    desc: "See everything in one place. Track project risk, delay trends, timelines and performance through interactive dashboards.",
-  },
-  {
-    num: "06",
-    Icon: ShieldCheck,
-    title: "Secure Government Access",
-    desc: "Give every team the right access. Role-based access lets different stakeholders securely view the information they need.",
-  },
-]
 
 /* --- Ripple Pulse ----------------------------------------------------------- */
 function RipplePulse({ visible }: { visible: boolean }) {
@@ -261,7 +222,18 @@ function FeatureCard({
 }
 
 /* --- Main Export ------------------------------------------------------------ */
-export default function FeaturesRippleSection({ isDark }: { isDark: boolean }) {
+export default function FeaturesRippleSection({ isDark, language }: { isDark: boolean; language: 'en' | 'hi' }) {
+  const hi = language === 'hi'
+
+  const CARDS = [
+    { num: '01', Icon: Zap,           title: hi ? 'रियल-टाइम जोखिम स्कोरिंग'          : 'Real-time Risk Scoring',             desc: hi ? 'जोखिम जल्दी जानें। LADRIS प्रोजेक्ट डेटा जांचता है और बताता है कि प्रोजेक्ट निम्न, मध्यम या उच्च जोखिम में है।' : 'Know the risk early. LADRIS checks project data and shows whether the project has Low, Medium, or High risk.' },
+    { num: '02', Icon: Brain,         title: hi ? 'AI निर्णय बुद्धिमत्ता'            : 'AI Decision Intelligence',           desc: hi ? 'AI से बेहतर निर्णय लें। AI प्रोजेक्ट डेटा का अध्ययन करता है और ऐसे पैटर्न खोजता है जो भविष्य विलंब का कारण बन सकते हैं।' : 'Make better decisions with AI. AI studies project data and finds patterns that may cause future delays.' },
+    { num: '03', Icon: MapPin,        title: hi ? 'GIS स्थानिक विश्लेषण'              : 'GIS Spatial Analytics',              desc: hi ? 'मानचित्र पर प्रोजेक्ट जोखिम देखें। विभिन्न जिलों और राज्यों में उच्च-जोखिम प्रोजेक्ट और विलंब प्रवृत्तियां देखें।' : 'See project risks on the map. View high-risk projects and delay trends across different districts and states.' },
+    { num: '04', Icon: AlertTriangle, title: hi ? 'पूर्वानुमानित बाधा पहचान'         : 'Predictive Bottleneck Detection',     desc: hi ? 'समस्याएं बढ़़ने से पहले खोजें। अनुमोदन, कानूनी, मुआवज़ा, दस्तावेज़ और पुनर्वास से जुड़े जोखिमों का पता लगाएं।' : 'Find problems before they grow. Detect risks from approvals, legal issues, compensation, documents, rehabilitation and other delays.' },
+    { num: '05', Icon: BarChart2,     title: hi ? 'स्मार्ट डैशबोर्ड और विश्लेषण'    : 'Smart Dashboards & Analytics',       desc: hi ? 'सब कुछ एक जगह देखें। इंटरैक्टिव डैशबोर्ड से प्रोजेक्ट जोखिम, विलंब प्रवृत्ति, समयसीमा और प्रदर्शन ट्रैक करें।' : 'See everything in one place. Track project risk, delay trends, timelines and performance through interactive dashboards.' },
+    { num: '06', Icon: ShieldCheck,   title: hi ? 'सुरक्षित सरकारी पहुंच'            : 'Secure Government Access',           desc: hi ? 'हर टीम को सही पहुंच दें। भूमिका-आधारित एक्सेस विभिन्न हितधारकों को सुरक्षित रूप से आवश्यक जानकारी देखने देता है।' : 'Give every team the right access. Role-based access lets different stakeholders securely view the information they need.' },
+  ]
+
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-8% 0px" })
   const reduced = useReducedMotion() ?? false
@@ -333,7 +305,7 @@ export default function FeaturesRippleSection({ isDark }: { isDark: boolean }) {
             color: isDark ? "#f0f6fc" : "#0a1d37",
             marginBottom: 12, lineHeight: 1.2,
           }}>
-            Everything You Need for Land Acquisition
+            {hi ? 'LADRIS के मुख्य घटक' : 'Key Components of LADRIS'}
           </h2>
 
           <motion.p
@@ -346,7 +318,7 @@ export default function FeaturesRippleSection({ isDark }: { isDark: boolean }) {
               lineHeight: 1.65, fontWeight: 500,
             }}
           >
-            One platform to predict delays, see risks, and act early.
+            {hi ? 'एक प्लेटफ़ॉर्म। हर विलंब की भविष्यवाणी, जोखिम देखें, और शीघ्र कार्रवाई करें।' : 'One platform to predict delays, see risks, and act early.'}
           </motion.p>
         </motion.div>
 
@@ -397,7 +369,7 @@ export default function FeaturesRippleSection({ isDark }: { isDark: boolean }) {
             letterSpacing: "0.18em", textTransform: "uppercase",
             color: "#4a6fa5",
           }}>
-            One System.&nbsp;&nbsp;Every Land-Acquisition Need.
+            {hi ? 'एक प्रणाली।\u00a0\u00a0हर भूमि-अधिग्रहण आवश्यकता।' : 'One System.\u00a0\u00a0Every Land-Acquisition Need.'}
           </span>
         </motion.div>
 
