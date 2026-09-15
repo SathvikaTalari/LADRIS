@@ -318,7 +318,6 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
   const [blockStates, setBlockStates] = useState<BlockState[]>(['ghost', 'ghost', 'ghost', 'ghost'])
   const [linesDrawn, setLinesDrawn] = useState([false, false, false])
   const [dotsActive, setDotsActive] = useState([false, false, false])
-  const [taglineVisible, setTaglineVisible] = useState(false)
   const [subtitleVisible, setSubtitleVisible] = useState(false)
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
@@ -353,7 +352,6 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
       t(() => { setLinesDrawn([true, false, false]); setBlock(1, 'active') }, 600)
       t(() => { setLinesDrawn([true, true, false]); setBlock(2, 'active') }, 800)
       t(() => { setLinesDrawn([true, true, true]); setBlock(3, 'active') }, 1000)
-      t(() => setTaglineVisible(true), 1200)
       t(() => setSubtitleVisible(true), 1400)
     } else {
       // Step 1 — Block 01 builds in
@@ -377,14 +375,11 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
 
       // Final sweep — all highlight, then reveal taglines
       t(() => setBlockStates(['active', 'active', 'active', 'active']), 6000)
-      t(() => setTaglineVisible(true), 6500)
       t(() => setSubtitleVisible(true), 6900)
     }
 
     return () => ts.forEach(clearTimeout)
   }, [isInView, reduced, setBlock, fireConnector])
-
-  const accentColor = isDark ? '#4a7fd4' : '#003366'
 
   return (
     <section

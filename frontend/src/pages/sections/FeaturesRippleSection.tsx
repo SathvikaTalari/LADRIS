@@ -10,6 +10,13 @@ import { Zap, Brain, MapPin, AlertTriangle, BarChart2, ShieldCheck } from "lucid
 
 const EASE_SMOOTH: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
+interface FeatureCardData {
+  num: string
+  Icon: React.ElementType
+  title: string
+  desc: string
+}
+
 /*
  * Ripple delay per card: centre-out wave pattern in a 3x2 grid
  * Index:  0   1   2
@@ -87,7 +94,7 @@ function RipplePulse({ visible }: { visible: boolean }) {
 function FeatureCard({
   card, active, isDark, reduced,
 }: {
-  card: typeof CARDS[number]
+  card: FeatureCardData
   active: boolean
   isDark: boolean
   reduced: boolean

@@ -10,6 +10,13 @@ import { motion, AnimatePresence, useInView } from 'framer-motion'
 const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number]
 type Phase = 0 | 1 | 2 | 3 | 4
 
+interface ComponentData {
+  num: string
+  title: string
+  process: string
+  desc: string
+}
+
 /* ─── DataStream ────────────────────────────────────────────────────────── */
 function DataStream({
   label, dir, index, visible, isDark,
@@ -67,26 +74,17 @@ function AICore({ visible, isDark, hi }: { visible: boolean; isDark: boolean; hi
           transition={{ duration: 0.6, ease: EASE }}
           style={{
             textAlign: 'center', padding: '18px 36px', borderRadius: 18,
-            background: isDark
-              ? 'linear-gradient(135deg, rgba(10,22,44,0.98), rgba(14,34,72,0.98))'
-              : 'linear-gradient(135deg, #eef3fc, #e4eefb)',
-            border: '1px solid rgba(74,111,165,0.42)',
-            boxShadow: isDark
-              ? '0 0 0 1px rgba(74,111,165,0.12), 0 0 44px rgba(74,111,165,0.16), 0 16px 48px rgba(0,0,0,0.55)'
-              : '0 0 0 1px rgba(74,111,165,0.14), 0 0 36px rgba(74,111,165,0.1), 0 8px 28px rgba(74,111,165,0.09)',
+            background: isDark ? 'rgba(10,22,44,0.97)' : '#ffffff',
+            border: `1px solid ${isDark ? 'rgba(74,111,165,0.22)' : 'rgba(74,111,165,0.18)'}`,
+            boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.35)' : '0 2px 10px rgba(74,111,165,0.07)',
             position: 'relative', overflow: 'hidden',
           }}
         >
-          {/* Breathing glow */}
-          <motion.div
-            animate={{ opacity: [0.2, 0.6, 0.2] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-              position: 'absolute', inset: 0,
-              background: 'radial-gradient(ellipse at 50% 50%, rgba(74,111,165,0.14) 0%, transparent 70%)',
-              pointerEvents: 'none', borderRadius: 18,
-            }}
-          />
+          {/* Top accent line — matches FeatureCard style */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+            background: 'linear-gradient(90deg, #4a6fa5, transparent 65%)',
+          }} />
 
           <div style={{
             fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.2em',
@@ -101,25 +99,18 @@ function AICore({ visible, isDark, hi }: { visible: boolean; isDark: boolean; hi
             LADRIS
           </div>
 
-          {/* Waveform bars */}
-          <motion.div
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}
-          >
-            {[0.5, 1, 0.7, 1, 0.5].map((h, i) => (
-              <motion.div
+          {/* Static waveform bars */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}>
+            {[6, 10, 8, 10, 6].map((h, i) => (
+              <div
                 key={i}
-                animate={{ scaleY: [h * 0.4, h, h * 0.4] }}
-                transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }}
                 style={{
-                  width: 3, height: 14, borderRadius: 2,
-                  background: `rgba(74,111,165,${0.4 + h * 0.35})`,
-                  transformOrigin: 'center',
+                  width: 3, height: h, borderRadius: 2,
+                  background: isDark ? 'rgba(74,111,165,0.45)' : 'rgba(74,111,165,0.3)',
                 }}
               />
             ))}
-          </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -130,7 +121,7 @@ function AICore({ visible, isDark, hi }: { visible: boolean; isDark: boolean; hi
 function FeatureCard({
   comp, isActive, isDark, gridMode, gridIndex,
 }: {
-  comp: typeof COMPONENTS[number]; isActive: boolean;
+  comp: ComponentData; isActive: boolean;
   isDark: boolean; gridMode: boolean; gridIndex: number;
 }) {
   return (
