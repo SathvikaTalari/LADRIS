@@ -267,3 +267,23 @@ export const healthAPI = {
     apiClient.get<HealthCheck>('/health').then((r) => r.data),
 }
 
+export interface ChatActionItem {
+  label: string
+  path: string
+}
+
+export interface ChatResponse {
+  reply: string
+  actions: ChatActionItem[]
+  suggestions: string[]
+  timestamp: string
+}
+
+export const chatbotAPI = {
+  chat: (data: { message: string; history?: Array<{ role: string; content: string }>; active_page?: string }) =>
+    apiClient.post<ChatResponse>('/api/v1/chatbot/chat', data).then((r) => r.data),
+
+  suggestions: (activePage?: string) =>
+    apiClient.get<string[]>('/api/v1/chatbot/suggestions', { params: { active_page: activePage } }).then((r) => r.data),
+}
+
