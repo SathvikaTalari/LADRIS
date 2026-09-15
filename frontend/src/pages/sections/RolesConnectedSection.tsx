@@ -1,5 +1,5 @@
 /**
- * RolesConnectedSection — LADRIS AI
+ * RolesConnectedSection — LADRIS
  * "Built for Every Role in Land Acquisition"
  * Animation: CONNECTED ROLE PATH
  * Library: Framer Motion (already installed)
