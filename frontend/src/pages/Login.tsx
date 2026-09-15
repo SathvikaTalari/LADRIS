@@ -9,6 +9,7 @@ import { useAuthStore, getRoleDefaultPath } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 
 export const ROLE_OPTIONS = [
+  { key: 'SUPER_ADMIN', label: 'Super Admin (System)', email: 'admin@ladris.gov.in', pass: 'Password123!', scope: 'System-wide', target: 'Admin Panel' },
   { key: 'CENTRAL_ADMIN', label: 'Central Ministry', email: 'central@ladris.gov.in', pass: 'Password123!', scope: 'India-wide', target: 'National Dashboard' },
   { key: 'STATE_ADMIN', label: 'State Government', email: 'state@ladris.gov.in', pass: 'Password123!', scope: 'State-wide', target: 'State Dashboard' },
   { key: 'DISTRICT_ADMIN', label: 'District Administration', email: 'district@ladris.gov.in', pass: 'Password123!', scope: 'District', target: 'District Dashboard' },
