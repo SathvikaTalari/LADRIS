@@ -122,6 +122,10 @@ export default function Landing() {
   const [reducedMotion, setReducedMotion] = useState(false)
   const [helpQuery, setHelpQuery] = useState('')
   const [helpAnswer, setHelpAnswer] = useState('')
+  const [openDropdown, setOpenDropdown] = useState<'about' | 'help' | null>(null)
+  const [mobileAboutOpen, setMobileAboutOpen] = useState(false)
+  const [mobileHelpOpen, setMobileHelpOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0])
@@ -131,6 +135,17 @@ export default function Landing() {
     const handler = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handler)
     return () => window.removeEventListener('scroll', handler)
+  }, [])
+
+  // Close dropdowns when clicking outside the nav
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
   }, [])
 
   // Auto-advance slideshow every 4.5 seconds
@@ -716,52 +731,221 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Center: Nav Links with dropdown chevrons */}
-            <nav className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
-              {([
-                { label: T.navFeatures, sectionId: 'features', dropdown: false },
-                { label: T.navArchitecture, sectionId: 'architecture', dropdown: false },
-                { label: T.navAnalytics, sectionId: 'analytics', dropdown: true },
-                { label: T.navAbout, sectionId: null, dropdown: true },
-                { label: T.navHelp, sectionId: null, dropdown: true },
-                { label: T.navDocuments, sectionId: null, dropdown: true },
-              ] as { label: string; sectionId: string | null; dropdown: boolean }[]).map(({ label, sectionId, dropdown }) => {
-                const isActive = sectionId && activeSection === sectionId
-                return (
-                  <button
-                    key={label}
-                    onClick={sectionId ? () => scrollToSection(sectionId) : undefined}
-                    style={{
-                      background: isActive ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
-                      border: 'none', cursor: 'pointer',
-                      padding: '0 13px', height: 60,
-                      display: 'inline-flex', alignItems: 'center', gap: 4,
-                      fontSize: '0.865rem', fontWeight: isActive ? 700 : 500,
-                      color: isActive ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
-                      fontFamily: 'inherit', whiteSpace: 'nowrap',
-                      letterSpacing: '0.005em', transition: 'all 0.15s',
-                      borderBottom: `3px solid ${isActive ? '#f47721' : 'transparent'}`,
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'
-                      e.currentTarget.style.borderBottomColor = '#f47721'
-                      e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.color = isActive ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155')
-                      e.currentTarget.style.borderBottomColor = isActive ? '#f47721' : 'transparent'
-                      e.currentTarget.style.background = isActive ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none'
-                    }}
-                  >
-                    {label}
-                    {dropdown && (
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.55, flexShrink: 0 }}>
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
-                    )}
-                  </button>
-                )
-              })}
+            {/* Center: Nav Links — wrapped in a ref for outside-click detection */}
+            <nav ref={dropdownRef} className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center', position: 'relative' }}>
+              {/* Features */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('features') }}
+                style={{
+                  background: activeSection === 'features' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'features' ? 700 : 500,
+                  color: activeSection === 'features' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'features' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'features' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'features' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'features' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navFeatures}
+              </button>
+
+              {/* Architecture */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('architecture') }}
+                style={{
+                  background: activeSection === 'architecture' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'architecture' ? 700 : 500,
+                  color: activeSection === 'architecture' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'architecture' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'architecture' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'architecture' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'architecture' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navArchitecture}
+              </button>
+
+              {/* Analytics */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('analytics') }}
+                style={{
+                  background: activeSection === 'analytics' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'analytics' ? 700 : 500,
+                  color: activeSection === 'analytics' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'analytics' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'analytics' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'analytics' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'analytics' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navAnalytics}
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.55, flexShrink: 0 }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+
+              {/* About ▾ — with dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setOpenDropdown(prev => prev === 'about' ? null : 'about')}
+                  style={{
+                    background: openDropdown === 'about' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                    border: 'none', cursor: 'pointer',
+                    padding: '0 13px', height: 60,
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: '0.865rem', fontWeight: openDropdown === 'about' ? 700 : 500,
+                    color: openDropdown === 'about' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                    fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    letterSpacing: '0.005em', transition: 'all 0.15s',
+                    borderBottom: `3px solid ${openDropdown === 'about' ? '#f47721' : 'transparent'}`,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = openDropdown === 'about' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = openDropdown === 'about' ? '#f47721' : 'transparent'; e.currentTarget.style.background = openDropdown === 'about' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+                >
+                  {T.navAbout}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ opacity: 0.55, flexShrink: 0, transform: openDropdown === 'about' ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {/* About dropdown */}
+                {openDropdown === 'about' && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 500,
+                    minWidth: 230,
+                    background: isDark ? '#0d1a2e' : '#ffffff',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                    borderRadius: 6,
+                    boxShadow: isDark ? '0 6px 24px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                  }}>
+                    {([
+                      { label: 'About the Project', route: '/about/project' },
+                      { label: 'User Guide', route: '/about/user-guide' },
+                      { label: 'Government Guidelines Compliance', route: '/about/compliance' },
+                    ] as { label: string; route: string }[]).map((item, i, arr) => (
+                      <button
+                        key={item.route}
+                        onClick={() => { setOpenDropdown(null); navigate(item.route) }}
+                        style={{
+                          display: 'block', width: '100%', padding: '11px 16px',
+                          background: 'none', border: 'none',
+                          borderBottom: i < arr.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}` : 'none',
+                          textAlign: 'left', cursor: 'pointer',
+                          fontFamily: 'inherit', fontSize: '0.855rem', fontWeight: 500,
+                          color: isDark ? '#c9d8f0' : '#334155',
+                          transition: 'background 0.12s, color 0.12s',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)'; e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = isDark ? '#c9d8f0' : '#334155' }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Help & Feedback ▾ — with dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setOpenDropdown(prev => prev === 'help' ? null : 'help')}
+                  style={{
+                    background: openDropdown === 'help' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                    border: 'none', cursor: 'pointer',
+                    padding: '0 13px', height: 60,
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: '0.865rem', fontWeight: openDropdown === 'help' ? 700 : 500,
+                    color: openDropdown === 'help' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                    fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    letterSpacing: '0.005em', transition: 'all 0.15s',
+                    borderBottom: `3px solid ${openDropdown === 'help' ? '#f47721' : 'transparent'}`,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = openDropdown === 'help' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = openDropdown === 'help' ? '#f47721' : 'transparent'; e.currentTarget.style.background = openDropdown === 'help' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+                >
+                  {T.navHelp}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ opacity: 0.55, flexShrink: 0, transform: openDropdown === 'help' ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {/* Help dropdown */}
+                {openDropdown === 'help' && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 500,
+                    minWidth: 200,
+                    background: isDark ? '#0d1a2e' : '#ffffff',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                    borderRadius: 6,
+                    boxShadow: isDark ? '0 6px 24px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                  }}>
+                    {([
+                      { label: 'Contact & Feedback', route: '/help/contact' },
+                      { label: 'Privacy Policy', route: '/help/privacy' },
+                      { label: 'Terms of Use', route: '/help/terms' },
+                      { label: 'FAQ', route: '/help/faq' },
+                    ] as { label: string; route: string }[]).map((item, i, arr) => (
+                      <button
+                        key={item.route}
+                        onClick={() => { setOpenDropdown(null); navigate(item.route) }}
+                        style={{
+                          display: 'block', width: '100%', padding: '11px 16px',
+                          background: 'none', border: 'none',
+                          borderBottom: i < arr.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}` : 'none',
+                          textAlign: 'left', cursor: 'pointer',
+                          fontFamily: 'inherit', fontSize: '0.855rem', fontWeight: 500,
+                          color: isDark ? '#c9d8f0' : '#334155',
+                          transition: 'background 0.12s, color 0.12s',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)'; e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = isDark ? '#c9d8f0' : '#334155' }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Documents */}
+              <button
+                style={{
+                  background: 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: 500,
+                  color: isDark ? '#94a9c9' : '#334155',
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: '3px solid transparent',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = isDark ? '#94a9c9' : '#334155'; e.currentTarget.style.borderBottomColor = 'transparent'; e.currentTarget.style.background = 'none' }}
+              >
+                {T.navDocuments}
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.55, flexShrink: 0 }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
             </nav>
 
             {/* Right: GitHub outlined + Login solid */}
@@ -838,27 +1022,82 @@ export default function Landing() {
               padding: '12px 24px 20px',
               display: 'flex', flexDirection: 'column', gap: 2,
             }}>
-              {([
-                { label: T.navFeatures, sectionId: 'features' },
-                { label: T.navArchitecture, sectionId: 'architecture' },
-                { label: T.navAnalytics, sectionId: 'analytics' },
-                { label: T.navAbout, sectionId: null },
-                { label: T.navHelp, sectionId: null },
-                { label: T.navDocuments, sectionId: null },
-              ] as { label: string; sectionId: string | null }[]).map(({ label, sectionId }) => (
-                <button key={label}
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    if (sectionId) setTimeout(() => scrollToSection(sectionId), 80)
-                  }}
-                  style={{
-                    textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer',
-                    padding: '10px 12px', borderRadius: 8,
-                    fontSize: '0.9rem', fontWeight: 500,
-                    color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit',
-                  }}
-                >{label}</button>
-              ))}
+              {/* Features */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('features'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navFeatures}</button>
+
+              {/* Architecture */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('architecture'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navArchitecture}</button>
+
+              {/* Analytics */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('analytics'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navAnalytics}</button>
+
+              {/* About ▾ — expandable */}
+              <button
+                onClick={() => setMobileAboutOpen(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', background: mobileAboutOpen ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)') : 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: mobileAboutOpen ? 600 : 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >
+                <span>{T.navAbout}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ opacity: 0.55, transform: mobileAboutOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {mobileAboutOpen && (
+                <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`, marginLeft: 12 }}>
+                  {([
+                    { label: 'About the Project', route: '/about/project' },
+                    { label: 'User Guide', route: '/about/user-guide' },
+                    { label: 'Government Guidelines Compliance', route: '/about/compliance' },
+                  ] as { label: string; route: string }[]).map(item => (
+                    <button key={item.route}
+                      onClick={() => { setMobileMenuOpen(false); setMobileAboutOpen(false); navigate(item.route) }}
+                      style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: 6, fontSize: '0.855rem', fontWeight: 400, color: isDark ? '#7a9abf' : '#475569', fontFamily: 'inherit' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+
+              {/* Help & Feedback ▾ — expandable */}
+              <button
+                onClick={() => setMobileHelpOpen(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', background: mobileHelpOpen ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)') : 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: mobileHelpOpen ? 600 : 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >
+                <span>{T.navHelp}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ opacity: 0.55, transform: mobileHelpOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {mobileHelpOpen && (
+                <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`, marginLeft: 12 }}>
+                  {([
+                    { label: 'Contact & Feedback', route: '/help/contact' },
+                    { label: 'Privacy Policy', route: '/help/privacy' },
+                    { label: 'Terms of Use', route: '/help/terms' },
+                    { label: 'FAQ', route: '/help/faq' },
+                  ] as { label: string; route: string }[]).map(item => (
+                    <button key={item.route}
+                      onClick={() => { setMobileMenuOpen(false); setMobileHelpOpen(false); navigate(item.route) }}
+                      style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: 6, fontSize: '0.855rem', fontWeight: 400, color: isDark ? '#7a9abf' : '#475569', fontFamily: 'inherit' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+
+              {/* Documents */}
+              <button
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navDocuments}</button>
+
               <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0'}`, display: 'flex', gap: 10 }}>
                 <button onClick={() => window.open('https://github.com/SathvikaTalari/LADRIS', '_blank', 'noopener,noreferrer')} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1'}`, color: isDark ? '#c9d8f0' : '#334155', fontWeight: 600, fontSize: '0.875rem' }}>GitHub</button>
                 <button onClick={handleAccessDashboard} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: '#003366', border: 'none', color: '#ffffff', fontWeight: 700, fontSize: '0.875rem' }}>{T.navLogin}</button>

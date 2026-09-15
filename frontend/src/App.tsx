@@ -19,6 +19,17 @@ import Admin from '@/pages/Admin'
 import DataSources from '@/pages/DataSources'
 import DataQuality from '@/pages/DataQuality'
 
+// About pages
+import AboutProject from '@/pages/about/AboutProject'
+import UserGuide from '@/pages/about/UserGuide'
+import Compliance from '@/pages/about/Compliance'
+
+// Help pages
+import ContactFeedback from '@/pages/help/ContactFeedback'
+import Privacy from '@/pages/help/Privacy'
+import Terms from '@/pages/help/Terms'
+import FAQ from '@/pages/help/FAQ'
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, fetchMe } = useAuthStore()
   const token = localStorage.getItem('access_token')
@@ -55,6 +66,17 @@ export default function App() {
         <Route path="/landing" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sitemap" element={<SiteMap />} />
+
+        {/* About pages */}
+        <Route path="/about/project" element={<AboutProject />} />
+        <Route path="/about/user-guide" element={<UserGuide />} />
+        <Route path="/about/compliance" element={<Compliance />} />
+
+        {/* Help pages */}
+        <Route path="/help/contact" element={<ContactFeedback />} />
+        <Route path="/help/privacy" element={<Privacy />} />
+        <Route path="/help/terms" element={<Terms />} />
+        <Route path="/help/faq" element={<FAQ />} />
 
         {/* Protected Dashboard Routes */}
         <Route
