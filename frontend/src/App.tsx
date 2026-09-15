@@ -30,6 +30,12 @@ import Privacy from '@/pages/help/Privacy'
 import Terms from '@/pages/help/Terms'
 import FAQ from '@/pages/help/FAQ'
 
+// Document pages
+import Blogs from '@/pages/documents/Blogs'
+import ResearchPapers from '@/pages/documents/ResearchPapers'
+import CaseStudies from '@/pages/documents/CaseStudies'
+import RealWorldExamples from '@/pages/documents/RealWorldExamples'
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, fetchMe } = useAuthStore()
   const token = localStorage.getItem('access_token')
@@ -77,6 +83,12 @@ export default function App() {
         <Route path="/help/privacy" element={<Privacy />} />
         <Route path="/help/terms" element={<Terms />} />
         <Route path="/help/faq" element={<FAQ />} />
+
+        {/* Document pages */}
+        <Route path="/documents/blogs" element={<Blogs />} />
+        <Route path="/documents/research-papers" element={<ResearchPapers />} />
+        <Route path="/documents/case-studies" element={<CaseStudies />} />
+        <Route path="/documents/real-world-examples" element={<RealWorldExamples />} />
 
         {/* Protected Dashboard Routes */}
         <Route

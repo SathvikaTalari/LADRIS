@@ -18,9 +18,7 @@ import {
   Trash2,
   ChevronRight,
   Compass,
-  ArrowRight,
   Shield,
-  HelpCircle,
   ExternalLink
 } from 'lucide-react'
 import { chatbotAPI, type ChatActionItem } from '@/api/client'
@@ -44,7 +42,7 @@ const DEFAULT_SUGGESTIONS = [
 ]
 
 // Simple Markdown Formatter Helper
-function FormattedText({ text, onNavigate }: { text: string; onNavigate: (path: string) => void }) {
+function FormattedText({ text }: { text: string }) {
   // Parse markdown tables, bold, headers, blockquotes, bullets
   const lines = text.split('\n')
   const elements: React.ReactNode[] = []
@@ -680,10 +678,6 @@ export function SaarthiWidget() {
                       ) : (
                         <FormattedText
                           text={msg.text}
-                          onNavigate={(path) => {
-                            navigate(path)
-                            if (!isExpanded) setIsOpen(false)
-                          }}
                         />
                       )}
 
