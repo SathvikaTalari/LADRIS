@@ -98,7 +98,7 @@ function AICore({ visible, isDark, hi }: { visible: boolean; isDark: boolean; hi
             fontSize: '1.35rem', fontWeight: 900, letterSpacing: '-0.03em',
             color: isDark ? '#ddeaff' : '#0a1d37', lineHeight: 1.1,
           }}>
-            LADRIS<span style={{ color: '#4a6fa5' }}>·</span>AI
+            LADRIS
           </div>
 
           {/* Waveform bars */}
