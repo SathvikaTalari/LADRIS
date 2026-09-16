@@ -179,6 +179,8 @@ class ProjectListResponse(BaseModel):
     milestone_data_status: Optional[str] = "USER_ENTERED"
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    priority_score: Optional[float] = None
+    top_bottleneck: Optional[str] = None
     created_at: datetime
 
 

@@ -120,6 +120,12 @@ async def list_projects(
         prediction = prediction_by_project.get(project.id)
         if prediction is not None:
             item.risk_level = RiskLevel(prediction.risk_category)
+            item.priority_score = float(prediction.risk_score)
+            raw_driver = next((d.get("feature") for d in (prediction.top_drivers or []) if d.get("contribution", 0) > 0), None)
+            if raw_driver:
+                item.top_bottleneck = raw_driver.replace("_", " ").title()
+        elif item.top_bottleneck is None and item.delay_reason:
+            item.top_bottleneck = item.delay_reason
         items.append(item)
 
     return PaginatedResponse(

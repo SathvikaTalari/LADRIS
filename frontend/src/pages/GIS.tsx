@@ -27,7 +27,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { PageHeader } from '@/components/common'
-import { projectsAPI, intelligenceAPI, predictionsAPI } from '@/api/client'
+import { projectsAPI, intelligenceAPI } from '@/api/client'
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap, Tooltip } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -62,28 +62,17 @@ const STATE_COORDINATES: Record<string, { coords: [number, number]; name: string
   GA: { coords: [15.2993, 74.1240], name: 'Goa', zoom: 9 },
 }
 
-// ─── High-Performance CDN Map Tiles ──────────────────────────────────────────
+// ─── Map Tiles ────────────────────────────────────────────────────────────────
 const MAP_TILES = {
   SATELLITE: {
     name: 'Satellite',
-    url: 'https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-    subdomains: ['0', '1', '2', '3'],
-    maxZoom: 20,
-    attribution: '&copy; Google Maps',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri',
   },
-  STREET: {
+  OSM: {
     name: 'Street',
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    subdomains: ['a', 'b', 'c', 'd'],
-    maxZoom: 19,
-    attribution: '&copy; CARTO &copy; OpenStreetMap',
-  },
-  DARK: {
-    name: 'Dark',
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    subdomains: ['a', 'b', 'c', 'd'],
-    maxZoom: 19,
-    attribution: '&copy; CARTO &copy; OpenStreetMap',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; OpenStreetMap contributors',
   },
 }
 
@@ -159,57 +148,45 @@ export default function GIS() {
   // Selected district for heatmap drilldown
   const [selectedHeatDistrict, setSelectedHeatDistrict] = useState<any>(null)
 
-  // Load projects
+  // Load projects and heatmap together in ONE single initial network call
   useEffect(() => {
+    let isMounted = true
     async function loadData() {
       try {
-        const res = await projectsAPI.list({ page_size: 100 })
-        const items = res.items || []
+        setIsHeatmapLoading(true)
+        const [projRes, heatRes] = await Promise.all([
+          projectsAPI.list({ page_size: 100 }),
+          intelligenceAPI.gisHeatmap().catch(() => ({ heatmap_points: [] })),
+        ])
 
-        const predictionRows = await Promise.all(items.map((project: any) =>
-          predictionsAPI.get(project.id).catch(() => null)
-        ))
-        const mapped = items.map((p: any, index: number) => {
+        if (!isMounted) return
+
+        const items = projRes.items || []
+        const mapped = items.map((p: any) => {
           const lat = p.latitude == null ? null : Number(p.latitude)
           const lng = p.longitude == null ? null : Number(p.longitude)
-          const prediction = predictionRows[index]
-          const driver = prediction?.top_drivers?.find((item: any) => item.contribution > 0)
-
           return {
             ...p,
             lat,
             lng,
-            risk_level: prediction?.risk_category || 'UNKNOWN',
-            priorityScore: prediction?.risk_score ?? null,
-            topBottleneck: driver?.feature || 'Risk driver unavailable',
+            risk_level: p.risk_level || 'UNKNOWN',
+            priorityScore: p.priority_score ?? null,
+            topBottleneck: p.top_bottleneck || p.delay_reason || 'Risk driver unavailable',
             stateLabel: p.state_code || 'Unknown',
           }
         }).filter((p: any) => Number.isFinite(p.lat) && Number.isFinite(p.lng))
+
         setProjects(mapped)
+        setHeatmapData(heatRes.heatmap_points || [])
       } catch (err) {
         console.error('GIS load error:', err)
+      } finally {
+        if (isMounted) setIsHeatmapLoading(false)
       }
     }
     loadData()
+    return () => { isMounted = false }
   }, [])
-
-  // Load heatmap data when heatmap mode is selected
-  useEffect(() => {
-    if (viewMode === 'heatmap' && heatmapData.length === 0) {
-      async function loadHeatmap() {
-        try {
-          setIsHeatmapLoading(true)
-          const res = await intelligenceAPI.gisHeatmap()
-          setHeatmapData(res.heatmap_points || [])
-        } catch (err) {
-          console.error('Heatmap load error:', err)
-        } finally {
-          setIsHeatmapLoading(false)
-        }
-      }
-      loadHeatmap()
-    }
-  }, [viewMode, heatmapData.length])
 
   // Filtered projects
   const visibleProjects = useMemo(() => {
@@ -395,18 +372,18 @@ export default function GIS() {
                 display: 'flex', background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(0,0,0,0.12)',
                 borderRadius: 10, padding: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.14)', gap: 2,
               }}>
-                {(['SATELLITE', 'STREET', 'DARK'] as const).map(k => (
+                {(['SATELLITE', 'OSM'] as const).map(k => (
                   <button
                     key={k}
                     onClick={() => setTileKey(k)}
                     style={{
-                      padding: '4px 12px', fontSize: '0.72rem', fontWeight: 700, borderRadius: 7,
+                      padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, borderRadius: 7,
                       border: 'none', cursor: 'pointer',
                       background: tileKey === k ? '#2563eb' : 'transparent',
                       color: tileKey === k ? '#fff' : '#475569', transition: 'all 0.13s',
                     }}
                   >
-                    {k === 'SATELLITE' ? '🛰️ Satellite' : k === 'STREET' ? '🗺️ Street' : '🌙 Dark'}
+                    {k === 'SATELLITE' ? '🛰️ Satellite' : '🌐 Street'}
                   </button>
                 ))}
               </div>
@@ -435,20 +412,10 @@ export default function GIS() {
           <MapContainer
             center={mapCenter}
             zoom={mapZoom}
-            preferCanvas={true}
-            style={{ height: '100%', width: '100%', background: '#0f172a' }}
+            style={{ height: '100%', width: '100%' }}
           >
             <MapViewController center={mapCenter} zoom={mapZoom} />
-            <TileLayer
-              key={tileKey}
-              attribution={currentTile.attribution}
-              url={currentTile.url}
-              subdomains={currentTile.subdomains || ['0', '1', '2', '3']}
-              maxZoom={currentTile.maxZoom || 19}
-              keepBuffer={8}
-              updateWhenZooming={false}
-              updateWhenIdle={true}
-            />
+            <TileLayer key={tileKey} attribution={currentTile.attribution} url={currentTile.url} />
 
             {/* ─── GIS Risk Map Mode ─── */}
             {viewMode === 'risk_map' && (
