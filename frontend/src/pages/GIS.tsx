@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   MapPin,
   Search,
-  Compass,
   Maximize2,
   Minimize2,
   Globe,
@@ -322,25 +321,6 @@ export default function GIS() {
           >
             <Thermometer size={14} /> Delay Risk Heatmap
           </button>
-        </div>
-
-        {/* Quick state nav pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', scrollbarWidth: 'none' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', display: 'flex', gap: 4, alignItems: 'center' }}>
-            <Compass size={12} color="var(--color-accent-primary)" /> Quick Navigation:
-          </span>
-          <button id="gis-state-ALL" onClick={() => handleSelectState('ALL')}
-            className={`btn btn-sm ${selectedState === 'ALL' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '3px 10px', fontSize: '0.7rem', borderRadius: 'var(--radius-full)', whiteSpace: 'nowrap' }}>
-            🌐 All India
-          </button>
-          {statesInView.slice(0, 10).map(st => (
-            <button key={st} id={`gis-state-${st}`} onClick={() => handleSelectState(st)}
-              className={`btn btn-sm ${selectedState === st ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ padding: '3px 10px', fontSize: '0.7rem', borderRadius: 'var(--radius-full)', whiteSpace: 'nowrap' }}>
-              {STATE_COORDINATES[st]?.name || st}
-            </button>
-          ))}
         </div>
       </div>
 
