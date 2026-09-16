@@ -62,17 +62,28 @@ const STATE_COORDINATES: Record<string, { coords: [number, number]; name: string
   GA: { coords: [15.2993, 74.1240], name: 'Goa', zoom: 9 },
 }
 
-// ─── Map Tiles ────────────────────────────────────────────────────────────────
+// ─── High-Performance CDN Map Tiles ──────────────────────────────────────────
 const MAP_TILES = {
   SATELLITE: {
     name: 'Satellite',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri',
+    url: 'https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+    subdomains: ['0', '1', '2', '3'],
+    maxZoom: 20,
+    attribution: '&copy; Google Maps',
   },
-  OSM: {
+  STREET: {
     name: 'Street',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; OpenStreetMap contributors',
+    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    subdomains: ['a', 'b', 'c', 'd'],
+    maxZoom: 19,
+    attribution: '&copy; CARTO &copy; OpenStreetMap',
+  },
+  DARK: {
+    name: 'Dark',
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    subdomains: ['a', 'b', 'c', 'd'],
+    maxZoom: 19,
+    attribution: '&copy; CARTO &copy; OpenStreetMap',
   },
 }
 
@@ -384,18 +395,18 @@ export default function GIS() {
                 display: 'flex', background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(0,0,0,0.12)',
                 borderRadius: 10, padding: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.14)', gap: 2,
               }}>
-                {(['SATELLITE', 'OSM'] as const).map(k => (
+                {(['SATELLITE', 'STREET', 'DARK'] as const).map(k => (
                   <button
                     key={k}
                     onClick={() => setTileKey(k)}
                     style={{
-                      padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, borderRadius: 7,
+                      padding: '4px 12px', fontSize: '0.72rem', fontWeight: 700, borderRadius: 7,
                       border: 'none', cursor: 'pointer',
                       background: tileKey === k ? '#2563eb' : 'transparent',
                       color: tileKey === k ? '#fff' : '#475569', transition: 'all 0.13s',
                     }}
                   >
-                    {k === 'SATELLITE' ? '🛰️ Satellite' : '🌐 Street'}
+                    {k === 'SATELLITE' ? '🛰️ Satellite' : k === 'STREET' ? '🗺️ Street' : '🌙 Dark'}
                   </button>
                 ))}
               </div>
@@ -424,10 +435,20 @@ export default function GIS() {
           <MapContainer
             center={mapCenter}
             zoom={mapZoom}
-            style={{ height: '100%', width: '100%' }}
+            preferCanvas={true}
+            style={{ height: '100%', width: '100%', background: '#0f172a' }}
           >
             <MapViewController center={mapCenter} zoom={mapZoom} />
-            <TileLayer key={tileKey} attribution={currentTile.attribution} url={currentTile.url} />
+            <TileLayer
+              key={tileKey}
+              attribution={currentTile.attribution}
+              url={currentTile.url}
+              subdomains={currentTile.subdomains || ['0', '1', '2', '3']}
+              maxZoom={currentTile.maxZoom || 19}
+              keepBuffer={8}
+              updateWhenZooming={false}
+              updateWhenIdle={true}
+            />
 
             {/* ─── GIS Risk Map Mode ─── */}
             {viewMode === 'risk_map' && (
