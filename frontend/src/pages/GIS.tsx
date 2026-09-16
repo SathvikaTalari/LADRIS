@@ -535,24 +535,125 @@ export default function GIS() {
             {/* ─── Predictive Risk Heatmap Mode ─── */}
             {viewMode === 'heatmap' && heatmapData.map((pt, i) => {
               const color = getHeatColor(pt.heat_intensity)
-              const radius = 8 + (pt.heat_intensity / 100) * 28
-              const opacity = 0.18 + (pt.heat_intensity / 100) * 0.42
+              const radius = 10 + (pt.heat_intensity / 100) * 28
+              const opacity = 0.25 + (pt.heat_intensity / 100) * 0.45
+              const stateName = STATE_COORDINATES[pt.state_code]?.name || pt.state_code
 
               return (
                 <CircleMarker
                   key={`heat-${i}`}
                   center={[pt.lat, pt.lng]}
                   radius={radius}
-                  pathOptions={{ color, fillColor: color, fillOpacity: opacity, weight: 2, opacity: 0.7 }}
+                  pathOptions={{ color, fillColor: color, fillOpacity: opacity, weight: 2.5, opacity: 0.85 }}
                   eventHandlers={{
                     click: () => setSelectedHeatDistrict(pt),
                   }}
                 >
                   <Tooltip permanent={false} direction="top" offset={[0, -10]}>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 700 }}>
-                      {pt.district} ({pt.state_code}) — ARP: {pt.heat_intensity}
+                    <div style={{ fontSize: '0.74rem', fontWeight: 700, padding: '2px 4px' }}>
+                      {pt.district}, {pt.state_code} · Risk Pressure: {pt.heat_intensity.toFixed(1)}/100 ({pt.dominant_risk_level})
                     </div>
                   </Tooltip>
+
+                  <Popup maxWidth={360} className="gis-custom-popup">
+                    <div style={{ minWidth: 260, maxWidth: 330, fontFamily: 'var(--font-sans)', color: '#0f172a', padding: '2px 0' }}>
+                      {/* District & State Title */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+                        <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#0f172a', lineHeight: 1.2 }}>
+                          {pt.district}, {stateName}
+                        </div>
+                        <span style={{
+                          fontSize: '0.65rem', fontWeight: 800, padding: '2px 8px', borderRadius: 999,
+                          background: `${color}18`, color: color, border: `1px solid ${color}40`,
+                          textTransform: 'uppercase', flexShrink: 0,
+                        }}>
+                          {pt.dominant_risk_level} RISK
+                        </span>
+                      </div>
+
+                      {/* Acquisition Risk Pressure Gauge */}
+                      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', marginBottom: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                          <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>Acquisition Risk Pressure (ARP)</span>
+                          <strong style={{ fontSize: '1rem', color: color, fontFamily: 'monospace' }}>
+                            {pt.heat_intensity.toFixed(1)}/100
+                          </strong>
+                        </div>
+                        <div style={{ width: '100%', height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${Math.min(100, pt.heat_intensity)}%`, background: color, borderRadius: 3 }} />
+                        </div>
+                      </div>
+
+                      {/* Signal Breakdown */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: '0.74rem', borderTop: '1px solid #e2e8f0', paddingTop: 8, marginBottom: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: '#64748b' }}>Projects Mapped:</span>
+                          <strong style={{ color: '#0f172a' }}>{pt.project_count || pt.top_projects?.length || 1}</strong>
+                        </div>
+                        {pt.predicted_delay_days != null && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: '#64748b' }}>Predicted Delay:</span>
+                            <strong style={{ color: '#dc2626' }}>{Math.round(pt.predicted_delay_days)} days</strong>
+                          </div>
+                        )}
+                        {pt.avg_comp_backlog_pct != null && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: '#64748b' }}>Compensation Backlog:</span>
+                            <strong style={{ color: pt.avg_comp_backlog_pct > 20 ? '#dc2626' : '#16a34a' }}>
+                              {pt.avg_comp_backlog_pct.toFixed(1)}%
+                            </strong>
+                          </div>
+                        )}
+                        {pt.current_stage && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: '#64748b' }}>Current Stage:</span>
+                            <strong style={{ color: '#0f172a', textTransform: 'capitalize' }}>
+                              {String(pt.current_stage).replace(/_/g, ' ')}
+                            </strong>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Detected Risk Issues */}
+                      {pt.issues && pt.issues.length > 0 && (
+                        <div style={{ marginBottom: 10 }}>
+                          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>
+                            Key Delay Drivers:
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                            {pt.issues.map((issue: string, idx: number) => (
+                              <span key={idx} style={{
+                                fontSize: '0.65rem', background: '#fee2e2', color: '#991b1b',
+                                padding: '2px 6px', borderRadius: 4, fontWeight: 600,
+                              }}>
+                                ⚠️ {issue}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Project Link(s) */}
+                      {pt.top_projects && pt.top_projects.map((proj: any) => (
+                        <Link
+                          key={proj.id}
+                          to={`/projects/${proj.id}`}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            width: '100%', padding: '7px 10px', marginTop: 4,
+                            background: '#2563eb', color: '#fff', fontSize: '0.75rem',
+                            fontWeight: 700, borderRadius: 6, textDecoration: 'none',
+                            boxShadow: '0 2px 6px rgba(37,99,235,0.25)',
+                          }}
+                        >
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 210 }}>
+                            {proj.name}
+                          </span>
+                          <ExternalLink size={12} style={{ flexShrink: 0, marginLeft: 6 }} />
+                        </Link>
+                      ))}
+                    </div>
+                  </Popup>
                 </CircleMarker>
               )
             })}
@@ -633,34 +734,39 @@ export default function GIS() {
                   {/* Signal Breakdown */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: '0.72rem', marginBottom: 12 }}>
                     {[
-                      { label: 'Risk Level Score', value: selectedHeatDistrict.avg_risk_score, max: 100 },
-                      { label: 'Compensation Backlog', value: selectedHeatDistrict.avg_comp_backlog_pct, max: 100 },
-                      { label: 'Legal Disputes', value: selectedHeatDistrict.avg_legal_score, max: 100 },
-                      { label: 'Delay Severity', value: selectedHeatDistrict.avg_delay_score, max: 100 },
-                      { label: 'Possession Gap', value: selectedHeatDistrict.avg_possession_gap, max: 100 },
-                    ].map(signal => (
-                      <div key={signal.label}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-                          <span style={{ color: 'var(--color-text-muted)' }}>{signal.label}</span>
-                          <span style={{ fontWeight: 700, color: getHeatColor(signal.value) }}>{signal.value.toFixed(0)}%</span>
+                      { label: 'Risk Level Score', value: selectedHeatDistrict.avg_risk_score ?? selectedHeatDistrict.heat_intensity ?? 0, max: 100 },
+                      { label: 'Compensation Backlog', value: selectedHeatDistrict.avg_comp_backlog_pct ?? 0, max: 100 },
+                      { label: 'Legal Disputes Risk', value: selectedHeatDistrict.avg_legal_score ?? 0, max: 100 },
+                      { label: 'Delay Severity', value: selectedHeatDistrict.avg_delay_score ?? 0, max: 100 },
+                      { label: 'Possession Gap', value: selectedHeatDistrict.avg_possession_gap ?? 0, max: 100 },
+                    ].map(signal => {
+                      const val = typeof signal.value === 'number' ? signal.value : 0
+                      return (
+                        <div key={signal.label}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                            <span style={{ color: 'var(--color-text-muted)' }}>{signal.label}</span>
+                            <span style={{ fontWeight: 700, color: getHeatColor(val) }}>{val.toFixed(0)}%</span>
+                          </div>
+                          <div style={{ height: 3, background: 'var(--color-bg-tertiary)', borderRadius: 2 }}>
+                            <div style={{ height: '100%', width: `${Math.min(100, val)}%`, background: getHeatColor(val), borderRadius: 2 }} />
+                          </div>
                         </div>
-                        <div style={{ height: 3, background: 'var(--color-bg-tertiary)', borderRadius: 2 }}>
-                          <div style={{ height: '100%', width: `${signal.value}%`, background: getHeatColor(signal.value), borderRadius: 2 }} />
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
 
                   {/* Issues */}
-                  <div style={{ marginBottom: 10 }}>
-                    <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Issues Detected</div>
-                    {selectedHeatDistrict.issues.map((issue: string, i: number) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: '0.72rem', color: 'var(--color-text-secondary)', marginBottom: 3 }}>
-                        <AlertTriangle size={10} color="#f97316" style={{ marginTop: 2, flexShrink: 0 }} />
-                        {issue}
-                      </div>
-                    ))}
-                  </div>
+                  {selectedHeatDistrict.issues && selectedHeatDistrict.issues.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Issues Detected</div>
+                      {selectedHeatDistrict.issues.map((issue: string, i: number) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: '0.72rem', color: 'var(--color-text-secondary)', marginBottom: 3 }}>
+                          <AlertTriangle size={10} color="#f97316" style={{ marginTop: 2, flexShrink: 0 }} />
+                          {String(issue).replace(/_/g, ' ')}
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Top Projects */}
                   <div>

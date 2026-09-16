@@ -177,11 +177,67 @@ async def gis_heatmap(db: AsyncSession = Depends(get_db), _: User = Depends(get_
     projects = {p.id: p for p in await _projects(db)}
     points, unavailable = [], []
     for row in await latest_predictions(db):
-        project = projects[row.project_id]
+        project = projects.get(row.project_id)
+        if not project:
+            continue
         if project.latitude is None or project.longitude is None:
-            unavailable.append({"project_id": str(project.id), "project_code": project.project_code, "reason": "Exact coordinates unavailable"}); continue
-        points.append({"district": (project.district_codes or [project.state_code])[0], "state_code": project.state_code, "lat": float(project.latitude), "lng": float(project.longitude), "heat_intensity": row.risk_score, "dominant_risk_level": row.risk_category, "project_count": 1, "avg_risk_score": row.risk_score, "issues": [d.get("feature") for d in row.top_drivers or [] if d.get("contribution", 0) > 0][:3], "top_projects": [{"id": str(project.id), "name": project.name, "project_code": project.project_code, "risk_level": row.risk_category, "risk_score": row.risk_score}]})
-    return {"status": "AVAILABLE" if points else "INSUFFICIENT_GIS_DATA", "total_locations": len(points), "total_projects": len(projects), "coordinate_source": "PROJECT_RECORD", "heatmap_points": points, "unavailable_projects": unavailable, "signals_used": ["Persisted calibrated LightGBM risk score"]}
+            unavailable.append({
+                "project_id": str(project.id),
+                "project_code": project.project_code,
+                "reason": "Exact coordinates unavailable"
+            })
+            continue
+
+        features = row.feature_snapshot or {}
+        comp_disbursed = float(features.get("compensation_disbursement_pct") or 0.0)
+        comp_backlog = round(max(0.0, 100.0 - comp_disbursed), 1)
+        disputes = int(features.get("open_legal_dispute_count") or 0)
+        legal_score = round(min(100.0, disputes * 25.0), 1)
+        delay_days = float(row.predicted_delay_days or 0.0)
+        delay_score = round(min(100.0, (delay_days / 365.0) * 100.0), 1)
+        randr_progress = float(features.get("rehabilitation_progress_pct") or 0.0)
+        possession_gap = round(max(0.0, 100.0 - randr_progress), 1)
+        raw_issues = [d.get("feature") for d in (row.top_drivers or []) if d.get("contribution", 0) > 0][:3]
+        issues = [f.replace("_", " ").title() for f in raw_issues if f]
+
+        points.append({
+            "district": (project.district_codes or [project.state_code])[0],
+            "state_code": project.state_code,
+            "lat": float(project.latitude),
+            "lng": float(project.longitude),
+            "heat_intensity": round(float(row.risk_score), 2),
+            "dominant_risk_level": row.risk_category,
+            "project_count": 1,
+            "avg_risk_score": round(float(row.risk_score), 2),
+            "avg_comp_backlog_pct": comp_backlog,
+            "avg_legal_score": legal_score,
+            "avg_delay_score": delay_score,
+            "avg_possession_gap": possession_gap,
+            "predicted_delay_days": round(delay_days, 1),
+            "current_stage": features.get("current_stage") or str(getattr(project.status, "value", project.status)),
+            "issues": issues,
+            "top_projects": [{
+                "id": str(project.id),
+                "name": project.name,
+                "project_code": project.project_code,
+                "risk_level": row.risk_category,
+                "risk_score": round(float(row.risk_score), 2)
+            }]
+        })
+    return {
+        "status": "AVAILABLE" if points else "INSUFFICIENT_GIS_DATA",
+        "total_locations": len(points),
+        "total_projects": len(projects),
+        "coordinate_source": "PROJECT_RECORD",
+        "heatmap_points": points,
+        "unavailable_projects": unavailable,
+        "signals_used": [
+            "Calibrated LightGBM delay risk score",
+            "Compensation backlog %",
+            "Open court dispute intensity",
+            "R&R possession readiness gap",
+        ]
+    }
 
 
 @intelligence_router.get("/risk-velocity/{project_id}")
