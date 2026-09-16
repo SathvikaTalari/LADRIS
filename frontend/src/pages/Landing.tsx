@@ -355,7 +355,7 @@ export default function Landing() {
     helpDisclaimer: hi ? 'केवल LADRIS प्लेटफ़ॉर्म विषयों तक सीमित।' : 'Limited to LADRIS platform topics only.',
     // Footer
     footerIntelligence: hi ? 'बुद्धिमत्ता प्लेटफ़ॉर्म' : 'Intelligence Platform',
-    footerTagline: hi ? 'AI-संचालित भूमि अधिग्रहण बुद्धिमत्ता — वास्तविक समय जोखिम, तेज़ निर्णय' : 'AI-Powered Land Acquisition Intelligence — Real-time Risk, Faster Decisions',
+    footerTagline: hi ? 'भूमि अधिग्रहण विलंब जोखिम बुद्धिमत्ता प्रणाली' : 'Land Acquisition Delay Risk Intelligence System',
     footerBuiltFor: hi ? 'ग्रामीण विकास मंत्रालय, भारत सरकार के लिए निर्मित।' : 'Built for Ministry of Rural Development, Government of India.',
     footerLocation: hi ? 'नई दिल्ली, भारत' : 'New Delhi, India',
     footerPlatformTitle: hi ? 'प्लेटफ़ॉर्म' : 'Platform',
@@ -1625,11 +1625,11 @@ export default function Landing() {
       </div>
 
       {/* ════ ROLES SECTION ════ */}
-      <RolesConnectedSection isDark={isDark} />
+      <RolesConnectedSection isDark={isDark} language={language} />
 
       {/* ════ SYSTEM ARCHITECTURE SECTION ════ */}
       <div id="architecture" style={{ scrollMarginTop: 0 }}>
-        <SystemArchitectureSection isDark={isDark} />
+        <SystemArchitectureSection isDark={isDark} language={language} />
       </div>
 
       {/* ════ [REMOVED OLD INLINE ARCHITECTURE] ════ */}
@@ -1929,8 +1929,8 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Tagline in saffron orange */}
-            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f47721', marginBottom: 12, lineHeight: 1.4 }}>
+            {/* Tagline */}
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.75)', marginBottom: 12, lineHeight: 1.4 }}>
               {T.footerTagline}
             </div>
 

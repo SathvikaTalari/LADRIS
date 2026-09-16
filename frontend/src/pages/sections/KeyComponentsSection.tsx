@@ -317,7 +317,7 @@ export default function KeyComponentsSection({ isDark, language }: { isDark: boo
               letterSpacing: '-0.03em', lineHeight: 1.2, marginBottom: 12,
             }}
           >
-            {hi ? 'LADRIS जो कुछ भी देखता है' : 'Everything LADRIS sees'}
+            {hi ? 'LADRIS AI जो कुछ भी देखता है' : 'Everything LADRIS AI sees'}
           </motion.h2>
 
           <motion.p
