@@ -219,20 +219,6 @@ function ExampleRow({ ex, isLast, c, isDark }: {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Tag */}
-      <div style={{
-        display: 'inline-block',
-        fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase',
-        color: c.tagColor,
-        background: c.tagBg,
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,51,102,0.1)'}`,
-        borderRadius: 4,
-        padding: '2px 8px',
-        marginBottom: 10,
-      }}>
-        {ex.tag}
-      </div>
 
       {/* Sector */}
       <div style={{ fontSize: '0.975rem', fontWeight: 600, color: c.heading, marginBottom: 16, lineHeight: 1.35 }}>
