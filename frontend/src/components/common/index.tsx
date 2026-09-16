@@ -126,11 +126,10 @@ export function DataNotice() {
       </div>
       <div>
         <strong style={{ color: '#eef2ff', fontWeight: 700, display: 'block', marginBottom: 4 }}>
-          Awaiting Data Connection
+          Waiting for Data
         </strong>
         <p style={{ margin: 0, color: '#4a5880', lineHeight: 1.6, fontSize: '0.85rem' }}>
-          Connect an approved official dataset through the Data Sources panel to begin analysis.
-          Dashboard metrics and predictions will populate automatically once data is available.
+          Add a data source to start. Results will appear when data is ready.
         </p>
       </div>
     </motion.div>

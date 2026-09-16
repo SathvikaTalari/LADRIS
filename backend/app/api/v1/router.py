@@ -13,11 +13,13 @@ from app.api.v1.predictions import (
 from app.api.v1.data_sources import data_sources_router
 from app.api.v1.monitoring import monitoring_router
 from app.api.v1.interventions import interventions_router  # Phase 4 — real implementation
-from app.api.v1.intelligence import intelligence_router    # Phase 7 — Decision Intelligence
+from app.api.v1.production_intelligence import intelligence_router
 from app.api.v1.alerts import router as alerts_router
 from app.api.v1.search import router as search_router
 from app.api.v1.reports import router as reports_router
 from app.api.v1.etl import etl_router
+from app.api.v1.audit import audit_router
+from app.api.v1.chatbot import router as chatbot_router
 from app.api.v1.stubs import (
     analytics_router,
     gis_router,
@@ -42,3 +44,5 @@ api_router.include_router(reports_router)
 api_router.include_router(gis_router)
 api_router.include_router(analytics_router)
 api_router.include_router(etl_router)
+api_router.include_router(audit_router)
+api_router.include_router(chatbot_router)

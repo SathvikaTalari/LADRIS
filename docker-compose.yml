@@ -40,13 +40,17 @@ services:
     container_name: landpulse_backend
     restart: unless-stopped
     env_file: .env
-    environment:
-      POSTGRES_HOST: db
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - ./ml:/ml
+      - ./land-delay-predictor:/land-delay-predictor:ro
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      ML_MODULE_PATH: /land-delay-predictor/app
+      MODELS_DIR: /land-delay-predictor/models
+      PROJECT_DATA_CSV: /land-delay-predictor/my_raw_projects.csv
     depends_on:
       db:
         condition: service_healthy

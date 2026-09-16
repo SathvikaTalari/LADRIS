@@ -118,8 +118,8 @@ export default function ProjectList() {
       transition={{ duration: 0.3 }}
     >
       <PageHeader
-        title="Land Acquisition Projects"
-        subtitle={total > 0 ? `${total} project${total !== 1 ? 's' : ''} found` : 'No projects loaded'}
+        title="Infrastructure Projects Directory"
+        subtitle={total > 0 ? `Showing ${total} active project${total !== 1 ? 's' : ''} across Indian states and sectors` : 'Browse, filter, and monitor delay risks for all infrastructure projects'}
         actions={
           <button
             className="btn btn-primary"
@@ -251,8 +251,8 @@ export default function ProjectList() {
             icon={<FolderKanban size={28} />}
             title="No Projects Found"
             description={isFiltered
-              ? 'No projects match your selected combination of filters. Try clearing or adjusting search criteria.'
-              : 'Connect an approved dataset to begin loading project records. Use the Data Sources panel to register an official dataset.'}
+              ? 'No projects match your selected filters. Try clearing or adjusting search criteria.'
+              : 'No projects currently loaded. You can create a new project or sync data records.'}
             action={
               isFiltered ? (
                 <button className="btn btn-secondary" onClick={clearAllFilters}>
@@ -260,7 +260,7 @@ export default function ProjectList() {
                 </button>
               ) : (
                 <button className="btn btn-primary" onClick={() => navigate('/data-sources')}>
-                  Connect Data Source
+                  View Data Sources
                 </button>
               )
             }
@@ -271,13 +271,13 @@ export default function ProjectList() {
               <thead>
                 <tr>
                   <th>Project Code</th>
-                  <th>Name</th>
-                  <th>Type & Agency</th>
+                  <th>Project Name</th>
+                  <th>Sector & Agency</th>
                   <th>Status</th>
-                  <th>Risk Level</th>
+                  <th>Delay Risk</th>
                   <th>State & District</th>
-                  <th>Area (ha)</th>
-                  <th>Target Date</th>
+                  <th>Land Area (ha)</th>
+                  <th>Target Completion</th>
                   <th></th>
                 </tr>
               </thead>

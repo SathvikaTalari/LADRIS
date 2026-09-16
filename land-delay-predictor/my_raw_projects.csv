@@ -1,0 +1,26 @@
+Project ID,Project Name,Project Type,Implementing Agency,State,District,Land Area (ha),Affected Families,Notification Date,Expected Completion,Actual Completion,Current Stage,Delayed (Y/N),Delay (days),Compensation Sanctioned,Compensation Disbursed,Open Disputes,R&R Progress %,Latitude,Longitude
+NHAI-EXP-001,Delhi-Mumbai Expressway Package 14,highway,NHAI,Gujarat,Vadodara,145.8,380,2022-04-10,2025-08-31,,compensation,,,420000000,365000000,1,78,22.3072,73.1812
+NHAI-EXP-002,Bangalore-Chennai Expressway Section 2,highway,NHAI,Andhra Pradesh,Chittoor,180.2,420,2022-08-15,2025-11-30,,possession,,,560000000,520000000,0,88,13.2172,79.1003
+NHAI-EXP-003,Ganga Expressway Phase 1 Meerut-Budaun,highway,UPEIDA,Uttar Pradesh,Meerut,290.5,740,2021-11-10,2025-12-31,,rehabilitation,,,850000000,620000000,3,65,28.9845,77.7064
+NHAI-COR-004,Samruddhi Mahamarg Nashik Link Spur,highway,MSRDC,Maharashtra,Nashik,112.4,290,2023-01-20,2026-03-31,,compensation,,,380000000,190000000,4,40,19.9975,73.7898
+NHAI-EC-005,Raipur-Visakhapatnam Economic Corridor,highway,NHAI,Odisha,Koraput,210.0,510,2022-09-01,2026-06-30,,approval,,,480000000,120000000,5,22,18.8135,82.7123
+NHAI-RRR-006,Hyderabad Regional Ring Road Northern Arc,highway,NHAI,Telangana,Medak,240.6,580,2023-03-15,2026-12-31,,compensation,,,720000000,215000000,6,30,18.0475,78.2618
+NHSRCL-HSR-007,Mumbai-Ahmedabad High Speed Rail Surat Package,railway,NHSRCL,Gujarat,Surat,95.4,310,2020-06-15,2026-08-31,,possession,,,680000000,660000000,1,94,21.1702,72.8311
+DFCCIL-WDFC-008,Western Dedicated Freight Corridor Palanpur Section,railway,DFCCIL,Gujarat,Banaskantha,135.0,260,2021-03-10,2025-09-30,,possession,,,390000000,375000000,0,92,24.1724,72.4346
+DFCCIL-EDFC-009,Eastern Dedicated Freight Corridor Aligarh-Khurja,railway,DFCCIL,Uttar Pradesh,Aligarh,160.8,450,2021-08-20,2025-10-31,,completed,,,480000000,480000000,0,100,27.8974,78.0880
+RVNL-HILL-010,Rishikesh-Karanprayag New Rail Link,railway,RVNL,Uttarakhand,Pauri Garhwal,108.5,340,2020-02-15,2026-04-30,,rehabilitation,,,520000000,390000000,2,70,30.1469,78.7806
+BMRCL-MET-011,Bangalore Metro Phase 2B Airport Line,urban,BMRCL,Karnataka,Bengaluru Urban,78.3,210,2022-05-10,2026-06-30,,possession,,,920000000,880000000,1,91,13.0827,77.5877
+PMRDA-MET-012,Pune Metro Line 3 Hinjawadi-Shivajinagar,urban,Maha-Metro,Maharashtra,Pune,52.6,160,2022-07-20,2025-11-30,,possession,,,650000000,630000000,0,95,18.5204,73.8567
+CMRL-MET-013,Chennai Metro Phase 2 Corridor 4,urban,CMRL,Tamil Nadu,Chennai,64.0,280,2021-10-15,2026-03-31,,possession,,,780000000,740000000,1,89,13.0827,80.2707
+PMRA-MET-014,Patna Metro Phase 1 Corridor 2,urban,DMRC,Bihar,Patna,48.2,310,2022-12-01,2026-09-30,,compensation,,,410000000,180000000,3,35,25.5941,85.1376
+YEDA-AIR-015,Noida International Airport Phase 2 Expansion,airport,YIAL,Uttar Pradesh,Gautam Buddha Nagar,1365.0,1250,2022-03-01,2026-10-31,,rehabilitation,,,3850000000,3100000000,2,76,28.1812,77.6254
+CIDCO-AIR-016,Navi Mumbai International Airport Core Area,airport,CIDCO,Maharashtra,Raigad,1160.0,1100,2020-04-15,2025-12-31,,possession,,,3500000000,3150000000,0,98,18.9894,73.0722
+APAD-AIR-017,Bhogapuram Greenfield International Airport,airport,APADCL,Andhra Pradesh,Vizianagaram,890.4,760,2021-06-20,2026-05-31,,possession,,,1850000000,1780000000,1,93,18.0267,83.4988
+TS-IRR-018,Kaleshwaram Lift Irrigation Link 3 Barrage,irrigation,State Irrigation Dept,Telangana,Peddapalli,340.5,850,2021-07-15,2025-07-31,,completed,,,980000000,980000000,0,100,18.6186,79.3812
+AP-IRR-019,Polavaram Right Main Canal Land Acquisition,irrigation,State Irrigation Dept,Andhra Pradesh,West Godavari,420.0,920,2022-01-10,2026-08-31,,legal_resolution,,,1250000000,580000000,7,42,16.9186,81.3312
+MP-IRR-020,Ken-Betwa River Interlinking Project Phase 1,irrigation,NWDA,Madhya Pradesh,Panna,880.0,1350,2023-04-01,2027-12-31,,approval,,,2400000000,480000000,5,18,24.7205,80.1983
+PGCIL-PWR-021,Khavda 30GW Renewable Park Evacuation Corridor,power,PGCIL,Gujarat,Kutch,310.5,140,2023-06-15,2026-02-28,,possession,,,450000000,430000000,0,95,23.8364,69.7289
+PGCIL-PWR-022,Bhadla Mega Solar Park 765kV Line Section,power,PGCIL,Rajasthan,Jodhpur,195.0,90,2022-09-10,2025-10-31,,completed,,,280000000,280000000,0,100,27.5386,71.9124
+DICDL-IND-023,Dholera Special Investment Region Activation Area,industrial,DICDL,Gujarat,Ahmedabad,1450.0,680,2021-05-15,2026-04-30,,rehabilitation,,,2100000000,1750000000,2,82,22.2475,72.1983
+NICDC-IND-024,Krishnapatnam Industrial Area NICDC Node,industrial,NICDC,Andhra Pradesh,Nellore,620.4,380,2022-11-20,2026-07-31,,compensation,,,950000000,580000000,3,54,14.2812,80.0812
+JNPA-PRT-025,Vadhavan Mega Port Rail-Road Connectivity Corridor,highway,NHAI,Maharashtra,Palghar,230.8,540,2023-08-10,2027-06-30,,legal_resolution,,,820000000,240000000,6,25,19.9812,72.7123

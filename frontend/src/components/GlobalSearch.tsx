@@ -143,7 +143,7 @@ export function GlobalSearch() {
                       {result.project_identifier}
                     </code>
                     <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
-                      • Match: {result.match_type}
+                      • {result.match_type === 'CODE' ? 'Matched by Code' : result.match_type === 'NAME' ? 'Matched by Name' : 'Matched'}
                     </span>
                   </div>
                 </button>

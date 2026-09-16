@@ -169,12 +169,12 @@ function DetailPanel({ proj, isDark, hi }: { proj:Project|null; isDark:boolean; 
 export default function GisIntelligenceSection({ isDark, language }: { isDark: boolean; language: 'en' | 'hi' }) {
   const hi = language === 'hi'
 
-  const PROJECTS = [
-    { id:1, name: hi ? 'राजमार्ग प्रोजेक्ट A'        : 'Highway Project A',        state: hi ? 'तेलंगाना'       : 'Telangana',       risk:'High'   as const, riskScore:84, delayProb: hi ? 'उच्च'     : 'High',     mainRisk: hi ? 'लंबित अनुमोदन'     : 'Pending Approval',     stage: hi ? 'भूमि अधिग्रहण'    : 'Land Acquisition',    coords:[17.385,78.4867], Icon:Building2 },
-    { id:2, name: hi ? 'अवसंरचना प्रोजेक्ट B'      : 'Infrastructure Project B', state: hi ? 'आंध्र प्रदेश'  : 'Andhra Pradesh',  risk:'Medium' as const, riskScore:56, delayProb: hi ? 'मध्यम'   : 'Moderate', mainRisk: hi ? 'मुआवज़ा विलंब'   : 'Compensation Delay',   stage: hi ? 'धारा 11 नोटिस'   : 'Section 11 Notice',   coords:[15.9129,79.74],  Icon:Landmark  },
-    { id:3, name: hi ? 'औद्योगिक गलियारा C'    : 'Industrial Corridor C',    state: hi ? 'महाराष्ट्र'     : 'Maharashtra',     risk:'High'   as const, riskScore:78, delayProb: hi ? 'उच्च'     : 'High',     mainRisk: hi ? 'कानूनी विवाद'        : 'Legal Dispute',        stage: hi ? 'पुरस्कार घोषणा'   : 'Award Declaration',   coords:[19.7515,75.7139],Icon:Factory   },
-    { id:4, name: hi ? 'प्रोजेक्ट D'                : 'Project D',                state: hi ? 'कर्नाटक'       : 'Karnataka',       risk:'Low'    as const, riskScore:22, delayProb: hi ? 'निम्न'     : 'Low',      mainRisk: hi ? 'आंशिक दस्तावेज़'  : 'Minor Documentation',  stage: hi ? 'कब्जा'            : 'Possession',          coords:[15.3173,75.7139],Icon:TreePine  },
-    { id:5, name: hi ? 'प्रोजेक्ट E'                : 'Project E',                state: hi ? 'ओड़िशा'          : 'Odisha',          risk:'Medium' as const, riskScore:51, delayProb: hi ? 'मध्यम'   : 'Moderate', mainRisk: hi ? 'पुनर्वास समस्या' : 'Rehabilitation Issue', stage: hi ? 'मुआवज़ा भुगतान' : 'Compensation Payment', coords:[20.9517,85.0985],Icon:HardHat  },
+  const PROJECTS: Project[] = [
+    { id:1, name: hi ? 'राजमार्ग प्रोजेक्ट A'        : 'Highway Project A',        state: hi ? 'तेलंगाना'       : 'Telangana',       risk:'High'   as const, riskScore:84, delayProb: hi ? 'उच्च'     : 'High',     mainRisk: hi ? 'लंबित अनुमोदन'     : 'Pending Approval',     stage: hi ? 'भूमि अधिग्रहण'    : 'Land Acquisition',    coords:[17.385,78.4867] as [number,number], Icon:Building2 },
+    { id:2, name: hi ? 'अवसंरचना प्रोजेक्ट B'      : 'Infrastructure Project B', state: hi ? 'आंध्र प्रदेश'  : 'Andhra Pradesh',  risk:'Medium' as const, riskScore:56, delayProb: hi ? 'मध्यम'   : 'Moderate', mainRisk: hi ? 'मुआवज़ा विलंब'   : 'Compensation Delay',   stage: hi ? 'धारा 11 नोटिस'   : 'Section 11 Notice',   coords:[15.9129,79.74]  as [number,number], Icon:Landmark  },
+    { id:3, name: hi ? 'औद्योगिक गलियारा C'    : 'Industrial Corridor C',    state: hi ? 'महाराष्ट्र'     : 'Maharashtra',     risk:'High'   as const, riskScore:78, delayProb: hi ? 'उच्च'     : 'High',     mainRisk: hi ? 'कानूनी विवाद'        : 'Legal Dispute',        stage: hi ? 'पुरस्कार घोषणा'   : 'Award Declaration',   coords:[19.7515,75.7139] as [number,number], Icon:Factory   },
+    { id:4, name: hi ? 'प्रोजेक्ट D'                : 'Project D',                state: hi ? 'कर्नाटक'       : 'Karnataka',       risk:'Low'    as const, riskScore:22, delayProb: hi ? 'निम्न'     : 'Low',      mainRisk: hi ? 'आंशिक दस्तावेज़'  : 'Minor Documentation',  stage: hi ? 'कब्जा'            : 'Possession',          coords:[15.3173,75.7139] as [number,number], Icon:TreePine  },
+    { id:5, name: hi ? 'प्रोजेक्ट E'                : 'Project E',                state: hi ? 'ओड़िशा'          : 'Odisha',          risk:'Medium' as const, riskScore:51, delayProb: hi ? 'मध्यम'   : 'Moderate', mainRisk: hi ? 'पुनर्वास समस्या' : 'Rehabilitation Issue', stage: hi ? 'मुआवज़ा भुगतान' : 'Compensation Payment', coords:[20.9517,85.0985] as [number,number], Icon:HardHat  },
   ]
 
   const sectionRef = useRef<HTMLElement>(null)
@@ -239,7 +239,7 @@ export default function GisIntelligenceSection({ isDark, language }: { isDark: b
           <motion.p initial={{ opacity:0, y: reduced?0:10 }} animate={headingVisible?{opacity:1,y:0}:{}}
             transition={{ duration:0.5, delay:0.14, ease:EASE }}
             style={{ fontSize:"1rem", fontWeight:500, color:ACCENT, maxWidth:420, margin:"0 auto", lineHeight:1.6 }}>
-            See the risk. Find the problem. Act early.
+            {hi ? 'जोखिम देखें। समस्या खोजें। जल्दी कार्रवाई करें।' : 'See the risk. Find the problem. Act early.'}
           </motion.p>
         </motion.div>
 
@@ -260,7 +260,7 @@ export default function GisIntelligenceSection({ isDark, language }: { isDark: b
                   onSelect={selectProject} isDark={isDark} />
               ))}
             </div>
-            <DetailPanel proj={activeProject} isDark={isDark} />
+            <DetailPanel proj={activeProject} isDark={isDark} hi={hi} />
             <div style={{ marginTop:12, fontSize:"0.6rem", color: isDark?"#475569":"#94a3b8", lineHeight:1.5 }}>
               * Prototype values for UI demonstration only.
             </div>

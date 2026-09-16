@@ -122,6 +122,11 @@ export default function Landing() {
   const [reducedMotion, setReducedMotion] = useState(false)
   const [helpQuery, setHelpQuery] = useState('')
   const [helpAnswer, setHelpAnswer] = useState('')
+  const [openDropdown, setOpenDropdown] = useState<'about' | 'help' | 'documents' | null>(null)
+  const [mobileAboutOpen, setMobileAboutOpen] = useState(false)
+  const [mobileHelpOpen, setMobileHelpOpen] = useState(false)
+  const [mobileDocsOpen, setMobileDocsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0])
@@ -131,6 +136,17 @@ export default function Landing() {
     const handler = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handler)
     return () => window.removeEventListener('scroll', handler)
+  }, [])
+
+  // Close dropdowns when clicking outside the nav
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
   }, [])
 
   // Auto-advance slideshow every 4.5 seconds
@@ -339,13 +355,13 @@ export default function Landing() {
     helpDisclaimer: hi ? 'केवल LADRIS प्लेटफ़ॉर्म विषयों तक सीमित।' : 'Limited to LADRIS platform topics only.',
     // Footer
     footerIntelligence: hi ? 'बुद्धिमत्ता प्लेटफ़ॉर्म' : 'Intelligence Platform',
-    footerTagline: hi ? 'AI-संचालित भूमि अधिग्रहण बुद्धिमत्ता — वास्तविक समय जोखिम, तेज़ निर्णय' : 'AI-Powered Land Acquisition Intelligence — Real-time Risk, Faster Decisions',
+    footerTagline: hi ? 'भूमि अधिग्रहण विलंब जोखिम बुद्धिमत्ता प्रणाली' : 'Land Acquisition Delay Risk Intelligence System',
     footerBuiltFor: hi ? 'ग्रामीण विकास मंत्रालय, भारत सरकार के लिए निर्मित।' : 'Built for Ministry of Rural Development, Government of India.',
     footerLocation: hi ? 'नई दिल्ली, भारत' : 'New Delhi, India',
     footerPlatformTitle: hi ? 'प्लेटफ़ॉर्म' : 'Platform',
     footerPlatformLinks: hi
-      ? ['विशेषताएं', 'आर्किटेक्चर', 'विश्लेषण', 'GIS इंटेलिजेंस', 'दस्तावेज़ीकरण', 'सहायता और प्रतिक्रिया', 'रिलीज़ नोट्स']
-      : ['Features', 'Architecture', 'Analytics', 'GIS Intelligence', 'Documentation', 'Help & Feedback', 'Release Notes'],
+      ? ['विशेषताएं', 'आर्किटेक्चर', 'विश्लेषण', 'GIS इंटेलिजेंस', 'दस्तावेज़ीकरण', 'सहायता और प्रतिक्रिया',]
+      : ['Features', 'Architecture', 'Analytics', 'GIS Intelligence', 'Documentation', 'Help & Feedback'],
     footerPartnersTitle: hi ? 'आधिकारिक साझेदार' : 'Official Partners',
     footerPartners: hi ? [
       { name: 'रेल मंत्रालय', sub: 'भारत सरकार' },
@@ -691,19 +707,17 @@ export default function Landing() {
             justifyContent: 'space-between', gap: 16,
           }}>
 
-            {/* Left: Emblem + Divider + Logo + Brand */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
+            {/* Left: Emblem + Gap + Logo + Brand */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
               {/* MoRTH Ashoka Emblem — pre-cropped: emblem + Hindi only, no English text */}
               <img
                 src="/logo_morth_clean.png"
                 alt="MoRTH Emblem"
-                style={{ height: 40, width: 'auto', display: 'block', flexShrink: 0 }}
+                style={{ height: 46, width: 'auto', display: 'block', flexShrink: 0 }}
               />
-              {/* Vertical divider */}
-              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 2px', flexShrink: 0 }} />
               {/* logo.png + Brand text */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <img src="/logo.png" alt="LADRIS" style={{ width: 38, height: 38, objectFit: 'contain', flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <img src="/logo.png" alt="LADRIS" style={{ width: 42, height: 42, objectFit: 'contain', flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
                     LADRIS<span style={{ color: '#4080ff' }}></span>
@@ -716,52 +730,263 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Center: Nav Links with dropdown chevrons */}
-            <nav className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
-              {([
-                { label: T.navFeatures, sectionId: 'features', dropdown: false },
-                { label: T.navArchitecture, sectionId: 'architecture', dropdown: false },
-                { label: T.navAnalytics, sectionId: 'analytics', dropdown: true },
-                { label: T.navAbout, sectionId: null, dropdown: true },
-                { label: T.navHelp, sectionId: null, dropdown: true },
-                { label: T.navDocuments, sectionId: null, dropdown: true },
-              ] as { label: string; sectionId: string | null; dropdown: boolean }[]).map(({ label, sectionId, dropdown }) => {
-                const isActive = sectionId && activeSection === sectionId
-                return (
-                  <button
-                    key={label}
-                    onClick={sectionId ? () => scrollToSection(sectionId) : undefined}
-                    style={{
-                      background: isActive ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
-                      border: 'none', cursor: 'pointer',
-                      padding: '0 13px', height: 60,
-                      display: 'inline-flex', alignItems: 'center', gap: 4,
-                      fontSize: '0.865rem', fontWeight: isActive ? 700 : 500,
-                      color: isActive ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
-                      fontFamily: 'inherit', whiteSpace: 'nowrap',
-                      letterSpacing: '0.005em', transition: 'all 0.15s',
-                      borderBottom: `3px solid ${isActive ? '#f47721' : 'transparent'}`,
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'
-                      e.currentTarget.style.borderBottomColor = '#f47721'
-                      e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.color = isActive ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155')
-                      e.currentTarget.style.borderBottomColor = isActive ? '#f47721' : 'transparent'
-                      e.currentTarget.style.background = isActive ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none'
-                    }}
-                  >
-                    {label}
-                    {dropdown && (
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.55, flexShrink: 0 }}>
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
-                    )}
-                  </button>
-                )
-              })}
+            {/* Center: Nav Links — wrapped in a ref for outside-click detection */}
+            <nav ref={dropdownRef} className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center', position: 'relative' }}>
+              {/* Features */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('features') }}
+                style={{
+                  background: activeSection === 'features' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'features' ? 700 : 500,
+                  color: activeSection === 'features' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'features' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'features' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'features' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'features' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navFeatures}
+              </button>
+
+              {/* Architecture */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('architecture') }}
+                style={{
+                  background: activeSection === 'architecture' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'architecture' ? 700 : 500,
+                  color: activeSection === 'architecture' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'architecture' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'architecture' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'architecture' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'architecture' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navArchitecture}
+              </button>
+
+              {/* Analytics */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('analytics') }}
+                style={{
+                  background: activeSection === 'analytics' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'analytics' ? 700 : 500,
+                  color: activeSection === 'analytics' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'analytics' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'analytics' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'analytics' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'analytics' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navAnalytics}
+              </button>
+
+              {/* About ▾ — with dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setOpenDropdown(prev => prev === 'about' ? null : 'about')}
+                  style={{
+                    background: openDropdown === 'about' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                    border: 'none', cursor: 'pointer',
+                    padding: '0 13px', height: 60,
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: '0.865rem', fontWeight: openDropdown === 'about' ? 700 : 500,
+                    color: openDropdown === 'about' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                    fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    letterSpacing: '0.005em', transition: 'all 0.15s',
+                    borderBottom: `3px solid ${openDropdown === 'about' ? '#f47721' : 'transparent'}`,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = openDropdown === 'about' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = openDropdown === 'about' ? '#f47721' : 'transparent'; e.currentTarget.style.background = openDropdown === 'about' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+                >
+                  {T.navAbout}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ opacity: 0.55, flexShrink: 0, transform: openDropdown === 'about' ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {/* About dropdown */}
+                {openDropdown === 'about' && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 500,
+                    minWidth: 230,
+                    background: isDark ? '#0d1a2e' : '#ffffff',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                    borderRadius: 6,
+                    boxShadow: isDark ? '0 6px 24px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                  }}>
+                    {([
+                      { label: 'About the Project', route: '/about/project' },
+                      { label: 'User Guide', route: '/about/user-guide' },
+                      { label: 'Government Guidelines Compliance', route: '/about/compliance' },
+                    ] as { label: string; route: string }[]).map((item, i, arr) => (
+                      <button
+                        key={item.route}
+                        onClick={() => { setOpenDropdown(null); navigate(item.route) }}
+                        style={{
+                          display: 'block', width: '100%', padding: '11px 16px',
+                          background: 'none', border: 'none',
+                          borderBottom: i < arr.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}` : 'none',
+                          textAlign: 'left', cursor: 'pointer',
+                          fontFamily: 'inherit', fontSize: '0.855rem', fontWeight: 500,
+                          color: isDark ? '#c9d8f0' : '#334155',
+                          transition: 'background 0.12s, color 0.12s',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)'; e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = isDark ? '#c9d8f0' : '#334155' }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Help & Feedback ▾ — with dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setOpenDropdown(prev => prev === 'help' ? null : 'help')}
+                  style={{
+                    background: openDropdown === 'help' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                    border: 'none', cursor: 'pointer',
+                    padding: '0 13px', height: 60,
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: '0.865rem', fontWeight: openDropdown === 'help' ? 700 : 500,
+                    color: openDropdown === 'help' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                    fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    letterSpacing: '0.005em', transition: 'all 0.15s',
+                    borderBottom: `3px solid ${openDropdown === 'help' ? '#f47721' : 'transparent'}`,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = openDropdown === 'help' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = openDropdown === 'help' ? '#f47721' : 'transparent'; e.currentTarget.style.background = openDropdown === 'help' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+                >
+                  {T.navHelp}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ opacity: 0.55, flexShrink: 0, transform: openDropdown === 'help' ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {/* Help dropdown */}
+                {openDropdown === 'help' && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 500,
+                    minWidth: 200,
+                    background: isDark ? '#0d1a2e' : '#ffffff',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                    borderRadius: 6,
+                    boxShadow: isDark ? '0 6px 24px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                  }}>
+                    {([
+                      { label: 'Contact & Feedback', route: '/help/contact' },
+                      { label: 'Privacy Policy', route: '/help/privacy' },
+                      { label: 'Terms of Use', route: '/help/terms' },
+                      { label: 'FAQ', route: '/help/faq' },
+                    ] as { label: string; route: string }[]).map((item, i, arr) => (
+                      <button
+                        key={item.route}
+                        onClick={() => { setOpenDropdown(null); navigate(item.route) }}
+                        style={{
+                          display: 'block', width: '100%', padding: '11px 16px',
+                          background: 'none', border: 'none',
+                          borderBottom: i < arr.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}` : 'none',
+                          textAlign: 'left', cursor: 'pointer',
+                          fontFamily: 'inherit', fontSize: '0.855rem', fontWeight: 500,
+                          color: isDark ? '#c9d8f0' : '#334155',
+                          transition: 'background 0.12s, color 0.12s',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)'; e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = isDark ? '#c9d8f0' : '#334155' }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Documents ▾ — with dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setOpenDropdown(prev => prev === 'documents' ? null : 'documents')}
+                  style={{
+                    background: openDropdown === 'documents' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                    border: 'none', cursor: 'pointer',
+                    padding: '0 13px', height: 60,
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: '0.865rem', fontWeight: openDropdown === 'documents' ? 700 : 500,
+                    color: openDropdown === 'documents' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                    fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    letterSpacing: '0.005em', transition: 'all 0.15s',
+                    borderBottom: `3px solid ${openDropdown === 'documents' ? '#f47721' : 'transparent'}`,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = openDropdown === 'documents' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = openDropdown === 'documents' ? '#f47721' : 'transparent'; e.currentTarget.style.background = openDropdown === 'documents' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+                  aria-haspopup="true"
+                  aria-expanded={openDropdown === 'documents'}
+                >
+                  {T.navDocuments}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ opacity: 0.55, flexShrink: 0, transform: openDropdown === 'documents' ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {/* Documents dropdown */}
+                {openDropdown === 'documents' && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 500,
+                    minWidth: 200,
+                    background: isDark ? '#0d1a2e' : '#ffffff',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                    borderRadius: 6,
+                    boxShadow: isDark ? '0 6px 24px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                  }}>
+                    {([
+                      { label: 'Blogs', route: '/documents/blogs' },
+                      { label: 'Research Papers', route: '/documents/research-papers' },
+                      { label: 'Case Studies', route: '/documents/case-studies' },
+                      { label: 'Real-World Examples', route: '/documents/real-world-examples' },
+                    ] as { label: string; route: string }[]).map((item, i, arr) => (
+                      <button
+                        key={item.route}
+                        onClick={() => { setOpenDropdown(null); navigate(item.route) }}
+                        style={{
+                          display: 'block', width: '100%', padding: '11px 16px',
+                          background: 'none', border: 'none',
+                          borderBottom: i < arr.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}` : 'none',
+                          textAlign: 'left', cursor: 'pointer',
+                          fontFamily: 'inherit', fontSize: '0.855rem', fontWeight: 500,
+                          color: isDark ? '#c9d8f0' : '#334155',
+                          transition: 'background 0.12s, color 0.12s',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)'; e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = isDark ? '#c9d8f0' : '#334155' }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </nav>
 
             {/* Right: GitHub outlined + Login solid */}
@@ -770,6 +995,7 @@ export default function Landing() {
               {/* GitHub — outlined button */}
               <motion.button
                 whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => window.open('https://github.com/SathvikaTalari/LADRIS', '_blank', 'noopener,noreferrer')}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 7,
                   padding: '7px 16px',
@@ -837,29 +1063,106 @@ export default function Landing() {
               padding: '12px 24px 20px',
               display: 'flex', flexDirection: 'column', gap: 2,
             }}>
-              {([
-                { label: T.navFeatures, sectionId: 'features' },
-                { label: T.navArchitecture, sectionId: 'architecture' },
-                { label: T.navAnalytics, sectionId: 'analytics' },
-                { label: T.navAbout, sectionId: null },
-                { label: T.navHelp, sectionId: null },
-                { label: T.navDocuments, sectionId: null },
-              ] as { label: string; sectionId: string | null }[]).map(({ label, sectionId }) => (
-                <button key={label}
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    if (sectionId) setTimeout(() => scrollToSection(sectionId), 80)
-                  }}
-                  style={{
-                    textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer',
-                    padding: '10px 12px', borderRadius: 8,
-                    fontSize: '0.9rem', fontWeight: 500,
-                    color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit',
-                  }}
-                >{label}</button>
-              ))}
+              {/* Features */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('features'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navFeatures}</button>
+
+              {/* Architecture */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('architecture'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navArchitecture}</button>
+
+              {/* Analytics */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('analytics'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navAnalytics}</button>
+
+              {/* About ▾ — expandable */}
+              <button
+                onClick={() => setMobileAboutOpen(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', background: mobileAboutOpen ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)') : 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: mobileAboutOpen ? 600 : 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >
+                <span>{T.navAbout}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ opacity: 0.55, transform: mobileAboutOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {mobileAboutOpen && (
+                <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`, marginLeft: 12 }}>
+                  {([
+                    { label: 'About the Project', route: '/about/project' },
+                    { label: 'User Guide', route: '/about/user-guide' },
+                    { label: 'Government Guidelines Compliance', route: '/about/compliance' },
+                  ] as { label: string; route: string }[]).map(item => (
+                    <button key={item.route}
+                      onClick={() => { setMobileMenuOpen(false); setMobileAboutOpen(false); navigate(item.route) }}
+                      style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: 6, fontSize: '0.855rem', fontWeight: 400, color: isDark ? '#7a9abf' : '#475569', fontFamily: 'inherit' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+
+              {/* Help & Feedback ▾ — expandable */}
+              <button
+                onClick={() => setMobileHelpOpen(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', background: mobileHelpOpen ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)') : 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: mobileHelpOpen ? 600 : 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >
+                <span>{T.navHelp}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ opacity: 0.55, transform: mobileHelpOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {mobileHelpOpen && (
+                <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`, marginLeft: 12 }}>
+                  {([
+                    { label: 'Contact & Feedback', route: '/help/contact' },
+                    { label: 'Privacy Policy', route: '/help/privacy' },
+                    { label: 'Terms of Use', route: '/help/terms' },
+                    { label: 'FAQ', route: '/help/faq' },
+                  ] as { label: string; route: string }[]).map(item => (
+                    <button key={item.route}
+                      onClick={() => { setMobileMenuOpen(false); setMobileHelpOpen(false); navigate(item.route) }}
+                      style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: 6, fontSize: '0.855rem', fontWeight: 400, color: isDark ? '#7a9abf' : '#475569', fontFamily: 'inherit' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+
+              {/* Documents ▾ — expandable */}
+              <button
+                onClick={() => setMobileDocsOpen(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', background: mobileDocsOpen ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)') : 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: mobileDocsOpen ? 600 : 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >
+                <span>{T.navDocuments}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ opacity: 0.55, transform: mobileDocsOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {mobileDocsOpen && (
+                <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`, marginLeft: 12 }}>
+                  {([
+                    { label: 'Blogs', route: '/documents/blogs' },
+                    { label: 'Research Papers', route: '/documents/research-papers' },
+                    { label: 'Case Studies', route: '/documents/case-studies' },
+                    { label: 'Real-World Examples', route: '/documents/real-world-examples' },
+                  ] as { label: string; route: string }[]).map(item => (
+                    <button key={item.route}
+                      onClick={() => { setMobileMenuOpen(false); setMobileDocsOpen(false); navigate(item.route) }}
+                      style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: 6, fontSize: '0.855rem', fontWeight: 400, color: isDark ? '#7a9abf' : '#475569', fontFamily: 'inherit' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+
               <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0'}`, display: 'flex', gap: 10 }}>
-                <button style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1'}`, color: isDark ? '#c9d8f0' : '#334155', fontWeight: 600, fontSize: '0.875rem' }}>GitHub</button>
+                <button onClick={() => window.open('https://github.com/SathvikaTalari/LADRIS', '_blank', 'noopener,noreferrer')} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1'}`, color: isDark ? '#c9d8f0' : '#334155', fontWeight: 600, fontSize: '0.875rem' }}>GitHub</button>
                 <button onClick={handleAccessDashboard} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: '#003366', border: 'none', color: '#ffffff', fontWeight: 700, fontSize: '0.875rem' }}>{T.navLogin}</button>
               </div>
             </div>
@@ -951,35 +1254,7 @@ export default function Landing() {
                 {T.heroSub}
               </motion.p>
 
-              {/* CTA Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 0.3 }}
-                style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <motion.button
-                  id="hero-access-dashboard-btn"
-                  whileHover={{ scale: 1.04, translateY: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleAccessDashboard}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                    padding: '14px 32px',
-                    background: 'linear-gradient(135deg, #f47721 0%, #d97706 100%)',
-                    border: 'none', borderRadius: 12,
-                    color: '#ffffff', fontWeight: 800,
-                    fontSize: '1rem', cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    boxShadow: '0 6px 28px rgba(244,119,33,0.55), inset 0 1px 0 rgba(255,255,255,0.2)',
-                    letterSpacing: '-0.01em',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  {T.heroCta1}
-                  <ArrowRight size={18} strokeWidth={2.5} />
-                </motion.button>
 
-              </motion.div>
             </div>
           </div>
         </motion.div>
@@ -1350,11 +1625,11 @@ export default function Landing() {
       </div>
 
       {/* ════ ROLES SECTION ════ */}
-      <RolesConnectedSection isDark={isDark} />
+      <RolesConnectedSection isDark={isDark} language={language} />
 
       {/* ════ SYSTEM ARCHITECTURE SECTION ════ */}
       <div id="architecture" style={{ scrollMarginTop: 0 }}>
-        <SystemArchitectureSection isDark={isDark} />
+        <SystemArchitectureSection isDark={isDark} language={language} />
       </div>
 
       {/* ════ [REMOVED OLD INLINE ARCHITECTURE] ════ */}
@@ -1646,7 +1921,7 @@ export default function Landing() {
                   fontSize: '1.05rem', fontWeight: 800,
                   color: '#f0f6fc', letterSpacing: '-0.03em', lineHeight: 1.1,
                 }}>
-                  LADRIS<span style={{ color: '#4080ff' }}>·</span>AI
+                  LADRIS
                 </div>
                 <div style={{ fontSize: '0.6rem', fontWeight: 600, color: '#546e96', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 2 }}>
                   {T.footerIntelligence}
@@ -1654,8 +1929,8 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Tagline in saffron orange */}
-            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f47721', marginBottom: 12, lineHeight: 1.4 }}>
+            {/* Tagline */}
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.75)', marginBottom: 12, lineHeight: 1.4 }}>
               {T.footerTagline}
             </div>
 

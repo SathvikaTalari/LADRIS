@@ -221,6 +221,29 @@ DEMO_USERS = {
     },
 }
 
+# Keep the credentials advertised by the login screen in sync with the backend.
+# The original, more descriptive demo addresses above remain valid for backward
+# compatibility with bookmarks, documentation, and existing seeded databases.
+DEMO_USER_ALIASES = {
+    "central@ladris.gov.in": "central.admin@ladris.gov.in",
+    "state@ladris.gov.in": "state.admin.tg@ladris.gov.in",
+    "district@ladris.gov.in": "district.officer.sangareddy@ladris.gov.in",
+    "authority@ladris.gov.in": "la.officer@ladris.gov.in",
+    "agency@ladris.gov.in": "project.agency@nhai.gov.in",
+    "policy@ladris.gov.in": "policy.analyst@niti.gov.in",
+}
+DEMO_USERS.update(
+    {alias: DEMO_USERS[canonical] for alias, canonical in DEMO_USER_ALIASES.items()}
+)
+DEMO_USERS["lrb@ladris.gov.in"] = {
+    "password": "Password123!",
+    "full_name": "Land Requiring Body Officer",
+    "role": UserRole.PROJECT_OFFICER,
+    "state_code": "TG",
+    "district_code": None,
+    "agency_name": "Land Requiring Body",
+}
+
 
 @router.post("/login", response_model=TokenResponse)
 async def login(

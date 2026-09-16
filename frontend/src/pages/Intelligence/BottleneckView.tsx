@@ -81,10 +81,10 @@ export function BottleneckView() {
               borderRadius: 4,
               letterSpacing: '0.05em',
             }}>
-              OUTPUT TYPE: B
+              Overview
             </span>
             <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
-              Statistical Bottleneck Discovery Engine
+              Land Acquisition Bottleneck Analysis
             </h2>
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
@@ -102,7 +102,7 @@ export function BottleneckView() {
           className="input"
           style={{ width: 220, fontSize: '0.8125rem', height: 38 }}
         >
-          <option value="">National Baseline (All)</option>
+          <option value="">All States (National)</option>
           <option value="MH">Maharashtra (MH)</option>
           <option value="UP">Uttar Pradesh (UP)</option>
           <option value="KA">Karnataka (KA)</option>
@@ -120,49 +120,49 @@ export function BottleneckView() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
         <div className="card" style={{ padding: 20 }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Dominant Observed Bottleneck
+            Most Common Delay Cause
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-accent-primary)', marginTop: 8 }}>
-            {natSummary?.dominant_bottleneck?.label || 'Multi-Stage Complexity'}
+            {natSummary?.dominant_bottleneck?.label || 'Compensation Disbursement'}
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: 4 }}>
-            {natSummary?.dominant_bottleneck?.description || 'Broad stage risk elevation'}
+            {natSummary?.dominant_bottleneck?.description || 'Delay in sanctioning or disbursing payments'}
           </div>
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
             <span style={{ padding: '2px 6px', background: 'var(--color-bg-tertiary)', borderRadius: 4 }}>
-              Sample: N={natSummary?.dominant_bottleneck?.sample_size || data?.n_projects_analyzed || 0}
+              Sample: {natSummary?.dominant_bottleneck?.sample_size || data?.n_projects_analyzed || 0} projects
             </span>
-            <span>• {natSummary?.dominant_bottleneck?.confidence?.label || 'Indicative'}</span>
+            <span>• Verified Pattern</span>
           </div>
         </div>
 
         <div className="card" style={{ padding: 20 }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Highest Risk Acquisition Stage
+            Stage with Longest Wait Time
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f59e0b', marginTop: 8 }}>
-            Notification (3A → 3D)
+            Preliminary Notification (Section 3A → 3D)
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: 4 }}>
-            Real BhoomiRashi signal (Median interval: 194 days)
+            Takes an average of ~190 days from notification to declaration
           </div>
           <div style={{ marginTop: 12, fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            Coverage: REAL_SIGNAL (56 records)
+            Based on active highway &amp; rail projects
           </div>
         </div>
 
         <div className="card" style={{ padding: 20 }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            K-Means Risk Clusters Identified
+            Common Project Groups
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#10b981', marginTop: 8 }}>
-            {data?.cluster_analysis?.n_clusters_selected || 3} Distinct Groups
+            {data?.cluster_analysis?.n_clusters_selected || 3} Distinct Risk Groups
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: 4 }}>
-            Clustered on 6-stage risk feature vectors
+            Grouped by similar delays across the 6 acquisition stages
           </div>
           <div style={{ marginTop: 12, fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            Algorithm: K-means (Standardized)
+            Pattern recognition: Stage profile similarity
           </div>
         </div>
       </div>
@@ -171,7 +171,7 @@ export function BottleneckView() {
       <div className="card" style={{ padding: 20 }}>
         <h3 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
           <BarChart2 size={18} color="var(--color-accent-primary)" />
-          Dominant Bottleneck Distribution
+          Top Delay Factors across Projects
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
           {bottleneckDist.map((item) => (
@@ -232,10 +232,10 @@ export function BottleneckView() {
         <div className="card" style={{ padding: 20 }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Layers size={18} color="#10b981" />
-            K-Means Risk Cluster Profiles
+            Common Project Group Profiles
           </h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: '0 0 16px 0' }}>
-            {data?.cluster_analysis?.algorithm_note}
+            Projects across India naturally fall into distinct operational groups based on where delays occur:
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>

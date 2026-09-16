@@ -12,6 +12,13 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
 const ACCENT   = '#003d6b'
 const ACCENT_D = '#4a7fd4'
 
+interface AreaData {
+  num: string
+  title: string
+  desc: string
+  icon: React.ReactNode
+}
+
 /* ─── Chart data: delay trend (prototype values) ─────────────────────────── */
 // SVG viewBox "0 0 280 200" — taller chart fills container, ascending delay trend
 const PTS: [number, number][] = [
@@ -40,7 +47,7 @@ const SMOOTH_PATH = buildSmoothPath(PTS)
 /* ─── Analytics area cards ─────────────────────────────────────────────── */
 /* ─── Hoverable area card ─────────────────────────────────────────────────── */
 function AreaCard({ area, visible, delay, isDark }: {
-  area: typeof AREAS[number]; visible: boolean; delay: number; isDark: boolean
+  area: AreaData; visible: boolean; delay: number; isDark: boolean
 }) {
   const [hovered, setHovered] = useState(false)
   const accent = isDark ? ACCENT_D : ACCENT

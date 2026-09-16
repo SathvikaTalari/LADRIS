@@ -5,69 +5,87 @@
  * and a traveling glowing dot between them.
  * Uses Framer Motion (already installed). Zero new dependencies.
  */
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, type ReactNode } from 'react'
 import { motion, useInView, useReducedMotion } from 'framer-motion'
 
 /* ─── Design tokens ─────────────────────────────────────────────────────── */
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 // Single unified accent — all blocks share this colour
-const UNIFIED_COLOR      = '#003d6b'       // deep navy
+const UNIFIED_COLOR = '#003d6b'       // deep navy
 const UNIFIED_COLOR_DARK = '#4a7fd4'       // blue for dark mode
-const UNIFIED_GLOW       = 'rgba(0,61,107,0.14)'
-const UNIFIED_GLOW_DARK  = 'rgba(74,127,212,0.18)'
+const UNIFIED_GLOW = 'rgba(0,61,107,0.14)'
+const UNIFIED_GLOW_DARK = 'rgba(74,127,212,0.18)'
+
+/* ─── Block definition type ─────────────────────────────────────────────── */
+interface BlockDef {
+  num: string
+  title: string
+  items: string[]
+  icon: ReactNode
+}
 
 /* ─── Block definitions ─────────────────────────────────────────────────── */
-const BLOCKS = [
-  {
-    num: '01',
-    title: 'DATA + GIS',
-    items: ['Land Records', 'Legal', 'Compensation', 'GIS'],
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <ellipse cx="12" cy="5" rx="9" ry="3"/>
-        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-      </svg>
-    ),
-  },
-  {
-    num: '02',
-    title: 'AI RISK ENGINE',
-    items: ['Predict', 'Score', 'Explain', 'Recommend'],
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="4"/>
-        <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-      </svg>
-    ),
-  },
-  {
-    num: '03',
-    title: 'API + SECURITY',
-    items: ['APIs', 'Role Access', 'Audit'],
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-    ),
-  },
-  {
-    num: '04',
-    title: 'ACTION DASHBOARD',
-    items: ['GIS Map', 'Alerts', 'Reports', 'Insights'],
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="3" width="20" height="14" rx="2"/>
-        <path d="M8 21h8m-4-4v4"/>
-      </svg>
-    ),
-  },
-] as const
+function getBlocks(hi: boolean): BlockDef[] {
+  return [
+    {
+      num: '01',
+      title: hi ? 'डेटा + GIS' : 'DATA + GIS',
+      items: hi
+        ? ['भूमि रिकॉर्ड', 'कानूनी', 'मुआवज़ा', 'GIS']
+        : ['Land Records', 'Legal', 'Compensation', 'GIS'],
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <ellipse cx="12" cy="5" rx="9" ry="3" />
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+        </svg>
+      ),
+    },
+    {
+      num: '02',
+      title: hi ? 'AI जोखिम इंजन' : 'AI RISK ENGINE',
+      items: hi
+        ? ['भविष्यवाणी', 'स्कोर', 'विवरण', 'सिफ़ारिश']
+        : ['Predict', 'Score', 'Explain', 'Recommend'],
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        </svg>
+      ),
+    },
+    {
+      num: '03',
+      title: hi ? 'API + सुरक्षा' : 'API + SECURITY',
+      items: hi
+        ? ['APIs', 'भूमिका पहुंच', 'ऑडिट', 'प्रमाणीकरण']
+        : ['APIs', 'Role Access', 'Audit', 'Authentication'],
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      ),
+    },
+    {
+      num: '04',
+      title: hi ? 'कार्रवाई डैशबोर्ड' : 'ACTION DASHBOARD',
+      items: hi
+        ? ['GIS मानचित्र', 'अलर्ट', 'रिपोर्ट', 'दृष्टिकोण']
+        : ['GIS Map', 'Alerts', 'Reports', 'Insights'],
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8m-4-4v4" />
+        </svg>
+      ),
+    },
+  ]
+}
 
 type BlockState = 'ghost' | 'building' | 'active' | 'dimmed'
 
@@ -100,14 +118,14 @@ function Connector({
       >
         <defs>
           <filter id={`glow-${idx}`} x="-60%" y="-600%" width="220%" height="1400%">
-            <feGaussianBlur stdDeviation="1.8" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            <feGaussianBlur stdDeviation="1.8" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
 
         {/* Ghost/background line */}
         <line x1="0" y1="1" x2="48" y2="1"
-          stroke={ghostStroke} strokeWidth="1" strokeDasharray="3 3"/>
+          stroke={ghostStroke} strokeWidth="1" strokeDasharray="3 3" />
 
         {/* Drawn line using clip trick: animated from left */}
         {lineDrawn && (
@@ -158,23 +176,23 @@ function ArchBlock({
   onMouseLeave,
   isHovered,
 }: {
-  block: typeof BLOCKS[number]
+  block: BlockDef
   state: BlockState
   isDark: boolean
   onMouseEnter: () => void
   onMouseLeave: () => void
   isHovered: boolean
 }) {
-  const isVisible  = state !== 'ghost'
-  const isActive   = state === 'active'
+  const isVisible = state !== 'ghost'
+  const isActive = state === 'active'
   const isBuilding = state === 'building'
 
   // Unified accent — same for all blocks
-  const accent     = isDark ? UNIFIED_COLOR_DARK : UNIFIED_COLOR
-  const glowColor  = isDark ? UNIFIED_GLOW_DARK  : UNIFIED_GLOW
+  const accent = isDark ? UNIFIED_COLOR_DARK : UNIFIED_COLOR
+  const glowColor = isDark ? UNIFIED_GLOW_DARK : UNIFIED_GLOW
 
   const baseOpacity = state === 'ghost' ? 0.07 : state === 'dimmed' ? 0.55 : 1
-  const hoverLift   = isVisible ? (isHovered ? -3 : 0) : 0
+  const hoverLift = isVisible ? (isHovered ? -3 : 0) : 0
 
   const cardBg = isDark
     ? (isActive ? 'rgba(14,26,52,0.98)' : isBuilding ? 'rgba(10,20,42,0.94)' : 'rgba(8,16,34,0.55)')
@@ -277,7 +295,7 @@ function ArchBlock({
               width: 4, height: 4, borderRadius: '50%', flexShrink: 0,
               background: isActive ? accent : isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,61,107,0.2)',
               transition: 'background 0.3s ease',
-            }}/>
+            }} />
             <span style={{
               fontSize: '0.72rem', lineHeight: 1.4,
               color: isActive
@@ -309,18 +327,19 @@ function ArchBlock({
 }
 
 /* ─── Main Component ─────────────────────────────────────────────────────── */
-export default function SystemArchitectureSection({ isDark }: { isDark: boolean }) {
-  const sectionRef  = useRef<HTMLElement>(null)
-  const isInView    = useInView(sectionRef, { once: true, margin: '-8% 0px' })
-  const reduced     = useReducedMotion() ?? false
+export default function SystemArchitectureSection({ isDark, language }: { isDark: boolean; language: 'en' | 'hi' }) {
+  const hi = language === 'hi'
+  const BLOCKS = getBlocks(hi)
+  const sectionRef = useRef<HTMLElement>(null)
+  const isInView = useInView(sectionRef, { once: true, margin: '-8% 0px' })
+  const reduced = useReducedMotion() ?? false
 
-  const [headingReady,    setHeadingReady]    = useState(false)
-  const [blockStates,     setBlockStates]     = useState<BlockState[]>(['ghost','ghost','ghost','ghost'])
-  const [linesDrawn,      setLinesDrawn]      = useState([false, false, false])
-  const [dotsActive,      setDotsActive]      = useState([false, false, false])
-  const [taglineVisible,  setTaglineVisible]  = useState(false)
+  const [headingReady, setHeadingReady] = useState(false)
+  const [blockStates, setBlockStates] = useState<BlockState[]>(['ghost', 'ghost', 'ghost', 'ghost'])
+  const [linesDrawn, setLinesDrawn] = useState([false, false, false])
+  const [dotsActive, setDotsActive] = useState([false, false, false])
   const [subtitleVisible, setSubtitleVisible] = useState(false)
-  const [hoveredIdx,      setHoveredIdx]      = useState<number | null>(null)
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   const setBlock = useCallback((idx: number, st: BlockState) => {
     setBlockStates(prev => { const n = [...prev] as BlockState[]; n[idx] = st; return n })
@@ -350,10 +369,9 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
     if (reduced) {
       // Reduced motion: simple sequential fade, no movement
       t(() => setBlock(0, 'active'), 400)
-      t(() => { setLinesDrawn([true,false,false]); setBlock(1,'active') }, 600)
-      t(() => { setLinesDrawn([true,true,false]);  setBlock(2,'active') }, 800)
-      t(() => { setLinesDrawn([true,true,true]);   setBlock(3,'active') }, 1000)
-      t(() => setTaglineVisible(true), 1200)
+      t(() => { setLinesDrawn([true, false, false]); setBlock(1, 'active') }, 600)
+      t(() => { setLinesDrawn([true, true, false]); setBlock(2, 'active') }, 800)
+      t(() => { setLinesDrawn([true, true, true]); setBlock(3, 'active') }, 1000)
       t(() => setSubtitleVisible(true), 1400)
     } else {
       // Step 1 — Block 01 builds in
@@ -376,15 +394,12 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
       t(() => setBlock(3, 'active'), 5520)
 
       // Final sweep — all highlight, then reveal taglines
-      t(() => setBlockStates(['active','active','active','active']), 6000)
-      t(() => setTaglineVisible(true), 6500)
+      t(() => setBlockStates(['active', 'active', 'active', 'active']), 6000)
       t(() => setSubtitleVisible(true), 6900)
     }
 
     return () => ts.forEach(clearTimeout)
   }, [isInView, reduced, setBlock, fireConnector])
-
-  const accentColor = isDark ? '#4a7fd4' : '#003366'
 
   return (
     <section
@@ -408,7 +423,7 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
           : 'radial-gradient(rgba(0,51,102,0.09) 1px, transparent 1px)',
         backgroundSize: '28px 28px',
         opacity: 0.65,
-      }}/>
+      }} />
 
       <div style={{ maxWidth: 1160, margin: '0 auto', position: 'relative' }}>
 
@@ -425,7 +440,7 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
             color: isDark ? '#f0f6fc' : '#0a1d37',
             lineHeight: 1.15, margin: '0 0 20px',
           }}>
-            SYSTEM ARCHITECTURE
+            {hi ? 'सिस्टम आर्किटेक्चर' : 'SYSTEM ARCHITECTURE'}
           </h2>
 
           <motion.div
@@ -439,21 +454,21 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
               color: isDark ? '#c8daf4' : '#0a1d37',
               margin: '0 0 10px', lineHeight: 1.4,
             }}>
-              Where land data becomes intelligence.
+              {hi ? 'जहां भूमि डेटा बुद्धिमत्ता बनता है।' : 'Where land data becomes intelligence.'}
             </p>
             <p style={{
               fontSize: '0.88rem', fontWeight: 400,
               color: isDark ? '#7da0cc' : '#4a6280',
               margin: '0 0 6px', lineHeight: 1.7,
             }}>
-              LADRIS connects data, prediction, security, and action in one seamless flow.
+              {hi ? 'LADRIS डेटा, भविष्यवाणी, सुरक्षा और कार्रवाई को एक सहज प्रवाह में जोड़ता है।' : 'LADRIS connects data, prediction, security, and action in one seamless flow.'}
             </p>
             <p style={{
               fontSize: '0.85rem', fontWeight: 400,
               color: isDark ? '#6a90bb' : '#5a7194',
               margin: 0, lineHeight: 1.7,
             }}>
-              Every layer works together to turn early risks into smarter decisions.
+              {hi ? 'हर परत मिलकर काम करती है ताकि शुरुआती जोखिमों को बेहतर निर्णयों में बदला जा सके।' : 'Every layer works together to turn early risks into smarter decisions.'}
             </p>
           </motion.div>
         </motion.div>
@@ -489,51 +504,6 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
         {/* ── Final tagline ─────────────────────────────────────────── */}
         <div style={{ textAlign: 'center', marginTop: 52 }}>
           <motion.div
-            initial={{ opacity: 0, y: reduced ? 0 : 8 }}
-            animate={taglineVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, ease: EASE }}
-            style={{ marginBottom: 12 }}
-          >
-            {/* DATA → AI → SECURITY → ACTION pill */}
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 0,
-              padding: '7px 18px',
-              background: isDark ? 'rgba(74,127,212,0.07)' : 'rgba(0,51,102,0.05)',
-              border: `1px solid ${isDark ? 'rgba(74,127,212,0.18)' : 'rgba(0,51,102,0.12)'}`,
-              borderRadius: 100,
-            }}>
-              {(['DATA', 'AI', 'SECURITY', 'ACTION'] as const).map((label, idx) => (
-                <span key={label} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={taglineVisible ? { opacity: 1 } : {}}
-                    transition={{ duration: 0.3, delay: idx * 0.1 }}
-                    style={{
-                      fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.13em',
-                      color: isDark ? '#c0d4f0' : '#0a1d37',
-                    }}
-                  >
-                    {label}
-                  </motion.span>
-                  {idx < 3 && (
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={taglineVisible ? { opacity: 1 } : {}}
-                      transition={{ duration: 0.2, delay: idx * 0.1 + 0.08 }}
-                      style={{
-                        fontSize: '0.6rem', color: accentColor,
-                        margin: '0 6px', fontWeight: 700, opacity: 0.7,
-                      }}
-                    >
-                      →
-                    </motion.span>
-                  )}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
             initial={{ opacity: 0 }}
             animate={subtitleVisible ? { opacity: 1 } : {}}
             transition={{ duration: 0.5, ease: EASE }}
@@ -542,7 +512,7 @@ export default function SystemArchitectureSection({ isDark }: { isDark: boolean 
               color: isDark ? '#546e96' : '#94a3b8',
             }}
           >
-            From land data to early action.
+            {hi ? 'भूमि डेटा से शुरुआती कार्रवाई तक।' : 'From land data to early action.'}
           </motion.div>
         </div>
       </div>

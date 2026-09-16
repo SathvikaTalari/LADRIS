@@ -183,10 +183,22 @@ export interface ProjectCreate {
   nodal_agency?: string
   executing_agency?: string
   total_area_ha?: number
+  area_acquired_ha?: number
+  area_in_possession_ha?: number
   total_affected_families?: number
+  families_compensated?: number
+  families_rehabilitated?: number
+  rehabilitation_progress_pct?: number
   planned_start_date?: string
   planned_end_date?: string
   estimated_compensation_inr?: number
+  disbursed_compensation_inr?: number
+  notification_3a_date?: string
+  notification_3d_date?: string
+  legal_case_count?: number
+  legal_case_status?: string
+  latitude?: number
+  longitude?: number
 }
 
 // ─── Alerts ───────────────────────────────────────────────────────────────────
@@ -404,15 +416,36 @@ export interface PredictionResult {
 
   // Legacy compatibility (still returned for backward compat)
   overall_risk_score?: number
-  delay_probability: null  // Always null — DEFERRED
-  risk_level?: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'UNKNOWN'
-  predicted_delay_days: null  // Always null — removed fabrication
+  delay_probability: number
+  risk_score: number
+  risk_category: 'HIGH' | 'MEDIUM' | 'LOW'
+  predicted_delay_days: number | null
+  prediction_interval: { p10: number | null; p90: number | null }
+  stage_predictions: Array<{ stage: string; delay_probability: number; risk_score: number; risk_category: 'HIGH' | 'MEDIUM' | 'LOW' }>
+  top_drivers: Array<{ feature: string; value: unknown; contribution: number; direction: string; recommendation?: string | null }>
+  recommendations: string[]
+  snapshot_date: string
+  predicted_at: string
+  latency_ms?: number | null
+  is_stale: boolean
+  unavailable_features: string[]
+  current_stage: string
+  risk_level?: 'HIGH' | 'MEDIUM' | 'LOW' | 'UNKNOWN'
 
   model_version?: string
   model_type?: string
   dataset_version?: string
   prediction_timestamp?: string
   data_completeness_pct: number
+  validation?: {
+    is_valid: boolean
+    error_count: number
+    warning_count: number
+    clamped_count: number
+    errors: string[]
+    warnings: string[]
+    clamped: string[]
+  }
   as_of_date?: string
   prediction_confidence?: PredictionConfidenceDetail
   authenticity_statement?: string

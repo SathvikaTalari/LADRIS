@@ -1,0 +1,30 @@
+# Example config for a scheduled CSV/XLSX export drop, e.g. a monthly official
+# export from a district administration that has no API. Used both by the
+# scheduler (watching `watch_glob`) and referenced when uploading manually via
+# POST /ingest/file or /ingest/manual (pass source_name matching this file's
+# source_name so the same field_mapping applies).
+
+source_name: "district_admin_monthly_export"
+connector_type: "file"
+schedule_interval_minutes: 43200   # ~monthly
+watch_glob: "data/incoming/district_admin/*.xlsx"
+
+field_mapping:
+  external_project_id: "Project ID"
+  project_name: "Project Name"
+  project_type: "Project Type"
+  implementing_agency: "Implementing Agency"
+  state: "State"
+  district: "District"
+  land_area_hectares: "Land Area (ha)"
+  affected_families_count: "Affected Families"
+  notification_date: "Notification Date"
+  expected_completion_date: "Expected Completion"
+  actual_completion_date: "Actual Completion"
+  current_stage: "Current Stage"
+  is_delayed: "Delayed (Y/N)"
+  delay_days: "Delay (days)"
+  compensation_sanctioned: "Compensation Sanctioned"
+  compensation_disbursed: "Compensation Disbursed"
+  legal_dispute_count: "Open Disputes"
+  rehabilitation_progress_pct: "R&R Progress %"

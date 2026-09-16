@@ -1,5 +1,5 @@
 /**
- * FeaturesRippleSection — LADRIS
+ * FeaturesRippleSection — LADRIS AI
  * "Everything You Need for Land Acquisition"
  * Animation: RIPPLE REVEAL — one central signal activates all 6 cards.
  * Library: Framer Motion (already installed)
@@ -9,6 +9,13 @@ import { motion, AnimatePresence, useInView, useReducedMotion } from "framer-mot
 import { Zap, Brain, MapPin, AlertTriangle, BarChart2, ShieldCheck } from "lucide-react"
 
 const EASE_SMOOTH: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+interface FeatureCardData {
+  num: string
+  Icon: React.ElementType
+  title: string
+  desc: string
+}
 
 /*
  * Ripple delay per card: centre-out wave pattern in a 3x2 grid
@@ -87,7 +94,7 @@ function RipplePulse({ visible }: { visible: boolean }) {
 function FeatureCard({
   card, active, isDark, reduced,
 }: {
-  card: typeof CARDS[number]
+  card: FeatureCardData
   active: boolean
   isDark: boolean
   reduced: boolean

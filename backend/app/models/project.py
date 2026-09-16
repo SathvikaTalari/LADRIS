@@ -106,6 +106,7 @@ class Project(Base):
     total_affected_families = Column(Integer, default=0)
     families_compensated = Column(Integer, default=0)
     families_rehabilitated = Column(Integer, default=0)
+    rehabilitation_progress_pct = Column(Numeric(5, 2), nullable=True)
 
     planned_start_date = Column(Date, nullable=True)
     planned_end_date = Column(Date, nullable=True)
@@ -123,7 +124,7 @@ class Project(Base):
     delay_reason = Column(Text, nullable=True)
     legal_case_count = Column(Integer, default=0)
     legal_case_status = Column(String(50), nullable=True, default="NONE")
-    milestone_data_status = Column(String(50), nullable=False, default="SYNTHETIC_DEMO")
+    milestone_data_status = Column(String(50), nullable=False, default="USER_ENTERED")
     latitude = Column(Numeric(9, 6), nullable=True)
     longitude = Column(Numeric(9, 6), nullable=True)
     lacrris_integration_status = Column(String(50), nullable=False, default="PLANNED")

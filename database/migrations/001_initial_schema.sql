@@ -238,8 +238,6 @@ CREATE TABLE project_stages (
                             CASE
                                 WHEN actual_end_date IS NOT NULL AND planned_end_date IS NOT NULL
                                     THEN (actual_end_date - planned_end_date)
-                                WHEN planned_end_date IS NOT NULL AND NOW()::DATE > planned_end_date
-                                    THEN (NOW()::DATE - planned_end_date)
                                 ELSE 0
                             END
                         ) STORED,

@@ -43,39 +43,66 @@ export default function DataQuality() {
   }
 
   const { summary, field_null_rates, sources } = metrics
+  const completeness = Math.max(0, 100 - summary.missing_value_rate * 100)
+  const consistency = summary.total_real_records
+    ? (summary.valid_records / summary.total_real_records) * 100
+    : null
+  const generatedAt = summary.generated_at
+    ? new Date(summary.generated_at).toLocaleString('en-IN')
+    : 'Unavailable'
+
+  const friendlyFieldNames: Record<string, string> = {
+    project_code: 'Project Code',
+    name: 'Project Name',
+    state_code: 'State',
+    district: 'District',
+    project_type: 'Project Sector / Type',
+    land_area_ha: 'Land Area (Hectares)',
+    total_cost_cr: 'Total Budget (₹ Cr)',
+    stage: 'Current Stage',
+    status: 'Project Status',
+    compensation_disbursement_ratio: 'Compensation Paid Ratio',
+    rehabilitation_progress_pct: 'Rehabilitation & Resettlement Progress (%)',
+    pending_court_cases: 'Pending Court Cases',
+    forest_clearance_status: 'Forest Clearance Status',
+    possession_status_pct: 'Physical Possession Progress (%)',
+    section_4_date: 'Section 4 Notification Date',
+    section_11_date: 'Section 11 Preliminary Date',
+    section_19_date: 'Section 19 Declaration Date',
+  }
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <PageHeader
-        title="DATA QUALITY COMMAND CENTER"
-        subtitle="Real-time data integrity metrics, null rates, and prediction-eligibility computed strictly from ingested public datasets"
+        title="Data Quality & Health"
+        subtitle="Monitor information completeness, data accuracy, and project readiness for AI delay predictions."
       />
 
       {/* Summary KPI Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24, width: '100%' }}>
         <KpiCard
           icon={<FileSpreadsheet size={18} color="var(--color-accent-primary)" />}
-          label="Total Real Records"
+          label="Total Projects Recorded"
           value={summary.total_real_records.toLocaleString('en-IN')}
-          subtitle="Ingested & Verified"
+          subtitle="Verified in Database"
         />
         <KpiCard
           icon={<CheckCircle2 size={18} color="var(--color-status-success)" />}
-          label="Valid Records"
+          label="Complete Profiles"
           value={summary.valid_records.toLocaleString('en-IN')}
-          subtitle={`${((summary.valid_records / Math.max(1, summary.total_real_records)) * 100).toFixed(1)}% Schema Compliant`}
+          subtitle={`${((summary.valid_records / Math.max(1, summary.total_real_records)) * 100).toFixed(1)}% Ready for Analysis`}
         />
         <KpiCard
           icon={<AlertOctagon size={18} color="var(--color-status-warning)" />}
-          label="Missing Value Rate"
+          label="Missing Details Rate"
           value={`${(summary.missing_value_rate * 100).toFixed(1)}%`}
-          subtitle="Across all fields"
+          subtitle="Across all project fields"
         />
         <KpiCard
           icon={<Layers size={18} color="var(--color-status-info)" />}
-          label="Prediction Eligible"
+          label="Ready for AI Predictions"
           value={summary.prediction_eligible_records.toLocaleString('en-IN')}
-          subtitle="Meets model threshold"
+          subtitle="Meets required criteria"
         />
       </div>
 
@@ -83,54 +110,54 @@ export default function DataQuality() {
         {/* Data Trust & Provenance */}
         <div className="card" style={{ border: '1px solid rgba(46, 213, 115, 0.4)', background: 'rgba(46, 213, 115, 0.03)' }}>
           <h3 style={{ fontSize: '0.9rem', fontWeight: 800, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            <ShieldCheck size={18} /> DATA TRUST
+            <ShieldCheck size={18} /> Data Reliability Score
           </h3>
           
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid rgba(46, 213, 115, 0.2)', paddingBottom: 14 }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Trust Score</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Overall Quality Score</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: '1.6rem', fontWeight: 800, color: '#16a34a', fontFamily: 'var(--font-mono)' }}>86<span style={{ fontSize: '1rem', color: 'rgba(22, 163, 74, 0.6)' }}>/100</span></span>
+              <span style={{ fontSize: '1.6rem', fontWeight: 800, color: '#16a34a', fontFamily: 'var(--font-mono)' }}>{completeness.toFixed(0)}<span style={{ fontSize: '1rem', color: 'rgba(22, 163, 74, 0.6)' }}>/100</span></span>
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: '0.8rem', marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Completeness</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>86%</strong>
+              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Field Completeness</span>
+              <strong style={{ color: 'var(--color-text-primary)' }}>{completeness.toFixed(1)}%</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Freshness</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>79%</strong>
+              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Data Freshness</span>
+              <strong style={{ color: 'var(--color-text-primary)' }}>Active Sync</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Consistency</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>92%</strong>
+              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Record Validity</span>
+              <strong style={{ color: 'var(--color-text-primary)' }}>{consistency === null ? 'Unavailable' : `${consistency.toFixed(1)}%`}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Official Source</span>
-              <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>Verified</span>
+              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Source Status</span>
+              <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>{sources.length ? 'Verified & Active' : 'Unavailable'}</span>
             </div>
           </div>
           
           <div style={{ paddingTop: 14, borderTop: '1px solid rgba(46, 213, 115, 0.2)', display: 'flex', flexDirection: 'column', gap: 10, fontSize: '0.75rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Primary Source:</span>
-              <strong style={{ color: 'var(--color-text-primary)', textAlign: 'right' }}>Bhoomi / Gati Shakti</strong>
+              <span style={{ color: 'var(--color-text-muted)' }}>Primary Dataset:</span>
+              <strong style={{ color: 'var(--color-text-primary)', textAlign: 'right' }}>{sources.map((source) => source.name).join(', ') || 'Projects Registry'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Last Updated:</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>2 hours ago</strong>
+              <span style={{ color: 'var(--color-text-muted)' }}>Last Synced:</span>
+              <strong style={{ color: 'var(--color-text-primary)' }}>{generatedAt}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Records Scanned:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Total Records:</span>
               <strong style={{ color: 'var(--color-text-primary)' }}>{summary.total_real_records.toLocaleString('en-IN')}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Missing Fields Avg:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Average Missing Data:</span>
               <strong style={{ color: 'var(--color-text-primary)' }}>{(summary.missing_value_rate * 100).toFixed(1)}%</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Prediction Eligible:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Ready for Prediction:</span>
               <strong style={{ color: '#2563eb' }}>{summary.prediction_eligible_records.toLocaleString('en-IN')}</strong>
             </div>
           </div>
@@ -138,14 +165,16 @@ export default function DataQuality() {
         {/* Field Null Rates */}
         <div className="card">
           <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: 16 }}>
-            Field Missing-Value Rates (Null Fraction)
+            Missing Information by Field
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {Object.entries(field_null_rates).map(([field, rate]) => (
               <div key={field}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', marginBottom: 4 }}>
-                  <code style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-primary)' }}>{field}</code>
-                  <span style={{ color: 'var(--color-text-muted)' }}>{(rate * 100).toFixed(1)}%</span>
+                  <span style={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
+                    {friendlyFieldNames[field] || field.replace(/_/g, ' ')}
+                  </span>
+                  <span style={{ color: 'var(--color-text-muted)' }}>{(rate * 100).toFixed(1)}% missing</span>
                 </div>
                 <div style={{ height: 6, background: 'var(--color-bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
                   <div style={{
@@ -163,7 +192,7 @@ export default function DataQuality() {
         {/* Source Coverage */}
         <div className="card">
           <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: 16 }}>
-            Ingested Sources & Record Coverage
+            Data Sources & Records Tracked
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {sources.map((src, i) => (
@@ -180,12 +209,12 @@ export default function DataQuality() {
                     {src.name}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                    Status: {src.status}
+                    Official Public Source
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{src.records}</div>
-                  <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>Verified</span>
+                  <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>{src.quality || 'Ingested'}</span>
                 </div>
               </div>
             ))}

@@ -1,0 +1,69 @@
+# REST API Data Source Configuration Template
+# Copy this file, rename to your source name (e.g., nhai_api.yaml), and fill in values
+# This config describes how to ingest data from a government API endpoint
+
+source_name: "YOUR_SOURCE_NAME"           # e.g., "nhai_projects"
+connector_type: "rest_api"
+base_url: "https://your-agency.gov.in/api/v1/land-projects"
+schedule_interval_minutes: 1440           # daily pull (set to null for manual only)
+
+# Authentication - choose one:
+auth:
+  type: "bearer"                        # or "api_key"
+  token: "${AGENCY_API_TOKEN}"        # use environment variable or secrets manager
+
+# Pagination (for APIs that return results in pages)
+pagination:
+  type: "offset"                        # or "none" if single page max 1000 items
+  offset_param: "offset"
+  limit_param: "limit"
+  page_size: 100                        # max items per request
+
+# Response parsing
+records_field: "results"                # JSON key containing the list
+
+# Static params appended to every request
+static_params:
+  status: "active"
+
+# Field mapping: canonical field name -> source API field name
+# REQUIRED FIELDS: external_project_id, project_name, project_type, state, district
+field_mapping:
+  # Core identity (required)
+  external_project_id: "project_code"
+  project_name: "project_name"
+  project_type: "project_type"
+  state: "state_name"
+  district: "district_name"
+
+  # Dates
+  notification_date: "notification_date"
+  expected_completion_date: "expected_completion"
+  actual_completion_date: "actual_completion"
+  current_stage: "current_stage"
+
+  # Labels (for training)
+  is_delayed: "is_delayed_flag"
+  delay_days: "delay_in_days"
+
+  # Compensation
+  compensation_sanctioned: "compensation_sanctioned_amount"
+  compensation_disbursed: "compensation_disbursed_amount"
+  compensation_sanction_date: "comp_sanction_date"
+  last_disbursement_date: "comp_last_paid_date"
+
+  # Legal
+  legal_dispute_count: "dispute_count"
+  dispute_type: "dispute_type"
+  dispute_filed_date: "dispute_filed_date"
+  dispute_resolved_date: "dispute_resolved_date"
+  court_level: "court_level"
+
+  # Rehabilitation
+  rehabilitation_progress_pct: "rehab_progress_percent"
+  rehab_site_ready: "resettlement_site_ready"
+
+  # Stakeholder
+  stakeholder_update_date: "last_update_date"
+
+# Optional: Add any extra fields here - they'll be available in the database

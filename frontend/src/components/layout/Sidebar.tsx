@@ -1,64 +1,80 @@
 /**
  * LADRIS — Premium Sidebar Navigation
  */
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard,
-  FolderKanban,
-  Map,
+  Folder,
+  MapPinned,
   BarChart3,
   Bell,
   Database,
   Settings,
   ChevronLeft,
   ChevronRight,
-  Activity,
-  Brain,
+  Target,
   ShieldCheck,
   Briefcase,
   Building2,
+  createLucideIcon,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { roleLabel } from '@/utils'
 
+// Universally recognizable Decision / Recommendation icon: Target / Bullseye with Checkmark
+const TargetCheck = createLucideIcon('TargetCheck', [
+  ['circle', { cx: '12', cy: '12', r: '10', key: 'outer' }],
+  ['circle', { cx: '12', cy: '12', r: '6', key: 'inner' }],
+  ['path', { d: 'm9 12 2 2 4-4', key: 'check' }],
+])
 
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
 }
 
+interface NavItem {
+  to: string
+  icon: any
+  label: string
+  tooltip?: string
+}
+
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { user } = useAuthStore()
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'CENTRAL_ADMIN' || user?.role === 'STATE_ADMIN'
+  const [hoveredTooltip, setHoveredTooltip] = useState<{ text: string; top: number } | null>(null)
 
-  const navItems = [
-    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  const navItems: NavItem[] = [
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', tooltip: 'Project Overview' },
   ]
 
   if (user?.role === 'LA_OFFICER' || user?.role === 'PROJECT_OFFICER') {
-    navItems.push({ to: '/la-workbench', icon: Briefcase, label: 'LA Workbench' })
+    navItems.push({ to: '/la-workbench', icon: Briefcase, label: 'Officer Workbench' })
   }
   if (user?.role === 'PROJECT_AGENCY') {
     navItems.push({ to: '/agency-portal', icon: Building2, label: 'Agency Portal' })
   }
 
   navItems.push(
-    { to: '/priority-intelligence', icon: Activity, label: 'Priority Intelligence' },
-    { to: '/intelligence', icon: Brain, label: 'Decision Intelligence' },
-    { to: '/projects', icon: FolderKanban, label: 'Projects' },
-    { to: '/gis', icon: Map, label: 'GIS Map' },
-    { to: '/analytics', icon: BarChart3, label: 'Analytics' },
-    { to: '/alerts', icon: Bell, label: 'Alerts' },
-    { to: '/data-sources', icon: Database, label: 'Data Sources' },
-    { to: '/data-quality', icon: ShieldCheck, label: 'Data Quality' },
+    { to: '/priority-intelligence', icon: Target, label: 'Priority Watchlist', tooltip: 'High Risk Projects & Urgency' },
+    { to: '/intelligence', icon: TargetCheck, label: 'Decision Simulator', tooltip: 'What-If Simulations & Solutions' },
+    { to: '/projects', icon: Folder, label: 'Projects Directory', tooltip: 'Browse All Projects & Details' },
+    { to: '/gis', icon: MapPinned, label: 'Interactive Map', tooltip: 'Geographic Risk & Route Mapping' },
+    { to: '/analytics', icon: BarChart3, label: 'Analytics & Trends', tooltip: 'Performance & Delay Trends' },
+    { to: '/alerts', icon: Bell, label: 'Alerts & Warnings', tooltip: 'Real-Time Delay Notifications' },
+    { to: '/data-sources', icon: Database, label: 'Data Sources', tooltip: 'CSV & Connected Data Feeds' },
+    { to: '/data-quality', icon: ShieldCheck, label: 'Data Health', tooltip: 'Completeness & Reliability Scores' },
   )
 
-  const adminItems = [{ to: '/admin', icon: Settings, label: 'Admin' }]
+  const adminItems = [{ to: '/admin', icon: Settings, label: 'Admin & AI Settings', tooltip: 'AI Configuration & Users' }]
 
 
   return (
-    <motion.aside
+    <>
+      <motion.aside
       animate={{ width: collapsed ? 68 : 252 }}
       transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
       style={{
@@ -133,19 +149,32 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav style={{
-        flex: 1,
-        padding: '10px 8px',
-        overflowY: 'auto',
-        overflowX: 'hidden',
-      }}>
+      <nav
+        onScroll={() => setHoveredTooltip(null)}
+        style={{
+          flex: 1,
+          padding: '10px 8px',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }}
+      >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {navItems.map(({ to, icon: Icon, label }) => (
+          {navItems.map(({ to, icon: Icon, label, tooltip }) => (
             <NavLink
               key={to}
               to={to}
-              title={collapsed ? label : undefined}
+              aria-label={tooltip ?? label}
               style={{ textDecoration: 'none' }}
+              onMouseEnter={(e) => {
+                if (tooltip) {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  setHoveredTooltip({
+                    text: tooltip,
+                    top: rect.top + rect.height / 2,
+                  })
+                }
+              }}
+              onMouseLeave={() => setHoveredTooltip(null)}
             >
               {({ isActive }) => (
                 <motion.div
@@ -337,5 +366,55 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
       </button>
     </motion.aside>
+
+    {/* Small Hover Tooltip (appears only when hovering directly over heading/icon area) */}
+    <AnimatePresence>
+      {hoveredTooltip && (
+        <motion.div
+          role="tooltip"
+          initial={{ opacity: 0, x: -4, scale: 0.96 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: -4, scale: 0.96 }}
+          transition={{ duration: 0.1 }}
+          style={{
+            position: 'fixed',
+            left: (collapsed ? 68 : 252) + 10,
+            top: hoveredTooltip.top,
+            transform: 'translateY(-50%)',
+            zIndex: 9999,
+            background: 'rgba(11, 19, 36, 0.96)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(64, 128, 255, 0.3)',
+            borderRadius: 6,
+            padding: '5px 10px',
+            color: '#f8fafc',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            letterSpacing: '0.01em',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.55), 0 0 10px rgba(64, 128, 255, 0.15)',
+            lineHeight: 1.2,
+          }}
+        >
+          {/* Arrow */}
+          <div
+            style={{
+              position: 'absolute',
+              left: -5,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: 0,
+              height: 0,
+              borderTop: '5px solid transparent',
+              borderBottom: '5px solid transparent',
+              borderRight: '5px solid rgba(64, 128, 255, 0.3)',
+            }}
+          />
+          {hoveredTooltip.text}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </>
   )
 }
