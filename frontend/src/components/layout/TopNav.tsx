@@ -1,10 +1,12 @@
 /**
  * LADRIS — Premium Top Navigation Bar
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon } from 'lucide-react'
+import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Pause, Play, Square, Sparkles } from 'lucide-react'
+import { voiceEngine } from '@/components/voice/voiceEngine'
+import { collectPageContent } from '@/components/voice/pageContentCollector'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { roleLabel } from '@/utils'
@@ -37,6 +39,51 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
   const location = useLocation()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [time, setTime] = useState(new Date())
+  const [voiceState, setVoiceState] = useState({
+    isSpeaking: false,
+    isPaused: false,
+  })
+  const lastVoiceClickRef = useRef<number>(0)
+
+  useEffect(() => {
+    return voiceEngine.subscribe((state) => {
+      setVoiceState({
+        isSpeaking: state.isSpeaking,
+        isPaused: state.isPaused,
+      })
+    })
+  }, [])
+
+  const handleSpeak = () => {
+    const now = Date.now()
+    if (now - lastVoiceClickRef.current < 400) {
+      return // Prevent duplicate speech when clicked repeatedly
+    }
+    lastVoiceClickRef.current = now
+
+    if (voiceEngine.isSpeaking()) {
+      return
+    }
+
+    const content = collectPageContent()
+    const textToSpeak = content && content.trim().length > 0
+      ? content
+      : 'LADRIS voice guidance is ready.'
+
+    voiceEngine.speak(textToSpeak)
+  }
+
+  const handlePause = () => {
+    voiceEngine.pause()
+  }
+
+  const handleResume = () => {
+    voiceEngine.resume()
+  }
+
+  const handleStop = () => {
+    voiceEngine.stop()
+  }
 
   const sidebarWidth = sidebarCollapsed ? 68 : 252
 
@@ -160,6 +207,13 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
           Live
         </div>
 
+        {/* Saarthi AI Assistant Trigger */}
+        <NavIconButton
+          icon={<Sparkles size={16} strokeWidth={2.2} color="#f47721" />}
+          onClick={() => window.dispatchEvent(new CustomEvent('open-saarthi'))}
+          title="Ask Saarthi AI Assistant"
+        />
+
         {/* Alerts Button */}
         <NavIconButton
           icon={<Bell size={15} strokeWidth={2} />}
@@ -167,6 +221,43 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
           badge={3}
           title="Alerts"
         />
+
+        {/* Voice Playback Controls */}
+        {!voiceState.isSpeaking ? (
+          <NavIconButton
+            icon={<Volume2 size={16} strokeWidth={2} />}
+            onClick={handleSpeak}
+            title="Start Voice Guidance"
+            ariaLabel="Start Voice Guidance"
+            ariaPressed={false}
+          />
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {voiceState.isPaused ? (
+              <NavIconButton
+                icon={<Play size={15} strokeWidth={2} color="var(--color-primary-400, #4080ff)" />}
+                onClick={handleResume}
+                title="Resume Voice Guidance"
+                ariaLabel="Resume Voice Guidance"
+                ariaPressed={false}
+              />
+            ) : (
+              <NavIconButton
+                icon={<Pause size={15} strokeWidth={2} color="var(--color-primary-400, #4080ff)" />}
+                onClick={handlePause}
+                title="Pause Voice Guidance"
+                ariaLabel="Pause Voice Guidance"
+                ariaPressed={true}
+              />
+            )}
+            <NavIconButton
+              icon={<Square size={13} strokeWidth={2} fill="currentColor" color="var(--color-risk-critical, #ef4444)" />}
+              onClick={handleStop}
+              title="Stop Voice Guidance"
+              ariaLabel="Stop Voice Guidance"
+            />
+          </div>
+        )}
 
         {/* Theme Toggle Button (Light / Dark) */}
         <NavIconButton
@@ -317,16 +408,22 @@ function NavIconButton({
   onClick,
   badge,
   title,
+  ariaLabel,
+  ariaPressed,
 }: {
   icon: React.ReactNode
   onClick: () => void
   badge?: number
   title?: string
+  ariaLabel?: string
+  ariaPressed?: boolean
 }) {
   return (
     <button
       onClick={onClick}
       title={title}
+      aria-label={ariaLabel ?? title}
+      aria-pressed={ariaPressed}
       style={{
         position: 'relative',
         width: 36, height: 36,

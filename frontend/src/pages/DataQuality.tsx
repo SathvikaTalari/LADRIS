@@ -153,11 +153,11 @@ export default function DataQuality() {
               <strong style={{ color: 'var(--color-text-primary)' }}>{summary.total_real_records.toLocaleString('en-IN')}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Missing Fields Avg:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Average Missing Data:</span>
               <strong style={{ color: 'var(--color-text-primary)' }}>{(summary.missing_value_rate * 100).toFixed(1)}%</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>Prediction Eligible:</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>Ready for Prediction:</span>
               <strong style={{ color: '#2563eb' }}>{summary.prediction_eligible_records.toLocaleString('en-IN')}</strong>
             </div>
           </div>
@@ -209,7 +209,7 @@ export default function DataQuality() {
                     {src.name}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                    Status: {src.status}
+                    Official Public Source
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>

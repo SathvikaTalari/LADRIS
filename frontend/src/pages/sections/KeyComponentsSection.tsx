@@ -1,36 +1,21 @@
 /**
- * KeyComponentsSection — LADRIS AI
+ * KeyComponentsSection — LADRIS
  * Animation: DATA STREAMS → AI CORE → CARD CYCLE → FINAL GRID
  * Library: Framer Motion (already installed, no new deps)
  */
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 
-/* ─── Static data ───────────────────────────────────────────────────────── */
-const STREAMS = [
-  { label: 'PROJECT DATA',    dir: 'left'  as const },
-  { label: 'APPROVALS',       dir: 'right' as const },
-  { label: 'LEGAL RECORDS',   dir: 'left'  as const },
-  { label: 'COMPENSATION',    dir: 'right' as const },
-  { label: 'GIS DATA',        dir: 'left'  as const },
-  { label: 'DOCUMENTS',       dir: 'right' as const },
-  { label: 'REHABILITATION',  dir: 'left'  as const },
-  { label: 'HISTORICAL DATA', dir: 'right' as const },
-]
-
-const COMPONENTS = [
-  { num: '01', title: 'AI Delay Prediction',   process: 'Analyzing project patterns…',  desc: 'Uses project data and machine learning to predict possible delays at different stages of land acquisition.' },
-  { num: '02', title: 'Project Risk Score',     process: 'Calculating project risk…',    desc: 'Gives every project a risk score and classifies it as High, Medium or Low Risk.' },
-  { num: '03', title: 'Delay Cause Detection',  process: 'Finding key delay causes…',    desc: 'Identifies causes such as pending approvals, compensation delays, legal disputes, incomplete documents, rehabilitation issues and administrative bottlenecks.' },
-  { num: '04', title: 'GIS Risk Map',           process: 'Mapping project risk…',        desc: 'Shows high-risk projects on digital maps and helps visualize delay trends across districts and states.' },
-  { num: '05', title: 'Early Alerts',           process: 'Checking risk threshold…',     desc: 'Automatically alerts project managers and administrators when a project has a high chance of delay.' },
-  { num: '06', title: 'Smart Recommendations',  process: 'Preparing preventive action…', desc: 'Suggests preventive actions based on predicted risks to help teams act before delays affect the project.' },
-  { num: '07', title: 'Explainable AI',         process: 'Identifying risk factors…',    desc: 'Shows the important factors behind a prediction so users can understand why a project is considered risky.' },
-  { num: '08', title: 'Continuous Learning',    process: 'Updating prediction model…',   desc: 'Uses newly available project data to improve prediction accuracy over time.' },
-]
-
+/* ─── Static data (translated at runtime) ────────────────────────────────── */
 const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number]
 type Phase = 0 | 1 | 2 | 3 | 4
+
+interface ComponentData {
+  num: string
+  title: string
+  process: string
+  desc: string
+}
 
 /* ─── DataStream ────────────────────────────────────────────────────────── */
 function DataStream({
@@ -77,7 +62,7 @@ function DataStream({
 }
 
 /* ─── AICore ────────────────────────────────────────────────────────────── */
-function AICore({ visible, isDark }: { visible: boolean; isDark: boolean }) {
+function AICore({ visible, isDark, hi }: { visible: boolean; isDark: boolean; hi: boolean }) {
   return (
     <AnimatePresence>
       {visible && (
@@ -89,59 +74,43 @@ function AICore({ visible, isDark }: { visible: boolean; isDark: boolean }) {
           transition={{ duration: 0.6, ease: EASE }}
           style={{
             textAlign: 'center', padding: '18px 36px', borderRadius: 18,
-            background: isDark
-              ? 'linear-gradient(135deg, rgba(10,22,44,0.98), rgba(14,34,72,0.98))'
-              : 'linear-gradient(135deg, #eef3fc, #e4eefb)',
-            border: '1px solid rgba(74,111,165,0.42)',
-            boxShadow: isDark
-              ? '0 0 0 1px rgba(74,111,165,0.12), 0 0 44px rgba(74,111,165,0.16), 0 16px 48px rgba(0,0,0,0.55)'
-              : '0 0 0 1px rgba(74,111,165,0.14), 0 0 36px rgba(74,111,165,0.1), 0 8px 28px rgba(74,111,165,0.09)',
+            background: isDark ? 'rgba(10,22,44,0.97)' : '#ffffff',
+            border: `1px solid ${isDark ? 'rgba(74,111,165,0.22)' : 'rgba(74,111,165,0.18)'}`,
+            boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.35)' : '0 2px 10px rgba(74,111,165,0.07)',
             position: 'relative', overflow: 'hidden',
           }}
         >
-          {/* Breathing glow */}
-          <motion.div
-            animate={{ opacity: [0.2, 0.6, 0.2] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-              position: 'absolute', inset: 0,
-              background: 'radial-gradient(ellipse at 50% 50%, rgba(74,111,165,0.14) 0%, transparent 70%)',
-              pointerEvents: 'none', borderRadius: 18,
-            }}
-          />
+          {/* Top accent line — matches FeatureCard style */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+            background: 'linear-gradient(90deg, #4a6fa5, transparent 65%)',
+          }} />
 
           <div style={{
             fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.2em',
             textTransform: 'uppercase', color: 'rgba(74,111,165,0.65)', marginBottom: 5,
           }}>
-            Intelligence Engine
+            {hi ? 'बुद्धिमत्ता इंजन' : 'Intelligence Engine'}
           </div>
           <div style={{
             fontSize: '1.35rem', fontWeight: 900, letterSpacing: '-0.03em',
             color: isDark ? '#ddeaff' : '#0a1d37', lineHeight: 1.1,
           }}>
-            LADRIS<span style={{ color: '#4a6fa5' }}>·</span>AI
+            LADRIS
           </div>
 
-          {/* Waveform bars */}
-          <motion.div
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}
-          >
-            {[0.5, 1, 0.7, 1, 0.5].map((h, i) => (
-              <motion.div
+          {/* Static waveform bars */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}>
+            {[6, 10, 8, 10, 6].map((h, i) => (
+              <div
                 key={i}
-                animate={{ scaleY: [h * 0.4, h, h * 0.4] }}
-                transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }}
                 style={{
-                  width: 3, height: 14, borderRadius: 2,
-                  background: `rgba(74,111,165,${0.4 + h * 0.35})`,
-                  transformOrigin: 'center',
+                  width: 3, height: h, borderRadius: 2,
+                  background: isDark ? 'rgba(74,111,165,0.45)' : 'rgba(74,111,165,0.3)',
                 }}
               />
             ))}
-          </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -152,7 +121,7 @@ function AICore({ visible, isDark }: { visible: boolean; isDark: boolean }) {
 function FeatureCard({
   comp, isActive, isDark, gridMode, gridIndex,
 }: {
-  comp: typeof COMPONENTS[number]; isActive: boolean;
+  comp: ComponentData; isActive: boolean;
   isDark: boolean; gridMode: boolean; gridIndex: number;
 }) {
   return (
@@ -243,7 +212,32 @@ function FeatureCard({
 }
 
 /* ─── Main Section ──────────────────────────────────────────────────────── */
-export default function KeyComponentsSection({ isDark }: { isDark: boolean }) {
+export default function KeyComponentsSection({ isDark, language }: { isDark: boolean; language: 'en' | 'hi' }) {
+  const hi = language === 'hi'
+
+  /* ── Translated data (computed per render) ── */
+  const STREAMS = [
+    { label: hi ? 'प्रोजेक्ट डेटा'    : 'PROJECT DATA',    dir: 'left'  as const },
+    { label: hi ? 'अनुमोदन'       : 'APPROVALS',       dir: 'right' as const },
+    { label: hi ? 'कानूनी रिकॉर्ड'  : 'LEGAL RECORDS',   dir: 'left'  as const },
+    { label: hi ? 'मुआवज़ा'      : 'COMPENSATION',    dir: 'right' as const },
+    { label: hi ? 'GIS डेटा'        : 'GIS DATA',        dir: 'left'  as const },
+    { label: hi ? 'दस्तावेज़'      : 'DOCUMENTS',       dir: 'right' as const },
+    { label: hi ? 'पुनर्वास'     : 'REHABILITATION',  dir: 'left'  as const },
+    { label: hi ? 'ऐतिहासिक डेटा' : 'HISTORICAL DATA', dir: 'right' as const },
+  ]
+
+  const COMPONENTS = [
+    { num: '01', title: hi ? 'AI विलंब भविष्यवाणी'    : 'AI Delay Prediction',   process: hi ? 'प्रोजेक्ट पैटर्न विश्लेषण…'  : 'Analyzing project patterns…',  desc: hi ? 'भूमि अधिग्रहण के विभिन्न चरणों में संभावित विलंबों की भविष्यवाणी के लिए प्रोजेक्ट डेटा और ML का उपयोग करता है।' : 'Uses project data and machine learning to predict possible delays at different stages of land acquisition.' },
+    { num: '02', title: hi ? 'प्रोजेक्ट जोखिम स्कोर'    : 'Project Risk Score',     process: hi ? 'प्रोजेक्ट जोखिम गणना…'    : 'Calculating project risk…',    desc: hi ? 'प्रत्येक प्रोजेक्ट को जोखिम स्कोर देता है और उच्च, मध्यम या निम्न जोखिम में वर्गीकृत करता है।' : 'Gives every project a risk score and classifies it as High, Medium or Low Risk.' },
+    { num: '03', title: hi ? 'विलंब कारण पहचान'  : 'Delay Cause Detection',  process: hi ? 'मुख्य विलंब कारण खोजना…'    : 'Finding key delay causes…',    desc: hi ? 'लंबित अनुमोदन, मुआवज़ा विलंब, कानूनी विवाद, अधूरे दस्तावेज़, पुनर्वास समस्याएं और प्रशासनिक बाधाओं जैसे कारणों की पहचान करता है।' : 'Identifies causes such as pending approvals, compensation delays, legal disputes, incomplete documents, rehabilitation issues and administrative bottlenecks.' },
+    { num: '04', title: hi ? 'GIS जोखिम मानचित्र'           : 'GIS Risk Map',           process: hi ? 'प्रोजेक्ट जोखिम मैपिंग…'        : 'Mapping project risk…',        desc: hi ? 'डिजिटल मानचित्रों पर उच्च-जोखिम प्रोजेक्ट दिखाता है और जिलों व राज्यों में विलंब प्रवृत्तियां दर्शाता है।' : 'Shows high-risk projects on digital maps and helps visualize delay trends across districts and states.' },
+    { num: '05', title: hi ? 'शीघ्र अलर्ट'           : 'Early Alerts',           process: hi ? 'जोखिम सीमा जांच…'     : 'Checking risk threshold…',     desc: hi ? 'जब किसी प्रोजेक्ट में विलंब की अधिक संभावना हो तो प्रोजेक्ट प्रबंधकों को स्वचालित अलर्ट भेजता है।' : 'Automatically alerts project managers and administrators when a project has a high chance of delay.' },
+    { num: '06', title: hi ? 'स्मार्ट सिफ़ारिशें'  : 'Smart Recommendations',  process: hi ? 'निवारक कार्रवाई तैयार…' : 'Preparing preventive action…', desc: hi ? 'भविष्यवाणी जोखिमों के आधार पर निवारक कार्रवाई सुझाता है ताकि विलंब से पहले टीमें कार्रवाई कर सकें।' : 'Suggests preventive actions based on predicted risks to help teams act before delays affect the project.' },
+    { num: '07', title: hi ? 'स्पष्टीकरणीय AI'         : 'Explainable AI',         process: hi ? 'जोखिम कारक पहचान…'    : 'Identifying risk factors…',    desc: hi ? 'भविष्यवाणी के पीछे के महत्वपूर्ण कारक दिखाता है ताकि उपयोगकर्ता समझ सकें कि कोई प्रोजेक्ट जोखिमभरा क्यों माना जाता है।' : 'Shows the important factors behind a prediction so users can understand why a project is considered risky.' },
+    { num: '08', title: hi ? 'निरंतर सीखना'    : 'Continuous Learning',    process: hi ? 'भविष्यवाणी मॉडल अपडेट…'   : 'Updating prediction model…',   desc: hi ? 'नए उपलब्ध प्रोजेक्ट डेटा का उपयोग करके समय के साथ भविष्यवाणी सटीकता में सुधार करता है।' : 'Uses newly available project data to improve prediction accuracy over time.' },
+  ]
+
   const sectionRef = useRef<HTMLElement>(null)
   const isInView   = useInView(sectionRef, { once: true, margin: '-8% 0px' })
 
@@ -323,7 +317,7 @@ export default function KeyComponentsSection({ isDark }: { isDark: boolean }) {
               letterSpacing: '-0.03em', lineHeight: 1.2, marginBottom: 12,
             }}
           >
-            Everything LADRIS AI sees
+            {hi ? 'LADRIS जो कुछ भी देखता है' : 'Everything LADRIS sees'}
           </motion.h2>
 
           <motion.p
@@ -335,7 +329,7 @@ export default function KeyComponentsSection({ isDark }: { isDark: boolean }) {
               maxWidth: 480, margin: '0 auto', lineHeight: 1.75,
             }}
           >
-            From project data to actionable intelligence.
+            {hi ? 'प्रोजेक्ट डेटा से कार्रवाई योग्य बुद्धिमत्ता तक।' : 'From project data to actionable intelligence.'}
           </motion.p>
         </motion.div>
 
@@ -365,7 +359,7 @@ export default function KeyComponentsSection({ isDark }: { isDark: boolean }) {
 
                 {/* Centre: AI core + cycling card */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
-                  <AICore visible={showCore} isDark={isDark} />
+                  <AICore visible={showCore} isDark={isDark} hi={hi} />
 
                   <AnimatePresence mode="wait">
                     {showCycle && (

@@ -191,7 +191,7 @@ export default function Dashboard() {
           value={isLoading ? null : (kpis?.total_active_projects ?? 0)}
           icon={<FolderKanban size={16} />}
           accent="var(--color-accent-navy)"
-          description="National portfolio count"
+          description="Total projects"
           isLoading={isLoading}
         />
         <MetricCard
@@ -199,7 +199,7 @@ export default function Dashboard() {
           value={isLoading ? null : `${(kpis?.total_land_required_ha ?? 0).toLocaleString()} ha`}
           icon={<MapIcon size={16} />}
           accent="var(--color-accent-primary)"
-          description="Acquisition footprint"
+          description="Land needed"
           isLoading={isLoading}
         />
         <MetricCard
@@ -207,7 +207,7 @@ export default function Dashboard() {
           value={isLoading ? null : `₹${(kpis?.financial_outlay_cr ?? 0).toLocaleString()} Cr`}
           icon={<DollarSign size={16} />}
           accent="var(--color-accent-tertiary)"
-          description="Estimated compensation"
+          description="Expected compensation"
           isLoading={isLoading}
         />
         <MetricCard

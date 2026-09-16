@@ -1,199 +1,241 @@
-# LADRIS
-### AI-Powered Land Acquisition Early-Warning & Intervention Intelligence Platform
+# 🛣️ LADRIS
+### **AI-Powered Land Acquisition Early-Warning & Decision Support Intelligence Platform**
+
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite-61DAFB?style=flat-square&logo=react)](https://react.dev/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20PostGIS-336791?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 ---
 
 ## 📌 Executive Summary
 
-**LADRIS** is an enterprise-grade AI decision-support platform designed for predictive analytics and early detection of land acquisition delays in infrastructure development projects across India.
+**LADRIS** (Land Acquisition Decision & Risk Intelligence System) is an enterprise AI decision-support platform designed for predictive analytics and proactive delay prevention across Indian infrastructure and National Highway projects.
 
-By analyzing administrative approval timelines, compensation disbursement rates, legal disputes, rehabilitation progress, and geospatial indicators, LADRIS shifts project monitoring from reactive reporting to predictive decision-making.
+Linear infrastructure development across India frequently faces multi-year delays due to statutory notification lapses, compensation distribution bottlenecks, court disputes, and Right-of-Way (RoW) encumbrances. LADRIS transforms this paradigm from **reactive tracking** into **predictive early intervention** by continuously auditing real gazettes, court filings, and milestone progress.
+
+---
+
+## 🌟 Core Features & Modules
+
+| Module | Route | What it Does |
+| :--- | :--- | :--- |
+| **🤖 Saarthi AI Copilot** | *Floating in all screens* | In-app intelligent conversational assistant grounded in live database metrics, statutory land laws (NH Act 1956 & RFCTLARR 2013), with speech-to-text and voice narration. |
+| **📊 Command Dashboard** | `/dashboard` | Executive KPI overview displaying total verified projects, delayed corridors, high-risk counts, and the priority intervention queue. |
+| **🎯 Priority Intelligence** | `/priority-intelligence` | Multi-factor decision-support ranking engine that explains *why* each corridor is prioritized based on timeline slippage, statutory lapse proximity, and legal bottlenecks. |
+| **🏛️ LA Officer Workbench** | `/la-workbench` | Operational dashboard for CALA (Competent Authority for Land Acquisition) officers to manage 3A/3D/3G notifications, objection hearings, and compensation disbursement. |
+| **🚜 Implementing Agency Portal** | `/agency-portal` | Project execution hub for NHAI and state agencies to monitor civil contractor handovers and encumbrance-free physical possession. |
+| **🧪 What-If Policy Simulator** | `/intelligence` | Simulation sandbox allowing planners to model how allocating special arbitration budgets or faster disbursement compresses project delay months. |
+| **🗺️ GIS Geospatial Risk Map** | `/gis` | Interactive PostGIS map showing highway alignment pins with colored risk tiers (Critical, High, Medium, Low) and strict zero-hallucination coordinates. |
+| **📈 District Analytics** | `/analytics` | Aggregated district and state distributions with sample-size safeguards. |
+| **🚨 Early-Warning Alerts** | `/alerts` | Automated triggers warning of impending statutory lapse cliffs (e.g. 1-year Section 3D deadline). |
+| **🔗 Data Sources & Quality** | `/data-sources` | Pipeline health monitor for BhoomiRashi gazette scrapers, Data.gov.in, and e-Courts case feeds. |
 
 ---
 
 ## 🏗️ Monorepo Architecture
 
 ```
-LADRIS_AI/
-├── frontend/          # React + TypeScript + Vite + Tailwind CSS + shadcn/ui
-├── backend/           # Python + FastAPI + Async SQLAlchemy + Pydantic + JWT Auth
-├── ml/                # ML Pipeline workspace & Data provenance registry
-│   ├── data/          # raw/, processed/, features/
-│   ├── notebooks/     # EDA & feature engineering notebooks
-│   └── models/        # Serialized model artifacts
-├── database/          # PostgreSQL + PostGIS schema migrations & index scripts
-├── docs/              # System architecture, DB ERD, API specs & data strategy
-├── docker-compose.yml # Container orchestration for DB, backend & frontend
-└── .env.example       # Environment configuration template
+LADRIS/
+├── frontend/             # React 19 + TypeScript + Vite + Zustand + Framer Motion
+│   ├── src/
+│   │   ├── api/          # Axios API client with automatic JWT token refresh
+│   │   ├── components/   # UI components (Layout, Chatbot, Voice, Charts)
+│   │   ├── pages/        # Dashboard, GIS, Workbench, Analytics, Intelligence
+│   │   └── store/        # Zustand state stores (Auth, Theme)
+├── backend/              # FastAPI + Async SQLAlchemy + Pydantic v2 + JWT
+│   ├── app/
+│   │   ├── api/v1/       # REST API endpoints (Projects, Intelligence, Chatbot, Alerts)
+│   │   ├── models/       # PostgreSQL models (Project, Alert, User, DataSource)
+│   │   ├── services/     # Business logic (Saarthi chatbot, Anomaly scoring, Audit)
+│   │   └── etl/          # BhoomiRashi scraper and data normalizer
+├── database/             # PostgreSQL + PostGIS migrations and seed scripts
+│   └── migrations/       # SQL schema versions (001 to 006)
+├── ml/                   # Machine learning training, features, and model cards
+│   ├── models/           # Serialized IsolationForest model artifacts (.pkl)
+│   └── training/         # Model training scripts and validation
+├── docs/                 # Detailed architectural and domain documentation
+└── docker-compose.yml    # Docker configuration for PostgreSQL + PostGIS
 ```
 
 ---
 
-## 🚀 Comprehensive Local Setup Guide
+## ⚡ Quick Start Guide (Run in 3 Minutes)
 
-Follow these instructions to clone, configure, and run **LADRIS** from scratch on your local machine.
-
----
-
-### 💻 Standard Setup Overview
-
-| Component | Execution Method | Details |
-| :--- | :--- | :--- |
-| **Database** | **Docker** (`docker compose up -d db`) | PostGIS container on port `15432` with auto-schema migration |
-| **Backend** | **Native Terminal** (`uvicorn`) | FastAPI server on `http://localhost:8000` with auto-reload |
-| **Frontend** | **Native Terminal** (`npm run dev`) | React + Vite app on `http://localhost:5173` |
-| **ML Engine** | **Native Terminal** (`python`) | Feature engineering & model training scripts |
+### 📋 Prerequisites
+- **Git** installed
+- **Docker Desktop** (for PostgreSQL + PostGIS database)
+- **Python 3.10+**
+- **Node.js 18+** & `npm`
 
 ---
 
-### 🚀 Step-by-Step Launch Guide
+### Step 1: Clone the Repository & Configure Environment
 
-#### Step 1: Clone Repository & Create `.env`
 ```bash
-git clone https://github.com/SathvikaTalari/LADRIS---Land-Acquisition.git
-cd LandPulse_AI
+git clone https://github.com/SathvikaTalari/LADRIS.git
+cd LADRIS
 
-# Create .env file from template
-cp .env.example .env    # Linux/macOS
-Copy-Item .env.example .env   # Windows PowerShell
+# Copy the environment file template
+# Windows PowerShell:
+Copy-Item .env.example .env
+
+# Linux / macOS:
+cp .env.example .env
 ```
 
-#### Step 2: Launch Database with Docker
-Run Docker Compose to start only the PostgreSQL + PostGIS database container:
+---
+
+### Step 2: Start the PostGIS Database Container
+
 ```bash
 docker compose up -d db
 ```
-> The container automatically initializes the `ladris` database schema, PostGIS extensions, and tables.
+> This starts PostgreSQL with the PostGIS extension on port `15432` with auto-initialized schemas.
 
-#### Step 3: Launch FastAPI Backend (Terminal 1)
+---
+
+### Step 3: Setup & Start Backend (Terminal 1)
+
 ```bash
 cd backend
 
-# Create & activate virtual environment
+# Create and activate Python virtual environment
+# Windows:
 python -m venv venv
-.\venv\Scripts\Activate.ps1   # Windows PowerShell
-# source venv/bin/activate    # Linux/macOS
+.\venv\Scripts\Activate.ps1
+
+# Linux / macOS:
+python3 -m venv venv
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Start backend development server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-- API Docs: `http://localhost:8000/docs`
-- Default Users Auto-Created: `admin@ladris.gov.in` / `officer@ladris.gov.in` (password: `admin123`)
+# Seed realistic demonstration projects (250 corridors across India)
+python seed_realistic_data.py
 
-#### Step 4: Launch React Frontend (Terminal 2)
-Open a **new terminal window** and run:
+# Start the FastAPI development server with hot-reload
+uvicorn app.main:app --reload --port 8000
+```
+- **Backend API URL**: `http://localhost:8000`
+- **Interactive Swagger Docs**: `http://localhost:8000/docs`
+
+---
+
+### Step 4: Setup & Start Frontend (Terminal 2)
+
+Open a new terminal window:
+
 ```bash
 cd frontend
 
-# Install Node modules
+# Install Node dependencies
 npm install
 
-# Start Vite dev server
+# Start Vite development server
 npm run dev
 ```
-- App UI: `http://localhost:5173`
+- **Web Application URL**: `http://localhost:5173`
 
-#### Step 5: Run ML Pipeline & Tests (Terminal 3)
-Open another terminal window for ML tasks:
+---
+
+## 🔑 Demo Access Credentials
+
+The platform includes pre-configured demo credentials representing every stakeholder role in the land acquisition lifecycle:
+
+| Stakeholder Role | Email Address | Password | Jurisdiction Scope |
+| :--- | :--- | :--- | :--- |
+| **Super Admin** | `admin@ladris.gov.in` | `Password123!` *(or `admin123`)* | Full System Admin |
+| **Central Ministry (MoRTH)** | `central@ladris.gov.in` | `Password123!` | National Highway Network |
+| **State Government** | `state@ladris.gov.in` | `Password123!` | State Revenue & PWD |
+| **District Administration** | `district@ladris.gov.in` | `Password123!` | District Collectorate |
+| **Land Acquiring Authority (CALA)** | `authority@ladris.gov.in` | `Password123!` | Land Acquisition Hearings |
+| **Land Requiring Body** | `lrb@ladris.gov.in` | `Password123!` | Infrastructure Project Sponsor |
+| **Project Implementing Agency** | `agency@ladris.gov.in` | `Password123!` | NHAI / NHIDCL Execution |
+| **Policy Maker** | `policy@ladris.gov.in` | `Password123!` | NITI Aayog / MoRTH Research |
+
+> 💡 **Quick Login**: On the login screen (`http://localhost:5173/login`), simply select any role from the **"Select User Role"** dropdown. It will automatically populate the demo email and password for you!
+
+---
+
+## 🤖 Saarthi — In-App AI Assistant
+
+**Saarthi** is your interactive decision copilot built into the bottom-right of every screen:
+
+- 💬 **Live Database Queries**: Ask *"Which projects have the highest delay risk?"* or *"Tell me about the Sangareddy Bypass"* and Saarthi will query the live 250 corridors and generate a summarized table.
+- 📜 **Statutory Law Guidance**: Ask about the **National Highways Act 1956** (Sections 3A to 3H) or **RFCTLARR Act 2013** (solatium and market value calculations).
+- 🧭 **In-App Action Buttons**: Every reply contains direct navigation links (e.g. `[Open GIS Map]`, `[Priority Queue]`) that route inside the app without reloading.
+- 🎙️ **Voice Accessibility**: Includes a microphone button for voice queries (Speech-to-Text) and a speaker toggle for audio narration (Text-to-Speech).
+
+---
+
+## ⚖️ Statutory Land Acquisition Framework
+
+LADRIS directly tracks the statutory stages defined under Indian law:
+
+### 1. National Highways Act, 1956
+```
+Section 3A (Intention to Acquire)
+      ↓ (21 Days for Objections)
+Section 3C (Hearing of Objections by CALA)
+      ↓ ⚠️ MUST BE PUBLISHED WITHIN 1 YEAR, OR 3A LAPSES!
+Section 3D (Declaration of Acquisition - Land Vests in Govt)
+      ↓
+Section 3G (Determination of Compensation by CALA)
+      ↓ (Dispute? → Arbitration by Divisional Commissioner)
+Section 3H (Deposit of Compensation with CALA)
+      ↓ (60 Days Notice)
+Section 3E (Enforcing Physical Possession of Right-of-Way)
+```
+
+### 2. RFCTLARR Act, 2013
+- **Market Value**: Higher of circle rate or average of top 50% sale deeds over past 3 years.
+- **Solatium**: Mandatory **100% additional amount** added to the market value.
+- **Rural Multiplication Factor**: Between **1.0x and 2.0x** based on distance from urban zones.
+- **Interest**: **12% per annum** from notification to award date.
+
+---
+
+## 🧪 Testing & Code Quality
+
+### Backend Tests
 ```bash
-# Re-train IsolationForest anomaly scorer
-python ml/training/train.py
-
-# Run unit & integration tests
+cd backend
+venv\Scripts\activate
 pytest
 ```
 
----
-
-### 🔑 Default System Access Credentials
-
-When the backend starts up, default accounts are verified automatically:
-
-| User Role | Email Address | Default Password |
-| :--- | :--- | :--- |
-| **Super Admin** | `admin@ladris.gov.in` | `admin123` |
-| **Project Officer** | `officer@ladris.gov.in` | `admin123` |
-
----
-
-### 🤖 ML Engine & Pipeline Execution
-
-The ML engine provides **anomaly scoring**, **stage bottleneck detection**, **risk velocity calculation**, and **intervention recommendations** across land acquisition projects.
-
-#### 1. Automatic Real-Time Inference
-- **Zero-Config Execution**: The backend (`backend/app/services/anomaly_service.py` & `risk_engine.py`) automatically loads the pre-trained serialized model (`ml/models/isolation_forest_v1.0-anomaly_*.pkl`) on startup.
-- In both Docker and Native setups, real-time risk scores and anomaly detection run automatically during API requests.
-
-#### 2. Running Data Ingestion Scrapers (Collecting Real Data)
-To ingest official projects from government portals:
+### Frontend Type Check
 ```bash
-# Docker Setup:
-docker compose exec backend python /ml/data_ingestion/bhoomirashi_scraper.py
-docker compose exec backend python /ml/data_ingestion/datagov_ingester.py
-
-# Native Setup:
-python ml/data_ingestion/bhoomirashi_scraper.py
-python ml/data_ingestion/datagov_ingester.py
+cd frontend
+npx tsc --noEmit
 ```
 
-#### 3. Re-Training the ML Anomaly Scorer
-To run feature engineering, data leakage checks, and train a new model artifact:
+### Verify Saarthi AI Endpoint
 ```bash
-# Docker Setup:
-docker compose exec backend python /ml/training/train.py
-
-# Native Setup:
-python ml/training/train.py
-```
-> The script validates prospective feature leakage, evaluates dataset sizes, trains an Isolation Forest model, normalizes anomaly scores, and updates `ml/models/current_model.json`.
-
-#### 4. Exploratory Data Analysis & Notebooks
-For interactive ML research and feature analysis:
-```bash
-# Install Jupyter inside backend virtual environment
-pip install jupyter
-
-# Launch notebook workspace
-jupyter notebook ml/notebooks
+# In backend virtual environment:
+python -c "import urllib.request, json; print(urllib.request.urlopen(urllib.request.Request('http://localhost:8000/api/v1/chatbot/chat', data=json.dumps({'message':'Show high risk projects'}).encode(), headers={'Content-Type':'application/json'})).read().decode())"
 ```
 
 ---
 
-## 🔑 Authentication & RBAC
+## 📚 Technical Documentation Directory
 
-LADRIS uses JWT tokens with standard Role-Based Access Control (RBAC):
+For deep-dive architectural specifications, refer to the [`docs/`](./docs) folder:
 
-| Role | Scope & Permissions |
-| :--- | :--- |
-| `SUPER_ADMIN` | Full system access, audit logs, dataset provenance management |
-| `STATE_ADMIN` | State-wide project CRUD and administrative reporting |
-| `DISTRICT_OFFICER` | Revenue district project creation and stage updates |
-| `PROJECT_OFFICER` | Single project milestone tracking and event logging |
-| `ANALYST` | Read-only analytics, custom query execution, model inspection |
-| `VIEWER` | Read-only dashboard view scoped to assigned jurisdiction |
-
----
-
-## 📜 Real Data Architecture Policy
-
-LADRIS strictly mandates **data authenticity**:
-- **No Fabricated Government Data**: Phase 1 includes zero fake government project statistics or dummy projects.
-- **Data Provenance**: Every imported dataset is tracked in `ml/data_provenance.json` with source URL, organization, retrieval timestamp, and license.
-- **Empty State System**: User interface components display clear, professional empty state indicators until official datasets are registered.
+- 📖 [System Architecture Specifications](./docs/architecture.md)
+- 🗄️ [Database Schema & ERD Design](./docs/database.md)
+- 🤖 [Model Card & Anomaly Scorer](./docs/model-card.md)
+- 📊 [ML Methodology & Stage Intelligence](./docs/ml-methodology.md)
+- 🔌 [API Reference Specifications](./docs/api.md)
+- 🛡️ [Security, RBAC & Data Provenance Standard](./docs/security.md)
+- 📋 [System User Guide](./docs/system-user-guide.md)
 
 ---
 
-## 📖 System Documentation
+## 👥 Contributors & Maintainers
 
-Detailed technical documentation is available in the [`docs/`](./docs) directory:
-- [Master AI Assistant Handoff & Implementation Tracker](./docs/implementation-tracking.md) ⭐
-- [Architecture Specifications](./docs/architecture.md)
-- [Model Card (v1.0-anomaly)](./docs/model-card.md)
-- [Data Gap Report & Target Specification](./docs/data-gap-report.md)
-- [ML Methodology & Stage Intelligence](./docs/ml-methodology.md)
-- [Database Schema & ERD](./docs/database.md)
-- [API Reference Guide](./docs/api.md)
-- [Data Strategy & Provenance Standard](./docs/data-strategy.md)
+Maintained with ❤️ for modernized, transparent, and predictive Indian infrastructure governance.

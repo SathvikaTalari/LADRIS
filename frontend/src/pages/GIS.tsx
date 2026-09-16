@@ -590,8 +590,8 @@ export default function GIS() {
               {viewMode === 'risk_map' ? `${visibleProjects.length} Projects Mapped` : `${heatmapData.length} Districts — Acquisition Risk Pressure Active`}
             </div>
             {viewMode === 'risk_map'
-              ? 'Click markers for project risk details, bottleneck, and priority score.'
-              : 'Click heatmap circles to drill down into district-level risk intelligence.'}
+              ? 'Click a marker to see project details and risk scores.'
+              : 'Click a circle to see district risk details.'}
           </div>
 
           {/* Loading overlay for heatmap */}
@@ -602,8 +602,8 @@ export default function GIS() {
             }}>
               <div style={{ textAlign: 'center' }}>
                 <Thermometer size={32} color="#dc2626" style={{ marginBottom: 8 }} />
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>Computing Acquisition Risk Pressure...</div>
-                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Aggregating multi-signal district risk</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>Loading risk heatmap...</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Calculating district risk scores</div>
               </div>
             </div>
           )}

@@ -1,0 +1,6 @@
+{
+  "status": "DEFERRED",
+  "reason": "No ingested data found",
+  "timestamp": "2026-09-10T07:50:30.235843+00:00",
+  "action_required": "Run ingestion scripts to collect real data, then re-run train.py"
+}

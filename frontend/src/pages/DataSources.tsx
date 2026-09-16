@@ -19,7 +19,7 @@ export default function DataSources() {
     setError(null)
     dataSourcesAPI.list()
       .then((res) => setSources(res.data_sources))
-      .catch(() => setError('Failed to load data sources from registry.'))
+      .catch(() => setError('Could not load data sources.'))
       .finally(() => setIsLoading(false))
   }
 

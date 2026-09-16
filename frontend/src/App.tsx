@@ -20,6 +20,23 @@ import Admin from '@/pages/Admin'
 import DataSources from '@/pages/DataSources'
 import DataQuality from '@/pages/DataQuality'
 
+// About pages
+import AboutProject from '@/pages/about/AboutProject'
+import UserGuide from '@/pages/about/UserGuide'
+import Compliance from '@/pages/about/Compliance'
+
+// Help pages
+import ContactFeedback from '@/pages/help/ContactFeedback'
+import Privacy from '@/pages/help/Privacy'
+import Terms from '@/pages/help/Terms'
+import FAQ from '@/pages/help/FAQ'
+
+// Document pages
+import Blogs from '@/pages/documents/Blogs'
+import ResearchPapers from '@/pages/documents/ResearchPapers'
+import CaseStudies from '@/pages/documents/CaseStudies'
+import RealWorldExamples from '@/pages/documents/RealWorldExamples'
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, fetchMe } = useAuthStore()
   const token = localStorage.getItem('access_token')
@@ -56,6 +73,23 @@ export default function App() {
         <Route path="/landing" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sitemap" element={<SiteMap />} />
+
+        {/* About pages */}
+        <Route path="/about/project" element={<AboutProject />} />
+        <Route path="/about/user-guide" element={<UserGuide />} />
+        <Route path="/about/compliance" element={<Compliance />} />
+
+        {/* Help pages */}
+        <Route path="/help/contact" element={<ContactFeedback />} />
+        <Route path="/help/privacy" element={<Privacy />} />
+        <Route path="/help/terms" element={<Terms />} />
+        <Route path="/help/faq" element={<FAQ />} />
+
+        {/* Document pages */}
+        <Route path="/documents/blogs" element={<Blogs />} />
+        <Route path="/documents/research-papers" element={<ResearchPapers />} />
+        <Route path="/documents/case-studies" element={<CaseStudies />} />
+        <Route path="/documents/real-world-examples" element={<RealWorldExamples />} />
 
         {/* Protected Dashboard Routes */}
         <Route

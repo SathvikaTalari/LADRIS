@@ -15,13 +15,16 @@ import { useThemeStore } from '@/store/themeStore'
 import KeyComponentsSection from './sections/KeyComponentsSection'
 import FeaturesRippleSection from './sections/FeaturesRippleSection'
 import RolesConnectedSection from './sections/RolesConnectedSection'
+import SystemArchitectureSection from './sections/SystemArchitectureSection'
+import GisIntelligenceSection from './sections/GisIntelligenceSection'
+import SmartAnalyticsSection from './sections/SmartAnalyticsSection'
 
 /* ─── Feature cards data ────────────────────────────────────────────────── */
 const FEATURES = [
   {
     icon: <Zap size={28} strokeWidth={1.8} />,
     title: 'Real-time Risk Scoring',
-    desc: 'Know the risk early. LADRIS AI checks project data and shows whether a project has low, medium, or high delay risk.',
+    desc: 'Know the risk early. LADRIS checks project data and shows whether a project has low, medium, or high delay risk.',
     color: '#4a6fa5',
   },
   {
@@ -39,7 +42,7 @@ const FEATURES = [
   {
     icon: <AlertTriangle size={28} strokeWidth={1.8} />,
     title: 'Predictive Bottleneck Detection',
-    desc: 'Find problems before they grow. LADRIS AI detects issues like approval, legal, compensation, and documentation delays before they seriously affect the project.',
+    desc: 'Find problems before they grow. LADRIS  detects issues like approval, legal, compensation, and documentation delays before they seriously affect the project.',
     color: '#4a6fa5',
   },
   {
@@ -111,6 +114,7 @@ export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSlide, setActiveSlide] = useState(0)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
   const [activePanel, setActivePanel] = useState<'sitemap' | 'language' | 'accessibility' | 'help' | null>(null)
   const [language, setLanguage] = useState<'en' | 'hi'>('en')
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal')
@@ -118,6 +122,11 @@ export default function Landing() {
   const [reducedMotion, setReducedMotion] = useState(false)
   const [helpQuery, setHelpQuery] = useState('')
   const [helpAnswer, setHelpAnswer] = useState('')
+  const [openDropdown, setOpenDropdown] = useState<'about' | 'help' | 'documents' | null>(null)
+  const [mobileAboutOpen, setMobileAboutOpen] = useState(false)
+  const [mobileHelpOpen, setMobileHelpOpen] = useState(false)
+  const [mobileDocsOpen, setMobileDocsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0])
@@ -127,6 +136,17 @@ export default function Landing() {
     const handler = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handler)
     return () => window.removeEventListener('scroll', handler)
+  }, [])
+
+  // Close dropdowns when clicking outside the nav
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
   }, [])
 
   // Auto-advance slideshow every 4.5 seconds
@@ -161,8 +181,42 @@ export default function Landing() {
     }
   }, [fontSize, highContrast, reducedMotion])
 
+  // ── Smooth-scroll helper: navigates to any section by id,
+  //    subtracting the actual sticky-header height + a small gap.
+  //    Respects prefers-reduced-motion.
+  const scrollToSection = (sectionId: string) => {
+    const target = document.getElementById(sectionId)
+    if (!target) return
+    const header = document.querySelector('header') as HTMLElement | null
+    const headerH = header ? header.getBoundingClientRect().height : 0
+    const gap = 16
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const targetTop = target.getBoundingClientRect().top + window.scrollY - headerH - gap
+    window.scrollTo({
+      top: targetTop,
+      behavior: prefersReduced ? 'auto' : 'smooth',
+    })
+  }
+
   const togglePanel = (panel: 'sitemap' | 'language' | 'accessibility' | 'help') =>
     setActivePanel(prev => (prev === panel ? null : panel))
+
+  // ── IntersectionObserver: track which section is in view for active nav highlight
+  useEffect(() => {
+    const ids = ['features', 'analytics', 'gis-intelligence', 'architecture']
+    const observers: IntersectionObserver[] = []
+    ids.forEach(id => {
+      const el = document.getElementById(id)
+      if (!el) return
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveSection(id) },
+        { threshold: 0.2, rootMargin: '-10% 0px -60% 0px' }
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach(o => o.disconnect())
+  }, [])
 
   const handleHelpQuery = (q: string) => {
     const query = q.toLowerCase().trim()
@@ -233,8 +287,8 @@ export default function Landing() {
     // Overview section
     overviewTitle: hi ? 'अवलोकन' : 'Overview',
     overviewText: hi
-      ? 'LADRIS AI भूमि अधिग्रहण के लिए एक AI-संचालित निर्णय-सहायता मंच है। यह ऐतिहासिक और लाइव परियोजना डेटा का अध्ययन करता है, विलंब की संभावना की भविष्यवाणी करता है, मुख्य जोखिम कारकों की पहचान करता है, GIS मानचित्र पर जोखिम भरी परियोजनाएं दिखाता है, अलर्ट भेजता है और निवारक कार्रवाई की सिफारिश करता है।'
-      : 'LADRIS AI is an AI-powered decision-support platform for land acquisition. It studies historical and live project data, predicts delay probability, finds the main risk factors, shows risky projects on GIS maps, sends alerts and recommends preventive actions.',
+      ? 'LADRIS  भूमि अधिग्रहण के लिए एक AI-संचालित निर्णय-सहायता मंच है। यह ऐतिहासिक और लाइव परियोजना डेटा का अध्ययन करता है, विलंब की संभावना की भविष्यवाणी करता है, मुख्य जोखिम कारकों की पहचान करता है, GIS मानचित्र पर जोखिम भरी परियोजनाएं दिखाता है, अलर्ट भेजता है और निवारक कार्रवाई की सिफारिश करता है।'
+      : 'LADRIS  is an AI-powered decision-support platform for land acquisition. It studies historical and live project data, predicts delay probability, finds the main risk factors, shows risky projects on GIS maps, sends alerts and recommends preventive actions.',
     overviewCta1: hi ? 'डैशबोर्ड एक्सेस करें' : 'Access Dashboard',
     overviewCta2: hi ? 'अधिक जानें' : 'Read More',
     // Challenges section
@@ -259,10 +313,10 @@ export default function Landing() {
     ],
     // Features
     features: hi ? [
-      { title: 'वास्तविक समय जोखिम स्कोरिंग', desc: 'जोखिम जल्दी जानें। LADRIS AI परियोजना डेटा जांचता है और बताता है कि परियोजना में कम, मध्यम या उच्च विलंब जोखिम है।' },
+      { title: 'वास्तविक समय जोखिम स्कोरिंग', desc: 'जोखिम जल्दी जानें। LADRIS  परियोजना डेटा जांचता है और बताता है कि परियोजना में कम, मध्यम या उच्च विलंब जोखिम है।' },
       { title: 'AI निर्णय बुद्धिमत्ता', desc: 'बेहतर निर्णय लें। AI पिछले और वर्तमान डेटा का अध्ययन करता है और टीमों को सही कार्रवाई जल्दी चुनने में मदद करता है।' },
       { title: 'GIS स्थानिक विश्लेषण', desc: 'मानचित्र पर जोखिम देखें। परियोजना स्थान, उच्च जोखिम क्षेत्र और जिलावार पैटर्न देखें।' },
-      { title: 'भविष्य संबंधी बाधा पहचान', desc: 'समस्याएं बढ़ने से पहले खोजें। LADRIS AI अनुमोदन, कानूनी, मुआवजा और दस्तावेज़ीकरण विलंब का पता लगाता है।' },
+      { title: 'भविष्य संबंधी बाधा पहचान', desc: 'समस्याएं बढ़ने से पहले खोजें। LADRIS  अनुमोदन, कानूनी, मुआवजा और दस्तावेज़ीकरण विलंब का पता लगाता है।' },
       { title: 'विश्लेषण और सिमुलेशन', desc: 'नीति परिवर्तन, बजट परिदृश्य और समयरेखा विकल्पों के सुरक्षित मूल्यांकन के लिए इंटरैक्टिव कॉरिडोर सिम्युलेटर।' },
       { title: 'सुरक्षित सरकारी पहुंच', desc: 'मंत्रालय पदानुक्रम के अनुसार भूमिका-आधारित पहुंच नियंत्रण — केंद्र, राज्य, जिला और LA अधिकारी प्रत्येक को अनुकूलित दृश्य मिलता है।' },
     ] : FEATURES.map(f => ({ title: f.title, desc: f.desc })),
@@ -273,6 +327,53 @@ export default function Landing() {
     footerLinks: hi
       ? ['गोपनीयता', 'शर्तें', 'पहुंच-क्षमता', 'कुकीज़']
       : ['Privacy', 'Terms', 'Accessibility', 'Cookies'],
+    // Utility panel labels
+    siteMapLabel: hi ? 'साइट मैप' : 'Site Map',
+    languageLabel: hi ? 'भाषा' : 'Language',
+    accessLabel: hi ? 'पहुंच-क्षमता' : 'Accessibility',
+    textSizeLabel: hi ? 'टेक्स्ट आकार' : 'Text Size',
+    highContrast: hi ? 'उच्च कंट्रास्ट' : 'High Contrast',
+    reducedMotion: hi ? 'कम मूवमेंट' : 'Reduced Motion',
+    // Help panel
+    helpLabel: hi ? 'LADRIS सहायता' : 'LADRIS Help',
+    helpFaqs: hi ? [
+      { q: 'डैशबोर्ड कैसे एक्सेस करें?', a: '"डैशबोर्ड एक्सेस करें" या "लॉगिन" पर क्लिक करें और अपने सरकारी क्रेडेंशियल से साइन इन करें। आपका व्यू भूमिका-आधारित है।' },
+      { q: 'जोखिम स्तर का क्या अर्थ है?', a: 'कम (हरा) = सही दिशा में। मध्यम (पीला) = ध्यान दें। उच्च (लाल) = तत्काल हस्तक्षेप आवश्यक।' },
+      { q: 'परियोजना स्थिति कैसे देखें?', a: 'डैशबोर्ड से परियोजनाएं खोलें और सभी भूमि अधिग्रहण परियोजनाएं चरण-वार स्थिति और विलंब संकेतकों के साथ देखें।' },
+      { q: 'विलंब फ्लैग क्यों आते हैं?', a: 'SIA, अधिसूचना, पुरस्कार, मुआवजा या कानूनी चरण अपेक्षित समय सीमा पार करने पर विलंब फ्लैग किया जाता है।' },
+      { q: 'जोखिम की गणना कैसे होती है?', a: 'LADRIS ऐतिहासिक पैटर्न, चरण अवधि, लंबित अनुमोदन और कानूनी विवादों के आधार पर AI से परियोजनाओं को स्कोर देता है।' },
+    ] : [
+      { q: 'How do I access the dashboard?', a: 'Click "Access Dashboard" or "Login" and sign in with your government credentials. Your view is role-based.' },
+      { q: 'What do risk levels mean?', a: 'Low (green) = on track. Medium (yellow) = watch closely. High (red) = immediate intervention needed.' },
+      { q: 'How do I view project status?', a: 'Go to Projects from the dashboard to see all acquisition projects with stage-wise status and delay indicators.' },
+      { q: 'What causes delay flags?', a: 'Delays are flagged when SIA, notification, award, compensation or legal stages exceed expected timelines.' },
+      { q: 'How is risk calculated?', a: 'LADRIS uses AI to score projects based on historical patterns, stage durations, pending approvals and legal disputes.' },
+    ],
+    askQuestion: hi ? 'एक और प्रश्न पूछें' : 'Ask another question',
+    helpPlaceholder: hi ? 'जैसे: GIS मानचित्र कैसे उपयोग करें?' : 'e.g. How do I use GIS map?',
+    askBtn: hi ? 'पूछें' : 'Ask',
+    helpDisclaimer: hi ? 'केवल LADRIS प्लेटफ़ॉर्म विषयों तक सीमित।' : 'Limited to LADRIS platform topics only.',
+    // Footer
+    footerIntelligence: hi ? 'बुद्धिमत्ता प्लेटफ़ॉर्म' : 'Intelligence Platform',
+    footerTagline: hi ? 'AI-संचालित भूमि अधिग्रहण बुद्धिमत्ता — वास्तविक समय जोखिम, तेज़ निर्णय' : 'AI-Powered Land Acquisition Intelligence — Real-time Risk, Faster Decisions',
+    footerBuiltFor: hi ? 'ग्रामीण विकास मंत्रालय, भारत सरकार के लिए निर्मित।' : 'Built for Ministry of Rural Development, Government of India.',
+    footerLocation: hi ? 'नई दिल्ली, भारत' : 'New Delhi, India',
+    footerPlatformTitle: hi ? 'प्लेटफ़ॉर्म' : 'Platform',
+    footerPlatformLinks: hi
+      ? ['विशेषताएं', 'आर्किटेक्चर', 'विश्लेषण', 'GIS इंटेलिजेंस', 'दस्तावेज़ीकरण', 'सहायता और प्रतिक्रिया',]
+      : ['Features', 'Architecture', 'Analytics', 'GIS Intelligence', 'Documentation', 'Help & Feedback'],
+    footerPartnersTitle: hi ? 'आधिकारिक साझेदार' : 'Official Partners',
+    footerPartners: hi ? [
+      { name: 'रेल मंत्रालय', sub: 'भारत सरकार' },
+      { name: 'सड़क परिवहन और राजमार्ग मंत्रालय', sub: 'और राजमार्ग (MoRTH)' },
+      { name: 'राष्ट्रीय राजमार्ग प्राधिकरण', sub: 'भारत (NHAI)' },
+      { name: 'भारी उद्योग मंत्रालय', sub: 'भारत सरकार' },
+    ] : [
+      { name: 'Ministry of Railways', sub: 'Government of India' },
+      { name: 'Ministry of Road Transport', sub: 'and Highways (MoRTH)' },
+      { name: 'National Highways Authority', sub: 'of India (NHAI)' },
+      { name: 'Ministry of Heavy Industries', sub: 'Government of India' },
+    ],
   }
 
   /* ── Color tokens based on theme ── */
@@ -404,7 +505,7 @@ export default function Landing() {
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
                   boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,51,102,0.14)', padding: '10px 0',
                 }}>
-                  <div style={{ padding: '4px 14px 8px', fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Site Map</div>
+                  <div style={{ padding: '4px 14px 8px', fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase' }}>{T.siteMapLabel}</div>
                   {([
                     { label: 'Landing Page', path: '/landing' },
                     { label: 'Login', path: '/login' },
@@ -443,7 +544,7 @@ export default function Landing() {
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
                   boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,51,102,0.14)', padding: '10px 0',
                 }}>
-                  <div style={{ padding: '4px 14px 8px', fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Language</div>
+                  <div style={{ padding: '4px 14px 8px', fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase' }}>{T.languageLabel}</div>
                   {([{ code: 'en' as const, native: 'English' }, { code: 'hi' as const, native: 'हिंदी' }]).map(lang => (
                     <button key={lang.code} onClick={() => { setLanguage(lang.code); setActivePanel(null) }}
                       style={{
@@ -482,10 +583,10 @@ export default function Landing() {
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
                   boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,51,102,0.14)', padding: '14px',
                 }}>
-                  <div style={{ fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>Accessibility</div>
+                  <div style={{ fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>{T.accessLabel}</div>
                   {/* Text Size */}
                   <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: '0.74rem', fontWeight: 600, color: isDark ? '#94a9c9' : '#334155', marginBottom: 6 }}>Text Size</div>
+                    <div style={{ fontSize: '0.74rem', fontWeight: 600, color: isDark ? '#94a9c9' : '#334155', marginBottom: 6 }}>{T.textSizeLabel}</div>
                     <div style={{ display: 'flex', gap: 6 }}>
                       {(['normal', 'large', 'xlarge'] as const).map(size => (
                         <button key={size} onClick={() => setFontSize(size)}
@@ -503,8 +604,8 @@ export default function Landing() {
                   </div>
                   {/* Toggles */}
                   {([
-                    { label: 'High Contrast', value: highContrast, set: setHighContrast },
-                    { label: 'Reduced Motion', value: reducedMotion, set: setReducedMotion },
+                    { label: T.highContrast, value: highContrast, set: setHighContrast },
+                    { label: T.reducedMotion, value: reducedMotion, set: setReducedMotion },
                   ] as { label: string; value: boolean; set: (v: boolean) => void }[]).map(opt => (
                     <div key={opt.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <span style={{ fontSize: '0.78rem', color: isDark ? '#94a9c9' : '#334155' }}>{opt.label}</span>
@@ -540,14 +641,8 @@ export default function Landing() {
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
                   boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,51,102,0.14)', padding: '14px',
                 }}>
-                  <div style={{ fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>LADRIS Help</div>
-                  {[
-                    { q: 'How do I access the dashboard?', a: 'Click "Access Dashboard" or "Login" and sign in with your government credentials. Your view is role-based.' },
-                    { q: 'What do risk levels mean?', a: 'Low (green) = on track. Medium (yellow) = watch closely. High (red) = immediate intervention needed.' },
-                    { q: 'How do I view project status?', a: 'Go to Projects from the dashboard to see all acquisition projects with stage-wise status and delay indicators.' },
-                    { q: 'What causes delay flags?', a: 'Delays are flagged when SIA, notification, award, compensation or legal stages exceed expected timelines.' },
-                    { q: 'How is risk calculated?', a: 'LADRIS uses AI to score projects based on historical patterns, stage durations, pending approvals and legal disputes.' },
-                  ].map(item => (
+                  <div style={{ fontSize: '0.67rem', fontWeight: 700, color: isDark ? '#5a7194' : '#94a3b8', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>{T.helpLabel}</div>
+                  {T.helpFaqs.map(item => (
                     <div key={item.q} style={{ marginBottom: 10 }}>
                       <div style={{ fontSize: '0.76rem', fontWeight: 600, color: isDark ? '#c9d8f0' : '#0a1d37', marginBottom: 3 }}>{item.q}</div>
                       <div style={{ fontSize: '0.72rem', color: isDark ? '#5a7194' : '#64748b', lineHeight: 1.5 }}>{item.a}</div>
@@ -556,24 +651,24 @@ export default function Landing() {
 
                   {/* ── More Help ── */}
                   <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : '#e2e8f0'}` }}>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: isDark ? '#7daaff' : '#003366', marginBottom: 6 }}>Ask another question</div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: isDark ? '#7daaff' : '#003366', marginBottom: 6 }}>{T.askQuestion}</div>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <input
                         type="text"
-                        placeholder="e.g. How do I use GIS map?"
+                        placeholder={T.helpPlaceholder}
                         value={helpQuery}
                         onChange={e => { setHelpQuery(e.target.value); if (!e.target.value) setHelpAnswer('') }}
                         onKeyDown={e => { if (e.key === 'Enter') handleHelpQuery(helpQuery) }}
                         style={{ flex: 1, padding: '6px 8px', borderRadius: 6, fontFamily: 'inherit', fontSize: '0.72rem', outline: 'none', background: isDark ? 'rgba(255,255,255,0.05)' : '#f8fafc', border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#e2e8f0'}`, color: isDark ? '#c9d8f0' : '#334155' }}
                       />
-                      <button onClick={() => handleHelpQuery(helpQuery)} style={{ padding: '6px 10px', borderRadius: 6, border: 'none', cursor: 'pointer', background: '#4080ff', color: '#fff', fontFamily: 'inherit', fontSize: '0.72rem', fontWeight: 700 }}>Ask</button>
+                      <button onClick={() => handleHelpQuery(helpQuery)} style={{ padding: '6px 10px', borderRadius: 6, border: 'none', cursor: 'pointer', background: '#4080ff', color: '#fff', fontFamily: 'inherit', fontSize: '0.72rem', fontWeight: 700 }}>{T.askBtn}</button>
                     </div>
                     {helpAnswer && (
                       <div style={{ marginTop: 8, padding: '8px 10px', borderRadius: 7, background: isDark ? 'rgba(64,128,255,0.08)' : 'rgba(0,51,102,0.05)', border: `1px solid ${isDark ? 'rgba(64,128,255,0.18)' : 'rgba(0,51,102,0.1)'}`, fontSize: '0.72rem', color: isDark ? '#94a9c9' : '#334155', lineHeight: 1.55 }}>
                         {helpAnswer}
                       </div>
                     )}
-                    <div style={{ fontSize: '0.64rem', color: isDark ? '#3d5470' : '#94a3b8', marginTop: 6, lineHeight: 1.4 }}>Limited to LADRIS platform topics only.</div>
+                    <div style={{ fontSize: '0.64rem', color: isDark ? '#3d5470' : '#94a3b8', marginTop: 6, lineHeight: 1.4 }}>{T.helpDisclaimer}</div>
                   </div>
                 </div>
               )}
@@ -612,19 +707,17 @@ export default function Landing() {
             justifyContent: 'space-between', gap: 16,
           }}>
 
-            {/* Left: Emblem + Divider + Logo + Brand */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
+            {/* Left: Emblem + Gap + Logo + Brand */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
               {/* MoRTH Ashoka Emblem — pre-cropped: emblem + Hindi only, no English text */}
               <img
                 src="/logo_morth_clean.png"
                 alt="MoRTH Emblem"
-                style={{ height: 40, width: 'auto', display: 'block', flexShrink: 0 }}
+                style={{ height: 46, width: 'auto', display: 'block', flexShrink: 0 }}
               />
-              {/* Vertical divider */}
-              <div style={{ width: 1, height: 30, background: isDark ? 'rgba(255,255,255,0.14)' : '#cbd5e1', margin: '0 2px', flexShrink: 0 }} />
               {/* logo.png + Brand text */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <img src="/logo.png" alt="LADRIS" style={{ width: 38, height: 38, objectFit: 'contain', flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <img src="/logo.png" alt="LADRIS" style={{ width: 42, height: 42, objectFit: 'contain', flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
                     LADRIS<span style={{ color: '#4080ff' }}></span>
@@ -637,47 +730,263 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Center: Nav Links with dropdown chevrons */}
-            <nav className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
-              {[
-                { label: T.navFeatures, dropdown: false },
-                { label: T.navArchitecture, dropdown: false },
-                { label: T.navAnalytics, dropdown: true },
-                { label: T.navAbout, dropdown: true },
-                { label: T.navHelp, dropdown: true },
-                { label: T.navDocuments, dropdown: true },
-              ].map(({ label, dropdown }) => (
+            {/* Center: Nav Links — wrapped in a ref for outside-click detection */}
+            <nav ref={dropdownRef} className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center', position: 'relative' }}>
+              {/* Features */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('features') }}
+                style={{
+                  background: activeSection === 'features' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'features' ? 700 : 500,
+                  color: activeSection === 'features' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'features' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'features' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'features' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'features' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navFeatures}
+              </button>
+
+              {/* Architecture */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('architecture') }}
+                style={{
+                  background: activeSection === 'architecture' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'architecture' ? 700 : 500,
+                  color: activeSection === 'architecture' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'architecture' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'architecture' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'architecture' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'architecture' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navArchitecture}
+              </button>
+
+              {/* Analytics */}
+              <button
+                onClick={() => { setOpenDropdown(null); scrollToSection('analytics') }}
+                style={{
+                  background: activeSection === 'analytics' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                  border: 'none', cursor: 'pointer',
+                  padding: '0 13px', height: 60,
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: '0.865rem', fontWeight: activeSection === 'analytics' ? 700 : 500,
+                  color: activeSection === 'analytics' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  letterSpacing: '0.005em', transition: 'all 0.15s',
+                  borderBottom: `3px solid ${activeSection === 'analytics' ? '#f47721' : 'transparent'}`,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = activeSection === 'analytics' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = activeSection === 'analytics' ? '#f47721' : 'transparent'; e.currentTarget.style.background = activeSection === 'analytics' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+              >
+                {T.navAnalytics}
+              </button>
+
+              {/* About ▾ — with dropdown */}
+              <div style={{ position: 'relative' }}>
                 <button
-                  key={label}
+                  onClick={() => setOpenDropdown(prev => prev === 'about' ? null : 'about')}
                   style={{
-                    background: 'none', border: 'none', cursor: 'pointer',
+                    background: openDropdown === 'about' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                    border: 'none', cursor: 'pointer',
                     padding: '0 13px', height: 60,
                     display: 'inline-flex', alignItems: 'center', gap: 4,
-                    fontSize: '0.865rem', fontWeight: 500,
-                    color: isDark ? '#94a9c9' : '#334155',
+                    fontSize: '0.865rem', fontWeight: openDropdown === 'about' ? 700 : 500,
+                    color: openDropdown === 'about' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
                     fontFamily: 'inherit', whiteSpace: 'nowrap',
                     letterSpacing: '0.005em', transition: 'all 0.15s',
-                    borderBottom: '3px solid transparent',
+                    borderBottom: `3px solid ${openDropdown === 'about' ? '#f47721' : 'transparent'}`,
                   }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'
-                    e.currentTarget.style.borderBottomColor = '#f47721'
-                    e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.color = isDark ? '#94a9c9' : '#334155'
-                    e.currentTarget.style.borderBottomColor = 'transparent'
-                    e.currentTarget.style.background = 'none'
-                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = openDropdown === 'about' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = openDropdown === 'about' ? '#f47721' : 'transparent'; e.currentTarget.style.background = openDropdown === 'about' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
                 >
-                  {label}
-                  {dropdown && (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.55, flexShrink: 0 }}>
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  )}
+                  {T.navAbout}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ opacity: 0.55, flexShrink: 0, transform: openDropdown === 'about' ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
                 </button>
-              ))}
+
+                {/* About dropdown */}
+                {openDropdown === 'about' && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 500,
+                    minWidth: 230,
+                    background: isDark ? '#0d1a2e' : '#ffffff',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                    borderRadius: 6,
+                    boxShadow: isDark ? '0 6px 24px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                  }}>
+                    {([
+                      { label: 'About the Project', route: '/about/project' },
+                      { label: 'User Guide', route: '/about/user-guide' },
+                      { label: 'Government Guidelines Compliance', route: '/about/compliance' },
+                    ] as { label: string; route: string }[]).map((item, i, arr) => (
+                      <button
+                        key={item.route}
+                        onClick={() => { setOpenDropdown(null); navigate(item.route) }}
+                        style={{
+                          display: 'block', width: '100%', padding: '11px 16px',
+                          background: 'none', border: 'none',
+                          borderBottom: i < arr.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}` : 'none',
+                          textAlign: 'left', cursor: 'pointer',
+                          fontFamily: 'inherit', fontSize: '0.855rem', fontWeight: 500,
+                          color: isDark ? '#c9d8f0' : '#334155',
+                          transition: 'background 0.12s, color 0.12s',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)'; e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = isDark ? '#c9d8f0' : '#334155' }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Help & Feedback ▾ — with dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setOpenDropdown(prev => prev === 'help' ? null : 'help')}
+                  style={{
+                    background: openDropdown === 'help' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                    border: 'none', cursor: 'pointer',
+                    padding: '0 13px', height: 60,
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: '0.865rem', fontWeight: openDropdown === 'help' ? 700 : 500,
+                    color: openDropdown === 'help' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                    fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    letterSpacing: '0.005em', transition: 'all 0.15s',
+                    borderBottom: `3px solid ${openDropdown === 'help' ? '#f47721' : 'transparent'}`,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = openDropdown === 'help' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = openDropdown === 'help' ? '#f47721' : 'transparent'; e.currentTarget.style.background = openDropdown === 'help' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+                >
+                  {T.navHelp}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ opacity: 0.55, flexShrink: 0, transform: openDropdown === 'help' ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {/* Help dropdown */}
+                {openDropdown === 'help' && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 500,
+                    minWidth: 200,
+                    background: isDark ? '#0d1a2e' : '#ffffff',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                    borderRadius: 6,
+                    boxShadow: isDark ? '0 6px 24px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                  }}>
+                    {([
+                      { label: 'Contact & Feedback', route: '/help/contact' },
+                      { label: 'Privacy Policy', route: '/help/privacy' },
+                      { label: 'Terms of Use', route: '/help/terms' },
+                      { label: 'FAQ', route: '/help/faq' },
+                    ] as { label: string; route: string }[]).map((item, i, arr) => (
+                      <button
+                        key={item.route}
+                        onClick={() => { setOpenDropdown(null); navigate(item.route) }}
+                        style={{
+                          display: 'block', width: '100%', padding: '11px 16px',
+                          background: 'none', border: 'none',
+                          borderBottom: i < arr.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}` : 'none',
+                          textAlign: 'left', cursor: 'pointer',
+                          fontFamily: 'inherit', fontSize: '0.855rem', fontWeight: 500,
+                          color: isDark ? '#c9d8f0' : '#334155',
+                          transition: 'background 0.12s, color 0.12s',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)'; e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = isDark ? '#c9d8f0' : '#334155' }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Documents ▾ — with dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setOpenDropdown(prev => prev === 'documents' ? null : 'documents')}
+                  style={{
+                    background: openDropdown === 'documents' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none',
+                    border: 'none', cursor: 'pointer',
+                    padding: '0 13px', height: 60,
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: '0.865rem', fontWeight: openDropdown === 'documents' ? 700 : 500,
+                    color: openDropdown === 'documents' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'),
+                    fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    letterSpacing: '0.005em', transition: 'all 0.15s',
+                    borderBottom: `3px solid ${openDropdown === 'documents' ? '#f47721' : 'transparent'}`,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366'; e.currentTarget.style.borderBottomColor = '#f47721'; e.currentTarget.style.background = isDark ? 'rgba(244,119,33,0.05)' : 'rgba(0,51,102,0.04)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = openDropdown === 'documents' ? (isDark ? '#f0f6fc' : '#003366') : (isDark ? '#94a9c9' : '#334155'); e.currentTarget.style.borderBottomColor = openDropdown === 'documents' ? '#f47721' : 'transparent'; e.currentTarget.style.background = openDropdown === 'documents' ? (isDark ? 'rgba(244,119,33,0.07)' : 'rgba(0,51,102,0.05)') : 'none' }}
+                  aria-haspopup="true"
+                  aria-expanded={openDropdown === 'documents'}
+                >
+                  {T.navDocuments}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ opacity: 0.55, flexShrink: 0, transform: openDropdown === 'documents' ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {/* Documents dropdown */}
+                {openDropdown === 'documents' && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 500,
+                    minWidth: 200,
+                    background: isDark ? '#0d1a2e' : '#ffffff',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                    borderRadius: 6,
+                    boxShadow: isDark ? '0 6px 24px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                  }}>
+                    {([
+                      { label: 'Blogs', route: '/documents/blogs' },
+                      { label: 'Research Papers', route: '/documents/research-papers' },
+                      { label: 'Case Studies', route: '/documents/case-studies' },
+                      { label: 'Real-World Examples', route: '/documents/real-world-examples' },
+                    ] as { label: string; route: string }[]).map((item, i, arr) => (
+                      <button
+                        key={item.route}
+                        onClick={() => { setOpenDropdown(null); navigate(item.route) }}
+                        style={{
+                          display: 'block', width: '100%', padding: '11px 16px',
+                          background: 'none', border: 'none',
+                          borderBottom: i < arr.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}` : 'none',
+                          textAlign: 'left', cursor: 'pointer',
+                          fontFamily: 'inherit', fontSize: '0.855rem', fontWeight: 500,
+                          color: isDark ? '#c9d8f0' : '#334155',
+                          transition: 'background 0.12s, color 0.12s',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,51,102,0.04)'; e.currentTarget.style.color = isDark ? '#f0f6fc' : '#003366' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = isDark ? '#c9d8f0' : '#334155' }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </nav>
 
             {/* Right: GitHub outlined + Login solid */}
@@ -686,6 +995,7 @@ export default function Landing() {
               {/* GitHub — outlined button */}
               <motion.button
                 whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => window.open('https://github.com/SathvikaTalari/LADRIS', '_blank', 'noopener,noreferrer')}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 7,
                   padding: '7px 16px',
@@ -753,16 +1063,106 @@ export default function Landing() {
               padding: '12px 24px 20px',
               display: 'flex', flexDirection: 'column', gap: 2,
             }}>
-              {[T.navFeatures, T.navArchitecture, T.navAnalytics, T.navAbout, T.navHelp, T.navDocuments].map(link => (
-                <button key={link} style={{
-                  textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer',
-                  padding: '10px 12px', borderRadius: 8,
-                  fontSize: '0.9rem', fontWeight: 500,
-                  color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit',
-                }}>{link}</button>
-              ))}
+              {/* Features */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('features'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navFeatures}</button>
+
+              {/* Architecture */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('architecture'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navArchitecture}</button>
+
+              {/* Analytics */}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setTimeout(() => scrollToSection('analytics'), 80) }}
+                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >{T.navAnalytics}</button>
+
+              {/* About ▾ — expandable */}
+              <button
+                onClick={() => setMobileAboutOpen(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', background: mobileAboutOpen ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)') : 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: mobileAboutOpen ? 600 : 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >
+                <span>{T.navAbout}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ opacity: 0.55, transform: mobileAboutOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {mobileAboutOpen && (
+                <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`, marginLeft: 12 }}>
+                  {([
+                    { label: 'About the Project', route: '/about/project' },
+                    { label: 'User Guide', route: '/about/user-guide' },
+                    { label: 'Government Guidelines Compliance', route: '/about/compliance' },
+                  ] as { label: string; route: string }[]).map(item => (
+                    <button key={item.route}
+                      onClick={() => { setMobileMenuOpen(false); setMobileAboutOpen(false); navigate(item.route) }}
+                      style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: 6, fontSize: '0.855rem', fontWeight: 400, color: isDark ? '#7a9abf' : '#475569', fontFamily: 'inherit' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+
+              {/* Help & Feedback ▾ — expandable */}
+              <button
+                onClick={() => setMobileHelpOpen(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', background: mobileHelpOpen ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)') : 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: mobileHelpOpen ? 600 : 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >
+                <span>{T.navHelp}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ opacity: 0.55, transform: mobileHelpOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {mobileHelpOpen && (
+                <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`, marginLeft: 12 }}>
+                  {([
+                    { label: 'Contact & Feedback', route: '/help/contact' },
+                    { label: 'Privacy Policy', route: '/help/privacy' },
+                    { label: 'Terms of Use', route: '/help/terms' },
+                    { label: 'FAQ', route: '/help/faq' },
+                  ] as { label: string; route: string }[]).map(item => (
+                    <button key={item.route}
+                      onClick={() => { setMobileMenuOpen(false); setMobileHelpOpen(false); navigate(item.route) }}
+                      style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: 6, fontSize: '0.855rem', fontWeight: 400, color: isDark ? '#7a9abf' : '#475569', fontFamily: 'inherit' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+
+              {/* Documents ▾ — expandable */}
+              <button
+                onClick={() => setMobileDocsOpen(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', background: mobileDocsOpen ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)') : 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 8, fontSize: '0.9rem', fontWeight: mobileDocsOpen ? 600 : 500, color: isDark ? '#94a9c9' : '#334155', fontFamily: 'inherit' }}
+              >
+                <span>{T.navDocuments}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ opacity: 0.55, transform: mobileDocsOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {mobileDocsOpen && (
+                <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`, marginLeft: 12 }}>
+                  {([
+                    { label: 'Blogs', route: '/documents/blogs' },
+                    { label: 'Research Papers', route: '/documents/research-papers' },
+                    { label: 'Case Studies', route: '/documents/case-studies' },
+                    { label: 'Real-World Examples', route: '/documents/real-world-examples' },
+                  ] as { label: string; route: string }[]).map(item => (
+                    <button key={item.route}
+                      onClick={() => { setMobileMenuOpen(false); setMobileDocsOpen(false); navigate(item.route) }}
+                      style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderRadius: 6, fontSize: '0.855rem', fontWeight: 400, color: isDark ? '#7a9abf' : '#475569', fontFamily: 'inherit' }}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              )}
+
               <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0'}`, display: 'flex', gap: 10 }}>
-                <button style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1'}`, color: isDark ? '#c9d8f0' : '#334155', fontWeight: 600, fontSize: '0.875rem' }}>GitHub</button>
+                <button onClick={() => window.open('https://github.com/SathvikaTalari/LADRIS', '_blank', 'noopener,noreferrer')} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1'}`, color: isDark ? '#c9d8f0' : '#334155', fontWeight: 600, fontSize: '0.875rem' }}>GitHub</button>
                 <button onClick={handleAccessDashboard} style={{ flex: 1, padding: '9px 0', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', background: '#003366', border: 'none', color: '#ffffff', fontWeight: 700, fontSize: '0.875rem' }}>{T.navLogin}</button>
               </div>
             </div>
@@ -854,35 +1254,7 @@ export default function Landing() {
                 {T.heroSub}
               </motion.p>
 
-              {/* CTA Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 0.3 }}
-                style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <motion.button
-                  id="hero-access-dashboard-btn"
-                  whileHover={{ scale: 1.04, translateY: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleAccessDashboard}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                    padding: '14px 32px',
-                    background: 'linear-gradient(135deg, #f47721 0%, #d97706 100%)',
-                    border: 'none', borderRadius: 12,
-                    color: '#ffffff', fontWeight: 800,
-                    fontSize: '1rem', cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    boxShadow: '0 6px 28px rgba(244,119,33,0.55), inset 0 1px 0 rgba(255,255,255,0.2)',
-                    letterSpacing: '-0.01em',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  {T.heroCta1}
-                  <ArrowRight size={18} strokeWidth={2.5} />
-                </motion.button>
 
-              </motion.div>
             </div>
           </div>
         </motion.div>
@@ -1235,23 +1607,33 @@ export default function Landing() {
       </section>
 
       {/* ════ KEY COMPONENTS SECTION ════ */}
-      <KeyComponentsSection isDark={isDark} />
+      <div id="features" style={{ scrollMarginTop: 0 }}>
+        <KeyComponentsSection isDark={isDark} language={language} />
+      </div>
 
       {/* ════ ALL FEATURES SECTION ════ */}
-      <FeaturesRippleSection isDark={isDark} />
+      <FeaturesRippleSection isDark={isDark} language={language} />
+
+      {/* ════ SMART ANALYTICS SECTION ════ */}
+      <div id="analytics" style={{ scrollMarginTop: 0 }}>
+        <SmartAnalyticsSection isDark={isDark} language={language} />
+      </div>
+
+      {/* ════ GIS INTELLIGENCE SECTION ════ */}
+      <div id="gis-intelligence" style={{ scrollMarginTop: 0 }}>
+        <GisIntelligenceSection isDark={isDark} language={language} />
+      </div>
 
       {/* ════ ROLES SECTION ════ */}
       <RolesConnectedSection isDark={isDark} />
 
-      {/* ════ 4-TIER ARCHITECTURE SECTION ════ */}
-      <section style={{
-        background: isDark
-          ? 'linear-gradient(160deg, #07111f 0%, #0a1a30 60%, #060f1e 100%)'
-          : 'linear-gradient(160deg, #eef3fb 0%, #f5f8fd 60%, #e8eef8 100%)',
-        padding: '96px 40px',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
+      {/* ════ SYSTEM ARCHITECTURE SECTION ════ */}
+      <div id="architecture" style={{ scrollMarginTop: 0 }}>
+        <SystemArchitectureSection isDark={isDark} />
+      </div>
+
+      {/* ════ [REMOVED OLD INLINE ARCHITECTURE] ════ */}
+      <section style={{ display: 'none' }}>
         {/* Background decorative grid */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -1539,28 +1921,21 @@ export default function Landing() {
                   fontSize: '1.05rem', fontWeight: 800,
                   color: '#f0f6fc', letterSpacing: '-0.03em', lineHeight: 1.1,
                 }}>
-                  LADRIS<span style={{ color: '#4080ff' }}>·</span>AI
+                  LADRIS
                 </div>
                 <div style={{ fontSize: '0.6rem', fontWeight: 600, color: '#546e96', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 2 }}>
-                  Intelligence Platform
+                  {T.footerIntelligence}
                 </div>
               </div>
             </div>
 
             {/* Tagline in saffron orange */}
-            <div style={{
-              fontSize: '0.8rem', fontWeight: 600,
-              color: '#f47721',
-              marginBottom: 12, lineHeight: 1.4,
-            }}>
-              AI-Powered Land Acquisition Intelligence — Real-time Risk, Faster Decisions
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f47721', marginBottom: 12, lineHeight: 1.4 }}>
+              {T.footerTagline}
             </div>
 
-            <div style={{
-              fontSize: '0.8rem', color: 'rgba(255,255,255,0.45)',
-              marginBottom: 20, lineHeight: 1.6,
-            }}>
-              Built for Ministry of Rural Development, Government of India.
+            <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.45)', marginBottom: 20, lineHeight: 1.6 }}>
+              {T.footerBuiltFor}
             </div>
 
             {/* Contact lines */}
@@ -1582,7 +1957,7 @@ export default function Landing() {
                   <circle cx="12" cy="10" r="3" />
                 </svg>
                 <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
-                  New Delhi, India
+                  {T.footerLocation}
                 </span>
               </div>
               {/* Phone */}
@@ -1599,111 +1974,64 @@ export default function Landing() {
 
           {/* ── Column 2: Platform Links ── */}
           <div>
-            <div style={{
-              fontSize: '0.88rem', fontWeight: 700,
-              color: '#f0f6fc', letterSpacing: '0.02em',
-              marginBottom: 20,
-            }}>
-              Platform
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f0f6fc', letterSpacing: '0.02em', marginBottom: 20 }}>
+              {T.footerPlatformTitle}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {[
-                'Features',
-                'Architecture',
-                'Analytics',
-                'GIS Intelligence',
-                'Documentation',
-                'Help & Feedback',
-                'Release Notes',
-              ].map(link => (
-                <a
-                  key={link}
-                  href="#"
-                  style={{
-                    fontSize: '0.84rem', color: 'rgba(255,255,255,0.5)',
-                    textDecoration: 'none', transition: 'color 0.15s',
-                    display: 'block',
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#f47721')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
-                >
-                  {link}
-                </a>
-              ))}
+              {T.footerPlatformLinks.map((link, idx) => {
+                const sectionMap: (string | null)[] = [
+                  'features', 'architecture', 'analytics', 'gis-intelligence',
+                  null, null, null,
+                ]
+                const sid = sectionMap[idx] ?? null
+                return sid ? (
+                  <button
+                    key={link}
+                    onClick={() => scrollToSection(sid)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left', fontFamily: 'inherit', fontSize: '0.84rem', color: 'rgba(255,255,255,0.5)', transition: 'color 0.15s', display: 'block' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#f47721')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
+                  >{link}</button>
+                ) : (
+                  <a key={link} href="#" style={{ fontSize: '0.84rem', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', transition: 'color 0.15s', display: 'block' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#f47721')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
+                  >{link}</a>
+                )
+              })}
             </div>
           </div>
 
           {/* ── Column 3: Official Partners ── */}
           <div>
-            <div style={{
-              fontSize: '0.88rem', fontWeight: 700,
-              color: '#f0f6fc', letterSpacing: '0.02em',
-              marginBottom: 20,
-            }}>
-              Official Partners
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f0f6fc', letterSpacing: '0.02em', marginBottom: 20 }}>
+              {T.footerPartnersTitle}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {[
-                {
-                  logo: '/logo_railways.png',
-                  name: 'Ministry of Railways',
-                  sub: 'Government of India',
-                },
-                {
-                  logo: '/logo_morth.png',
-                  name: 'Ministry of Road Transport',
-                  sub: 'and Highways (MoRTH)',
-                },
-                {
-                  logo: '/logo_nhai.png',
-                  name: 'National Highways Authority',
-                  sub: 'of India (NHAI)',
-                },
-                {
-                  logo: '/logo_heavy_industries.png',
-                  name: 'Ministry of Heavy Industries',
-                  sub: 'Government of India',
-                },
-              ].map(partner => (
-                <div
-                  key={partner.name}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '8px 14px',
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: 10,
-                    transition: 'all 0.18s',
-                    cursor: 'default',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.07)'
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
-                  }}
-                >
-                  {/* Partner logo */}
-                  <div style={{
-                    width: 44, height: 44, borderRadius: 8, flexShrink: 0,
-                    background: '#ffffff',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    padding: '4px',
-                  }}>
-                    <img src={partner.logo} alt={partner.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#c9d8f0', lineHeight: 1.3 }}>
-                      {partner.name}
+              {([
+                { logo: '/logo_railways.png', idx: 0 },
+                { logo: '/logo_morth.png', idx: 1 },
+                { logo: '/logo_nhai.png', idx: 2 },
+                { logo: '/logo_heavy_industries.png', idx: 3 },
+              ] as { logo: string; idx: number }[]).map(({ logo, idx }) => {
+                const p = T.footerPartners[idx]
+                return (
+                  <div
+                    key={p.name}
+                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, transition: 'all 0.18s', cursor: 'default' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
+                  >
+                    <div style={{ width: 44, height: 44, borderRadius: 8, flexShrink: 0, background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
+                      <img src={logo} alt={p.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                     </div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
-                      {partner.sub}
+                    <div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#c9d8f0', lineHeight: 1.3 }}>{p.name}</div>
+                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{p.sub}</div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
