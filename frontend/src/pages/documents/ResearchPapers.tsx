@@ -6,48 +6,59 @@ import { useNavigate } from 'react-router-dom'
 import { useThemeStore } from '@/store/themeStore'
 import { useEffect, useState } from 'react'
 
-const PAPERS = [
+/*
+ * Metadata policy:
+ * Only fields confirmed from the actual source are included.
+ * Title/author fields marked with a note where access was restricted.
+ */
+interface Paper {
+  title: string | null
+  titleNote?: string
+  context: string
+  meta: string
+  url: string
+}
+
+const PAPERS: Paper[] = [
   {
-    title: 'Predictive Analytics for Infrastructure Project Risk Management: A Machine Learning Approach',
-    summary:
-      'Proposes an ML framework that uses historical project data — stage durations, approval timelines, compensation records — to predict delay risk before it materialises. Relevant to the core scoring model in LADRIS.',
-    meta: 'International Journal of Project Management',
-    url: 'https://www.sciencedirect.com/journal/international-journal-of-project-management',
+    // Source URL: https://www.sciencedirect.com/science/article/pii/S0926580525006284
+    // Journal: Automation in Construction (ISSN 0926-5805), Elsevier, 2025
+    // Full title not publicly indexable — article accessible at original URL
+    title: null,
+    titleNote: 'Article available at source — full title accessible via the link below.',
+    context:
+      'Published in Automation in Construction (Elsevier, 2025). The journal covers AI, monitoring, and risk management in construction projects, including land acquisition-related factors that affect project schedules.',
+    meta: 'Automation in Construction · Elsevier · 2025',
+    url: 'https://www.sciencedirect.com/science/article/pii/S0926580525006284?via%3Dihub',
   },
   {
-    title: 'Land Acquisition and Infrastructure Delays in India: Causes, Consequences and Policy Responses',
-    summary:
-      'Analyses documented delay drivers in major infrastructure projects and finds that compensation disputes, incomplete rehabilitation, and coordination failures are the most frequent causes.',
-    meta: 'NIPFP Working Paper Series',
-    url: 'https://www.nipfp.org.in/publications/working-papers/',
+    // Source URL: https://link.springer.com/article/10.1007/s40030-025-00899-5
+    // Verified from source metadata
+    title: 'Delay Analysis of Infrastructure Construction Projects in India',
+    context:
+      'Investigates causes and mitigation strategies for delays in Indian infrastructure construction, with a focus on roads and bridges. Identifies land acquisition as a critical delay factor for road projects (RII = 0.68), alongside material shortages and contractor inefficiencies. Relevant to LADRIS as it documents the types of delay drivers the platform is designed to monitor early.',
+    meta: 'Journal of The Institution of Engineers (India): Series A · Springer · 2025',
+    url: 'https://link.springer.com/article/10.1007/s40030-025-00899-5',
   },
   {
-    title: 'Explainable AI for Administrative Decision-Making: Transparency and Accountability in Government Systems',
-    summary:
-      'Examines how explainable AI (XAI) can make model predictions interpretable for non-technical government users, supporting audit compliance and trust in algorithmic outputs.',
-    meta: 'Government Information Quarterly',
-    url: 'https://www.sciencedirect.com/journal/government-information-quarterly',
+    // Source URL: https://www.sciencedirect.com/science/article/abs/pii/S1474034625011127
+    // Journal: Advanced Engineering Informatics (ISSN 1474-0346), Elsevier, 2025
+    // Full title not publicly indexable — article accessible at original URL
+    title: null,
+    titleNote: 'Article available at source — full title accessible via the link below.',
+    context:
+      'Published in Advanced Engineering Informatics (Elsevier, 2025). The journal publishes research on AI and data-driven systems for engineering decision-making, including delay prediction and risk assessment in infrastructure projects.',
+    meta: 'Advanced Engineering Informatics · Elsevier · 2025',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/S1474034625011127?via%3Dihub',
   },
   {
-    title: 'GIS-Based Spatial Analysis for Land Administration and Risk Assessment',
-    summary:
-      'Demonstrates how geographic information systems can map land record disputes, identify acquisition risk zones, and improve coordination between district-level authorities.',
-    meta: 'Land Use Policy (Elsevier)',
-    url: 'https://www.sciencedirect.com/journal/land-use-policy',
-  },
-  {
-    title: 'Early Warning Systems for Public Infrastructure: A Framework for Delay Detection',
-    summary:
-      'Presents a delay-detection framework based on threshold monitoring and machine learning — paralleling the automated alerts and risk scoring described in the LADRIS design.',
-    meta: 'Transport Policy (Elsevier)',
-    url: 'https://www.sciencedirect.com/journal/transport-policy',
-  },
-  {
-    title: 'Compensation Delays in Land Acquisition: Evidence from Infrastructure Projects in India',
-    summary:
-      'Uses case data from highway and railway projects to quantify how delays in compensation payment extend possession timelines and downstream construction schedules.',
-    meta: 'Economic & Political Weekly',
-    url: 'https://www.epw.in/',
+    // Source URL: https://www.sciencedirect.com/science/article/pii/S2666827021000839
+    // Verified from multiple sources
+    title: 'Applied Artificial Intelligence for Predicting Construction Projects Delay',
+    context:
+      'Develops an ensemble machine learning model to forecast construction project delays using bagging, boosting, and Naïve Bayes techniques. Demonstrates how AI can reliably predict delays from project characteristics before they escalate — a core capability that LADRIS applies to land acquisition projects.',
+    meta: 'Machine Learning with Applications · Elsevier · Vol. 6, 2021',
+    url: 'https://www.sciencedirect.com/science/article/pii/S2666827021000839',
   },
 ]
 
@@ -134,7 +145,7 @@ export default function ResearchPapers() {
             Research Papers
           </h1>
           <p style={{ fontSize: '0.93rem', color: c.body, lineHeight: 1.7, maxWidth: 580, margin: 0 }}>
-            Research behind predictive risk and infrastructure governance.
+            Research behind project delays, risk analysis and infrastructure planning.
           </p>
         </div>
 
@@ -144,7 +155,7 @@ export default function ResearchPapers() {
         <section aria-label="Research papers">
           {PAPERS.map((paper, i) => (
             <PaperRow
-              key={paper.url + i}
+              key={paper.url}
               paper={paper}
               isLast={i === PAPERS.length - 1}
               c={c}
@@ -163,7 +174,9 @@ export default function ResearchPapers() {
           background: isDark ? 'rgba(255,255,255,0.02)' : '#f8fafc',
           fontSize: '0.83rem', color: c.body, lineHeight: 1.65,
         }}>
-          Links point to the source journal or institution. Access to specific papers may require institutional login or subscription.
+          Links open the original source paper or journal page in a new tab.
+          Access to some papers may require institutional login or subscription.
+          Only metadata verified from the actual source is shown.
         </div>
 
       </main>
@@ -172,7 +185,7 @@ export default function ResearchPapers() {
 }
 
 function PaperRow({ paper, isLast, c, isDark }: {
-  paper: { title: string; summary: string; meta: string; url: string }
+  paper: Paper
   isLast: boolean
   c: Record<string, string>
   isDark: boolean
@@ -190,36 +203,40 @@ function PaperRow({ paper, isLast, c, isDark }: {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{ fontSize: '0.975rem', fontWeight: 600, color: c.heading, marginBottom: 7, lineHeight: 1.4 }}>
-        {paper.title}
+      {paper.title ? (
+        <div style={{ fontSize: '0.975rem', fontWeight: 600, color: c.heading, marginBottom: 5, lineHeight: 1.4 }}>
+          {paper.title}
+        </div>
+      ) : (
+        <div style={{ fontSize: '0.875rem', fontStyle: 'italic', color: c.label, marginBottom: 5, lineHeight: 1.4 }}>
+          {paper.titleNote}
+        </div>
+      )}
+      <div style={{ fontSize: '0.78rem', color: c.label, fontWeight: 500, marginBottom: 8 }}>
+        {paper.meta}
       </div>
       <div style={{ fontSize: '0.875rem', color: c.body, lineHeight: 1.7, marginBottom: 12 }}>
-        {paper.summary}
+        {paper.context}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.75rem', color: c.label, fontWeight: 500 }}>
-          {paper.meta}
-        </span>
-        <a
-          href={paper.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            fontSize: '0.8rem', fontWeight: 600,
-            color: c.linkColor,
-            textDecoration: 'none',
-            transition: 'text-decoration 0.12s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
-          onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
-        >
-          View Paper
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </a>
-      </div>
+      <a
+        href={paper.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          fontSize: '0.8rem', fontWeight: 600,
+          color: c.linkColor,
+          textDecoration: 'none',
+          transition: 'text-decoration 0.12s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
+        onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
+      >
+        View Paper
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </a>
     </div>
   )
 }

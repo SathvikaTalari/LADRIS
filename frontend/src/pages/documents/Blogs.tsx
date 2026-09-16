@@ -6,48 +6,55 @@ import { useNavigate } from 'react-router-dom'
 import { useThemeStore } from '@/store/themeStore'
 import { useEffect, useState } from 'react'
 
-const BLOGS = [
+const BLOGS: { title: string; context: string; source: string; year: string; url: string }[] = [
   {
-    title: 'Why Land Acquisition Delays Are India\'s Biggest Infrastructure Bottleneck',
-    summary:
-      'Examines how unresolved ownership disputes, slow compensation disbursement, and coordination gaps between state and central agencies have stalled highway and railway projects across India.',
-    source: 'The Hindu BusinessLine',
-    url: 'https://www.thehindubusinessline.com/',
+    title: 'Slow land acquisition, clearances delay infrastructure plans: centre to states',
+    context: 'Shows how slow land acquisition and clearances can hold up infrastructure plans.',
+    source: 'Economic Times',
+    year: '2023',
+    url: 'https://economictimes.indiatimes.com/news/india/slow-land-acquisition-clearances-delay-infrastructure-plans-centre-to-states/articleshow/97038810.cms',
   },
   {
-    title: 'India\'s Land Acquisition Act: Progress and Persistent Gaps',
-    summary:
-      'Reviews the RFCTLARR Act 2013 — what improved in administration, where delays continue, and how predictive tools could help authorities act earlier in the acquisition process.',
-    source: 'Economic & Political Weekly',
-    url: 'https://www.epw.in/',
+    title: 'Standing committee flags issue of delay in road projects; shortfall in NMP targets',
+    context: 'Connects road-project delays with land acquisition and the need for better coordination.',
+    source: 'Economic Times',
+    year: '2023',
+    url: 'https://economictimes.indiatimes.com/news/economy/infrastructure/standing-committee-flags-issue-of-delay-in-road-projects-shortfall-in-nmp-targets/articleshow/105843201.cms',
   },
   {
-    title: 'AI in Governance: Predicting and Preventing Infrastructure Project Delays',
-    summary:
-      'Covers how machine learning models trained on historical project data can forecast land acquisition bottlenecks in advance, enabling preventive administrative action before delays escalate.',
-    source: 'NITI Aayog — Blog',
-    url: 'https://www.niti.gov.in/blog',
+    title: 'Important infra projects held up in Kerala due to delay in land acquisition',
+    context: 'Shows how land acquisition delays can hold up important infrastructure projects.',
+    source: 'ThePrint',
+    year: '2024',
+    url: 'https://theprint.in/india/important-infra-projects-held-up-in-kerala-due-to-delay-in-land-acquisition-vaishnaw/2204778/',
   },
   {
-    title: 'GIS and Land Administration: Mapping Risk Before It Escalates',
-    summary:
-      'Discusses how geographic information systems help visualise land record inconsistencies and high-risk acquisition zones, supporting earlier intervention by district officers.',
-    source: 'Geospatial World',
-    url: 'https://www.geospatialworld.net/',
+    title: '30 Punjab highway projects paused due to land acquisition delays, farmer protests',
+    context: 'Highlights how land acquisition delays, stakeholder resistance and related issues can affect highway projects.',
+    source: 'ThePrint',
+    year: '2024',
+    url: 'https://theprint.in/india/30-punjab-highway-projects-paused-due-to-land-acquisition-delays-farmer-protests-nhai-pulls-plug-on-3/2180055/',
   },
   {
-    title: 'The Cost of Delay: How Slow Land Acquisition Inflates Infrastructure Budgets',
-    summary:
-      'Analyses the financial impact of extended land acquisition timelines on highway, metro, and railway projects, drawing on publicly available CAG and ministry data.',
-    source: 'Infrastructure Today',
-    url: 'https://www.infrastructuretoday.co.in/',
+    title: 'Slew of amendments to National Highways Act on cards as Centre looks to acquire land faster, cut costs',
+    context: 'Shows efforts to make land acquisition faster and reduce delays and costs.',
+    source: 'ThePrint',
+    year: '2025',
+    url: 'https://theprint.in/india/slew-of-amendments-to-national-highways-act-on-cards-as-centre-looks-to-acquire-land-faster-cut-costs/2552545/',
   },
   {
-    title: 'Explainable AI in Public Administration: Accountability Without the Black Box',
-    summary:
-      'Explores how explainable AI models can surface the key factors behind a risk prediction — making decisions auditable and acceptable to government decision-makers.',
-    source: 'Centre for Internet & Society',
-    url: 'https://cis-india.org/',
+    title: 'Nearly 700 highway projects delayed, 35% due to land acquisition disputes',
+    context: 'Highlights how land acquisition disputes can contribute significantly to highway project delays.',
+    source: 'ThePrint',
+    year: '2025',
+    url: 'https://theprint.in/india/governance/nearly-700-highway-projects-delayed-35-due-to-land-acquisition-disputes-says-parliamentary-panel/2564537/',
+  },
+  {
+    title: 'To cut delays & cost overruns, roads ministry mandates land acquisition, green nod deadlines',
+    context: 'Shows how setting early land-acquisition and clearance deadlines can help reduce project delays.',
+    source: 'Indian Express',
+    year: '2025',
+    url: 'https://indianexpress.com/article/business/cut-delays-cost-overruns-roads-ministry-mandates-land-acquisition-green-deadlines-10009890/',
   },
 ]
 
@@ -71,7 +78,6 @@ export default function Blogs() {
     divider:    isDark ? 'rgba(255,255,255,0.07)' : '#e2e8f0',
     navBg:      isDark ? '#070c1b' : '#ffffff',
     navBorder:  isDark ? 'rgba(255,255,255,0.07)' : '#e2e8f0',
-    rowBg:      isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,51,102,0.02)',
     linkColor:  isDark ? '#4a7fd4' : '#003366',
   }
 
@@ -135,7 +141,7 @@ export default function Blogs() {
             Blogs
           </h1>
           <p style={{ fontSize: '0.93rem', color: c.body, lineHeight: 1.7, maxWidth: 580, margin: 0 }}>
-            Insights on land acquisition, delay risks and predictive governance.
+            Real-world insights on land acquisition and infrastructure delays.
           </p>
         </div>
 
@@ -164,8 +170,8 @@ export default function Blogs() {
           background: isDark ? 'rgba(255,255,255,0.02)' : '#f8fafc',
           fontSize: '0.83rem', color: c.body, lineHeight: 1.65,
         }}>
-          Links open the publisher's homepage or index. LADRIS does not host or endorse third-party content.
-          Specific articles may require site search or subscription to access.
+          Links open the original publisher article in a new tab. LADRIS does not host or endorse third-party content.
+          Articles are sourced from publicly available news publications.
         </div>
 
       </main>
@@ -174,7 +180,7 @@ export default function Blogs() {
 }
 
 function BlogRow({ blog, isLast, c, isDark }: {
-  blog: { title: string; summary: string; source: string; url: string }
+  blog: { title: string; context: string; source: string; year: string; url: string }
   isLast: boolean
   c: Record<string, string>
   isDark: boolean
@@ -192,36 +198,34 @@ function BlogRow({ blog, isLast, c, isDark }: {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{ fontSize: '0.975rem', fontWeight: 600, color: c.heading, marginBottom: 7, lineHeight: 1.4 }}>
+      <div style={{ fontSize: '0.975rem', fontWeight: 600, color: c.heading, marginBottom: 5, lineHeight: 1.4 }}>
         {blog.title}
       </div>
+      <div style={{ fontSize: '0.78rem', color: c.label, fontWeight: 500, marginBottom: 8 }}>
+        {blog.source} · {blog.year}
+      </div>
       <div style={{ fontSize: '0.875rem', color: c.body, lineHeight: 1.7, marginBottom: 12 }}>
-        {blog.summary}
+        {blog.context}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.75rem', color: c.label, fontWeight: 500 }}>
-          Source: {blog.source}
-        </span>
-        <a
-          href={blog.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            fontSize: '0.8rem', fontWeight: 600,
-            color: c.linkColor,
-            textDecoration: 'none',
-            transition: 'text-decoration 0.12s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
-          onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
-        >
-          Read Article
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </a>
-      </div>
+      <a
+        href={blog.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          fontSize: '0.8rem', fontWeight: 600,
+          color: c.linkColor,
+          textDecoration: 'none',
+          transition: 'text-decoration 0.12s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
+        onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
+      >
+        Read Article
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </a>
     </div>
   )
 }

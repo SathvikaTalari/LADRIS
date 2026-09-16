@@ -137,7 +137,7 @@ export default function CaseStudies() {
             Case Studies
           </h1>
           <p style={{ fontSize: '0.93rem', color: c.body, lineHeight: 1.7, maxWidth: 580, margin: 0 }}>
-            See how early risk signals can support earlier action.
+            How early risk signals can support earlier action.
           </p>
         </div>
 
