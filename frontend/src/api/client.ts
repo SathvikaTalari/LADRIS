@@ -166,6 +166,26 @@ export const modelsAPI = {
 
   features: () =>
     apiClient.get<Record<string, any>>('/api/v1/models/features').then((r) => r.data),
+
+  monitoring: () =>
+    apiClient.get<any>('/api/ml/monitoring').then((r) => r.data),
+
+  retrainingStatus: () =>
+    apiClient.get<any>('/api/ml/retraining-status').then((r) => r.data),
+
+  trainingHistory: () =>
+    apiClient.get<any>('/api/ml/training-history').then((r) => r.data),
+
+  triggerRetraining: (force: boolean = false) =>
+    apiClient.post<any>(`/api/ml/retrain?force=${force}`).then((r) => r.data),
+}
+
+export const auditAPI = {
+  list: (params?: { action?: string; resource_type?: string; user_email?: string; limit?: number; offset?: number }) =>
+    apiClient.get<{ status: string; total: number; limit: number; offset: number; items: any[] }>('/api/v1/audit/', { params }).then((r) => r.data),
+
+  stats: () =>
+    apiClient.get<{ status: string; total_audit_records: number; top_actions: any[]; top_resources: any[] }>('/api/v1/audit/stats').then((r) => r.data),
 }
 
 export const monitoringAPI = {
@@ -194,6 +214,10 @@ export const analyticsAPI = {
     apiClient.get<AnalyticsOverview>('/api/v1/analytics/overview').then((r) => r.data),
   executive: () =>
     apiClient.get<any>('/api/v1/analytics/executive').then((r) => r.data),
+  districtSummary: () =>
+    apiClient.get<any>('/api/v1/analytics/district-summary').then((r) => r.data),
+  riskTrend: () =>
+    apiClient.get<any>('/api/v1/analytics/risk-trend').then((r) => r.data),
 }
 
 export const alertsAPI = {

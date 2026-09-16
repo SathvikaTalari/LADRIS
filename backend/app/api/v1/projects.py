@@ -21,9 +21,11 @@ from app.models.project import Project, ProjectStatus, ProjectType, RiskLevel
 from app.models.user import User, UserRole
 from app.schemas.common import PaginatedResponse
 from app.schemas.project import ProjectCreate, ProjectListResponse, ProjectResponse, ProjectUpdate
+from app.models.stage import ProjectStage, StageName, StageStatus
 from app.services.audit_service import record_audit_log
 from app.services.ml_feature_service import validate_project_consistency
-from app.services.production_ml_service import latest_prediction, latest_predictions
+from app.services.production_ml_service import generate_prediction, latest_prediction, latest_predictions
+from app.services.project_csv_service import append_or_update_project_in_csv, STAGES
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -121,7 +123,7 @@ async def create_project(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_officer),
 ) -> Project:
-    """Create a new land acquisition project."""
+    """Create a new land acquisition project, generate ML prediction, and sync into raw CSV."""
     # Check for duplicate project code
     existing = await db.execute(
         select(Project).where(Project.project_code == payload.project_code)
@@ -136,9 +138,45 @@ async def create_project(
         **payload.model_dump(),
         created_by=current_user.id,
         updated_by=current_user.id,
+        status=ProjectStatus.ACTIVE,
     )
+
+    consistency_errors = validate_project_consistency(project)
+    if consistency_errors:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=consistency_errors)
+
     db.add(project)
     await db.flush()
+
+    # Initialize standard acquisition stages
+    for index, (_, stage_name) in enumerate(STAGES):
+        status_val = StageStatus.IN_PROGRESS if index == 0 else StageStatus.PENDING
+        stage = ProjectStage(
+            project_id=project.id,
+            stage_name=stage_name,
+            stage_order=index + 1,
+            status=status_val,
+        )
+        db.add(stage)
+    await db.flush()
+
+    # Generate ML delay prediction immediately for the new project!
+    prediction = None
+    try:
+        prediction = await generate_prediction(db, project.id)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("Immediate ML prediction failed for new project %s: %s", project.id, exc)
+
+    # Immediately add/sync into my_raw_projects.csv
+    try:
+        append_or_update_project_in_csv(project, prediction)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).error("Failed to append project %s to CSV: %s", project.project_code, exc)
+
+    await db.commit()
+    await db.refresh(project)
 
     await record_audit_log(
         db=db,
@@ -180,7 +218,14 @@ async def get_project(
 
     # The immutable production prediction is the only source for displayed risk.
     prediction = await latest_prediction(db, project.id)
-    if prediction is not None:
+    if prediction is None:
+        try:
+            pred_dict = await generate_prediction(db, project.id)
+            await db.commit()
+            project.risk_level = RiskLevel(pred_dict["risk_category"])
+        except Exception:
+            pass
+    else:
         project.risk_level = RiskLevel(prediction.risk_category)
 
     return project
@@ -194,7 +239,7 @@ async def update_project(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_officer),
 ) -> Project:
-    """Update project fields."""
+    """Update project fields, recalculate ML prediction, and sync into raw CSV."""
     result = await db.execute(
         select(Project).where(
             Project.id == project_id,
@@ -218,6 +263,23 @@ async def update_project(
     consistency_errors = validate_project_consistency(project)
     if consistency_errors:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=consistency_errors)
+
+    await db.flush()
+
+    # Recalculate ML prediction immediately on project update
+    prediction = None
+    try:
+        prediction = await generate_prediction(db, project.id)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("ML prediction update failed for project %s: %s", project.id, exc)
+
+    # Sync and update row in my_raw_projects.csv
+    try:
+        append_or_update_project_in_csv(project, prediction)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).error("Failed to update project %s in CSV: %s", project.project_code, exc)
 
     await db.commit()
     await db.refresh(project)

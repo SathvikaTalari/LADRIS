@@ -215,7 +215,7 @@ export default function Dashboard() {
           value={isLoading ? null : (kpis?.high_critical_projects ?? 0)}
           icon={<AlertTriangle size={16} />}
           accent="var(--color-risk-critical)"
-          description="Structural timeline divergence"
+          description="Projects needing urgent intervention"
           isLoading={isLoading}
         />
         <MetricCard
@@ -223,7 +223,7 @@ export default function Dashboard() {
           value={isLoading ? null : (kpis?.projects_delayed ?? 0)}
           icon={<Flame size={16} />}
           accent="var(--color-risk-high)"
-          description="Exceeding baseline timeline"
+          description="Already behind original deadline"
           isLoading={isLoading}
         />
         <MetricCard
@@ -231,7 +231,7 @@ export default function Dashboard() {
           value={isLoading ? null : (kpis?.active_alerts ?? 0)}
           icon={<AlertCircle size={16} />}
           accent="var(--color-accent-primary)"
-          description="Automated system triggers"
+          description="Urgent early warnings"
           isLoading={isLoading}
         />
       </div>
@@ -253,10 +253,10 @@ export default function Dashboard() {
           <span>•</span>
           <span>Average Data Completeness: <strong style={{ color: 'var(--color-accent-primary)' }}>{kpis?.avg_data_completeness ?? 0}%</strong></span>
           <span>•</span>
-          <span>Data Trust Score: <strong style={{ color: 'var(--color-accent-tertiary)' }}>{kpis?.data_trust_score ?? 0}/100</strong></span>
+          <span>Data Quality Score: <strong style={{ color: 'var(--color-accent-tertiary)' }}>{kpis?.data_trust_score ?? 0}/100</strong></span>
         </div>
         <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
-          * Production calibrated LightGBM delay model · stored snapshots only
+          * AI delay predictions based on active project records
         </span>
       </div>
 
@@ -275,7 +275,7 @@ export default function Dashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <PieChart size={18} color="var(--color-accent-primary)" />
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                  Portfolio Risk Distribution
+                  Project Delay Risk Breakdown
                 </h3>
               </div>
             </div>
@@ -290,7 +290,7 @@ export default function Dashboard() {
               border: '1px solid var(--color-border-subtle)',
               marginBottom: 10,
             }}>
-              {[{ id: 'verified_delay_risk', label: 'Production ML Risk' }].map((t) => (
+              {[{ id: 'verified_delay_risk', label: 'All Projects Delay Risk' }].map((t) => (
                 <button
                   key={t.id}
                   style={{
@@ -340,14 +340,14 @@ export default function Dashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Activity size={18} color="var(--color-accent-saffron)" />
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                  Stage Bottleneck Panel
+                  Where Projects Get Delayed Most
                 </h3>
               </div>
-              <span className="badge badge-yellow" style={{ fontSize: '0.62rem' }}>6 Stages</span>
+              <span className="badge badge-yellow" style={{ fontSize: '0.62rem' }}>6 Acquisition Stages</span>
             </div>
 
             <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
-              Quantifies timeline congestion across RFCTLARR / NH Act acquisition stages.
+              Shows which stages of land acquisition face the highest risk of slowdown across projects.
             </p>
           </div>
 
@@ -355,7 +355,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
               { name: 'Notification (Section 3A)', pct: 41, color: '#138808' },
-              { name: 'Objection (Section 3C)', pct: 37, color: '#138808' },
+              { name: 'Objections Hearing (Section 3C)', pct: 37, color: '#138808' },
               { name: 'Award Declaration', pct: 52, color: '#d97706' },
               { name: 'Compensation Disbursement', pct: 78, color: '#ff4757', isBottleneck: true },
               { name: 'R&R Implementation', pct: 49, color: '#d97706' },
@@ -399,10 +399,10 @@ export default function Dashboard() {
             justifyContent: 'space-between',
           }}>
             <span style={{ fontWeight: 700, color: 'var(--color-risk-critical)' }}>
-              Dominant Bottleneck: Compensation
+              Biggest Delay Factor: Compensation Disbursement
             </span>
             <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
-              State: Possession
+              Next Stage: Possession
             </span>
           </div>
         </div>
@@ -414,15 +414,15 @@ export default function Dashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Flame size={16} color="var(--color-risk-critical)" />
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                  Needs Attention Today
+                  Projects Needing Attention Today
                 </h3>
               </div>
               <Link to="/priority-intelligence" style={{ fontSize: '0.7rem', color: 'var(--color-accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
-                Full Queue →
+                Full Watchlist →
               </Link>
             </div>
             <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: 10 }}>
-              Urgent intervention queue ranked by risk signal & bottleneck.
+              Urgent projects ranked by likelihood of delay and key bottleneck.
             </p>
           </div>
 
@@ -515,7 +515,7 @@ export default function Dashboard() {
 
           <div style={{ paddingTop: 8, borderTop: '1px solid var(--color-border-subtle)', textAlign: 'center' }}>
             <Link to="/priority-intelligence" style={{ fontSize: '0.72rem', color: 'var(--color-accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
-              Open Decision Priority Engine →
+              Open Priority Watchlist →
             </Link>
           </div>
         </div>
@@ -530,11 +530,11 @@ export default function Dashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <MapIcon size={18} color="var(--color-accent-primary)" />
               <h3 style={{ fontSize: '0.9rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                Compact GIS Risk Map
+                National Project Map
               </h3>
             </div>
             <Link to="/gis" className="btn btn-secondary btn-sm" style={{ padding: '2px 8px', fontSize: '0.72rem' }}>
-              Open GIS Intelligence →
+              Open Interactive Map →
             </Link>
           </div>
 
@@ -590,10 +590,10 @@ export default function Dashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <BarChart3 size={18} color="var(--color-accent-primary)" />
               <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                State / District Comparison
+                States with Highest Delay Risk
               </h3>
             </div>
-            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.68rem' }}>By stored ML risk score</span>
+            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.68rem' }}>Ranked by average risk score</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -610,14 +610,14 @@ export default function Dashboard() {
               }}>
                 <div>
                   <strong style={{ fontSize: '0.82rem', color: 'var(--color-text-primary)' }}>{state.state} ({state.code})</strong>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Top Risk District: {district ? `${district.district} (${district.score})` : 'Unavailable'}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Highest Risk District: {district ? `${district.district} (${district.score}/100)` : 'Unavailable'}</div>
                 </div>
                 <strong style={{ fontSize: '1rem', fontFamily: 'var(--font-mono)', color: state.score >= 70 ? 'var(--color-risk-critical)' : 'var(--color-risk-high)' }}>
                   {state.score}
                 </strong>
               </div>
             })}
-            {topStates.length === 0 && <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>No stored ML predictions are available for comparison.</div>}
+            {topStates.length === 0 && <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>No state predictions available.</div>}
           </div>
         </div>
 
@@ -674,30 +674,30 @@ export default function Dashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Database size={18} color="var(--color-accent-tertiary)" />
                 <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                  Data Health & AI Reliability
+                  Data Health & Completeness
                 </h3>
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.78rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Predictions Available:</span>
+                <span>Projects with Full Predictions:</span>
                 <strong style={{ color: '#138808' }}>{dataHealth?.prediction_available ?? 0}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Predictions Unavailable:</span>
+                <span>Projects Awaiting Assessment:</span>
                 <strong style={{ color: '#d97706' }}>{dataHealth?.prediction_unavailable ?? 0}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Total Active Projects:</span>
+                <span>Total Monitored Projects:</span>
                 <strong style={{ color: '#7daaff' }}>{dataHealth?.total_projects ?? 0}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--color-border-subtle)', paddingTop: 6 }}>
-                <span>Average Data Trust Score:</span>
+                <span>Average Data Completeness:</span>
                 <strong style={{ color: 'var(--color-accent-tertiary)', fontFamily: 'var(--font-mono)' }}>{dataHealth?.average_trust_score ?? 0}/100</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Low-Reliability Predictions:</span>
+                <span>Incomplete Data Warnings:</span>
                 <strong style={{ color: 'var(--color-risk-critical)' }}>{reliability?.low_reliability ?? 0}</strong>
               </div>
             </div>

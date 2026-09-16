@@ -32,6 +32,42 @@ PROJECT_TYPES = {
     "other": ProjectType.OTHER,
 }
 
+TYPE_TO_RAW = {v: k for k, v in PROJECT_TYPES.items()}
+
+CODE_TO_STATE = {
+    "AP": "Andhra Pradesh", "AR": "Arunachal Pradesh", "AS": "Assam", "BR": "Bihar",
+    "CG": "Chhattisgarh", "GA": "Goa", "GJ": "Gujarat", "HR": "Haryana",
+    "HP": "Himachal Pradesh", "JH": "Jharkhand", "KA": "Karnataka", "KL": "Kerala",
+    "MP": "Madhya Pradesh", "MH": "Maharashtra", "MN": "Manipur", "ML": "Meghalaya",
+    "MZ": "Mizoram", "NL": "Nagaland", "OD": "Odisha", "PB": "Punjab", "RJ": "Rajasthan",
+    "SK": "Sikkim", "TN": "Tamil Nadu", "TS": "Telangana", "TG": "Telangana", "TR": "Tripura",
+    "UP": "Uttar Pradesh", "UK": "Uttarakhand", "WB": "West Bengal", "DL": "Delhi",
+    "JK": "Jammu and Kashmir", "LA": "Ladakh", "PY": "Puducherry",
+}
+
+RAW_CSV_FIELDNAMES = [
+    "Project ID",
+    "Project Name",
+    "Project Type",
+    "Implementing Agency",
+    "State",
+    "District",
+    "Land Area (ha)",
+    "Affected Families",
+    "Notification Date",
+    "Expected Completion",
+    "Actual Completion",
+    "Current Stage",
+    "Delayed (Y/N)",
+    "Delay (days)",
+    "Compensation Sanctioned",
+    "Compensation Disbursed",
+    "Open Disputes",
+    "R&R Progress %",
+    "Latitude",
+    "Longitude",
+]
+
 STATE_CODES = {
     "andhra pradesh": "AP", "assam": "AS", "bihar": "BR", "chhattisgarh": "CG",
     "delhi": "DL", "gujarat": "GJ", "haryana": "HR", "karnataka": "KA",
@@ -50,6 +86,30 @@ STAGES = [
     ("possession", StageName.POSSESSION),
     ("completed", StageName.PROJECT_HANDOVER),
 ]
+
+DISTRICT_COORDINATES = {
+    ("nalgonda", "ts"): (17.0577, 79.2684),
+    ("nalgonda", "telangana"): (17.0577, 79.2684),
+    ("bengaluru rural", "ka"): (13.2847, 77.5877),
+    ("bengaluru rural", "karnataka"): (13.2847, 77.5877),
+    ("karimnagar", "ts"): (18.4386, 79.1288),
+    ("karimnagar", "telangana"): (18.4386, 79.1288),
+    ("guntur", "ap"): (16.3067, 80.4365),
+    ("guntur", "andhra pradesh"): (16.3067, 80.4365),
+    ("nagpur", "mh"): (21.1458, 79.0882),
+    ("nagpur", "maharashtra"): (21.1458, 79.0882),
+    ("jaipur", "rj"): (26.9124, 75.7873),
+    ("jaipur", "rajasthan"): (26.9124, 75.7873),
+    ("varanasi", "up"): (25.3176, 82.9739),
+    ("varanasi", "uttar pradesh"): (25.3176, 82.9739),
+    ("khammam", "ts"): (17.2473, 80.1514),
+    ("khammam", "telangana"): (17.2473, 80.1514),
+    ("lucknow", "up"): (26.8467, 80.9462),
+    ("pune", "mh"): (18.5204, 73.8567),
+    ("ahmedabad", "gj"): (23.0225, 72.5714),
+    ("patna", "br"): (25.5941, 85.1376),
+    ("bhopal", "mp"): (23.2599, 77.4126),
+}
 
 
 def _text(row: dict[str, str], column: str) -> str | None:
@@ -111,12 +171,26 @@ def read_raw_projects(path: str | Path) -> list[dict[str, object]]:
         if notification and expected and expected < notification:
             raise ValueError(f"CSV row {line_number}: Expected Completion precedes Notification Date")
 
+        state_str = (_text(row, "State") or "").lower()
+        district_str = (_text(row, "District") or "").lower()
+        state_code = STATE_CODES.get(state_str, (_text(row, "State") or "")[:3].upper())
+
+        lat = _float(row, "Latitude")
+        lon = _float(row, "Longitude")
+        if (lat is None or lon is None) and district_str:
+            coords = (
+                DISTRICT_COORDINATES.get((district_str, state_str))
+                or DISTRICT_COORDINATES.get((district_str, state_code.lower()))
+            )
+            if coords:
+                lat, lon = coords
+
         mapped.append({
             "project_code": code,
             "name": name,
             "project_type": PROJECT_TYPES[raw_type],
             "executing_agency": _text(row, "Implementing Agency"),
-            "state_code": STATE_CODES.get((_text(row, "State") or "").lower(), (_text(row, "State") or "")[:3].upper()),
+            "state_code": state_code,
             "district_codes": [_text(row, "District")] if _text(row, "District") else [],
             "total_area_ha": _float(row, "Land Area (ha)"),
             "total_affected_families": affected,
@@ -130,6 +204,8 @@ def read_raw_projects(path: str | Path) -> list[dict[str, object]]:
             "rehabilitation_progress_pct": rehab,
             "families_rehabilitated": round((affected or 0) * (rehab or 0) / 100),
             "current_stage": raw_stage,
+            "latitude": lat,
+            "longitude": lon,
         })
     return mapped
 
@@ -190,9 +266,118 @@ async def sync_projects_from_csv(
         await session.execute(
             update(Project).where(
                 Project.project_code.not_in(imported_codes),
-                Project.milestone_data_status == "SYNTHETIC_DEMO",
                 Project.deleted_at.is_(None),
             ).values(deleted_at=datetime.now(timezone.utc))
         )
     await session.flush()
     return imported_ids
+
+
+def append_or_update_project_in_csv(
+    project: Project,
+    prediction: dict[str, Any] | None = None,
+    path: str | Path | None = None,
+) -> Path:
+    """Synchronize a created or updated project row directly into my_raw_projects.csv."""
+    if path is None:
+        from app.config import get_settings
+        path = get_settings().PROJECT_DATA_CSV
+
+    csv_path = Path(path)
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+
+    rows: list[dict[str, str]] = []
+    fieldnames = RAW_CSV_FIELDNAMES
+
+    if csv_path.is_file():
+        with csv_path.open("r", encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle)
+            if reader.fieldnames:
+                fieldnames = reader.fieldnames
+            rows = list(reader)
+
+    # Determine Project Type string
+    pt = project.project_type
+    raw_type = TYPE_TO_RAW.get(pt)
+    if not raw_type and hasattr(pt, "value"):
+        raw_type = TYPE_TO_RAW.get(pt.value, str(pt.value).lower())
+    if not raw_type:
+        raw_type = str(pt).lower() if pt else "other"
+    if raw_type not in PROJECT_TYPES:
+        raw_type = "other"
+
+    # State
+    state_code = (project.state_code or "").upper()
+    state_name = CODE_TO_STATE.get(state_code, project.state_code or "")
+
+    # District
+    district = project.district_codes[0] if project.district_codes else ""
+
+    # Dates
+    notif_date = project.notification_3a_date or project.planned_start_date
+    notif_str = notif_date.isoformat()[:10] if notif_date else ""
+    expected_str = project.planned_end_date.isoformat()[:10] if project.planned_end_date else ""
+    actual_str = getattr(project, "actual_end_date", None)
+    actual_str = actual_str.isoformat()[:10] if actual_str else ""
+
+    # Current Stage
+    current_stage = "notification"
+    stages_list = list(getattr(project, "stages", []) or [])
+    if stages_list:
+        from app.services.ml_feature_service import _current_stage
+        current_stage = _current_stage(stages_list)
+
+    # Delay predictions
+    delayed_yn = ""
+    delay_days = ""
+    if prediction:
+        prob = prediction.get("delay_probability")
+        pred_days = prediction.get("predicted_delay_days")
+        if prob is not None:
+            delayed_yn = "Y" if (float(prob) >= 0.5 or (pred_days and float(pred_days) > 30)) else "N"
+        if pred_days is not None:
+            delay_days = str(max(0, round(float(pred_days))))
+
+    new_row: dict[str, str] = {
+        "Project ID": str(project.project_code),
+        "Project Name": str(project.name),
+        "Project Type": raw_type,
+        "Implementing Agency": str(project.executing_agency or project.nodal_agency or "NHAI"),
+        "State": state_name,
+        "District": district,
+        "Land Area (ha)": f"{float(project.total_area_ha):.1f}" if project.total_area_ha is not None else "",
+        "Affected Families": str(int(project.total_affected_families)) if project.total_affected_families is not None else "",
+        "Notification Date": notif_str,
+        "Expected Completion": expected_str,
+        "Actual Completion": actual_str,
+        "Current Stage": current_stage,
+        "Delayed (Y/N)": delayed_yn,
+        "Delay (days)": delay_days,
+        "Compensation Sanctioned": str(int(project.estimated_compensation_inr)) if project.estimated_compensation_inr is not None else "",
+        "Compensation Disbursed": str(int(project.disbursed_compensation_inr)) if project.disbursed_compensation_inr is not None else "",
+        "Open Disputes": str(int(project.legal_case_count or 0)),
+        "R&R Progress %": str(round(float(project.rehabilitation_progress_pct))) if project.rehabilitation_progress_pct is not None else "",
+        "Latitude": f"{float(project.latitude):.4f}" if project.latitude is not None else "",
+        "Longitude": f"{float(project.longitude):.4f}" if project.longitude is not None else "",
+    }
+
+    # Upsert by Project ID
+    found_idx = None
+    for idx, r in enumerate(rows):
+        if (r.get("Project ID") or "").strip() == str(project.project_code).strip():
+            found_idx = idx
+            break
+
+    if found_idx is not None:
+        rows[found_idx] = new_row
+    else:
+        rows.append(new_row)
+
+    # Write back to CSV cleanly
+    with csv_path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return csv_path
+

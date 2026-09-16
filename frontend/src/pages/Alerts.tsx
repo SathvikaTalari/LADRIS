@@ -54,15 +54,15 @@ export default function Alerts() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <PageHeader
-        title="Alerts & Early-Warning Command Center"
-        subtitle="Automated real-time notifications for risk escalations, data quality degradation, and high-priority interventions"
+        title="Project Alerts &amp; Notifications"
+        subtitle="Real-time alerts for project timeline delays, pending court disputes, and compensation roadblocks"
       />
 
       {/* KPI Cards */}
       <div className="grid-kpi" style={{ marginBottom: 20 }}>
         <div className="metric-card">
           <div className="metric-label flex items-center gap-1.5">
-            <Bell size={14} className="text-amber-400" /> Active Early Warnings
+            <Bell size={14} className="text-amber-400" /> Active Alerts
           </div>
           <div className="metric-value text-amber-400">{activeCount}</div>
           <div className="text-xs text-slate-400">Requires officer review</div>
@@ -73,15 +73,15 @@ export default function Alerts() {
             <AlertTriangle size={14} className="text-rose-400" /> Critical Severity
           </div>
           <div className="metric-value text-rose-400">{criticalCount}</div>
-          <div className="text-xs text-slate-400">Critical anomaly signals</div>
+          <div className="text-xs text-slate-400">Severe delay risk</div>
         </div>
 
         <div className="metric-card">
           <div className="metric-label flex items-center gap-1.5">
-            <Info size={14} className="text-blue-400" /> Acknowledged
+            <Info size={14} className="text-blue-400" /> In Review
           </div>
           <div className="metric-value text-blue-400">{ackCount}</div>
-          <div className="text-xs text-slate-400">Under officer investigation</div>
+          <div className="text-xs text-slate-400">Under officer review</div>
         </div>
 
         <div className="metric-card">
@@ -89,7 +89,7 @@ export default function Alerts() {
             <CheckCircle2 size={14} className="text-emerald-400" /> Resolved
           </div>
           <div className="metric-value text-emerald-400">{resolvedCount}</div>
-          <div className="text-xs text-slate-400">Action taken</div>
+          <div className="text-xs text-slate-400">Action completed</div>
         </div>
       </div>
 
@@ -243,7 +243,7 @@ export default function Alerts() {
                         className="btn btn-ghost btn-sm"
                         style={{ fontSize: '0.75rem' }}
                       >
-                        Workspace <ChevronRight size={12} />
+                        View Project <ChevronRight size={12} />
                       </Link>
                     )}
 

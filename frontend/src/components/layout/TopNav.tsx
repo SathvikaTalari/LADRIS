@@ -16,16 +16,18 @@ interface TopNavProps {
 }
 
 const PAGE_LABELS: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/priority-intelligence': 'Priority Intelligence',
-  '/intelligence': 'Decision Intelligence',
-  '/projects': 'Projects',
-  '/gis': 'GIS Command Map',
-  '/analytics': 'Analytics',
-  '/alerts': 'Alerts',
-  '/data-sources': 'Data Sources',
-  '/data-quality': 'Data Quality',
-  '/admin': 'Administration',
+  '/dashboard': 'Executive Dashboard',
+  '/la-workbench': 'Officer Workbench',
+  '/agency-portal': 'Agency Portal',
+  '/priority-intelligence': 'Priority Watchlist',
+  '/intelligence': 'Decision Simulator',
+  '/projects': 'Projects Directory',
+  '/gis': 'Interactive Map',
+  '/analytics': 'Analytics & Trends',
+  '/alerts': 'Alerts & Warnings',
+  '/data-sources': 'Official Data Sources',
+  '/data-quality': 'Data Health & Quality',
+  '/admin': 'Administration & AI Settings',
 }
 
 export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {

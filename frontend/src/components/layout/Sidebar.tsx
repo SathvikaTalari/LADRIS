@@ -37,24 +37,24 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   ]
 
   if (user?.role === 'LA_OFFICER' || user?.role === 'PROJECT_OFFICER') {
-    navItems.push({ to: '/la-workbench', icon: Briefcase, label: 'LA Workbench' })
+    navItems.push({ to: '/la-workbench', icon: Briefcase, label: 'Officer Workbench' })
   }
   if (user?.role === 'PROJECT_AGENCY') {
     navItems.push({ to: '/agency-portal', icon: Building2, label: 'Agency Portal' })
   }
 
   navItems.push(
-    { to: '/priority-intelligence', icon: Activity, label: 'Priority Intelligence' },
-    { to: '/intelligence', icon: Brain, label: 'Decision Intelligence' },
-    { to: '/projects', icon: FolderKanban, label: 'Projects' },
-    { to: '/gis', icon: Map, label: 'GIS Map' },
-    { to: '/analytics', icon: BarChart3, label: 'Analytics' },
-    { to: '/alerts', icon: Bell, label: 'Alerts' },
+    { to: '/priority-intelligence', icon: Activity, label: 'Priority Watchlist' },
+    { to: '/intelligence', icon: Brain, label: 'Decision Simulator' },
+    { to: '/projects', icon: FolderKanban, label: 'Projects Directory' },
+    { to: '/gis', icon: Map, label: 'Interactive Map' },
+    { to: '/analytics', icon: BarChart3, label: 'Analytics & Trends' },
+    { to: '/alerts', icon: Bell, label: 'Alerts & Warnings' },
     { to: '/data-sources', icon: Database, label: 'Data Sources' },
-    { to: '/data-quality', icon: ShieldCheck, label: 'Data Quality' },
+    { to: '/data-quality', icon: ShieldCheck, label: 'Data Health' },
   )
 
-  const adminItems = [{ to: '/admin', icon: Settings, label: 'Admin' }]
+  const adminItems = [{ to: '/admin', icon: Settings, label: 'Admin & AI Settings' }]
 
 
   return (

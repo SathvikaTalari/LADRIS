@@ -98,15 +98,21 @@ class Settings(BaseSettings):
     ETL_DATA_DIR: str = "data"                      # relative to backend/
 
     # Existing trained LightGBM module (never retrained by request handlers)
-    ML_MODULE_PATH: str = str(Path(__file__).resolve().parents[2] / "land-delay-predictor" / "app")
-    MODELS_DIR: str = str(Path(__file__).resolve().parents[2] / "land-delay-predictor" / "models")
+    @staticmethod
+    def _get_ml_root() -> Path:
+        base = Path(__file__).resolve().parents[2]
+        pred_dir = base / "land-delay-prediction"
+        if pred_dir.exists():
+            return pred_dir
+        return base / "land-delay-predictor"
+
+    ML_MODULE_PATH: str = str(_get_ml_root() / "app")
+    MODELS_DIR: str = str(_get_ml_root() / "models")
     ML_PREDICTION_STALE_HOURS: int = 24
 
     # ─── Project CSV Source ─────────────────────────────────────────────────
     # Runtime project inputs. Training data remains separate and read-only.
-    PROJECT_DATA_CSV: str = str(
-        Path(__file__).resolve().parents[2] / "land-delay-predictor" / "my_raw_projects.csv"
-    )
+    PROJECT_DATA_CSV: str = str(_get_ml_root() / "my_raw_projects.csv")
     SYNC_PROJECTS_FROM_CSV: bool = True
     PROJECT_CSV_EXCLUSIVE: bool = True
 

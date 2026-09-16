@@ -32,11 +32,11 @@ export default function PriorityIntelligence() {
             ...project,
             risk_level: prediction?.risk_category || 'UNKNOWN',
             priorityScore: prediction?.risk_score ?? null,
-            priorityLabel: prediction ? `${prediction.risk_category} ML RISK` : 'PREDICTION UNAVAILABLE',
+            priorityLabel: prediction ? `${prediction.risk_category} DELAY RISK` : 'NO PREDICTION YET',
             topIntervention: prediction ? {
-              display_name: prediction.recommendations?.[0] || 'Manual review recommended',
-              category: 'MODEL_RECOMMENDATION',
-              action_description: prediction.recommendations?.[0] || 'No recommendation returned by the production model.',
+              display_name: prediction.recommendations?.[0] || 'Administrative review recommended',
+              category: 'RECOMMENDATION',
+              action_description: prediction.recommendations?.[0] || 'Review project milestones and land acquisition paperwork.',
               score_components: {},
             } : null,
           }
@@ -98,8 +98,11 @@ export default function PriorityIntelligence() {
           </div>
           <div>
             <h1 style={{ fontSize: '1.375rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-              Global Priority Intelligence Center
+              Priority Project Watchlist
             </h1>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>
+              Quickly identify high-risk projects that require immediate administrative intervention or attention
+            </p>
           </div>
         </div>
       </div>
@@ -108,7 +111,7 @@ export default function PriorityIntelligence() {
       <div className="card" style={{ marginBottom: 24, background: 'var(--color-bg-card)', padding: 18, width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <Filter size={14} color="var(--color-accent-primary)" />
-          FILTER & RANK CRITERIA
+          Filter & Sort Projects
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, width: '100%' }}>
@@ -138,10 +141,10 @@ export default function PriorityIntelligence() {
               style={{ height: 38, fontSize: '0.8125rem', padding: '0 32px 0 12px', lineHeight: '38px', boxSizing: 'border-box' }}
             >
               <option value="ALL">All Risk Levels</option>
-              <option value="CRITICAL">Critical Anomaly Risk</option>
-              <option value="HIGH">High Anomaly Risk</option>
-              <option value="MEDIUM">Medium Anomaly Risk</option>
-              <option value="LOW">Low Anomaly Risk</option>
+              <option value="CRITICAL">Critical Delay Risk</option>
+              <option value="HIGH">High Delay Risk</option>
+              <option value="MEDIUM">Medium Delay Risk</option>
+              <option value="LOW">Low Delay Risk</option>
             </select>
           </div>
 
@@ -181,7 +184,7 @@ export default function PriorityIntelligence() {
       {isLoading ? (
         <div className="card" style={{ textAlign: 'center', padding: 40, color: 'var(--color-text-muted)' }}>
           <div className="spinner" style={{ margin: '0 auto 12px' }} />
-          Calculating national priority scores across public project registry...
+          Loading priority project watchlist...
         </div>
       ) : filteredProjects.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: 40, color: 'var(--color-text-muted)' }}>
@@ -231,7 +234,7 @@ export default function PriorityIntelligence() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Priority Score
+                        Delay Risk Score
                       </div>
                       <div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-warning)', lineHeight: 1.2 }}>
                         {p.priorityScore ? p.priorityScore.toFixed(1) : 'N/A'}{' '}
@@ -246,7 +249,7 @@ export default function PriorityIntelligence() {
                       className="btn btn-secondary btn-sm"
                       style={{ padding: '8px 16px', fontSize: '0.8125rem' }}
                     >
-                      Workspace <ChevronRight size={14} />
+                      View Project <ChevronRight size={14} />
                     </button>
                   </div>
                 </div>
@@ -255,10 +258,10 @@ export default function PriorityIntelligence() {
                 <div style={{ marginTop: 14, padding: 16, background: 'var(--color-bg-secondary)', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Zap size={14} color="var(--color-accent-primary)" />
-                    WHY THIS PROJECT IS PRIORITIZED:
+                    Why Attention Is Needed & Recommended Action:
                   </div>
                   <p style={{ fontSize: '0.85rem', color: 'var(--color-text-primary)', margin: 0, marginBottom: 14, lineHeight: 1.5 }}>
-                    {topInt ? topInt.action_description : 'Prediction unavailable. Generate a production ML prediction after completing required source data.'}
+                    {topInt ? topInt.action_description : 'Prediction is not yet available for this project. Check that project records and milestones are up to date.'}
                   </p>
 
                   {/* Component Formula Breakdown Grid */}

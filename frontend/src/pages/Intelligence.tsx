@@ -26,7 +26,6 @@ import {
   Clock,
   Search,
   ExternalLink,
-  ShieldAlert,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -57,10 +56,10 @@ export default function Intelligence() {
             </div>
             <div>
               <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}>
-                Government Decision Intelligence Platform
+                Government Decision Support Center
               </h1>
               <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                Risk DNA • Bottlenecks • Priority Queue • Benchmark Simulation
+                Priority Watchlist • Bottleneck Discovery • Staff Simulator • Project Comparisons
               </div>
             </div>
           </div>
@@ -72,8 +71,8 @@ export default function Intelligence() {
             border: '1px solid var(--color-border-subtle)', borderRadius: 6, color: 'var(--color-text-secondary)',
             display: 'flex', alignItems: 'center', gap: 6,
           }}>
-            <ShieldAlert size={14} color="var(--color-accent-primary)" />
-            <span>Rule: ANOMALY RISK ≠ DELAY PROBABILITY</span>
+            <CheckCircle2 size={14} color="#10b981" />
+            <span>Real-time project delay forecasts</span>
           </div>
         </div>
       </div>
@@ -88,7 +87,7 @@ export default function Intelligence() {
           style={{ borderRadius: '6px 6px 0 0', display: 'flex', alignItems: 'center', gap: 8 }}
         >
           <Activity size={16} />
-          Cross-Project Priority Queue
+          Priority Watchlist
         </button>
         <button
           className={`btn ${activeTab === 'bottleneck' ? 'btn-primary' : 'btn-ghost'}`}
@@ -96,7 +95,7 @@ export default function Intelligence() {
           style={{ borderRadius: '6px 6px 0 0', display: 'flex', alignItems: 'center', gap: 8 }}
         >
           <Layers size={16} />
-          Bottleneck Discovery Engine
+          Bottleneck Discovery
         </button>
         <button
           className={`btn ${activeTab === 'dna' ? 'btn-primary' : 'btn-ghost'}`}
@@ -104,7 +103,7 @@ export default function Intelligence() {
           style={{ borderRadius: '6px 6px 0 0', display: 'flex', alignItems: 'center', gap: 8 }}
         >
           <GitBranch size={16} />
-          Project Risk DNA & Benchmarking
+          Project Risk Profile &amp; Comparison
         </button>
       </div>
 
@@ -189,10 +188,10 @@ function PriorityQueueTab() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ background: '#8b5cf6', color: '#fff', fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: 4, letterSpacing: '0.05em' }}>
-              OUTPUT TYPE: D
+              Action Hub
             </span>
             <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
-              Cross-Project Priority Queue & Decision Support Scorer
+              Priority Watchlist &amp; Intervention Ranking
             </h2>
           </div>
           <button
@@ -200,7 +199,7 @@ function PriorityQueueTab() {
             onClick={() => { setShowScenario(!showScenario); if (!scenarioData) runSimulation(); }}
           >
             <Sliders size={14} style={{ marginRight: 6 }} />
-            {showScenario ? 'Hide Resource Simulator' : 'Simulate Constrained Capacity'}
+            {showScenario ? 'Hide Staff Simulator' : 'Simulate Team Availability'}
           </button>
         </div>
       </div>
@@ -211,21 +210,21 @@ function PriorityQueueTab() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ background: '#ec4899', color: '#fff', fontSize: '0.65rem', fontWeight: 700, padding: '2px 6px', borderRadius: 4 }}>
-                OUTPUT TYPE: E
+                What-If Tool
               </span>
               <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                Greedy Resource Allocation Simulator
+                Officer &amp; Team Allocation Simulator
               </h3>
             </div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-              Simulates project assignment under capacity limits
+              Test how allocating available staff across projects affects timelines
             </span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 16 }}>
             <div>
               <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 4 }}>
-                Legal Officers / LA Collectors Capacity:
+                Available Legal Officers / Land Collectors:
               </label>
               <input
                 type="number" min={0} max={20} className="input"
@@ -234,7 +233,7 @@ function PriorityQueueTab() {
             </div>
             <div>
               <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 4 }}>
-                Compensation Teams Capacity:
+                Available Compensation Teams:
               </label>
               <input
                 type="number" min={0} max={20} className="input"
@@ -243,7 +242,7 @@ function PriorityQueueTab() {
             </div>
             <div>
               <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 4 }}>
-                R&R Officers Capacity:
+                Available Rehabilitation (R&amp;R) Officers:
               </label>
               <input
                 type="number" min={0} max={20} className="input"
@@ -622,17 +621,17 @@ function ProjectDNATab({ initialProjectId }: { initialProjectId: string }) {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ background: 'var(--color-accent-primary)', color: '#fff', fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: 4, letterSpacing: '0.05em' }}>
-                    {dnaData.output_type}
+                    Profile
                   </span>
                   <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
-                    Project Risk DNA Profile
+                    Project Risk Profile
                   </h2>
                 </div>
               </div>
 
               <div style={{ textAlign: 'right', background: 'var(--color-bg-secondary)', padding: '12px 20px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
-                  DNA Composite Score
+                  Overall Delay Risk Score
                 </div>
                 <div style={{ fontSize: '1.8rem', fontWeight: 900, color: dnaData.dna_tier === 'CRITICAL' ? '#ef4444' : dnaData.dna_tier === 'HIGH' ? '#f59e0b' : '#3b82f6', fontFamily: 'var(--font-mono)' }}>
                   {(dnaData.dna_composite_score * 100).toFixed(1)}%
@@ -643,39 +642,39 @@ function ProjectDNATab({ initialProjectId }: { initialProjectId: string }) {
               </div>
             </div>
 
-            {/* 5 DNA Dimensions Grid */}
+            {/* 5 Key Project Dimensions Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 24 }}>
-              {/* Dimension 1: Anomaly Signal */}
+              {/* Dimension 1: Unusual Risk Indicators */}
               <div style={{ background: 'var(--color-bg-secondary)', padding: 16, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#3b82f6' }}>DIMENSION 1 (SIGNAL C)</div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#3b82f6' }}>INDICATOR 1</div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 700, margin: '4px 0', color: 'var(--color-text-primary)' }}>
-                  Anomaly Signal
+                  Unusual Delay Risks
                 </div>
                 <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono)', margin: '4px 0' }}>
                   {((dims?.anomaly_signal?.score || 0) * 100).toFixed(1)}%
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
-                  Tier: <strong style={{ color: 'var(--color-warning)' }}>{dims?.anomaly_signal?.risk_level || 'N/A'}</strong>
+                  Level: <strong style={{ color: 'var(--color-warning)' }}>{dims?.anomaly_signal?.risk_level || 'Normal'}</strong>
                 </div>
               </div>
 
-              {/* Dimension 2: Stage Fingerprint */}
+              {/* Dimension 2: Stage Impact */}
               <div style={{ background: 'var(--color-bg-secondary)', padding: 16, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#8b5cf6' }}>DIMENSION 2 (SIGNAL C)</div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#8b5cf6' }}>INDICATOR 2</div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 700, margin: '4px 0', color: 'var(--color-text-primary)' }}>
-                  Stage Fingerprint
+                  Stage Delay Risk
                 </div>
                 <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono)', margin: '4px 0' }}>
                   {((dims?.stage_fingerprint?.score || 0) * 100).toFixed(1)}%
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
-                  Peak: <strong style={{ color: 'var(--color-text-primary)' }}>{dims?.stage_fingerprint?.peak_stage || 'N/A'}</strong>
+                  Highest at: <strong style={{ color: 'var(--color-text-primary)' }}>{dims?.stage_fingerprint?.peak_stage?.replace(/_/g, ' ') || 'In Progress'}</strong>
                 </div>
               </div>
 
               {/* Dimension 3: Data Completeness */}
               <div style={{ background: 'var(--color-bg-secondary)', padding: 16, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#10b981' }}>DIMENSION 3 (SIGNAL A)</div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#10b981' }}>INDICATOR 3</div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 700, margin: '4px 0', color: 'var(--color-text-primary)' }}>
                   Data Completeness
                 </div>
@@ -683,35 +682,35 @@ function ProjectDNATab({ initialProjectId }: { initialProjectId: string }) {
                   {dims?.data_completeness?.completeness_pct || 100}%
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
-                  Official Fields Checked
+                  Required Fields Filled
                 </div>
               </div>
 
-              {/* Dimension 4: SHAP Driver */}
+              {/* Dimension 4: Primary Delay Cause */}
               <div style={{ background: 'var(--color-bg-secondary)', padding: 16, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b' }}>DIMENSION 4 (SIGNAL C)</div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b' }}>INDICATOR 4</div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 700, margin: '4px 0', color: 'var(--color-text-primary)' }}>
-                  Top SHAP Driver
+                  Primary Delay Cause
                 </div>
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: '4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {dims?.shap_driver_severity?.top_driver_name || 'None'}
+                  {dims?.shap_driver_severity?.top_driver_name ? dims.shap_driver_severity.top_driver_name.replace(/_/g, ' ') : 'None'}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
                   Impact: <strong style={{ color: 'var(--color-accent-primary)', fontFamily: 'var(--font-mono)' }}>+{((dims?.shap_driver_severity?.top_driver_contribution || 0) * 100).toFixed(1)}%</strong>
                 </div>
               </div>
 
-              {/* Dimension 5: Reliability */}
+              {/* Dimension 5: Prediction Confidence */}
               <div style={{ background: 'var(--color-bg-secondary)', padding: 16, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#ec4899' }}>DIMENSION 5 (SIGNAL B)</div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#ec4899' }}>INDICATOR 5</div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 700, margin: '4px 0', color: 'var(--color-text-primary)' }}>
-                  Reliability / OOD
+                  Prediction Confidence
                 </div>
                 <div style={{ fontSize: '1.4rem', fontWeight: 800, color: dims?.reliability?.confidence_assessment === 'HIGH' ? '#10b981' : '#f59e0b', fontFamily: 'var(--font-mono)', margin: '4px 0' }}>
-                  {dims?.reliability?.confidence_assessment || 'MEDIUM'}
+                  {dims?.reliability?.confidence_assessment === 'HIGH' ? 'High Confidence' : 'Moderate'}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
-                  OOD Flag: <strong style={{ color: 'var(--color-text-primary)' }}>{dims?.reliability?.is_out_of_distribution ? 'YES' : 'NO (Normal)'}</strong>
+                  Status: <strong style={{ color: 'var(--color-text-primary)' }}>{dims?.reliability?.is_out_of_distribution ? 'Needs Review' : 'Reliable'}</strong>
                 </div>
               </div>
             </div>
