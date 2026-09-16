@@ -1,8 +1,8 @@
 # =============================================================================
-# LADRIS — One-Click Team Setup Script (Windows PowerShell)
+# LADRIS - One-Click Team Setup Script (Windows PowerShell)
 # =============================================================================
 Write-Host "`n========================================================" -ForegroundColor Cyan
-Write-Host "   🛣️  LADRIS — Automated Team Onboarding Setup" -ForegroundColor Cyan
+Write-Host "   LADRIS - Automated Team Onboarding Setup" -ForegroundColor Cyan
 Write-Host "========================================================`n" -ForegroundColor Cyan
 
 $RepoRoot = $PSScriptRoot
@@ -38,9 +38,9 @@ $BackendPy = "$RepoRoot\backend\venv\Scripts\python.exe"
 Write-Host "   [OK] Backend dependencies installed." -ForegroundColor Green
 
 # 4. Sync my_raw_projects.csv and generate ML delay predictions
-Write-Host "`n[4/5] Loading 25 projects from my_raw_projects.csv & generating ML predictions..." -ForegroundColor Yellow
+Write-Host "`n[4/5] Loading 25 projects from my_raw_projects.csv and generating ML predictions..." -ForegroundColor Yellow
 & $BackendPy seed_my_raw_projects.py
-Write-Host "   [OK] ML predictions & SHAP explanations synchronized." -ForegroundColor Green
+Write-Host "   [OK] ML predictions and SHAP explanations synchronized." -ForegroundColor Green
 
 # 5. Frontend dependencies
 Write-Host "`n[5/5] Checking Frontend npm dependencies..." -ForegroundColor Yellow
