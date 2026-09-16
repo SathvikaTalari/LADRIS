@@ -98,9 +98,13 @@ class Settings(BaseSettings):
     BHOOMIRASHI_MAX_PROJECTS_PER_STATE: int = 500   # cap per state
     BHOOMIRASHI_TIMEOUT_SECONDS: float = 30.0
 
-    # ─── ETL Settings ─────────────────────────────────────────────────────────
+    # ─── ETL & Ingestion Settings ─────────────────────────────────────────────
     ETL_BATCH_SIZE: int = 50                        # DB upsert batch size
     ETL_DATA_DIR: str = "data"                      # relative to backend/
+    INGESTION_UPLOAD_DIR: str = "data/uploads"
+    INGESTION_MAX_FILE_SIZE_MB: int = 50
+    INGESTION_API_KEY: str = "ladris-secure-api-key-default"
+    EXTERNAL_DB_URL: str = ""
 
     # Existing trained LightGBM module (never retrained by request handlers)
     @staticmethod

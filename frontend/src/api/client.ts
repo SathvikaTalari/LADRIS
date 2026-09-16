@@ -97,8 +97,6 @@ import type {
   BottleneckResponse,
   ComparableProjectsResponse,
   PriorityQueueResponse,
-  ResourceScenarioRequest,
-  ResourceScenarioResponse,
 } from '@/types'
 
 export const authAPI = {
@@ -276,9 +274,6 @@ export const intelligenceAPI = {
   priorityQueue: (params?: { filter_state?: string; filter_agency?: string; filter_tier?: string }) =>
     apiClient.get<PriorityQueueResponse>('/api/v1/intelligence/priority-queue', { params }).then((r) => r.data),
 
-  resourceScenario: (data: ResourceScenarioRequest) =>
-    apiClient.post<ResourceScenarioResponse>('/api/v1/intelligence/resource-scenario', data).then((r) => r.data),
-
   riskVelocity: (projectId: string, riskType: string = 'structural_anomaly') =>
     apiClient.get<any>(`/api/v1/intelligence/risk-velocity/${projectId}`, { params: { risk_type: riskType } }).then((r) => r.data),
 
@@ -313,4 +308,347 @@ export const chatbotAPI = {
   suggestions: (activePage?: string) =>
     apiClient.get<string[]>('/api/v1/chatbot/suggestions', { params: { active_page: activePage } }).then((r) => r.data),
 }
+
+// ─── Data Ingestion API ───────────────────────────────────────────────────────
+export interface CSVPreviewData {
+  file_id: string
+  file_name: string
+  total_rows: number
+  columns: string[]
+  sample_rows: Record<string, any>[]
+  suggested_entity: string
+  suggested_mappings: Record<string, string>
+  available_target_fields: { field: string; label: string; required: string }[]
+}
+
+export interface CSVImportSummaryData {
+  job_id: string
+  total_rows: number
+  imported_rows: number
+  duplicate_rows: number
+  invalid_rows: number
+  rejected_rows: number
+  error_report_url?: string
+  sample_errors: Array<{ row_index: number; project_code: string; reason: string }>
+  ml_refreshed_count: number
+  status: string
+}
+
+export interface GISIngestionData {
+  job_id: string
+  file_name: string
+  project_id?: string
+  total_features: number
+  valid_features: number
+  invalid_features: number
+  geometry_types: string[]
+  geojson_preview: any
+  bounding_box?: number[]
+  message: string
+}
+
+export interface DocumentExtractData {
+  document_id: string
+  job_id?: string
+  file_name: string
+  file_size_bytes: number
+  document_type: string
+  extracted_text_preview: string
+  extracted_fields: Record<string, any>
+  field_details: Record<string, { value: any; confidence: number; source_snippet?: string }>
+  suggested_project_id?: string
+  review_status: string
+}
+
+export interface IngestionJobItem {
+  id: string
+  job_type: string
+  source_name: string
+  source_type: string
+  source_file_name?: string
+  status: string
+  total_records: number
+  valid_records: number
+  invalid_records: number
+  duplicate_records: number
+  imported_records: number
+  project_id?: string
+  reporting_period?: string
+  error_summary: any[]
+  created_at: string
+  completed_at?: string
+}
+
+export const ingestionAPI = {
+  manual: (data: { entity_type: string; data: Record<string, any>; source_name?: string; reporting_period?: string }) =>
+    apiClient.post('/api/v1/ingestion/manual', data).then((r) => r.data),
+
+  previewSpreadsheet: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient.post<CSVPreviewData>('/api/v1/ingestion/csv-excel/preview', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
+
+  importSpreadsheet: (params: {
+    file_id?: string
+    file?: File
+    column_mapping: Record<string, string>
+    target_entity?: string
+    source_name?: string
+    reporting_period?: string
+  }) => {
+    const formData = new FormData()
+    if (params.file) formData.append('file', params.file)
+    if (params.file_id) formData.append('file_id', params.file_id)
+    formData.append('column_mapping', JSON.stringify(params.column_mapping))
+    formData.append('target_entity', params.target_entity || 'PROJECT')
+    if (params.source_name) formData.append('source_name', params.source_name)
+    if (params.reporting_period) formData.append('reporting_period', params.reporting_period)
+
+    return apiClient.post<CSVImportSummaryData>('/api/v1/ingestion/csv-excel/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
+
+  externalBatch: (batch: any) =>
+    apiClient.post('/api/v1/ingestion/external', batch).then((r) => r.data),
+
+  uploadGIS: (file: File, projectId?: string) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (projectId) formData.append('project_id', projectId)
+    return apiClient.post<GISIngestionData>('/api/v1/ingestion/gis', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
+
+  extractDocument: (file: File, documentType: string = 'NOTIFICATION', projectId?: string) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('document_type', documentType)
+    if (projectId) formData.append('project_id', projectId)
+    return apiClient.post<DocumentExtractData>('/api/v1/ingestion/document', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
+
+  confirmDocument: (data: {
+    document_id: string
+    confirmed_fields: Record<string, any>
+    create_project?: boolean
+    project_id?: string
+  }) => apiClient.post('/api/v1/ingestion/document/confirm', data).then((r) => r.data),
+
+  testDatabase: (data: { connection_url?: string; table_name: string; limit?: number }) =>
+    apiClient.post('/api/v1/ingestion/database/test', data).then((r) => r.data),
+
+  history: (params?: { limit?: number; job_type?: string }) =>
+    apiClient.get<{ total: number; jobs: IngestionJobItem[] }>('/api/v1/ingestion/history', { params }).then((r) => r.data),
+
+  errorReportUrl: (jobId: string) => `${BASE_URL}/api/v1/ingestion/jobs/${jobId}/errors.csv`,
+}
+
+// ─── Decision Intelligence Types & API ────────────────────────────────────────
+
+export interface ProjectSummaryHeaderData {
+  project_id: string
+  project_name: string
+  project_code: string
+  state_code: string
+  risk_score: number
+  risk_level: string
+  predicted_delay_days: number
+  predicted_delay_months: number
+  current_stage: string
+  main_blocker: string
+  action_needed: string
+  model_version: string
+  predicted_at: string
+}
+
+export interface ConflictNodeData {
+  id: string
+  label: string
+  category: string
+  status: 'CLEAR' | 'WARNING' | 'BLOCKED' | 'PENDING'
+  detail?: string
+  subtext?: string
+}
+
+export interface LandParcelDetailData {
+  id?: string
+  khasra_number?: string
+  village?: string
+  district?: string
+  area_ha?: number
+  owner_count?: number
+  has_legal_dispute: boolean
+  is_in_possession: boolean
+  issue?: string
+}
+
+export interface LandBlockersData {
+  title: string
+  short_text: string
+  has_data: boolean
+  message?: string
+  parcels_count: number
+  disputed_parcels_count: number
+  possession_pending_count: number
+  blocked_stage?: string
+  responsible_department?: string
+  most_blocking_issue?: string | null
+  risk_level?: string
+  days_pending?: number
+  affected_downstream_stage?: string | null
+  nodes: ConflictNodeData[]
+  parcel_items: LandParcelDetailData[]
+}
+
+export interface WhatIfSimulationRequestData {
+  compensation_disbursement_pct?: number
+  open_legal_dispute_count?: number
+  rehabilitation_progress_pct?: number
+  resettlement_site_ready?: boolean
+  stakeholder_update_count_90d?: number
+}
+
+export interface WhatIfSimulationData {
+  title: string
+  short_text: string
+  baseline_risk_score: number
+  baseline_risk_level: string
+  baseline_delay_days: number
+  simulated_risk_score: number
+  simulated_risk_level: string
+  simulated_delay_days: number
+  risk_score_reduction: number
+  delay_reduction_days: number
+  improved: boolean
+  target_transition?: string
+  minimum_practical_changes: string[]
+  current_inputs: Record<string, any>
+  simulated_inputs: Record<string, any>
+  simulated_stage_risks?: Array<{ stage: string; delay_probability: number; risk_score: number; risk_category: string }>
+  model_version: string
+  simulated_at: string
+}
+
+export interface PaymentPossessionGapData {
+  title: string
+  short_text: string
+  compensation_sanctioned_inr: number
+  compensation_disbursed_inr: number
+  payment_pct: number
+  total_area_ha: number
+  possessed_area_ha: number
+  possession_pct: number
+  gap_pct: number
+  has_abnormal_gap?: boolean
+  severity?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  likelihood_possession_delayed?: number
+  status: 'Aligned' | 'Attention Needed' | 'Critical Disconnect' | 'Early Stage'
+  status_level: 'success' | 'warning' | 'danger' | 'info'
+  diagnostic: string
+  action_needed: string
+}
+
+export interface WorkflowStageData {
+  name: string
+  step_number: number
+  status: 'COMPLETED' | 'IN_PROGRESS' | 'BLOCKED' | 'PENDING'
+  responsible_department: string
+  days_taken_or_pending: number
+  is_blocked_step: boolean
+  details?: string
+}
+
+export interface ProcessBottlenecksData {
+  title: string
+  short_text: string
+  blocked_at: string
+  responsible_department: string
+  days_pending: number
+  next_stages_affected: number
+  probability_downstream_delay?: number
+  estimated_days_impact?: number
+  later_stages_affected_list?: string[]
+  stages: WorkflowStageData[]
+  recommendation: string
+}
+
+export interface ProjectInterventionCreateData {
+  intervention_type: string
+  title: string
+  description?: string
+  action_taken_by?: string
+  action_date?: string
+  updated_compensation_pct?: number
+  resolved_disputes_count?: number
+  updated_rr_pct?: number
+  resettlement_ready?: boolean
+}
+
+export interface ProjectInterventionData {
+  id: string
+  project_id: string
+  intervention_type: string
+  title: string
+  description?: string
+  action_taken_by?: string
+  action_date: string
+  risk_score_before: number
+  risk_category_before: string
+  predicted_delay_before?: number
+  delay_days_before?: number
+  risk_score_after: number
+  risk_category_after: string
+  predicted_delay_after?: number
+  delay_days_after?: number
+  risk_score_reduction: number
+  delay_reduction_days: number
+  status_improved: boolean
+  improved?: boolean
+  model_version: string
+  prediction_timestamp: string
+  created_at: string
+}
+
+export interface DecisionIntelligenceOverviewData {
+  summary: ProjectSummaryHeaderData
+  land_blockers: LandBlockersData
+  what_if_baseline: WhatIfSimulationData
+  payment_possession_gap: PaymentPossessionGapData
+  process_bottlenecks: ProcessBottlenecksData
+  recent_interventions: ProjectInterventionData[]
+}
+
+export const decisionIntelligenceAPI = {
+  getOverview: (projectId: string) =>
+    apiClient.get<DecisionIntelligenceOverviewData>(`/api/v1/decision-intelligence/${projectId}`).then((r) => r.data),
+
+  getSummary: (projectId: string) =>
+    apiClient.get<ProjectSummaryHeaderData>(`/api/v1/decision-intelligence/${projectId}/summary`).then((r) => r.data),
+
+  getLandBlockers: (projectId: string) =>
+    apiClient.get<LandBlockersData>(`/api/v1/decision-intelligence/${projectId}/land-blockers`).then((r) => r.data),
+
+  simulate: (projectId: string, data: WhatIfSimulationRequestData) =>
+    apiClient.post<WhatIfSimulationData>(`/api/v1/decision-intelligence/${projectId}/simulate`, data).then((r) => r.data),
+
+  getPaymentPossessionGap: (projectId: string) =>
+    apiClient.get<PaymentPossessionGapData>(`/api/v1/decision-intelligence/${projectId}/payment-possession-gap`).then((r) => r.data),
+
+  getProcessBottlenecks: (projectId: string) =>
+    apiClient.get<ProcessBottlenecksData>(`/api/v1/decision-intelligence/${projectId}/process-bottlenecks`).then((r) => r.data),
+
+  recordIntervention: (projectId: string, data: ProjectInterventionCreateData) =>
+    apiClient.post<ProjectInterventionData>(`/api/v1/decision-intelligence/${projectId}/interventions`, data).then((r) => r.data),
+
+  getInterventions: (projectId: string) =>
+    apiClient.get<ProjectInterventionData[]>(`/api/v1/decision-intelligence/${projectId}/interventions`).then((r) => r.data),
+}
+
 

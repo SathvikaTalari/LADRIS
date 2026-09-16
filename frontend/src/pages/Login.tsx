@@ -9,14 +9,12 @@ import { useAuthStore, getRoleDefaultPath } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 
 export const ROLE_OPTIONS = [
-  { key: 'SUPER_ADMIN', label: 'Super Admin (System)', email: 'admin@ladris.gov.in', pass: 'Password123!', scope: 'System-wide', target: 'Admin Panel' },
-  { key: 'CENTRAL_ADMIN', label: 'Central Ministry', email: 'central@ladris.gov.in', pass: 'Password123!', scope: 'India-wide', target: 'National Dashboard' },
-  { key: 'STATE_ADMIN', label: 'State Government', email: 'state@ladris.gov.in', pass: 'Password123!', scope: 'State-wide', target: 'State Dashboard' },
-  { key: 'DISTRICT_ADMIN', label: 'District Administration', email: 'district@ladris.gov.in', pass: 'Password123!', scope: 'District', target: 'District Dashboard' },
-  { key: 'LAND_AUTHORITY', label: 'Land Acquiring Authority', email: 'authority@ladris.gov.in', pass: 'Password123!', scope: 'Land Acquisition', target: 'Acquisition Dashboard' },
-  { key: 'LAND_REQUIRING_BODY', label: 'Land Requiring Body', email: 'lrb@ladris.gov.in', pass: 'Password123!', scope: 'Project', target: 'Project Dashboard' },
-  { key: 'PROJECT_AGENCY', label: 'Project Implementing Agency', email: 'agency@ladris.gov.in', pass: 'Password123!', scope: 'Project', target: 'Project Dashboard' },
-  { key: 'POLICY_MAKER', label: 'Policy Maker', email: 'policy@ladris.gov.in', pass: 'Password123!', scope: 'India-wide', target: 'Policy Dashboard' },
+  { key: 'SUPER_ADMIN', label: 'System Admin', email: 'admin@ladris.gov.in', pass: 'Password123!', scope: 'System-wide', target: 'Admin Panel' },
+  { key: 'LA_OFFICER', label: 'Land Acquisition Officer', email: 'la.officer@ladris.gov.in', pass: 'Password123!', scope: 'Land Acquisition', target: 'Acquisition Dashboard' },
+  { key: 'DISTRICT_ADMIN', label: 'District Admin', email: 'district.admin@ladris.gov.in', pass: 'Password123!', scope: 'District', target: 'District Dashboard' },
+  { key: 'STATE_ADMIN', label: 'State Authority', email: 'state.authority@ladris.gov.in', pass: 'Password123!', scope: 'State-wide', target: 'State Dashboard' },
+  { key: 'PROJECT_AGENCY', label: 'Project Agency User', email: 'agency.user@ladris.gov.in', pass: 'Password123!', scope: 'Project', target: 'Project Dashboard' },
+  { key: 'VIEWER', label: 'Viewer / Decision Maker', email: 'viewer@ladris.gov.in', pass: 'Password123!', scope: 'Read-only / Audit', target: 'Executive Dashboard' },
 ]
 
 export default function Login() {

@@ -55,7 +55,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 import PriorityIntelligence from '@/pages/PriorityIntelligence'
-import Intelligence from '@/pages/Intelligence'
+import DecisionIntelligence from '@/pages/DecisionIntelligence'
 import LAWorkbench from '@/pages/LAWorkbench'
 import AgencyPortal from '@/pages/AgencyPortal'
 import { useThemeStore } from '@/store/themeStore'
@@ -105,9 +105,11 @@ export default function App() {
           <Route path="la-workbench" element={<LAWorkbench />} />
           <Route path="agency-portal" element={<AgencyPortal />} />
           <Route path="priority-intelligence" element={<PriorityIntelligence />} />
-          <Route path="intelligence" element={<Intelligence />} />
+          <Route path="intelligence" element={<DecisionIntelligence />} />
+          <Route path="decision-intelligence" element={<DecisionIntelligence />} />
           <Route path="projects" element={<ProjectList />} />
-          <Route path="projects/new" element={<ProjectForm />} />
+          <Route path="projects/new" element={<Navigate to="/projects?new=true" replace />} />
+          <Route path="ingestion" element={<Navigate to="/projects?new=true" replace />} />
           <Route path="projects/:id/edit" element={<ProjectForm />} />
           <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="gis" element={<GIS />} />

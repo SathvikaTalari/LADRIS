@@ -267,7 +267,7 @@ export default function Dashboard() {
         gap: 20,
         marginBottom: 24,
       }}>
-        
+
         {/* 1. Portfolio Risk Distribution */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 430 }}>
           <div>
@@ -326,10 +326,10 @@ export default function Dashboard() {
             paddingTop: 8,
             textAlign: 'center',
           }}>
-            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>LOW</span><br/><strong style={{ color: '#138808', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.LOW ?? 0}</strong></div>
-            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>MEDIUM</span><br/><strong style={{ color: '#d97706', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.MEDIUM ?? 0}</strong></div>
-            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>HIGH</span><br/><strong style={{ color: '#f47721', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.HIGH ?? 0}</strong></div>
-            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>UNAVAILABLE</span><br/><strong style={{ color: '#7daaff', fontSize: '0.9rem' }}>{Math.max(0, (kpis?.total_active_projects ?? 0) - ((distributions?.verified_delay_risk?.LOW ?? 0) + (distributions?.verified_delay_risk?.MEDIUM ?? 0) + (distributions?.verified_delay_risk?.HIGH ?? 0)))}</strong></div>
+            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>LOW</span><br /><strong style={{ color: '#138808', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.LOW ?? 0}</strong></div>
+            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>MEDIUM</span><br /><strong style={{ color: '#d97706', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.MEDIUM ?? 0}</strong></div>
+            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>HIGH</span><br /><strong style={{ color: '#f47721', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.HIGH ?? 0}</strong></div>
+            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>UNAVAILABLE</span><br /><strong style={{ color: '#7daaff', fontSize: '0.9rem' }}>{Math.max(0, (kpis?.total_active_projects ?? 0) - ((distributions?.verified_delay_risk?.LOW ?? 0) + (distributions?.verified_delay_risk?.MEDIUM ?? 0) + (distributions?.verified_delay_risk?.HIGH ?? 0)))}</strong></div>
           </div>
         </div>
 
@@ -340,7 +340,7 @@ export default function Dashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Activity size={18} color="var(--color-accent-saffron)" />
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                  Where Projects Get Delayed Most
+                  Most Delayed Stage
                 </h3>
               </div>
               <span className="badge badge-yellow" style={{ fontSize: '0.62rem' }}>6 Acquisition Stages</span>
@@ -414,7 +414,7 @@ export default function Dashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Flame size={16} color="var(--color-risk-critical)" />
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                  Projects Needing Attention Today
+                  Priority Projects
                 </h3>
               </div>
               <Link to="/priority-intelligence" style={{ fontSize: '0.7rem', color: 'var(--color-accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
@@ -551,25 +551,25 @@ export default function Dashboard() {
 
               {/* Map Markers */}
               {geoQueue.map((p: any) => (
-                  <Marker
-                    key={p.id}
-                    position={[p.latitude, p.longitude]}
-                    icon={createRiskMarkerIcon(p.risk_level)}
-                  >
-                    <Popup>
-                      <div style={{ padding: 4, maxWidth: 200, color: '#0f172a' }}>
-                        <strong>{p.name}</strong>
-                        <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 4 }}>
-                          <div>District: {p.district}</div>
-                          <div>Stage: {p.critical_stage}</div>
-                          <div>Priority: {p.priority_score}</div>
-                        </div>
-                        <Link to={`/projects/${p.id}`} style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: 700, display: 'inline-block', marginTop: 6 }}>
-                          Open Project →
-                        </Link>
+                <Marker
+                  key={p.id}
+                  position={[p.latitude, p.longitude]}
+                  icon={createRiskMarkerIcon(p.risk_level)}
+                >
+                  <Popup>
+                    <div style={{ padding: 4, maxWidth: 200, color: '#0f172a' }}>
+                      <strong>{p.name}</strong>
+                      <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 4 }}>
+                        <div>District: {p.district}</div>
+                        <div>Stage: {p.critical_stage}</div>
+                        <div>Priority: {p.priority_score}</div>
                       </div>
-                    </Popup>
-                  </Marker>
+                      <Link to={`/projects/${p.id}`} style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: 700, display: 'inline-block', marginTop: 6 }}>
+                        Open Project →
+                      </Link>
+                    </div>
+                  </Popup>
+                </Marker>
               ))}
             </MapContainer>
             {geoQueue.length === 0 && (
@@ -583,7 +583,7 @@ export default function Dashboard() {
 
       {/* ─── ROW 3 — STATE COMPARISON, ALERTS & DATA QUALITY ────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
-        
+
         {/* State / District Comparison */}
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>

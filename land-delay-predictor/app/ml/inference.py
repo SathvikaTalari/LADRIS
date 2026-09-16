@@ -99,7 +99,12 @@ def _drivers(classifier: Any, frame: pd.DataFrame, raw: dict[str, Any], limit: i
 def predict_features(features: dict[str, Any]) -> dict[str, Any]:
     """Validate and score one point-in-time, 23-feature snapshot."""
     started = time.perf_counter()
-    cleaned, validation = validate_single_row(features, strict=True)
+    features_copy = dict(features)
+    allowed_stages = {"notification", "survey", "approval", "compensation", "legal_resolution", "rehabilitation", "possession", "completed"}
+    c_stage = str(features_copy.get("current_stage") or "notification").strip().lower()
+    features_copy["current_stage"] = c_stage if c_stage in allowed_stages else "notification"
+
+    cleaned, validation = validate_single_row(features_copy, strict=True)
     if not validation.is_valid:
         raise ValueError("; ".join(validation.errors))
 
@@ -117,13 +122,22 @@ def predict_features(features: dict[str, Any]) -> dict[str, Any]:
     clamp = lambda value: None if value is None else round(float(np.clip(value, 0, 2000)), 2)
     drivers = _drivers(bundle["classifier"], frame, cleaned)
 
+    lower_days = clamp(p10)
+    upper_days = clamp(p90)
+    delay_range = {
+        "lower_days": lower_days,
+        "upper_days": upper_days,
+        "range_text": f"{int(lower_days or 0)} – {int(upper_days or 0)} days",
+    }
+
     return {
         "model_version": bundle["version"],
         "delay_probability": round(probability, 6),
         "risk_score": score,
         "risk_category": category,
         "predicted_delay_days": clamp(predicted),
-        "prediction_interval": {"p10": clamp(p10), "p90": clamp(p90)},
+        "prediction_interval": {"p10": lower_days, "p90": upper_days},
+        "delay_range": delay_range,
         "top_drivers": drivers,
         "recommendations": [d["recommendation"] for d in drivers if d["recommendation"]],
         "validation": validation.summary(),

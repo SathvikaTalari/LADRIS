@@ -126,6 +126,31 @@ export default function ProjectDetail() {
         </div>
       </div>
 
+      {/* High-Risk Alert Banner */}
+      {prediction?.high_risk_alert?.requires_immediate_attention && (
+        <div
+          className="card"
+          style={{
+            borderColor: '#ef4444',
+            background: 'rgba(239, 68, 68, 0.08)',
+            borderLeft: '4px solid #ef4444',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <AlertTriangle size={24} color="#ef4444" style={{ flexShrink: 0 }} />
+          <div>
+            <strong style={{ color: '#ef4444', fontSize: '0.95rem' }}>
+              HIGH-RISK ESCALATION REQUIRED
+            </strong>
+            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: 2 }}>
+              {prediction.high_risk_alert.alert_message}
+            </div>
+          </div>
+        </div>
+      )}
+
       {predictionError && (
         <div className="card" style={{ borderColor: 'var(--color-risk-critical)', color: 'var(--color-risk-critical)', background: 'rgba(239, 68, 68, 0.05)' }}>
           {predictionError}
@@ -142,8 +167,8 @@ export default function ProjectDetail() {
         </div>
       )}
 
-      {/* 5 Big Key Metrics in Plain English */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+      {/* 6 Big Key Metrics in Plain English */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
         <Metric
           label="Chance of Delay"
           value={prediction ? `${(prediction.delay_probability * 100).toFixed(0)}%` : 'Unavailable'}
@@ -151,9 +176,14 @@ export default function ProjectDetail() {
           highlightColor={prediction && prediction.delay_probability > 0.6 ? '#ef4444' : '#10b981'}
         />
         <Metric
-          label="Delay Risk Score"
+          label="Risk score"
           value={prediction ? `${prediction.risk_score} / 100` : 'Unavailable'}
-          description="Risk score (0-100)"
+          description={
+            prediction?.risk_trend
+              ? `Trend: ${prediction.risk_trend.trend} (${prediction.risk_trend.delta > 0 ? '+' : ''}${prediction.risk_trend.delta} pts)`
+              : 'Calibrated LightGBM score'
+          }
+          highlightColor={prediction?.risk_category === 'HIGH' ? '#ef4444' : prediction?.risk_category === 'MEDIUM' ? '#f59e0b' : '#10b981'}
         />
         <Metric
           label="Risk Category"
@@ -162,14 +192,20 @@ export default function ProjectDetail() {
         />
         <Metric
           label="Expected Extra Delay"
-          value={prediction?.predicted_delay_days == null ? 'Unavailable' : `${prediction.predicted_delay_days} days`}
+          value={prediction?.estimated_delay_days != null ? `${prediction.estimated_delay_days} days` : (prediction?.predicted_delay_days != null ? `${prediction.predicted_delay_days} days` : 'Unavailable')}
           description={prediction?.predicted_delay_days != null ? `~${Math.round(prediction.predicted_delay_days / 30)} months past deadline` : ''}
           highlightColor="#f59e0b"
         />
         <Metric
-          label="Likely Delay Window"
-          value={prediction?.prediction_interval?.p10 == null ? 'Unavailable' : `${prediction.prediction_interval.p10} to ${prediction.prediction_interval.p90} days`}
-          description="Best to worst case range"
+          label="Delay Range (P10–P90)"
+          value={prediction?.delay_range?.range_text || (prediction?.prediction_interval?.p10 != null ? `${prediction.prediction_interval.p10} to ${prediction.prediction_interval.p90} days` : 'Unavailable')}
+          description="Quantile confidence interval"
+        />
+        <Metric
+          label="Critical Stage"
+          value={prediction?.critical_stage?.stage_name_display || prediction?.current_stage?.replace(/_/g, ' ') || 'Notification'}
+          description={prediction?.critical_stage ? `Risk: ${prediction.critical_stage.risk_score}/100` : 'Operational bottleneck'}
+          highlightColor="#8b5cf6"
         />
       </div>
 
@@ -264,6 +300,44 @@ export default function ProjectDetail() {
               )
             }) || <p style={{ color: 'var(--color-text-muted)' }}>Stage predictions unavailable.</p>}
           </div>
+
+          {prediction?.stage_completion_estimates && prediction.stage_completion_estimates.length > 0 && (
+            <div style={{ marginTop: 22 }}>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
+                Stage Completion Estimates (Statutory vs Risk-Adjusted Timelines)
+              </h4>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="table" style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: 'var(--color-bg-secondary)', textAlign: 'left', borderBottom: '1px solid var(--color-border-subtle)' }}>
+                      <th style={{ padding: '8px 12px' }}>Lifecycle Stage</th>
+                      <th style={{ padding: '8px 12px' }}>Statutory Duration</th>
+                      <th style={{ padding: '8px 12px' }}>Predicted Duration</th>
+                      <th style={{ padding: '8px 12px' }}>Delay Probability</th>
+                      <th style={{ padding: '8px 12px' }}>Stage Risk</th>
+                      <th style={{ padding: '8px 12px' }}>Estimated Target Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {prediction.stage_completion_estimates.map((est) => (
+                      <tr key={est.stage} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                        <td style={{ padding: '8px 12px', fontWeight: 600 }}>{est.stage_name_display}</td>
+                        <td style={{ padding: '8px 12px', color: 'var(--color-text-muted)' }}>{est.baseline_days} days</td>
+                        <td style={{ padding: '8px 12px', fontWeight: 700, color: est.estimated_duration_days > est.baseline_days ? '#f59e0b' : 'inherit' }}>
+                          {est.estimated_duration_days} days
+                        </td>
+                        <td style={{ padding: '8px 12px' }}>{(est.delay_probability * 100).toFixed(0)}%</td>
+                        <td style={{ padding: '8px 12px' }}>
+                          <RiskBadge level={est.risk_category} />
+                        </td>
+                        <td style={{ padding: '8px 12px', fontFamily: 'var(--font-mono)' }}>{est.expected_completion_date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

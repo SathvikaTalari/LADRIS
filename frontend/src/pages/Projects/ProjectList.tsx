@@ -3,13 +3,14 @@
  * Multi-criteria filterable directory by Status, Risk Level, State, District, and Agency.
  */
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Plus, Search, Filter, FolderKanban, ChevronRight, RotateCcw, MapPin, Building2 } from 'lucide-react'
 import { projectsAPI } from '@/api/client'
 import type { ProjectListItem, ProjectStatus, RiskLevel } from '@/types'
 import { RiskBadge, StatusBadge, EmptyState, LoadingState, PageHeader } from '@/components/common'
 import { formatDate, formatHa } from '@/utils'
+import { NewProjectModal } from '@/pages/DataIngestion'
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: '', label: 'All Statuses' },
@@ -59,10 +60,12 @@ const AGENCY_OPTIONS: { value: string; label: string }[] = [
 
 export default function ProjectList() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [showNewProjectModal, setShowNewProjectModal] = useState<boolean>(searchParams.get('new') === 'true')
   const [projects, setProjects] = useState<ProjectListItem[]>([])
   const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
+  const [page, setPage] = useState(1)
 
   // Filters
   const [search, setSearch] = useState('')
@@ -111,6 +114,12 @@ export default function ProjectList() {
     return () => clearTimeout(timer)
   }, [loadProjects])
 
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      setShowNewProjectModal(true)
+    }
+  }, [searchParams])
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -123,12 +132,26 @@ export default function ProjectList() {
         actions={
           <button
             className="btn btn-primary"
-            onClick={() => navigate('/projects/new')}
+            onClick={() => setShowNewProjectModal(true)}
           >
             <Plus size={16} />
             New Project
           </button>
         }
+      />
+
+      {/* New Project Modal with all 6 data ingestion methods */}
+      <NewProjectModal
+        isOpen={showNewProjectModal}
+        onClose={() => {
+          setShowNewProjectModal(false)
+          if (searchParams.get('new')) {
+            setSearchParams({})
+          }
+        }}
+        onProjectCreated={() => {
+          loadProjects()
+        }}
       />
 
       {/* Filter Control Bar */}

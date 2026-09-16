@@ -1,4 +1,4 @@
-Project ID,Project Name,Project Type,Implementing Agency,State,District,Land Area (ha),Affected Families,Notification Date,Expected Completion,Actual Completion,Current Stage,Delayed (Y/N),Delay (days),Compensation Sanctioned,Compensation Disbursed,Open Disputes,R&R Progress %,Latitude,Longitude
+﻿Project ID,Project Name,Project Type,Implementing Agency,State,District,Land Area (ha),Affected Families,Notification Date,Expected Completion,Actual Completion,Current Stage,Delayed (Y/N),Delay (days),Compensation Sanctioned,Compensation Disbursed,Open Disputes,R&R Progress %,Latitude,Longitude
 NHAI-EXP-001,Delhi-Mumbai Expressway Package 14,highway,NHAI,Gujarat,Vadodara,145.8,380,2022-04-10,2025-08-31,,compensation,,,420000000,365000000,1,78,22.3072,73.1812
 NHAI-EXP-002,Bangalore-Chennai Expressway Section 2,highway,NHAI,Andhra Pradesh,Chittoor,180.2,420,2022-08-15,2025-11-30,,possession,,,560000000,520000000,0,88,13.2172,79.1003
 NHAI-EXP-003,Ganga Expressway Phase 1 Meerut-Budaun,highway,UPEIDA,Uttar Pradesh,Meerut,290.5,740,2021-11-10,2025-12-31,,rehabilitation,,,850000000,620000000,3,65,28.9845,77.7064
@@ -24,3 +24,13 @@ PGCIL-PWR-022,Bhadla Mega Solar Park 765kV Line Section,power,PGCIL,Rajasthan,Jo
 DICDL-IND-023,Dholera Special Investment Region Activation Area,industrial,DICDL,Gujarat,Ahmedabad,1450.0,680,2021-05-15,2026-04-30,,rehabilitation,,,2100000000,1750000000,2,82,22.2475,72.1983
 NICDC-IND-024,Krishnapatnam Industrial Area NICDC Node,industrial,NICDC,Andhra Pradesh,Nellore,620.4,380,2022-11-20,2026-07-31,,compensation,,,950000000,580000000,3,54,14.2812,80.0812
 JNPA-PRT-025,Vadhavan Mega Port Rail-Road Connectivity Corridor,highway,NHAI,Maharashtra,Palghar,230.8,540,2023-08-10,2027-06-30,,legal_resolution,,,820000000,240000000,6,25,19.9812,72.7123
+TEST-TG-SR-A23C85,NH65 Sangareddy Highway Four-Laning,highway,National Highways Authority of India (NHAI),Telangana,TG-SR,95.0,0,,,,notification,Y,223,,0,0,,,
+TEST-UP-DFCCIL-1655DF,EDFC Dedicated Freight Corridor UP,railway,DFCCIL,Uttar Pradesh,Aligarh,140.0,0,,,,notification,Y,246,,0,0,,,
+TEST-MH-PWD-B8429E,Pune Ring Road Infrastructure,highway,Maharashtra PWD,Maharashtra,Pune,65.0,0,,,,notification,Y,220,,0,0,,,
+TEST-TG-SR-E6FE2E,NH65 Sangareddy Highway Four-Laning,highway,National Highways Authority of India (NHAI),Telangana,TG-SR,95.0,0,,,,notification,Y,223,,0,0,,,
+TEST-UP-DFCCIL-ED6B21,EDFC Dedicated Freight Corridor UP,railway,DFCCIL,Uttar Pradesh,Aligarh,140.0,0,,,,notification,Y,246,,0,0,,,
+TEST-MH-PWD-93A708,Pune Ring Road Infrastructure,highway,Maharashtra PWD,Maharashtra,Pune,65.0,0,,,,notification,Y,220,,0,0,,,
+TEST-TG-SR-ED397A,NH65 Sangareddy Highway Four-Laning,highway,National Highways Authority of India (NHAI),Telangana,TG-SR,95.0,0,,,,notification,Y,223,,0,0,,,
+TEST-UP-DFCCIL-A81654,EDFC Dedicated Freight Corridor UP,railway,DFCCIL,Uttar Pradesh,Aligarh,140.0,0,,,,notification,Y,246,,0,0,,,
+TEST-MH-PWD-6534C4,Pune Ring Road Infrastructure,highway,Maharashtra PWD,Maharashtra,Pune,65.0,0,,,,notification,Y,220,,0,0,,,
+UPSIDA-IND-UP-303,Lucknow-Kanpur Industrial Corridor Node A,industrial,NHAI,Uttar Pradesh,,410.0,1450,2021-05-20,2025-08-31,,notification,Y,106,580000000,310000000,7,22,26.8467,80.9462
