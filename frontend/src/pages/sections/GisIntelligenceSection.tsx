@@ -239,7 +239,7 @@ export default function GisIntelligenceSection({ isDark, language }: { isDark: b
           <motion.p initial={{ opacity:0, y: reduced?0:10 }} animate={headingVisible?{opacity:1,y:0}:{}}
             transition={{ duration:0.5, delay:0.14, ease:EASE }}
             style={{ fontSize:"1rem", fontWeight:500, color:ACCENT, maxWidth:420, margin:"0 auto", lineHeight:1.6 }}>
-            See the risk. Find the problem. Act early.
+            {hi ? 'जोखिम देखें। समस्या खोजें। जल्दी कार्रवाई करें।' : 'See the risk. Find the problem. Act early.'}
           </motion.p>
         </motion.div>
 

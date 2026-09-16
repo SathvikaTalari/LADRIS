@@ -4,52 +4,73 @@
  * Animation: CONNECTED ROLE PATH
  * Library: Framer Motion (already installed)
  */
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, type ElementType } from "react"
 import { motion, useInView, useReducedMotion } from "framer-motion"
 import { Building2, Landmark, MapPin, Flag, HardHat, Briefcase } from "lucide-react"
 
 /* ─── Types ────────────────────────────────────────────────────────────────── */
 type CardState = "idle" | "active" | "done"
 
+interface RoleDef {
+  num: string
+  Icon: ElementType
+  title: string
+  desc: string
+}
+
 /* ─── Data ─────────────────────────────────────────────────────────────────── */
-const ROLES = [
-  {
-    num: "01",
-    Icon: Building2,
-    title: "Land Requiring Body",
-    desc: "Plan with confidence. Track land progress and possible risks before they affect the project.",
-  },
-  {
-    num: "02",
-    Icon: Landmark,
-    title: "Land Acquiring Authority",
-    desc: "Acquire without surprises. Monitor risks, approvals, compensation and issues that may slow acquisition.",
-  },
-  {
-    num: "03",
-    Icon: MapPin,
-    title: "District Administration",
-    desc: "See your district clearly. Find risky projects and focus on cases that need action.",
-  },
-  {
-    num: "04",
-    Icon: Flag,
-    title: "State Government",
-    desc: "See the bigger picture. Compare projects and districts and identify where attention is needed.",
-  },
-  {
-    num: "05",
-    Icon: HardHat,
-    title: "Project Implementing Agency",
-    desc: "Keep projects moving. Track land-related issues that may affect timelines and act early.",
-  },
-  {
-    num: "06",
-    Icon: Briefcase,
-    title: "Policy Maker",
-    desc: "Decide with better insight. Use project trends and risk information for better planning.",
-  },
-]
+function getRoles(hi: boolean): RoleDef[] {
+  return [
+    {
+      num: "01",
+      Icon: Building2,
+      title: hi ? "भूमि आवश्यकताकर्ता निकाय" : "Land Requiring Body",
+      desc: hi
+        ? "आत्मविश्वास के साथ योजना बनाएं। परियोजना को प्रभावित करने से पहले भूमि प्रगति और संभावित जोखिमों को ट्रैक करें।"
+        : "Plan with confidence. Track land progress and possible risks before they affect the project.",
+    },
+    {
+      num: "02",
+      Icon: Landmark,
+      title: hi ? "भूमि अधिग्रहण प्राधिकरण" : "Land Acquiring Authority",
+      desc: hi
+        ? "बिना आश्चर्य के अधिग्रहण करें। जोखिमों, अनुमोदनों, मुआवज़े और अधिग्रहण को धीमा करने वाली समस्याओं की निगरानी करें।"
+        : "Acquire without surprises. Monitor risks, approvals, compensation and issues that may slow acquisition.",
+    },
+    {
+      num: "03",
+      Icon: MapPin,
+      title: hi ? "जिला प्रशासन" : "District Administration",
+      desc: hi
+        ? "अपना जिला स्पष्ट रूप से देखें। जोखिमपूर्ण परियोजनाएं खोजें और कार्रवाई की आवश्यकता वाले मामलों पर ध्यान केंद्रित करें।"
+        : "See your district clearly. Find risky projects and focus on cases that need action.",
+    },
+    {
+      num: "04",
+      Icon: Flag,
+      title: hi ? "राज्य सरकार" : "State Government",
+      desc: hi
+        ? "बड़ी तस्वीर देखें। परियोजनाओं और जिलों की तुलना करें और पहचानें कि ध्यान कहाँ चाहिए।"
+        : "See the bigger picture. Compare projects and districts and identify where attention is needed.",
+    },
+    {
+      num: "05",
+      Icon: HardHat,
+      title: hi ? "परियोजना कार्यान्वयन एजेंसी" : "Project Implementing Agency",
+      desc: hi
+        ? "परियोजनाएं आगे बढ़ाएं। भूमि से संबंधित समस्याओं को ट्रैक करें जो समयसीमा को प्रभावित कर सकती हैं और जल्दी कार्रवाई करें।"
+        : "Keep projects moving. Track land-related issues that may affect timelines and act early.",
+    },
+    {
+      num: "06",
+      Icon: Briefcase,
+      title: hi ? "नीति निर्माता" : "Policy Maker",
+      desc: hi
+        ? "बेहतर जानकारी के साथ निर्णय लें। बेहतर योजना के लिए परियोजना प्रवृत्तियों और जोखिम जानकारी का उपयोग करें।"
+        : "Decide with better insight. Use project trends and risk information for better planning.",
+    },
+  ]
+}
 
 /*
  * Desktop 3×2 grid connection path:
@@ -128,12 +149,13 @@ function Connector({ dir, active }: { dir: ConnDir; active: boolean }) {
 
 /* ─── Role Card ─────────────────────────────────────────────────────────────── */
 function RoleCard({
-  role, state, isDark, reduced,
+  role, state, isDark, reduced, hi,
 }: {
-  role: typeof ROLES[number]
+  role: RoleDef
   state: CardState
   isDark: boolean
   reduced: boolean
+  hi: boolean
 }) {
   const { Icon } = role
   const isActive = state === "active"
@@ -201,7 +223,7 @@ function RoleCard({
           textTransform: "uppercase",
         }}
       >
-        ACTIVE
+        {hi ? 'सक्रिय' : 'ACTIVE'}
       </motion.div>
 
       {/* Icon */}
@@ -266,7 +288,9 @@ function RoleCard({
 }
 
 /* ─── Main Section ──────────────────────────────────────────────────────────── */
-export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
+export default function RolesConnectedSection({ isDark, language }: { isDark: boolean; language: 'en' | 'hi' }) {
+  const hi = language === 'hi'
+  const ROLES = getRoles(hi)
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-8% 0px" })
   const reduced = useReducedMotion() ?? false
@@ -370,7 +394,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
             color: isDark ? "#f0f6fc" : "#0a1d37",
             marginBottom: 12, lineHeight: 1.2,
           }}>
-            Built for Every Role in Land Acquisition
+            {hi ? 'भूमि अधिग्रहण में हर भूमिका के लिए' : 'Built for Every Role in Land Acquisition'}
           </h2>
           <motion.p
             initial={{ opacity: 0, y: reduced ? 0 : 10 }}
@@ -382,7 +406,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
               lineHeight: 1.65, fontWeight: 500,
             }}
           >
-            One platform. Every team. One clear view of land-acquisition progress.
+            {hi ? 'एक प्लेटफ़ॉर्म। हर टीम। भूमि-अधिग्रहण प्रगति का एक स्पष्ट दृश्य।' : 'One platform. Every team. One clear view of land-acquisition progress.'}
           </motion.p>
         </motion.div>
 
@@ -408,7 +432,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
           {/* Row 0: cards 0,1,2 + h-connectors 0,1 */}
           {/* Card 0 */}
           <div style={{ gridColumn: 1, gridRow: 1 }}>
-            <RoleCard role={ROLES[0]} state={cardStates[0]} isDark={isDark} reduced={reduced} />
+            <RoleCard role={ROLES[0]} state={cardStates[0]} isDark={isDark} reduced={reduced} hi={hi} />
           </div>
           {/* H-connector 0→1 */}
           <div className="crp-hconn" style={{ gridColumn: 2, gridRow: 1, display: "flex", alignItems: "center" }}>
@@ -416,7 +440,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
           </div>
           {/* Card 1 */}
           <div style={{ gridColumn: 3, gridRow: 1 }}>
-            <RoleCard role={ROLES[1]} state={cardStates[1]} isDark={isDark} reduced={reduced} />
+            <RoleCard role={ROLES[1]} state={cardStates[1]} isDark={isDark} reduced={reduced} hi={hi} />
           </div>
           {/* H-connector 1→2 */}
           <div className="crp-hconn" style={{ gridColumn: 4, gridRow: 1, display: "flex", alignItems: "center" }}>
@@ -424,7 +448,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
           </div>
           {/* Card 2 */}
           <div style={{ gridColumn: 5, gridRow: 1 }}>
-            <RoleCard role={ROLES[2]} state={cardStates[2]} isDark={isDark} reduced={reduced} />
+            <RoleCard role={ROLES[2]} state={cardStates[2]} isDark={isDark} reduced={reduced} hi={hi} />
           </div>
 
           {/* Row 1 (vertical connector row): only column 5 has connector (2→3 down) */}
@@ -435,7 +459,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
           {/* Row 2: cards 5,4,3 + h-connectors (reversed) */}
           {/* Card 5 */}
           <div style={{ gridColumn: 1, gridRow: 3 }}>
-            <RoleCard role={ROLES[5]} state={cardStates[5]} isDark={isDark} reduced={reduced} />
+            <RoleCard role={ROLES[5]} state={cardStates[5]} isDark={isDark} reduced={reduced} hi={hi} />
           </div>
           {/* H-connector 4→5 (left direction) */}
           <div className="crp-hconn" style={{ gridColumn: 2, gridRow: 3, display: "flex", alignItems: "center" }}>
@@ -443,7 +467,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
           </div>
           {/* Card 4 */}
           <div style={{ gridColumn: 3, gridRow: 3 }}>
-            <RoleCard role={ROLES[4]} state={cardStates[4]} isDark={isDark} reduced={reduced} />
+            <RoleCard role={ROLES[4]} state={cardStates[4]} isDark={isDark} reduced={reduced} hi={hi} />
           </div>
           {/* H-connector 3→4 (left direction) */}
           <div className="crp-hconn" style={{ gridColumn: 4, gridRow: 3, display: "flex", alignItems: "center" }}>
@@ -451,7 +475,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
           </div>
           {/* Card 3 */}
           <div style={{ gridColumn: 5, gridRow: 3 }}>
-            <RoleCard role={ROLES[3]} state={cardStates[3]} isDark={isDark} reduced={reduced} />
+            <RoleCard role={ROLES[3]} state={cardStates[3]} isDark={isDark} reduced={reduced} hi={hi} />
           </div>
         </div>
 
@@ -478,7 +502,7 @@ export default function RolesConnectedSection({ isDark }: { isDark: boolean }) {
             letterSpacing: "0.18em", textTransform: "uppercase",
             color: ACCENT,
           }}>
-            Connected Teams.&nbsp;&nbsp;Faster Action.
+            {hi ? 'जुड़ी टीमें।  तेज़ कार्रवाई।' : 'Connected Teams.  Faster Action.'}
           </span>
         </motion.div>
 
