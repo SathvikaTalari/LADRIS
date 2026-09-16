@@ -21,5 +21,7 @@ COPY . .
 # Expose port
 EXPOSE 8000
 
-# Run with hot-reload in development
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Run a stable application process. Source changes are applied with
+# `docker compose restart backend`; filesystem watchers can fail on Windows
+# bind mounts and must not terminate production inference.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -30,11 +30,11 @@ export default function DataSources() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <PageHeader
-        title="DATA TRUST & PROVENANCE"
-        subtitle="Manage official government data and check its source."
+        title="Official Data Sources"
+        subtitle="Browse verified government project records and data feeds used for delay predictions."
         actions={
           <button className="btn btn-secondary btn-sm" onClick={fetchSources}>
-            <RefreshCw size={14} /> Refresh Registry
+            <RefreshCw size={14} /> Refresh Sources
           </button>
         }
       />
@@ -48,14 +48,14 @@ export default function DataSources() {
       ) : error ? (
         <EmptyState
           icon={<Database size={28} />}
-          title="Error Loading Registry"
+          title="Error Loading Data Sources"
           description={error}
         />
       ) : sources.length === 0 ? (
         <EmptyState
           icon={<Database size={28} />}
-          title="No Data Sources Registered"
-          description="Add data sources to view them here."
+          title="No Data Sources Found"
+          description="No active project data sources were detected in the database."
         />
       ) : (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -63,12 +63,12 @@ export default function DataSources() {
             <thead>
               <tr>
                 <th>Dataset Name</th>
-                <th>Organization</th>
-                <th>Classification</th>
-                <th>Format</th>
-                <th>Records</th>
-                <th>Fields Obtained</th>
-                <th>Retrieval Date</th>
+                <th>Source Agency / Department</th>
+                <th>Status</th>
+                <th>File Type</th>
+                <th>Projects Count</th>
+                <th>Information Included</th>
+                <th>Last Synced</th>
               </tr>
             </thead>
             <tbody>

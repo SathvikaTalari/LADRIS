@@ -16,6 +16,7 @@ from sqlalchemy import (
     Numeric,
     String,
     Text,
+    Float,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -92,6 +93,28 @@ class PredictionLog(Base):
     feature_contributions = Column(JSONB, nullable=False, default=list)
     confidence_assessment = Column(String(20), nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class MLPrediction(Base):
+    """Immutable point-in-time output from the production delay model."""
+    __tablename__ = "ml_predictions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    snapshot_date = Column(DateTime(timezone=True), nullable=False, index=True)
+    model_version = Column(String(50), nullable=False, index=True)
+    feature_snapshot = Column(JSONB, nullable=False)
+    delay_probability = Column(Float, nullable=False)
+    risk_score = Column(Float, nullable=False)
+    risk_category = Column(String(10), nullable=False, index=True)
+    predicted_delay_days = Column(Float, nullable=True)
+    prediction_interval = Column(JSONB, nullable=False, default=dict)
+    stage_predictions = Column(JSONB, nullable=False, default=list)
+    top_drivers = Column(JSONB, nullable=False, default=list)
+    recommendations = Column(JSONB, nullable=False, default=list)
+    validation = Column(JSONB, nullable=False, default=dict)
+    latency_ms = Column(Float, nullable=True)
+    predicted_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
 
 
 class ProjectRiskSnapshot(Base):

@@ -28,7 +28,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { PageHeader } from '@/components/common'
-import { projectsAPI, intelligenceAPI } from '@/api/client'
+import { projectsAPI, intelligenceAPI, predictionsAPI } from '@/api/client'
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap, Tooltip } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -156,47 +156,25 @@ export default function GIS() {
         const res = await projectsAPI.list({ page_size: 100 })
         const items = res.items || []
 
-        const mapped = items.map((p: any, idx: number) => {
-          const rawState = (p.state_code || '').toUpperCase().trim()
-          const stateObj = STATE_COORDINATES[rawState]
-          const baseCoords = stateObj ? stateObj.coords : [20.5937, 78.9629] as [number, number]
-          const hash = p.id.split('-').reduce((acc: number, c: string) => acc + c.charCodeAt(0), 0)
-          const latOffset = (((hash * 17 + idx * 31) % 100) / 100 - 0.5) * 1.8
-          const lngOffset = (((hash * 23 + idx * 47) % 100) / 100 - 0.5) * 1.8
-          const lat = p.latitude ? Number(p.latitude) : (baseCoords[0] + latOffset)
-          const lng = p.longitude ? Number(p.longitude) : (baseCoords[1] + lngOffset)
-
-          // Priority score by risk level
-          const priorityMap: Record<string, number> = { CRITICAL: 88.5, HIGH: 74.2, MEDIUM: 52.0, LOW: 28.5, UNKNOWN: 40 }
-          const priorityScore = priorityMap[p.risk_level] ?? 40
-
-          // Dynamic top bottleneck based on project data
-          let topBottleneck = 'Pending Assessment'
-          if (p.legal_case_count > 5) {
-            topBottleneck = 'Severe Legal Disputes Blocking Possession'
-          } else if (p.delay_months > 12) {
-            topBottleneck = 'Prolonged Notification (3A/3D) Delays'
-          } else if ((p.area_in_possession_ha || 0) < (p.area_acquired_ha || 0) * 0.5 && p.area_acquired_ha > 0) {
-            topBottleneck = 'Physical Possession Halted'
-          } else if (p.risk_level === 'CRITICAL') {
-            topBottleneck = 'Compensation Disbursement Stalled'
-          } else if (p.risk_level === 'HIGH') {
-            topBottleneck = 'Legal Disputes Blocking Possession'
-          } else if (p.risk_level === 'MEDIUM') {
-            topBottleneck = 'Notification Stage Delays'
-          } else if (p.risk_level === 'LOW') {
-            topBottleneck = 'Minor R&R Compliance Gap'
-          }
+        const predictionRows = await Promise.all(items.map((project: any) =>
+          predictionsAPI.get(project.id).catch(() => null)
+        ))
+        const mapped = items.map((p: any, index: number) => {
+          const lat = p.latitude == null ? null : Number(p.latitude)
+          const lng = p.longitude == null ? null : Number(p.longitude)
+          const prediction = predictionRows[index]
+          const driver = prediction?.top_drivers?.find((item: any) => item.contribution > 0)
 
           return {
             ...p,
             lat,
             lng,
-            priorityScore,
-            topBottleneck,
-            stateLabel: stateObj?.name ?? rawState,
+            risk_level: prediction?.risk_category || 'UNKNOWN',
+            priorityScore: prediction?.risk_score ?? null,
+            topBottleneck: driver?.feature || 'Risk driver unavailable',
+            stateLabel: p.state_code || 'Unknown',
           }
-        })
+        }).filter((p: any) => Number.isFinite(p.lat) && Number.isFinite(p.lng))
         setProjects(mapped)
       } catch (err) {
         console.error('GIS load error:', err)
@@ -302,8 +280,8 @@ export default function GIS() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
       <PageHeader
-        title="GIS Risk Map & Predictive Risk Heatmap"
-        subtitle="View land acquisition risks on the map."
+        title="Interactive Geographic Risk Map"
+        subtitle="Visualize project locations, state-by-state delay hotspots, and district risk intensity across India"
       />
 
       {/* ── View Mode Toggle ───────────────────────────────────────────────── */}
@@ -328,7 +306,7 @@ export default function GIS() {
               transition: 'all 0.15s',
             }}
           >
-            <MapPin size={14} /> GIS Risk Map
+            <MapPin size={14} /> Project Map View
           </button>
           <button
             id="gis-view-heatmap"
@@ -342,14 +320,14 @@ export default function GIS() {
               transition: 'all 0.15s',
             }}
           >
-            <Thermometer size={14} /> Predictive Risk Heatmap
+            <Thermometer size={14} /> Delay Risk Heatmap
           </button>
         </div>
 
         {/* Quick state nav pills */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', scrollbarWidth: 'none' }}>
           <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', display: 'flex', gap: 4, alignItems: 'center' }}>
-            <Compass size={12} color="var(--color-accent-primary)" /> Fly To:
+            <Compass size={12} color="var(--color-accent-primary)" /> Quick Navigation:
           </span>
           <button id="gis-state-ALL" onClick={() => handleSelectState('ALL')}
             className={`btn btn-sm ${selectedState === 'ALL' ? 'btn-primary' : 'btn-secondary'}`}
@@ -372,10 +350,10 @@ export default function GIS() {
       }}>
         {[
           { label: 'Total Projects', value: stats.total, color: 'var(--color-accent-primary)' },
-          { label: '🔴 Critical', value: stats.critical, color: '#dc2626' },
-          { label: '🟠 High', value: stats.high, color: '#f97316' },
-          { label: '🟡 Medium', value: stats.medium, color: '#eab308' },
-          { label: '🟢 Low', value: stats.low, color: '#16a34a' },
+          { label: '🔴 Critical Risk', value: stats.critical, color: '#dc2626' },
+          { label: '🟠 High Risk', value: stats.high, color: '#f97316' },
+          { label: '🟡 Medium Risk', value: stats.medium, color: '#eab308' },
+          { label: '🟢 Low Risk', value: stats.low, color: '#16a34a' },
         ].map(s => (
           <div key={s.label} className="card" style={{ padding: '10px 14px', textAlign: 'center' }}>
             <div style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color, fontFamily: 'var(--font-mono)' }}>{s.value}</div>
@@ -538,9 +516,9 @@ export default function GIS() {
                             <strong style={{ color: '#0f172a', textAlign: 'right', maxWidth: 160 }}>{p.executing_agency || p.nodal_agency || 'N/A'}</strong>
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#64748b' }}>Priority Score:</span>
+                            <span style={{ color: '#64748b' }}>Delay Risk Score:</span>
                             <strong style={{ color: getRiskLevelColor(p.risk_level), fontFamily: 'monospace', fontSize: '0.85rem' }}>
-                              {p.priorityScore.toFixed(1)}/100
+                              {p.priorityScore == null ? 'Unavailable' : `${p.priorityScore.toFixed(1)}/100`}
                             </strong>
                           </div>
 
@@ -550,7 +528,7 @@ export default function GIS() {
                           </div>
 
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <span style={{ color: '#64748b' }}>Main Bottleneck:</span>
+                            <span style={{ color: '#64748b' }}>Main Delay Factor:</span>
                             <strong style={{ color: '#dc2626', textAlign: 'right', maxWidth: 170, lineHeight: 1.3 }}>{p.topBottleneck}</strong>
                           </div>
                         </div>
@@ -565,7 +543,7 @@ export default function GIS() {
                             boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
                           }}
                         >
-                          Open Project Workspace <ExternalLink size={12} />
+                          View Project Details <ExternalLink size={12} />
                         </Link>
                       </div>
                     </Popup>
@@ -862,16 +840,16 @@ export default function GIS() {
             <div className="card" style={{ border: '1px solid rgba(64,128,255,0.15)', background: 'rgba(64,128,255,0.03)' }}>
               <h4 style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4080ff', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Target size={13} />
-                {viewMode === 'risk_map' ? 'Risk Map Legend' : 'Acquisition Risk Pressure Legend'}
+                {viewMode === 'risk_map' ? 'Project Delay Risk Legend' : 'District Risk Intensity Legend'}
               </h4>
 
               {viewMode === 'risk_map' ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.75rem' }}>
                   {[
-                    { color: '#dc2626', label: '🔴 Critical Risk', sub: 'Priority Score > 80' },
-                    { color: '#f97316', label: '🟠 High Risk', sub: 'Priority Score 65–80' },
-                    { color: '#eab308', label: '🟡 Medium Risk', sub: 'Priority Score 45–65' },
-                    { color: '#16a34a', label: '🟢 Low Risk', sub: 'Priority Score < 45' },
+                    { color: '#dc2626', label: '🔴 Critical Risk', sub: 'Delay Risk Score > 80' },
+                    { color: '#f97316', label: '🟠 High Risk', sub: 'Delay Risk Score 65–80' },
+                    { color: '#eab308', label: '🟡 Medium Risk', sub: 'Delay Risk Score 45–65' },
+                    { color: '#16a34a', label: '🟢 Low Risk', sub: 'Delay Risk Score < 45' },
                   ].map(l => (
                     <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <div style={{ width: 12, height: 12, borderRadius: '50%', background: l.color, boxShadow: `0 0 6px ${l.color}60`, flexShrink: 0 }} />
@@ -886,14 +864,14 @@ export default function GIS() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: '0.72rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ width: 30, height: 8, borderRadius: 4, background: 'linear-gradient(90deg, #16a34a, #eab308, #f97316, #dc2626)' }} />
-                    <span style={{ color: 'var(--color-text-muted)' }}>Low → Critical Pressure</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>Low Risk → Critical Risk</span>
                   </div>
                   <div style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-                    Larger circles mean higher risk.<br />
-                    Click a circle to see details.
+                    Circle size = relative delay risk concentration<br />
+                    Click any district bubble to view local delay factors
                   </div>
                   <div style={{ paddingTop: 6, borderTop: '1px solid var(--color-border-subtle)' }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.7rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>Signals Used:</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.7rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>Risk Factors Included:</div>
                     {['Risk Level (35%)', 'Compensation Backlog (25%)', 'Legal Disputes (15%)', 'Delay Severity (15%)', 'Possession Gap (10%)'].map(s => (
                       <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.65rem', color: 'var(--color-text-muted)', marginBottom: 2 }}>
                         <BarChart3 size={9} color="var(--color-accent-primary)" /> {s}

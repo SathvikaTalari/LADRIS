@@ -1,0 +1,46 @@
+# CSV/XLSX Data Source Configuration Template
+# For periodic exports from district/state offices
+
+source_name: "YOUR_CSV_SOURCE_NAME"     # e.g., "district_monthly_export"
+connector_type: "file"
+schedule_interval_minutes: 43200        # ~monthly export
+watch_glob: "data/incoming/district_admin/*.xlsx"
+
+# Field mapping: canonical field name -> CSV column name
+field_mapping:
+  # Core identity (required)
+  external_project_id: "Project ID"
+  project_name: "Project Name"
+  project_type: "Project Type"
+  state: "State"
+  district: "District"
+
+  # Dates
+  notification_date: "Notification Date"
+  expected_completion_date: "Expected Completion"
+  actual_completion_date: "Actual Completion"
+  current_stage: "Current Stage"
+
+  # Labels
+  is_delayed: "Delayed (Y/N)"
+  delay_days: "Delay (days)"
+
+  # Compensation
+  compensation_sanctioned: "Compensation Sanctioned"
+  compensation_disbursed: "Compensation Disbursed"
+  compensation_sanction_date: "Sanction Date"
+  last_disbursement_date: "Last Disbursement Date"
+
+  # Legal
+  legal_dispute_count: "Open Disputes"
+  dispute_type: "Dispute Type"
+  dispute_filed_date: "Dispute Filed Date"
+  dispute_resolved_date: "Dispute Resolved Date"
+  court_level: "Court Level"
+
+  # Rehabilitation
+  rehabilitation_progress_pct: "R&R Progress %"
+  resettlement_site_ready: "Resettlement Site Ready"
+
+  # Stakeholder
+  stakeholder_update_date: "Last Update Date"

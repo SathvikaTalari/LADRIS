@@ -1,0 +1,99 @@
+{
+  "feature_columns": [
+    "project_type",
+    "state",
+    "district",
+    "implementing_agency",
+    "land_area_hectares",
+    "affected_families_count",
+    "days_since_notification",
+    "days_to_expected_completion",
+    "compensation_sanctioned",
+    "compensation_disbursed",
+    "compensation_disbursement_pct",
+    "days_since_last_disbursement",
+    "legal_dispute_count",
+    "open_legal_dispute_count",
+    "max_dispute_pendency_days",
+    "rehabilitation_progress_pct",
+    "resettlement_site_ready",
+    "stakeholder_update_count_90d",
+    "avg_days_between_updates",
+    "stage_count_recorded",
+    "current_stage",
+    "district_historical_delay_rate",
+    "agency_historical_delay_rate"
+  ],
+  "categorical_columns": [
+    "project_type",
+    "state",
+    "district",
+    "implementing_agency",
+    "current_stage"
+  ],
+  "has_regressor": true,
+  "training_timestamp": "2026-09-14T06:08:15.056153",
+  "evaluation": {
+    "baseline_comparison": {
+      "majority_class": {
+        "predicted": 1,
+        "accuracy": 0.663
+      },
+      "random": {
+        "accuracy": 0.663
+      },
+      "heuristic": {
+        "accuracy": 1.0
+      },
+      "target_distribution": {
+        "total": 368,
+        "delayed": 244,
+        "not_delayed": 124,
+        "delay_rate": 0.663
+      }
+    },
+    "cross_validation": {
+      "accuracy": 0.9212,
+      "precision": 0.9352,
+      "recall": 0.9467,
+      "f1_score": 0.9409,
+      "auc_roc": 0.9722,
+      "auc_pr": 0.9875,
+      "confusion_matrix": {
+        "tn": 108,
+        "fp": 16,
+        "fn": 13,
+        "tp": 231
+      },
+      "threshold_analysis": {
+        "threshold_05": 0.9212
+      }
+    },
+    "train_metrics": {
+      "accuracy": 0.9592,
+      "precision": 0.9831,
+      "recall": 0.9549,
+      "f1_score": 0.9688,
+      "auc_roc": 0.9923,
+      "auc_pr": 0.9966,
+      "confusion_matrix": {
+        "tn": 120,
+        "fp": 4,
+        "fn": 11,
+        "tp": 233
+      },
+      "threshold_analysis": {
+        "threshold_05": 0.9592
+      }
+    },
+    "n_labeled": 368,
+    "training_timestamp": "2026-09-14T06:08:15.011154",
+    "regressor_metrics": {
+      "mae_days": 134.62,
+      "rmse_days": 169.75,
+      "n_train": 195,
+      "n_test": 49,
+      "avg_delay_days": 209.8
+    }
+  }
+}

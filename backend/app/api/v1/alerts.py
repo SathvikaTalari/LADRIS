@@ -12,82 +12,62 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User, UserRole
 from app.models.misc import Alert, AlertStatus, AlertType, AlertSeverity
-from app.models.project import Project, RiskLevel
+from app.models.project import Project
+from app.models.ml_models import MLPrediction
 from app.schemas.misc import AlertResponse, AlertUpdate
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
 async def _seed_alerts_from_projects(db: AsyncSession):
-    """Seed real early-warning alerts based on Risk Velocity & High Anomaly Risk."""
-    from app.services.risk_velocity_service import get_project_risk_velocity
+    """Create one active alert per HIGH production prediction/model version."""
+    projects = (await db.execute(select(Project).where(Project.deleted_at.is_(None)))).scalars().all()
+    project_by_id = {project.id: project for project in projects}
+    predictions = (await db.execute(
+        select(MLPrediction).order_by(MLPrediction.project_id, desc(MLPrediction.predicted_at))
+    )).scalars().all()
+    latest = {}
+    for prediction in predictions:
+        latest.setdefault(prediction.project_id, prediction)
 
-    res = await db.execute(
-        select(Project).where(
-            Project.deleted_at.is_(None)
-        ).limit(20)
-    )
-    all_projects = res.scalars().all()
-
-    for p in all_projects:
-        vel = await get_project_risk_velocity(p.id, "structural_anomaly", db)
-
-        if vel.get("velocity_status") == "RAPIDLY_RISING":
-            prev = vel.get("previous_score_7d", 57)
-            curr = vel.get("current_score", 79)
-            change = vel.get("change_7d", 22)
-            days = vel.get("days_between_snapshots", 7)
-
-            alert = Alert(
-                project_id=p.id,
-                alert_type=AlertType.RISK_ESCALATION,
-                severity=AlertSeverity.CRITICAL,
-                status=AlertStatus.ACTIVE,
-                title=f"CRITICAL EARLY-WARNING SIGNAL: Rapid Risk Escalation",
-                message=f"Project '{p.name}' ({p.project_code}) in {p.state_code} risk jumped from {int(round(prev))} → {int(round(curr))} (+{int(round(change))} points in {days} days). Risk Velocity: Rapidly Rising ↑↑.",
-                alert_metadata={
-                    "project_code": p.project_code,
-                    "state_code": p.state_code,
-                    "risk_level": p.risk_level.value if hasattr(p.risk_level, 'value') else str(p.risk_level),
-                    "previous_score": prev,
-                    "current_score": curr,
-                    "change_7d": change,
-                    "days_between": days,
-                    "velocity_status": "RAPIDLY_RISING",
-                    "velocity_label": "Rapidly Rising",
-                    "critical_stage": "Compensation",
-                },
-                triggered_at=datetime.now(timezone.utc)
-            )
-            db.add(alert)
-        elif vel.get("velocity_status") == "RISING" and p.risk_level in [RiskLevel.HIGH, RiskLevel.CRITICAL]:
-            prev = vel.get("previous_score_7d", 60)
-            curr = vel.get("current_score", 72)
-            change = vel.get("change_7d", 12)
-            days = vel.get("days_between_snapshots", 7)
-
-            alert = Alert(
-                project_id=p.id,
-                alert_type=AlertType.RISK_ESCALATION,
-                severity=AlertSeverity.HIGH,
-                status=AlertStatus.ACTIVE,
-                title=f"EARLY-WARNING SIGNAL: Escalating Risk Velocity",
-                message=f"Project '{p.name}' ({p.project_code}) risk increased from {int(round(prev))} → {int(round(curr))} (+{int(round(change))} in {days} days). Velocity: Rising ↑.",
-                alert_metadata={
-                    "project_code": p.project_code,
-                    "state_code": p.state_code,
-                    "risk_level": p.risk_level.value if hasattr(p.risk_level, 'value') else str(p.risk_level),
-                    "previous_score": prev,
-                    "current_score": curr,
-                    "change_7d": change,
-                    "days_between": days,
-                    "velocity_status": "RISING",
-                    "velocity_label": "Rising",
-                    "critical_stage": "Gazette 3D Objection",
-                },
-                triggered_at=datetime.now(timezone.utc)
-            )
-            db.add(alert)
-
+    existing = (await db.execute(select(Alert))).scalars().all()
+    existing_keys = {
+        (alert.project_id, str((alert.alert_metadata or {}).get("model_version")))
+        for alert in existing
+    }
+    for project_id, prediction in latest.items():
+        project = project_by_id.get(project_id)
+        key = (project_id, prediction.model_version)
+        if project is None or prediction.risk_category != "HIGH" or key in existing_keys:
+            continue
+        peak = max(
+            prediction.stage_predictions or [],
+            key=lambda item: float(item.get("risk_score", 0)),
+            default={},
+        )
+        db.add(Alert(
+            project_id=project.id,
+            alert_type=AlertType.RISK_ESCALATION,
+            severity=AlertSeverity.CRITICAL if prediction.risk_score >= 90 else AlertSeverity.HIGH,
+            status=AlertStatus.ACTIVE,
+            title=f"ML high-risk project: {project.project_code}",
+            message=(
+                f"{project.name} has production-model delay risk {prediction.risk_score:.2f}/100 "
+                f"({prediction.delay_probability:.1%}) at snapshot {prediction.snapshot_date}."
+            ),
+            alert_metadata={
+                "prediction_source": "ml_predictions",
+                "model_version": prediction.model_version,
+                "prediction_id": str(prediction.id),
+                "project_code": project.project_code,
+                "state_code": project.state_code,
+                "risk_level": prediction.risk_category,
+                "risk_score": prediction.risk_score,
+                "delay_probability": prediction.delay_probability,
+                "critical_stage": peak.get("stage"),
+                "critical_stage_risk_score": peak.get("risk_score"),
+            },
+            triggered_at=prediction.predicted_at,
+        ))
     await db.commit()
 
 @router.get("/", response_model=List[AlertResponse])
@@ -107,8 +87,8 @@ async def get_alerts(
     result = await db.execute(query)
     alerts = result.scalars().all()
     
-    # Auto-seed if database alerts table has no records
-    if not alerts and not project_id and not status:
+    # Synchronize production-model alerts without fabricating velocity history.
+    if not project_id and not status:
         await _seed_alerts_from_projects(db)
         result = await db.execute(query)
         alerts = result.scalars().all()

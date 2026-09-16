@@ -52,24 +52,24 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   ]
 
   if (user?.role === 'LA_OFFICER' || user?.role === 'PROJECT_OFFICER') {
-    navItems.push({ to: '/la-workbench', icon: Briefcase, label: 'LA Workbench' })
+    navItems.push({ to: '/la-workbench', icon: Briefcase, label: 'Officer Workbench' })
   }
   if (user?.role === 'PROJECT_AGENCY') {
     navItems.push({ to: '/agency-portal', icon: Building2, label: 'Agency Portal' })
   }
 
   navItems.push(
-    { to: '/intelligence', icon: TargetCheck, label: 'Decision Intelligence', tooltip: 'Smart Decisions' },
-    { to: '/projects', icon: Folder, label: 'Projects', tooltip: 'Project Tracking' },
-    { to: '/gis', icon: MapPinned, label: 'GIS Map', tooltip: 'Risk Mapping' },
-    { to: '/analytics', icon: BarChart3, label: 'Analytics', tooltip: 'Data Insights' },
-    { to: '/alerts', icon: Bell, label: 'Alerts', tooltip: 'Risk Alerts' },
-    { to: '/data-sources', icon: Database, label: 'Data Sources', tooltip: 'Project Data' },
-    { to: '/data-quality', icon: ShieldCheck, label: 'Data Quality', tooltip: 'Data Reliability' },
-    { to: '/priority-intelligence', icon: Target, label: 'Priority Intelligence', tooltip: 'Risk Prioritization' },
+    { to: '/priority-intelligence', icon: Target, label: 'Priority Watchlist', tooltip: 'High Risk Projects & Urgency' },
+    { to: '/intelligence', icon: TargetCheck, label: 'Decision Simulator', tooltip: 'What-If Simulations & Solutions' },
+    { to: '/projects', icon: Folder, label: 'Projects Directory', tooltip: 'Browse All Projects & Details' },
+    { to: '/gis', icon: MapPinned, label: 'Interactive Map', tooltip: 'Geographic Risk & Route Mapping' },
+    { to: '/analytics', icon: BarChart3, label: 'Analytics & Trends', tooltip: 'Performance & Delay Trends' },
+    { to: '/alerts', icon: Bell, label: 'Alerts & Warnings', tooltip: 'Real-Time Delay Notifications' },
+    { to: '/data-sources', icon: Database, label: 'Data Sources', tooltip: 'CSV & Connected Data Feeds' },
+    { to: '/data-quality', icon: ShieldCheck, label: 'Data Health', tooltip: 'Completeness & Reliability Scores' },
   )
 
-  const adminItems = [{ to: '/admin', icon: Settings, label: 'Admin' }]
+  const adminItems = [{ to: '/admin', icon: Settings, label: 'Admin & AI Settings', tooltip: 'AI Configuration & Users' }]
 
 
   return (

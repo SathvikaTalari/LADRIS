@@ -6,7 +6,7 @@ Pydantic v2 schemas for all intervention API request/response contracts.
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 # ─── Scenario Input ───────────────────────────────────────────────────────────
@@ -16,13 +16,22 @@ class ScenarioInput(BaseModel):
     Validated scenario inputs for a single what-if simulation.
     Only eligible fields are accepted. Non-simulatable fields are rejected.
     """
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "scenario_name": "Scenario A — Compensation Improvement",
+            "inputs": {
+                "rehabilitation_progress_pct": 80,
+                "stakeholder_update_count_90d": 12,
+            },
+        }
+    })
+
     scenario_name: str = Field(default="Scenario A", max_length=100)
     inputs: Dict[str, float] = Field(
         ...,
         description=(
             "Map of simulatable field name → hypothetical value. "
-            "Eligible fields: compensation_completion_pct, area_acquired_pct, "
-            "cost_per_ha, total_affected_families."
+            "Eligible production-model fields are returned by the fields endpoint."
         ),
     )
 
@@ -34,18 +43,6 @@ class ScenarioInput(BaseModel):
         if len(v) > 10:
             raise ValueError("Maximum 10 fields can be simulated at once.")
         return v
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "scenario_name": "Scenario A — Compensation Improvement",
-                "inputs": {
-                    "compensation_completion_pct": 0.80,
-                    "total_affected_families": 500,
-                },
-            }
-        }
-
 
 class CompareRequest(BaseModel):
     """Request to compare up to 3 scenarios side by side."""

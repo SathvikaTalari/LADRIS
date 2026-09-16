@@ -1,0 +1,55 @@
+# Example config for a REST API source (e.g. a state land records portal API,
+# or an agency's project management system exposing an API).
+# Copy this file, rename per source, and fill in real values.
+
+source_name: "example_state_portal_api"
+connector_type: "rest_api"
+base_url: "https://example-state-portal.gov.in/api/v1/land-projects"
+schedule_interval_minutes: 1440   # daily pull
+
+auth:
+  type: "bearer"           # or "api_key"
+  token: "${STATE_PORTAL_API_TOKEN}"   # resolve from env/secrets manager, never commit real tokens
+
+pagination:
+  type: "offset"            # or "none" for single-page responses
+  offset_param: "offset"
+  limit_param: "limit"
+  page_size: 100
+
+records_field: "results"    # JSON key in the response holding the list of records
+static_params:
+  status: "active"
+
+# canonical_field: source_field_name
+# Only fields present in this mapping are pulled through by the ETL step.
+field_mapping:
+  external_project_id: "project_code"
+  project_name: "name"
+  project_type: "category"
+  implementing_agency: "agency"
+  state: "state_name"
+  district: "district_name"
+  land_area_hectares: "area_ha"
+  affected_families_count: "affected_families"
+  notification_date: "notified_on"
+  expected_completion_date: "target_date"
+  actual_completion_date: "completed_on"
+  current_stage: "stage"
+  is_delayed: "delayed_flag"
+  delay_days: "delay_in_days"
+  compensation_sanctioned: "comp_sanctioned_amt"
+  compensation_disbursed: "comp_disbursed_amt"
+  compensation_sanction_date: "comp_sanction_date"
+  last_disbursement_date: "comp_last_paid_date"
+  legal_dispute_count: "dispute_count"
+  dispute_type: "dispute_category"
+  dispute_filed_date: "dispute_filed_on"
+  dispute_resolved_date: "dispute_closed_on"
+  court_level: "court"
+  rehabilitation_progress_pct: "rnr_progress_pct"
+  families_to_resettle: "rnr_target_families"
+  families_resettled: "rnr_completed_families"
+  resettlement_site_ready: "rnr_site_ready"
+  stage_entered_date: "stage_start_date"
+  stage_exited_date: "stage_end_date"

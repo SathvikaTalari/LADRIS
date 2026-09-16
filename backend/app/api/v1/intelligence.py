@@ -38,6 +38,7 @@ from app.database import get_db
 from app.dependencies import get_current_user, require_analyst
 from app.models.project import Project
 from app.models.user import User
+from app.services.production_ml_service import latest_predictions
 
 log = logging.getLogger(__name__)
 
@@ -613,7 +614,7 @@ async def run_resource_scenario(
 
 # ─── GET /intelligence/gis-heatmap ───────────────────────────────────────────
 
-@intelligence_router.get("/gis-heatmap")
+@intelligence_router.get("/gis-heatmap-legacy", include_in_schema=False)
 async def get_gis_heatmap(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -823,6 +824,76 @@ async def get_gis_heatmap(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"GIS heatmap computation failed: {str(e)}",
         )
+
+
+@intelligence_router.get("/gis-heatmap")
+async def get_production_ml_gis_heatmap(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Dict[str, Any]:
+    """Return only geocoded projects, coloured by persisted production ML risk.
+
+    State centroids and coordinate offsets are deliberately not used as project
+    locations. Records without source latitude/longitude are reported separately.
+    """
+    projects = list((await db.execute(
+        select(Project).where(Project.deleted_at.is_(None))
+    )).scalars().all())
+    prediction_by_project = {
+        row.project_id: row for row in await latest_predictions(db)
+    }
+    heatmap_points = []
+    unavailable_projects = []
+    for project in projects:
+        prediction = prediction_by_project.get(project.id)
+        if prediction is None:
+            unavailable_projects.append({
+                "project_id": str(project.id),
+                "project_code": project.project_code,
+                "reason": "No stored production ML prediction",
+            })
+            continue
+        if project.latitude is None or project.longitude is None:
+            unavailable_projects.append({
+                "project_id": str(project.id),
+                "project_code": project.project_code,
+                "reason": "Exact latitude/longitude unavailable in source record",
+            })
+            continue
+        district = (project.district_codes or [project.state_code])[0]
+        heatmap_points.append({
+            "district": district,
+            "state_code": project.state_code,
+            "lat": float(project.latitude),
+            "lng": float(project.longitude),
+            "heat_intensity": round(prediction.risk_score, 2),
+            "dominant_risk_level": prediction.risk_category,
+            "project_count": 1,
+            "avg_risk_score": round(prediction.risk_score, 2),
+            "issues": [
+                item.get("feature") for item in (prediction.top_drivers or [])
+                if item.get("direction") == "increases_risk"
+            ][:3],
+            "top_projects": [{
+                "id": str(project.id),
+                "name": project.name,
+                "project_code": project.project_code,
+                "risk_level": prediction.risk_category,
+                "risk_score": prediction.risk_score,
+                "state_code": project.state_code,
+                "data_source": project.milestone_data_status,
+            }],
+        })
+    heatmap_points.sort(key=lambda item: item["heat_intensity"], reverse=True)
+    return {
+        "status": "AVAILABLE" if heatmap_points else "INSUFFICIENT_GIS_DATA",
+        "total_locations": len(heatmap_points),
+        "total_projects": len(projects),
+        "coordinate_source": "PROJECT_RECORD",
+        "heatmap_points": heatmap_points,
+        "unavailable_projects": unavailable_projects,
+        "signals_used": ["Persisted calibrated LightGBM risk score"],
+    }
 
 
     """

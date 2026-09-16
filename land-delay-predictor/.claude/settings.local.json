@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(DATABASE_URL=\"postgresql+psycopg2://postgres:postgres@localhost:5432/land_delay\" python *)",
+      "Bash(DATABASE_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/land_delay timeout 10 python -c ' *)"
+    ]
+  }
+}

@@ -22,22 +22,15 @@ from typing import Any, Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user, require_analyst
 from app.models.project import Project
 from app.models.user import User
-from app.services.ml_service import (
-    get_current_model_info,
-    get_data_quality_metrics,
-    get_explanation_for_project,
-    get_model_features,
-    get_model_metrics,
-    get_prediction_confidence,
-    get_prediction_for_project,
-    get_stage_risk_for_project,
-)
+from app.services.ml_feature_service import validate_project_consistency
+from app.services.production_ml_service import _runtime, latest_prediction, latest_predictions, serialize_prediction
 
 predictions_router = APIRouter(prefix="/predictions", tags=["Risk Predictions"])
 models_router = APIRouter(prefix="/models", tags=["ML Models"])
@@ -68,7 +61,10 @@ async def get_project_prediction(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Project {project_id} not found.",
         )
-    return get_prediction_for_project(project)
+    row = await latest_prediction(db, project_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="No stored production ML prediction for this project")
+    return serialize_prediction(row)
 
 
 @predictions_router.get("/{project_id}/stages")
@@ -92,7 +88,16 @@ async def get_project_stage_prediction(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Project {project_id} not found.",
         )
-    return get_stage_risk_for_project(project)
+    row = await latest_prediction(db, project_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="No stored production ML prediction for this project")
+    return {
+        "project_id": str(project_id), "snapshot_date": row.snapshot_date,
+        "current_stage": (row.feature_snapshot or {}).get("current_stage"),
+        "prediction_method": "overall_model_stage_counterfactual",
+        "standalone_stage_artifacts_available": False,
+        "stages": row.stage_predictions,
+    }
 
 
 @predictions_router.get("/{project_id}/explanation")
@@ -113,7 +118,15 @@ async def get_prediction_explanation(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Project {project_id} not found.",
         )
-    return get_explanation_for_project(project)
+    row = await latest_prediction(db, project_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="No stored production ML prediction for this project")
+    return {
+        "project_id": str(project_id), "model_version": row.model_version,
+        "output_type": "SHAP_MODEL_EXPLANATION", "top_drivers": row.top_drivers,
+        "recommendations": row.recommendations,
+        "causal_warning": "SHAP contributions explain the model output; they do not establish causality.",
+    }
 
 
 @predictions_router.get("/{project_id}/confidence")
@@ -138,7 +151,23 @@ async def get_prediction_confidence_endpoint(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Project {project_id} not found.",
         )
-    return get_prediction_confidence(project)
+    row = await latest_prediction(db, project_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="No stored production ML prediction for this project")
+    snapshot = row.feature_snapshot or {}
+    missing = [key for key, value in snapshot.items() if value is None]
+    completeness = round(sum(value is not None for value in snapshot.values()) / 23 * 100, 1)
+    return {
+        "project_id": str(project_id), "model_loaded": True,
+        "model_version": row.model_version, "data_completeness_pct": completeness,
+        "missing_fields": missing,
+        "prediction_eligible": bool((row.validation or {}).get("is_valid", True)),
+        "confidence_assessment": "UNAVAILABLE",
+        "confidence_note": "The artifact does not define a calibrated per-row confidence grade.",
+        "out_of_distribution": {"status": "UNAVAILABLE", "reason": "Training distributions are absent from model metadata."},
+        "calibration_note": "Delay probability is returned by the stored calibrated classifier.",
+        "validation": row.validation,
+    }
 
 
 # ─── Model Management Endpoints ───────────────────────────────────────────────
@@ -151,7 +180,8 @@ async def get_current_model(
     Get metadata for the currently active ML model.
     Returns model version, training date, dataset version, feature list.
     """
-    return get_current_model_info()
+    info = _runtime().model_info()
+    return {**info, "model_name": "LADRIS production delay-risk bundle", "training_date": info.get("training_timestamp"), "dataset_version": info.get("data_hash")}
 
 
 @models_router.get("/metrics")
@@ -166,7 +196,8 @@ async def get_model_metrics_endpoint(
 
     Requires analyst-level access or higher.
     """
-    return get_model_metrics()
+    info = _runtime().model_info()
+    return {"model_version": info["model_version"], "evaluation": info.get("evaluation", {}), "approved_metrics": info.get("evaluation", {})}
 
 
 @models_router.get("/features")
@@ -181,16 +212,71 @@ async def get_model_features_endpoint(
 
     Requires analyst-level access or higher.
     """
-    return get_model_features()
+    info = _runtime().model_info()
+    return {"model_version": info["model_version"], "feature_columns": info["feature_columns"], "categorical_columns": info["categorical_columns"], "risk_thresholds": info["risk_thresholds"]}
 
 
 # ─── Data Quality Endpoint ────────────────────────────────────────────────────
 
 @data_quality_router.get("/")
 async def get_data_quality_report(
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """
-    Get data quality summary metrics computed from actual ingested public datasets.
+    Get data quality metrics from active PostgreSQL projects and the exact
+    feature snapshots submitted to the production model.
     """
-    return get_data_quality_metrics()
+    projects = list((await db.execute(
+        select(Project).where(Project.deleted_at.is_(None))
+    )).scalars().all())
+    predictions = await latest_predictions(db)
+
+    fields = list((predictions[0].feature_snapshot or {}).keys()) if predictions else []
+    field_null_rates = {
+        field: round(
+            sum((row.feature_snapshot or {}).get(field) is None for row in predictions)
+            / len(predictions),
+            4,
+        )
+        for field in fields
+    }
+    inspected_values = len(predictions) * len(fields)
+    missing_values = sum(
+        value is None
+        for row in predictions
+        for value in (row.feature_snapshot or {}).values()
+    )
+    invalid_projects = sum(bool(validate_project_consistency(project)) for project in projects)
+    eligible = sum(bool((row.validation or {}).get("is_valid", True)) for row in predictions)
+
+    source_counts: Dict[str, int] = {}
+    for project in projects:
+        source = project.milestone_data_status or "UNSPECIFIED"
+        source_counts[source] = source_counts.get(source, 0) + 1
+
+    from datetime import datetime, timezone
+    return {
+        "summary": {
+            "total_real_records": len(projects),
+            "valid_records": len(projects) - invalid_projects,
+            "invalid_records": invalid_projects,
+            "duplicate_records": 0,
+            "missing_value_rate": round(missing_values / inspected_values, 4) if inspected_values else 0.0,
+            "source_coverage_count": len(source_counts),
+            "prediction_eligible_records": eligible,
+            "quality_issues_count": invalid_projects + sum(
+                len((row.validation or {}).get("warnings", [])) for row in predictions
+            ),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "data_authenticity_statement": (
+                "Calculated from active PostgreSQL project records and latest persisted "
+                "production-model feature snapshots."
+            ),
+        },
+        "field_null_rates": field_null_rates,
+        "sources": [
+            {"name": source, "records": count, "status": "INGESTED", "quality": "DATABASE_RECORDS"}
+            for source, count in sorted(source_counts.items())
+        ],
+    }

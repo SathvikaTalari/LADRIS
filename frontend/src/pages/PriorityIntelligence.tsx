@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { AlertTriangle, Filter, ChevronRight, Zap, Search } from 'lucide-react'
-import { projectsAPI, interventionsAPI } from '@/api/client'
+import { projectsAPI, predictionsAPI } from '@/api/client'
 import { useNavigate } from 'react-router-dom'
 import { RiskBadge, StatusBadge } from '@/components/common'
 
@@ -23,62 +23,27 @@ export default function PriorityIntelligence() {
         const res = await projectsAPI.list({ page_size: 50 })
         const items = res.items || []
 
-        // Compute baseline priority score immediately so UI renders instantly without hanging
-        const baseEnriched = items.map((p: any) => {
-          let score = 30.0
-          if (p.risk_level === 'CRITICAL') score = 92.5
-          else if (p.risk_level === 'HIGH') score = 78.4
-          else if (p.risk_level === 'MEDIUM') score = 54.2
-          else if (p.risk_level === 'LOW') score = 28.0
-
-          const areaBonus = Math.min(10, ((p.total_area_ha || 50) / 100) * 2)
-          score = Math.min(99.5, Math.max(10.0, score + areaBonus))
-
+        const predictions = await Promise.all(items.map((project: any) =>
+          predictionsAPI.get(project.id).catch(() => null)
+        ))
+        const enriched = items.map((project: any, index: number) => {
+          const prediction = predictions[index]
           return {
-            ...p,
-            priorityScore: score,
-            priorityLabel: score > 75 ? 'CRITICAL PRIORITY' : score > 50 ? 'HIGH PRIORITY' : 'MEDIUM PRIORITY',
-            topIntervention: {
-              display_name: 'Expedite Gazette Notification 3A -> 3D',
-              category: 'ADMINISTRATIVE',
-              action_description: 'High anomaly risk detected in acquisition timeline divergence. Direct district collector review recommended.',
-              score_components: {
-                risk_severity: { label: 'Current Risk (35%)', value: p.risk_level === 'HIGH' || p.risk_level === 'CRITICAL' ? 0.85 : 0.4, weight: 0.35 },
-                urgency: { label: 'Stage Urgency (20%)', value: 0.80, weight: 0.20 },
-                impact: { label: 'Project Impact (15%)', value: 0.75, weight: 0.15 },
-                risk_velocity: { label: 'Risk Velocity (10%)', value: 0.85, weight: 0.10 },
-                feasibility: { label: 'Actionability (10%)', value: 0.90, weight: 0.10 },
-                data_confidence: { label: 'Data Confidence (10%)', value: 0.85, weight: 0.10 },
-              }
-            }
+            ...project,
+            risk_level: prediction?.risk_category || 'UNKNOWN',
+            priorityScore: prediction?.risk_score ?? null,
+            priorityLabel: prediction ? `${prediction.risk_category} DELAY RISK` : 'NO PREDICTION YET',
+            topIntervention: prediction ? {
+              display_name: prediction.recommendations?.[0] || 'Administrative review recommended',
+              category: 'RECOMMENDATION',
+              action_description: prediction.recommendations?.[0] || 'Review project milestones and land acquisition paperwork.',
+              score_components: {},
+            } : null,
           }
         })
-
-        // Sort descending by priority score
-        baseEnriched.sort((a, b) => b.priorityScore - a.priorityScore)
-        setProjects(baseEnriched)
+        enriched.sort((a: any, b: any) => (b.priorityScore ?? -1) - (a.priorityScore ?? -1))
+        setProjects(enriched)
         setIsLoading(false)
-
-        // Asynchronously fetch exact Phase 4 priority scores for top 10 items in background
-        const top10 = baseEnriched.slice(0, 10)
-        Promise.all(
-          top10.map(p => interventionsAPI.priority(p.id).catch(() => null))
-        ).then(priorityResults => {
-          setProjects(prev => {
-            const updated = [...prev]
-            priorityResults.forEach((res, idx) => {
-              if (res && updated[idx]) {
-                updated[idx] = {
-                  ...updated[idx],
-                  priorityScore: res.priority_score ?? updated[idx].priorityScore,
-                  priorityLabel: res.priority_label ?? updated[idx].priorityLabel,
-                  topIntervention: res.top_intervention ?? updated[idx].topIntervention,
-                }
-              }
-            })
-            return updated
-          })
-        })
 
       } catch (err) {
         console.error('Failed to load priority projects', err)
@@ -133,10 +98,10 @@ export default function PriorityIntelligence() {
           </div>
           <div>
             <h1 style={{ fontSize: '1.375rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-              Global Priority Intelligence Center
+              Priority Project Watchlist
             </h1>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '3px 0 0 0' }}>
-              Find and rank projects that need attention first.
+            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>
+              Quickly identify high-risk projects that require immediate administrative intervention or attention
             </p>
           </div>
         </div>
@@ -146,7 +111,7 @@ export default function PriorityIntelligence() {
       <div className="card" style={{ marginBottom: 24, background: 'var(--color-bg-card)', padding: 18, width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <Filter size={14} color="var(--color-accent-primary)" />
-          FILTER & RANK CRITERIA
+          Filter & Sort Projects
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, width: '100%' }}>
@@ -176,10 +141,10 @@ export default function PriorityIntelligence() {
               style={{ height: 38, fontSize: '0.8125rem', padding: '0 32px 0 12px', lineHeight: '38px', boxSizing: 'border-box' }}
             >
               <option value="ALL">All Risk Levels</option>
-              <option value="CRITICAL">Critical Anomaly Risk</option>
-              <option value="HIGH">High Anomaly Risk</option>
-              <option value="MEDIUM">Medium Anomaly Risk</option>
-              <option value="LOW">Low Anomaly Risk</option>
+              <option value="CRITICAL">Critical Delay Risk</option>
+              <option value="HIGH">High Delay Risk</option>
+              <option value="MEDIUM">Medium Delay Risk</option>
+              <option value="LOW">Low Delay Risk</option>
             </select>
           </div>
 
@@ -219,7 +184,7 @@ export default function PriorityIntelligence() {
       {isLoading ? (
         <div className="card" style={{ textAlign: 'center', padding: 40, color: 'var(--color-text-muted)' }}>
           <div className="spinner" style={{ margin: '0 auto 12px' }} />
-          Calculating national priority scores across public project registry...
+          Loading priority project watchlist...
         </div>
       ) : filteredProjects.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: 40, color: 'var(--color-text-muted)' }}>
@@ -269,7 +234,7 @@ export default function PriorityIntelligence() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Priority Score
+                        Delay Risk Score
                       </div>
                       <div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-warning)', lineHeight: 1.2 }}>
                         {p.priorityScore ? p.priorityScore.toFixed(1) : 'N/A'}{' '}
@@ -284,7 +249,7 @@ export default function PriorityIntelligence() {
                       className="btn btn-secondary btn-sm"
                       style={{ padding: '8px 16px', fontSize: '0.8125rem' }}
                     >
-                      Workspace <ChevronRight size={14} />
+                      View Project <ChevronRight size={14} />
                     </button>
                   </div>
                 </div>
@@ -293,10 +258,10 @@ export default function PriorityIntelligence() {
                 <div style={{ marginTop: 14, padding: 16, background: 'var(--color-bg-secondary)', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Zap size={14} color="var(--color-accent-primary)" />
-                    WHY THIS PROJECT IS PRIORITIZED:
+                    Why Attention Is Needed & Recommended Action:
                   </div>
                   <p style={{ fontSize: '0.85rem', color: 'var(--color-text-primary)', margin: 0, marginBottom: 14, lineHeight: 1.5 }}>
-                    {topInt ? topInt.action_description : 'High anomaly risk detected in acquisition timeline divergence. Direct district collector review recommended.'}
+                    {topInt ? topInt.action_description : 'Prediction is not yet available for this project. Check that project records and milestones are up to date.'}
                   </p>
 
                   {/* Component Formula Breakdown Grid */}

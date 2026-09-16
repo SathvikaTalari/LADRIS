@@ -1,0 +1,50 @@
+# Database Data Source Configuration Template
+# For read-only access to an agency database
+
+source_name: "YOUR_DB_SOURCE_NAME"       # e.g., "state_portal_db"
+connector_type: "database"
+connection_string: "postgresql+psycopg2://readonly_user:password@db-host:5432/land_acquisition"
+schedule_interval_minutes: 1440          # daily pull (set to null for manual only)
+
+# Read-only SELECT query
+query: >
+  SELECT
+    project_id,
+    project_name,
+    project_type,
+    state,
+    district,
+    notification_date,
+    expected_completion,
+    actual_completion,
+    current_stage,
+    is_delayed,
+    delay_days,
+    compensation_sanctioned,
+    compensation_disbursed,
+    dispute_count,
+    rehab_progress_percent
+  FROM land_acquisition_projects
+  WHERE updated_at > :since
+
+# Parameters for the query above
+query_params:
+  since: "2024-01-01"
+
+# Field mapping: canonical field name -> DB column name
+field_mapping:
+  external_project_id: "project_id"
+  project_name: "project_name"
+  project_type: "project_type"
+  state: "state"
+  district: "district"
+  notification_date: "notification_date"
+  expected_completion_date: "expected_completion"
+  actual_completion_date: "actual_completion"
+  current_stage: "current_stage"
+  is_delayed: "is_delayed"
+  delay_days: "delay_days"
+  compensation_sanctioned: "compensation_sanctioned"
+  compensation_disbursed: "compensation_disbursed"
+  legal_dispute_count: "dispute_count"
+  rehabilitation_progress_pct: "rehab_progress_percent"

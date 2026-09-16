@@ -12,6 +12,7 @@ import SiteMap from '@/pages/SiteMap'
 import Dashboard from '@/pages/Dashboard'
 import ProjectList from '@/pages/Projects/ProjectList'
 import ProjectDetail from '@/pages/Projects/ProjectDetail'
+import ProjectForm from '@/pages/Projects/ProjectForm'
 import GIS from '@/pages/GIS'
 import Analytics from '@/pages/Analytics'
 import Alerts from '@/pages/Alerts'
@@ -106,6 +107,8 @@ export default function App() {
           <Route path="priority-intelligence" element={<PriorityIntelligence />} />
           <Route path="intelligence" element={<Intelligence />} />
           <Route path="projects" element={<ProjectList />} />
+          <Route path="projects/new" element={<ProjectForm />} />
+          <Route path="projects/:id/edit" element={<ProjectForm />} />
           <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="gis" element={<GIS />} />
           <Route path="analytics" element={<Analytics />} />

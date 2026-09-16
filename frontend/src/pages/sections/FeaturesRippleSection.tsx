@@ -1,5 +1,5 @@
 /**
- * FeaturesRippleSection — LADRIS
+ * FeaturesRippleSection — LADRIS AI
  * "Everything You Need for Land Acquisition"
  * Animation: RIPPLE REVEAL — one central signal activates all 6 cards.
  * Library: Framer Motion (already installed)
