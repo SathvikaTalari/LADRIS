@@ -138,7 +138,7 @@ async def training_history(_: User = Depends(get_current_user)):
             return [safe(item) for item in value]
         return value
     history = []
-    for path in sorted(Path(get_settings().MODELS_DIR).glob("*/metadata.json")):
+    for path in sorted(Path(get_settings().resolved_models_dir).glob("*/metadata.json")):
         try:
             metadata = json.loads(path.read_text(encoding="utf-8"))
             history.append({"model_version": path.parent.name, "training_timestamp": metadata.get("training_timestamp"), "evaluation": safe(metadata.get("evaluation", {})), "metadata_status": "VALID"})

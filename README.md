@@ -72,6 +72,24 @@ LADRIS/
 
 ---
 
+### 🚀 One-Click Automated Team Setup (Fastest)
+
+Run the automated setup script from the root `LADRIS` directory. It configures `.env`, starts the PostGIS database, installs all Python & npm dependencies, and loads the 25 projects with pre-computed ML predictions automatically:
+
+```powershell
+# Windows PowerShell:
+.\setup_team.ps1
+```
+
+```bash
+# Linux / macOS:
+chmod +x ./setup_team.sh && ./setup_team.sh
+```
+
+---
+
+### 🛠️ Manual Step-by-Step Setup
+
 ### Step 1: Clone the Repository & Configure Environment
 
 ```bash
@@ -114,8 +132,8 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Seed realistic demonstration projects (250 corridors across India)
-python seed_realistic_data.py
+# Sync projects from my_raw_projects.csv and generate ML predictions:
+python seed_my_raw_projects.py
 
 # Start the FastAPI development server with hot-reload
 uvicorn app.main:app --reload --port 8000

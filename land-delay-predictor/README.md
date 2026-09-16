@@ -72,37 +72,73 @@ For each stage, the system computes:
 | `/alerts/summary` | GET | Alert overview |
 | `/alerts/all` | GET | All alerts (default threshold 70) |
 
-## Setup
+## Setup & Connection Architecture
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
+`land-delay-predictor` operates in two modes:
 
-# Set database URL
-export DATABASE_URL="postgresql+psycopg2://user:pass@localhost:5432/land_delay"
+### 1. Integrated Mode (Standard LADRIS Application)
+When running the main LADRIS application (`backend` + `frontend`):
+- The FastAPI backend (`c:\Ladris\LADRIS\backend`) connects directly to `land-delay-predictor/app/ml/inference.py` in-process.
+- Trained LightGBM model bundles are automatically loaded from `land-delay-predictor/models/` at startup.
+- All predictions, stage breakdowns, and SHAP explanations are served on `http://localhost:8000/api/ml/` and consumed by the React UI (`http://localhost:5173`).
+- **No separate ML server process is required** when running the main application!
 
-# Initialize database
+### 2. Standalone Mode (Dedicated ML Pipeline & Ingestion API)
+If you wish to run `land-delay-predictor` as an independent microservice or run local data ingestion, ETL, and model retraining pipelines:
+
+#### Windows PowerShell:
+```powershell
+# 1. Navigate to land-delay-predictor
+cd land-delay-predictor
+
+# 2. Activate virtual environment
+.\venv\Scripts\Activate.ps1
+# (or invoke directly via .\venv\Scripts\python)
+
+# 3. Environment configuration
+# The .env file in this directory is pre-configured for the running PostGIS container on port 15432:
+# DATABASE_URL=postgresql+psycopg2://ladris_user:landpulse_pass@localhost:15432/land_delay
+# To override in PowerShell:
+# $env:DATABASE_URL="postgresql+psycopg2://ladris_user:landpulse_pass@localhost:15432/land_delay"
+
+# 4. Initialize database schema
 python -m app.db.init_db
 
-# Start the API server
-uvicorn app.api.main:app --reload
+# 5. Start standalone ML API server (run on port 8001 to avoid port 8000 backend collision)
+uvicorn app.api.main:app --reload --port 8001
 ```
 
-## Docker Deployment
-
+#### Linux / macOS:
 ```bash
-# Start PostgreSQL with PostGIS
-docker run -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=land_delay -p 5432:5432 -d postgres:15
+# 1. Activate virtual environment
+source venv/bin/activate
 
-# Initialize and ingest
+# 2. Set database URL (or use .env file)
+export DATABASE_URL="postgresql+psycopg2://ladris_user:landpulse_pass@localhost:15432/land_delay"
+
+# 3. Initialize database
 python -m app.db.init_db
-curl -X POST "http://localhost:8000/ingest/file?source_name=district_admin_monthly_export" \
+
+# 4. Start standalone ML API server
+uvicorn app.api.main:app --reload --port 8001
+```
+
+## Local Docker Deployment (PostgreSQL + PostGIS)
+
+If running the containerized database from the LADRIS root:
+```bash
+# From LADRIS root:
+docker compose up -d db
+# Starts PostGIS on port 15432 with ladris and land_delay databases
+
+# Ingest sample seed and run ETL:
+curl -X POST "http://localhost:8001/ingest/file?source_name=district_admin_monthly_export" \
      -F "file=@data/sample_seed/sample_projects.csv"
-curl -X POST "http://localhost:8000/etl/run"
-curl -X POST "http://localhost:8000/model/train"
+curl -X POST "http://localhost:8001/etl/run"
+curl -X POST "http://localhost:8001/model/train"
 
 # Get predictions
-curl -X POST "http://localhost:8000/model/predict"
+curl -X POST "http://localhost:8001/model/predict"
 ```
 
 ## Data Sources

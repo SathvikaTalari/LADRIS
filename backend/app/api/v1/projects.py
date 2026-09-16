@@ -42,27 +42,42 @@ async def list_projects(
     status: Optional[ProjectStatus] = None,
     risk_level: Optional[RiskLevel] = None,
     search: Optional[str] = Query(None, max_length=200),
+    scoped_only: bool = Query(False, description="Filter only to user's assigned jurisdiction/agency"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> PaginatedResponse[ProjectListResponse]:
     """List projects with optional filters (status, risk level, state, district, agency) and pagination."""
     query = select(Project).where(Project.deleted_at.is_(None))
 
-    # Apply role-based scoping automatically
-    if current_user.role == UserRole.STATE_ADMIN and current_user.state_code:
-        query = query.where(Project.state_code == current_user.state_code.upper())
-    elif current_user.role == UserRole.DISTRICT_OFFICER and current_user.state_code:
-        query = query.where(Project.state_code == current_user.state_code.upper())
-
-    if current_user.role == UserRole.PROJECT_AGENCY and current_user.agency_name:
-        query = query.where(
-            (Project.executing_agency.ilike(f"%{current_user.agency_name}%")) |
-            (Project.nodal_agency.ilike(f"%{current_user.agency_name}%"))
-        )
+    # Apply role-based scoping only when explicitly requested (e.g. for officer workbench)
+    if scoped_only:
+        if current_user.role in (UserRole.STATE_ADMIN, UserRole.DISTRICT_OFFICER) and current_user.state_code:
+            st = current_user.state_code.upper()
+            if st in ("TG", "TS"):
+                query = query.where(Project.state_code.in_(["TG", "TS"]))
+            elif st in ("UK", "UT"):
+                query = query.where(Project.state_code.in_(["UK", "UT"]))
+            elif st in ("CT", "CG"):
+                query = query.where(Project.state_code.in_(["CT", "CG"]))
+            else:
+                query = query.where(Project.state_code == st)
+        elif current_user.role == UserRole.PROJECT_AGENCY and current_user.agency_name:
+            query = query.where(
+                (Project.executing_agency.ilike(f"%{current_user.agency_name}%")) |
+                (Project.nodal_agency.ilike(f"%{current_user.agency_name}%"))
+            )
 
     # Filter by explicitly provided query parameters
     if state_code:
-        query = query.where(Project.state_code == state_code.upper())
+        st = state_code.upper()
+        if st in ("TG", "TS"):
+            query = query.where(Project.state_code.in_(["TG", "TS"]))
+        elif st in ("UK", "UT"):
+            query = query.where(Project.state_code.in_(["UK", "UT"]))
+        elif st in ("CT", "CG"):
+            query = query.where(Project.state_code.in_(["CT", "CG"]))
+        else:
+            query = query.where(Project.state_code == st)
     if district:
         query = query.where(func.array_to_string(Project.district_codes, ',').ilike(f"%{district}%"))
     if agency:

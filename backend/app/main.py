@@ -245,7 +245,7 @@ async def lifespan(app: FastAPI):
                 await sync_model_registry(session)
                 imported_ids = await sync_projects_from_csv(
                     session,
-                    settings.PROJECT_DATA_CSV,
+                    settings.resolved_project_data_csv,
                     exclusive=settings.PROJECT_CSV_EXCLUSIVE,
                 )
                 await session.commit()

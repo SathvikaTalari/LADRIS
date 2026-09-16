@@ -22,9 +22,13 @@ log = logging.getLogger(__name__)
 
 def _runtime():
     settings = get_settings()
-    os.environ["MODELS_DIR"] = settings.MODELS_DIR
-    if settings.ML_MODULE_PATH not in sys.path:
-        sys.path.insert(0, settings.ML_MODULE_PATH)
+    models_dir = settings.resolved_models_dir
+    ml_path = settings.resolved_ml_module_path
+    os.environ["MODELS_DIR"] = models_dir
+    if ml_path not in sys.path:
+        sys.path.insert(0, ml_path)
+    from ml import model_store
+    model_store.MODELS_DIR = models_dir
     from ml import inference
     return inference
 
@@ -44,6 +48,7 @@ async def sync_model_registry(db: AsyncSession) -> None:
         MLModelRegistry.__table__.update().values(is_current=False)
     )
     if existing is None:
+        models_dir = get_settings().resolved_models_dir
         existing = MLModelRegistry(
             model_name="LADRIS production delay-risk bundle",
             model_version=version,
@@ -52,8 +57,8 @@ async def sync_model_registry(db: AsyncSession) -> None:
             record_count_used=(info.get("evaluation") or {}).get("n_labeled"),
             feature_list=info["feature_columns"],
             evaluation_metrics=info.get("evaluation") or {},
-            model_path=os.path.join(get_settings().MODELS_DIR, version),
-            preprocessing_path=os.path.join(get_settings().MODELS_DIR, version, "classifier.joblib"),
+            model_path=os.path.join(models_dir, version),
+            preprocessing_path=os.path.join(models_dir, version, "classifier.joblib"),
             authenticity_statement="Existing calibrated LightGBM production bundle; not trained by request handlers.",
             data_sources_used=["synthetic_projects.csv"],
         )

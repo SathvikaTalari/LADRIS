@@ -72,7 +72,7 @@ STATE_CODES = {
     "andhra pradesh": "AP", "assam": "AS", "bihar": "BR", "chhattisgarh": "CG",
     "delhi": "DL", "gujarat": "GJ", "haryana": "HR", "karnataka": "KA",
     "kerala": "KL", "madhya pradesh": "MP", "maharashtra": "MH", "odisha": "OD",
-    "punjab": "PB", "rajasthan": "RJ", "tamil nadu": "TN", "telangana": "TS",
+    "punjab": "PB", "rajasthan": "RJ", "tamil nadu": "TN", "telangana": "TG",
     "uttar pradesh": "UP", "uttarakhand": "UK", "west bengal": "WB",
 }
 

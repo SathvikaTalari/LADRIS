@@ -50,6 +50,7 @@ services:
       POSTGRES_PORT: 5432
       ML_MODULE_PATH: /land-delay-predictor/app
       MODELS_DIR: /land-delay-predictor/models
+      PROJECT_DATA_CSV: /land-delay-predictor/my_raw_projects.csv
     depends_on:
       db:
         condition: service_healthy
