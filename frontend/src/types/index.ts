@@ -139,6 +139,7 @@ export interface Project {
   actual_end_date: string | null
   estimated_compensation_inr: number | null
   disbursed_compensation_inr: number | null
+  rehabilitation_progress_pct?: number | null
   notification_3a_date?: string | null
   notification_3d_date?: string | null
   milestone_data_status?: string | null

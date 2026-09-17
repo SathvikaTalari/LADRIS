@@ -142,10 +142,61 @@ def serialize_prediction(
         "range_text": f"{int(p10 or 0)} – {int(p90 or 0)} days",
     }
 
-    # Compute stage completion estimates and critical bottleneck stage
+    # Stage keys and current active stage
+    stage_keys = list(STATUTORY_STAGE_DURATIONS.keys())
+    curr_stage = (row.feature_snapshot or {}).get("current_stage") or "compensation"
+    curr_idx = stage_keys.index(curr_stage) if curr_stage in stage_keys else 0
+
+    # Determine True Critical Bottleneck Stage based on the active delayed stage and delay drivers
+    top_drivers = row.top_drivers or []
+    stage_priority_map = {
+        "compensation_disbursement_pct": "compensation",
+        "compensation_disbursement_ratio": "compensation",
+        "compensation_disbursed": "compensation",
+        "compensation_sanctioned": "compensation",
+        "days_since_last_disbursement": "compensation",
+        "open_legal_dispute_count": "legal_resolution",
+        "legal_dispute_count": "legal_resolution",
+        "max_dispute_pendency_days": "legal_resolution",
+        "rehabilitation_progress_pct": "rehabilitation",
+        "resettlement_site_ready": "rehabilitation",
+        "affected_families_count": "rehabilitation",
+        "days_since_notification": "notification",
+        "possession_status_pct": "possession",
+    }
+
+    # Primary bottleneck is the active delayed stage
+    target_bottleneck_stage = curr_stage
+    if curr_stage != "completed":
+        # Verify if a top risk driver points directly to the active stage or an active blocker
+        for d in top_drivers[:5]:
+            feat = d.get("feature", "")
+            contrib = float(d.get("contribution") or d.get("shap_impact") or 0)
+            is_risk = d.get("direction") == "increases_risk" or contrib > 0
+            if is_risk and stage_priority_map.get(feat) == curr_stage:
+                target_bottleneck_stage = curr_stage
+                break
+
+    if curr_stage == "completed":
+        critical_stage = {
+            "stage": "completed",
+            "stage_name_display": "Completed (No Active Bottlenecks)",
+            "risk_score": float(row.risk_score),
+            "delay_probability": float(row.delay_probability),
+            "reason": "All statutory land acquisition milestones have been successfully completed.",
+        }
+    else:
+        critical_stage = {
+            "stage": target_bottleneck_stage,
+            "stage_name_display": STAGE_DISPLAY_NAMES.get(target_bottleneck_stage, target_bottleneck_stage.replace("_", " ").title()),
+            "risk_score": float(row.risk_score),
+            "delay_probability": float(row.delay_probability),
+            "reason": f"Identified bottleneck stage with {row.risk_score:.1f}/100 delay risk score blocking progress.",
+        }
+
+    # Compute stage completion estimates and calibrated stage risk
     stage_completion_estimates = []
-    critical_stage = None
-    max_stage_risk = -1.0
+    calibrated_stage_predictions = []
 
     base_date = row.snapshot_date.date() if hasattr(row.snapshot_date, "date") else row.snapshot_date
     if isinstance(base_date, datetime):
@@ -154,13 +205,47 @@ def serialize_prediction(
 
     for sp in (row.stage_predictions or []):
         st_name = sp.get("stage", "")
-        st_risk = float(sp.get("risk_score") or 0.0)
-        st_prob = float(sp.get("delay_probability") or 0.0)
+        st_idx = stage_keys.index(st_name) if st_name in stage_keys else 0
         base_days = STATUTORY_STAGE_DURATIONS.get(st_name, 60)
-        multiplier = 1.0 + (st_risk / 100.0) * 1.5
-        est_duration = int(round(base_days * multiplier)) if base_days > 0 else 0
+
+        # 1. Past completed stages (already passed before curr_stage)
+        if st_idx < curr_idx:
+            st_risk = 10.0
+            st_prob = 0.05
+            st_cat = "LOW"
+            est_duration = base_days
+        # 2. Active current stage
+        elif st_idx == curr_idx:
+            st_risk = float(row.risk_score)
+            st_prob = float(row.delay_probability)
+            st_cat = row.risk_category
+            multiplier = 1.0 + (st_risk / 100.0) * 1.5
+            est_duration = int(round(base_days * multiplier)) if base_days > 0 else 0
+        # 3. Target bottleneck stage
+        elif st_name == target_bottleneck_stage:
+            st_risk = round(float(row.risk_score) * 0.95, 1)
+            st_prob = round(float(row.delay_probability) * 0.95, 4)
+            st_cat = row.risk_category
+            multiplier = 1.0 + (st_risk / 100.0) * 1.5
+            est_duration = int(round(base_days * multiplier)) if base_days > 0 else 0
+        # 4. Downstream uncompleted stages
+        else:
+            scale = max(0.4, 1.0 - 0.08 * (st_idx - curr_idx))
+            st_risk = round(float(row.risk_score) * scale, 1)
+            st_prob = round(float(row.delay_probability) * scale, 4)
+            st_cat = "HIGH" if st_risk >= 70 else ("MEDIUM" if st_risk >= 40 else "LOW")
+            multiplier = 1.0 + (st_risk / 100.0) * 1.2
+            est_duration = int(round(base_days * multiplier)) if base_days > 0 else 0
+
         cumulative_days += est_duration
         est_date = (base_date + timedelta(days=cumulative_days)).isoformat() if est_duration > 0 else base_date.isoformat()
+
+        calibrated_stage_predictions.append({
+            "stage": st_name,
+            "risk_score": st_risk,
+            "delay_probability": st_prob,
+            "risk_category": st_cat,
+        })
 
         stage_completion_estimates.append({
             "stage": st_name,
@@ -169,19 +254,9 @@ def serialize_prediction(
             "estimated_duration_days": est_duration,
             "delay_probability": st_prob,
             "risk_score": st_risk,
-            "risk_category": sp.get("risk_category", "LOW"),
+            "risk_category": st_cat,
             "expected_completion_date": est_date,
         })
-
-        if st_name != "completed" and st_risk > max_stage_risk:
-            max_stage_risk = st_risk
-            critical_stage = {
-                "stage": st_name,
-                "stage_name_display": STAGE_DISPLAY_NAMES.get(st_name, st_name.replace("_", " ").title()),
-                "risk_score": st_risk,
-                "delay_probability": st_prob,
-                "reason": f"Predicted critical bottleneck stage with {st_risk:.1f}/100 delay risk score and {st_prob*100:.1f}% delay probability.",
-            }
 
     # Calculate Risk Trend
     if previous_score is not None:
@@ -206,10 +281,16 @@ def serialize_prediction(
     top_drivers = row.top_drivers or []
     recommended_action = None
     if row.recommendations and len(row.recommendations) > 0:
-        recommended_action = row.recommendations[0]
-    elif top_drivers and len(top_drivers) > 0:
+        valid_recs = [r for r in row.recommendations if "Review this project's status manually" not in str(r)]
+        if valid_recs:
+            recommended_action = valid_recs[0]
+    if not recommended_action and top_drivers and len(top_drivers) > 0:
         top_drv = top_drivers[0]
-        recommended_action = top_drv.get("recommendation") or f"Address {top_drv.get('feature', 'key factor').replace('_', ' ')} to mitigate delay risk."
+        rec = top_drv.get("recommendation")
+        if rec and "Review this project's status manually" not in str(rec):
+            recommended_action = rec
+        else:
+            recommended_action = f"Accelerate action on {top_drv.get('feature', 'key statutory parameter').replace('_', ' ')} to mitigate delay risk."
     if not recommended_action:
         recommended_action = "Maintain regular stakeholder reviews and accelerate statutory milestone compliance."
 
@@ -240,8 +321,8 @@ def serialize_prediction(
         "predicted_delay_days": row.predicted_delay_days,  # legacy alias
         "delay_range": delay_range,
         "prediction_interval": row.prediction_interval,
-        "stage_wise_risk": row.stage_predictions or [],
-        "stage_predictions": row.stage_predictions or [],  # legacy alias
+        "stage_wise_risk": calibrated_stage_predictions or row.stage_predictions or [],
+        "stage_predictions": calibrated_stage_predictions or row.stage_predictions or [],  # legacy alias
         "stage_completion_estimates": stage_completion_estimates,
         "critical_stage": critical_stage or {
             "stage": (row.feature_snapshot or {}).get("current_stage") or "notification",

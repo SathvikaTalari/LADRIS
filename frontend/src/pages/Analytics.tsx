@@ -188,10 +188,10 @@ export default function Analytics() {
             Average Expected Delay
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f59e0b', marginTop: 4 }}>
-            {overviewSummary?.average_delay_days ? `${Math.round(overviewSummary.average_delay_days)} d` : '190 d'}
+            {overviewSummary?.average_delay_days ? `${Math.round(overviewSummary.average_delay_days)} days` : '190 d'}
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-            ~6 months average delay
+            6 months average delay
           </div>
         </div>
 

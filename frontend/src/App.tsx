@@ -37,6 +37,12 @@ import ResearchPapers from '@/pages/documents/ResearchPapers'
 import CaseStudies from '@/pages/documents/CaseStudies'
 import RealWorldExamples from '@/pages/documents/RealWorldExamples'
 
+import PriorityIntelligence from '@/pages/PriorityIntelligence'
+import DecisionIntelligence from '@/pages/DecisionIntelligence'
+import LAWorkbench from '@/pages/LAWorkbench'
+import AgencyPortal from '@/pages/AgencyPortal'
+import { useThemeStore } from '@/store/themeStore'
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, fetchMe } = useAuthStore()
   const token = localStorage.getItem('access_token')
@@ -53,12 +59,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>
 }
-
-import PriorityIntelligence from '@/pages/PriorityIntelligence'
-import DecisionIntelligence from '@/pages/DecisionIntelligence'
-import LAWorkbench from '@/pages/LAWorkbench'
-import AgencyPortal from '@/pages/AgencyPortal'
-import { useThemeStore } from '@/store/themeStore'
 
 export default function App() {
   const { theme } = useThemeStore()

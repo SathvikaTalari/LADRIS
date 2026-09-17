@@ -46,9 +46,11 @@ from app.schemas.ingestion import (
     CSVImportSummary,
     CSVPreviewResponse,
     DatabaseImportRequest,
+    DatabaseImportResponse,
     DatabaseTestRequest,
     DatabaseTestResponse,
     DocumentConfirmRequest,
+    DocumentConfirmResponse,
     DocumentExtractResponse,
     ExternalIngestionBatch,
     ExternalIngestionResponse,
@@ -57,6 +59,7 @@ from app.schemas.ingestion import (
     IngestionJobResponse,
     ManualIngestionRequest,
     ManualIngestionResponse,
+    MultiDocumentExtractResponse,
 )
 from app.services.audit_service import record_audit_log
 from app.services.ingestion_service import IngestionService
@@ -323,17 +326,62 @@ async def test_database_connection(
         )
 
 
+@router.post("/database/import", response_model=DatabaseImportResponse)
+async def import_database_table(
+    payload: DatabaseImportRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> DatabaseImportResponse:
+    """Import records directly from a database table, map canonical fields, and execute ML delay prediction."""
+    service = IngestionService(db)
+    try:
+        res = await service.ingest_database_table(
+            table_name=payload.table_name,
+            column_mapping=payload.column_mapping,
+            connection_url=payload.connection_url,
+            target_entity=payload.target_entity,
+            source_name=payload.source_name,
+            limit=payload.limit or 1000,
+            user_id=current_user.id,
+        )
+
+        await record_audit_log(
+            db=db,
+            action="INGEST_DATABASE",
+            user_id=current_user.id,
+            user_email=current_user.email,
+            user_role=current_user.role,
+            resource_type="ingestion",
+            resource_id=uuid.UUID(res["job_id"]),
+            ip_address=request.client.host if request and request.client else None,
+            request_method="POST",
+            request_path="/api/v1/ingestion/database/import",
+            response_status=200,
+        )
+
+        return DatabaseImportResponse(**res)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
 # ─── 5. GIS Data Upload & PostGIS Ingestion ───────────────────────────────────
 
 @router.post("/gis", response_model=GISIngestionResponse)
 async def ingest_gis(
     file: UploadFile = File(...),
     project_id: Optional[UUID] = Form(None),
+    create_project: bool = Form(True),
+    project_code: Optional[str] = Form(None),
+    project_name: Optional[str] = Form(None),
+    project_type: Optional[str] = Form(None),
+    state_code: Optional[str] = Form(None),
+    district: Optional[str] = Form(None),
     request: Request = None,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> GISIngestionResponse:
-    """Upload GeoJSON, KML, zipped Shapefile, or CSV lat/lng. Validates geometry and stores in PostGIS."""
+    """Upload GeoJSON, KML, zipped Shapefile, or CSV lat/lng. Stores in PostGIS and executes ML delay model."""
     content = await file.read()
     validate_file_safety(file.filename, len(content), ALLOWED_GIS_EXTS)
 
@@ -343,6 +391,12 @@ async def ingest_gis(
             file_content=content,
             filename=file.filename,
             project_id=project_id,
+            create_project=create_project,
+            project_code=project_code,
+            project_name=project_name,
+            project_type=project_type,
+            state_code=state_code,
+            district=district,
             user_id=current_user.id,
         )
 
@@ -377,7 +431,7 @@ async def extract_document(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> DocumentExtractResponse:
-    """Upload PDF (notification, award, SIA report), extract text & key fields into review screen."""
+    """Upload single PDF (notification, award, SIA report), extract text & key fields into review screen."""
     content = await file.read()
     validate_file_safety(file.filename, len(content), ALLOWED_DOC_EXTS)
 
@@ -395,25 +449,57 @@ async def extract_document(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Document parsing failed: {str(exc)}")
 
 
-@router.post("/document/confirm")
+@router.post("/documents/multi-extract", response_model=MultiDocumentExtractResponse)
+async def extract_multiple_documents(
+    files: List[UploadFile] = File(...),
+    document_type: str = Form("AUTO_DETECT"),
+    project_id: Optional[UUID] = Form(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> MultiDocumentExtractResponse:
+    """Upload multiple PDFs (e.g. Notification, Award, SIA report), extract and merge fields into a unified review screen."""
+    if not files:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided for extraction.")
+
+    file_tuples = []
+    for f in files:
+        content = await f.read()
+        validate_file_safety(f.filename, len(content), ALLOWED_DOC_EXTS)
+        file_tuples.append((content, f.filename, document_type))
+
+    service = IngestionService(db)
+    try:
+        res = await service.parse_and_extract_multiple_documents(
+            files=file_tuples,
+            project_id=project_id,
+            user_id=current_user.id,
+        )
+        return MultiDocumentExtractResponse(**res)
+    except Exception as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Multi-document parsing failed: {str(exc)}")
+
+
+@router.post("/document/confirm", response_model=DocumentConfirmResponse)
 async def confirm_document(
     payload: DocumentConfirmRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
-    """Save user-reviewed and verified document fields into canonical database."""
+) -> DocumentConfirmResponse:
+    """Save user-reviewed and verified document fields into canonical database and trigger ML prediction."""
     service = IngestionService(db)
     try:
-        doc_uuid = uuid.UUID(payload.document_id)
+        doc_uuid = uuid.UUID(payload.document_id) if payload.document_id else None
+        doc_uuids = [uuid.UUID(d) for d in payload.document_ids] if payload.document_ids else None
         proj_uuid = uuid.UUID(payload.project_id) if payload.project_id else None
         res = await service.confirm_document_extraction(
             document_id=doc_uuid,
+            document_ids=doc_uuids,
             confirmed_fields=payload.confirmed_fields,
             create_project=payload.create_project,
             project_id=proj_uuid,
             user_id=current_user.id,
         )
-        return res
+        return DocumentConfirmResponse(**res)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 

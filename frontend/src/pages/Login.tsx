@@ -8,7 +8,7 @@ import { Eye, EyeOff, AlertCircle, Lock, Mail, Zap, Sun, Moon, UserCheck } from 
 import { useAuthStore, getRoleDefaultPath } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 
-export const ROLE_OPTIONS = [
+const ROLE_OPTIONS = [
   { key: 'SUPER_ADMIN', label: 'System Admin', email: 'admin@ladris.gov.in', pass: 'Password123!', scope: 'System-wide', target: 'Admin Panel' },
   { key: 'LA_OFFICER', label: 'Land Acquisition Officer', email: 'la.officer@ladris.gov.in', pass: 'Password123!', scope: 'Land Acquisition', target: 'Acquisition Dashboard' },
   { key: 'DISTRICT_ADMIN', label: 'District Admin', email: 'district.admin@ladris.gov.in', pass: 'Password123!', scope: 'District', target: 'District Dashboard' },

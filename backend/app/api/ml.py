@@ -20,7 +20,17 @@ router = APIRouter(prefix="/api/ml", tags=["Production ML"])
 @router.post("/predict/{project_id}")
 async def predict(project_id: UUID, snapshot_date: datetime | None = Query(None), db: AsyncSession = Depends(get_db), _: User = Depends(get_current_user)):
     try:
-        return await generate_prediction(db, project_id, snapshot_date)
+        prediction = await generate_prediction(db, project_id, snapshot_date)
+        await db.commit()
+        try:
+            from app.services.project_csv_service import append_or_update_project_in_csv
+            project_obj = (await db.execute(select(Project).where(Project.id == project_id))).scalar_one_or_none()
+            if project_obj:
+                append_or_update_project_in_csv(project_obj, prediction)
+        except Exception as exc:
+            import logging
+            logging.getLogger("uvicorn.error").warning("Failed to sync project CSV after predict: %s", exc)
+        return prediction
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
     except ValueError as exc:

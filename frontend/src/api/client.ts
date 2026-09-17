@@ -334,17 +334,109 @@ export interface CSVImportSummaryData {
   status: string
 }
 
+export interface ExternalImportedProject {
+  project_id: string
+  project_code: string
+  project_name: string
+  project_type?: string
+  state_code?: string
+  district?: string
+  total_area_ha?: number
+  risk_score?: number
+  risk_category?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | string
+  delay_probability?: number
+  predicted_delay_days?: number
+  confidence_score?: number
+  top_delay_drivers?: Array<{
+    feature: string
+    importance?: number
+    shap_value?: number
+    direction?: string
+    recommendation?: string
+  }>
+}
+
+export interface ExternalIngestionResult {
+  job_id: string
+  status: string
+  total: number
+  imported: number
+  duplicates: number
+  invalid: number
+  errors: Array<{ row_index: number; project_code?: string; reason: string }>
+  ml_refreshed_count: number
+  projects: ExternalImportedProject[]
+  message?: string
+}
+
 export interface GISIngestionData {
   job_id: string
   file_name: string
   project_id?: string
+  project_code?: string
+  project_name?: string
   total_features: number
   valid_features: number
   invalid_features: number
   geometry_types: string[]
   geojson_preview: any
   bounding_box?: number[]
+  centroid?: { latitude: number; longitude: number }
+  total_calculated_area_ha?: number
+  ml_refreshed: boolean
+  prediction?: {
+    risk_score: number
+    risk_category: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | string
+    delay_probability: number
+    predicted_delay_days: number
+    confidence_score: number
+    top_delay_drivers?: Array<{
+      feature: string
+      importance?: number
+      shap_value?: number
+      direction?: string
+      recommendation?: string
+    }>
+  }
   message: string
+}
+
+export interface SingleDocumentSummary {
+  document_id: string
+  file_name: string
+  file_size_bytes: number
+  document_type: string
+  extracted_text_preview: string
+  extracted_fields: Record<string, any>
+  field_details?: Record<string, { value: any; confidence: number; source_snippet?: string }>
+}
+
+export interface MultiDocumentExtractData {
+  documents: SingleDocumentSummary[]
+  merged_fields: Record<string, any>
+  field_sources: Record<string, string>
+  primary_document_id: string
+  document_ids: string[]
+  suggested_project_id?: string
+  review_status: string
+  total_files: number
+}
+
+export interface DocumentConfirmResult {
+  document_id?: string
+  document_ids?: string[]
+  project_id?: string
+  project_code?: string
+  status: string
+  ml_refreshed: boolean
+  message: string
+  prediction?: {
+    risk_score: number
+    risk_category: string
+    delay_probability: number
+    predicted_delay_days: number
+    top_drivers?: any[]
+  }
 }
 
 export interface DocumentExtractData {
@@ -377,6 +469,46 @@ export interface IngestionJobItem {
   error_summary: any[]
   created_at: string
   completed_at?: string
+}
+
+export interface DatabaseTestResult {
+  success: boolean
+  table_name?: string
+  columns: string[]
+  sample_rows: Record<string, any>[]
+  suggested_mapping?: Record<string, string>
+  total_rows_approx?: number
+  error?: string
+}
+
+export interface DatabaseImportedProject {
+  project_id: string
+  project_code: string
+  project_name: string
+  risk_score?: number
+  risk_category?: string
+  delay_probability?: number
+  predicted_delay_days?: number
+  top_delay_drivers?: Array<{
+    feature: string
+    value: any
+    contribution: number
+    direction: string
+    recommendation?: string
+  }>
+}
+
+export interface DatabaseImportResult {
+  job_id: string
+  status: string
+  table_name: string
+  total_records: number
+  imported_count: number
+  duplicates_count: number
+  invalid_count: number
+  ml_refreshed_count: number
+  projects: DatabaseImportedProject[]
+  message: string
 }
 
 export const ingestionAPI = {
@@ -412,13 +544,39 @@ export const ingestionAPI = {
     }).then((r) => r.data)
   },
 
-  externalBatch: (batch: any) =>
-    apiClient.post('/api/v1/ingestion/external', batch).then((r) => r.data),
+  externalBatch: (batch: any, apiKey?: string) =>
+    apiClient.post<ExternalIngestionResult>('/api/v1/ingestion/external', batch, {
+      headers: apiKey ? { 'X-API-Key': apiKey } : undefined,
+    }).then((r) => r.data),
 
-  uploadGIS: (file: File, projectId?: string) => {
+  uploadGIS: (
+    file: File,
+    optionsOrProjectId?:
+      | string
+      | {
+          projectId?: string
+          createProject?: boolean
+          projectCode?: string
+          projectName?: string
+          projectType?: string
+          stateCode?: string
+          district?: string
+        }
+  ) => {
     const formData = new FormData()
     formData.append('file', file)
-    if (projectId) formData.append('project_id', projectId)
+    if (typeof optionsOrProjectId === 'string') {
+      formData.append('project_id', optionsOrProjectId)
+    } else if (optionsOrProjectId) {
+      if (optionsOrProjectId.projectId) formData.append('project_id', optionsOrProjectId.projectId)
+      if (optionsOrProjectId.createProject !== undefined)
+        formData.append('create_project', String(optionsOrProjectId.createProject))
+      if (optionsOrProjectId.projectCode) formData.append('project_code', optionsOrProjectId.projectCode)
+      if (optionsOrProjectId.projectName) formData.append('project_name', optionsOrProjectId.projectName)
+      if (optionsOrProjectId.projectType) formData.append('project_type', optionsOrProjectId.projectType)
+      if (optionsOrProjectId.stateCode) formData.append('state_code', optionsOrProjectId.stateCode)
+      if (optionsOrProjectId.district) formData.append('district', optionsOrProjectId.district)
+    }
     return apiClient.post<GISIngestionData>('/api/v1/ingestion/gis', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((r) => r.data)
@@ -434,15 +592,36 @@ export const ingestionAPI = {
     }).then((r) => r.data)
   },
 
+  extractMultipleDocuments: (files: File[], documentType: string = 'AUTO_DETECT', projectId?: string) => {
+    const formData = new FormData()
+    files.forEach((f) => formData.append('files', f))
+    formData.append('document_type', documentType)
+    if (projectId) formData.append('project_id', projectId)
+    return apiClient.post<MultiDocumentExtractData>('/api/v1/ingestion/documents/multi-extract', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
+
   confirmDocument: (data: {
-    document_id: string
+    document_id?: string
+    document_ids?: string[]
     confirmed_fields: Record<string, any>
     create_project?: boolean
     project_id?: string
-  }) => apiClient.post('/api/v1/ingestion/document/confirm', data).then((r) => r.data),
+  }) => apiClient.post<DocumentConfirmResult>('/api/v1/ingestion/document/confirm', data).then((r) => r.data),
 
   testDatabase: (data: { connection_url?: string; table_name: string; limit?: number }) =>
-    apiClient.post('/api/v1/ingestion/database/test', data).then((r) => r.data),
+    apiClient.post<DatabaseTestResult>('/api/v1/ingestion/database/test', data).then((r) => r.data),
+
+  importDatabase: (data: {
+    connection_url?: string
+    table_name: string
+    target_entity?: string
+    column_mapping?: Record<string, string>
+    source_name?: string
+    limit?: number
+    project_id?: string
+  }) => apiClient.post<DatabaseImportResult>('/api/v1/ingestion/database/import', data).then((r) => r.data),
 
   history: (params?: { limit?: number; job_type?: string }) =>
     apiClient.get<{ total: number; jobs: IngestionJobItem[] }>('/api/v1/ingestion/history', { params }).then((r) => r.data),
@@ -650,5 +829,34 @@ export const decisionIntelligenceAPI = {
   getInterventions: (projectId: string) =>
     apiClient.get<ProjectInterventionData[]>(`/api/v1/decision-intelligence/${projectId}/interventions`).then((r) => r.data),
 }
+
+export const gisAPI = {
+  getProjects: () =>
+    apiClient.get('/api/v1/gis/projects').then((r) => r.data),
+
+  getProjectGIS: async (projectId: string) => {
+    try {
+      const res = await apiClient.get(`/api/v1/gis/projects/${projectId}`)
+      return res.data
+    } catch {
+      return {
+        project_id: projectId,
+        risk_summary: {
+          total_parcels: 0,
+          acquired_parcels: 0,
+          pending_parcels: 0,
+          disputed_parcels: 0,
+          possession_pct: 0,
+          compensation_disbursed_pct: 0,
+        },
+        parcels: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      }
+    }
+  },
+}
+
 
 

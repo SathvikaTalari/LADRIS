@@ -108,6 +108,22 @@ class ExternalIngestionBatch(BaseModel):
     records: Optional[List[Dict[str, Any]]] = None  # Generic records if not only projects
 
 
+class ExternalImportedProject(BaseModel):
+    project_id: str
+    project_code: str
+    project_name: str
+    project_type: Optional[str] = None
+    state_code: Optional[str] = None
+    district: Optional[str] = None
+    total_area_ha: Optional[float] = None
+    risk_score: Optional[float] = None
+    risk_category: Optional[str] = None
+    delay_probability: Optional[float] = None
+    predicted_delay_days: Optional[float] = None
+    confidence_score: Optional[float] = None
+    top_delay_drivers: List[Dict[str, Any]] = []
+
+
 class ExternalIngestionResponse(BaseModel):
     job_id: str
     status: str
@@ -117,6 +133,8 @@ class ExternalIngestionResponse(BaseModel):
     invalid: int
     errors: List[Dict[str, Any]] = []
     ml_refreshed_count: int = 0
+    projects: List[ExternalImportedProject] = []
+    message: Optional[str] = None
 
 
 # ─── PostgreSQL / External DB Import Schemas ──────────────────────────────────
@@ -129,8 +147,10 @@ class DatabaseTestRequest(BaseModel):
 
 class DatabaseTestResponse(BaseModel):
     success: bool
-    columns: List[str]
-    sample_rows: List[Dict[str, Any]]
+    table_name: Optional[str] = None
+    columns: List[str] = []
+    sample_rows: List[Dict[str, Any]] = []
+    suggested_mapping: Optional[Dict[str, str]] = None
     total_rows_approx: Optional[int] = None
     error: Optional[str] = None
 
@@ -139,10 +159,34 @@ class DatabaseImportRequest(BaseModel):
     connection_url: Optional[str] = None
     table_name: str
     target_entity: str = "PROJECT"
-    column_mapping: Dict[str, str]
+    column_mapping: Optional[Dict[str, str]] = None
     source_name: Optional[str] = None
     limit: Optional[int] = 1000
     project_id: Optional[str] = None
+
+
+class DatabaseImportedProject(BaseModel):
+    project_id: str
+    project_code: str
+    project_name: str
+    risk_score: Optional[float] = None
+    risk_category: Optional[str] = None
+    delay_probability: Optional[float] = None
+    predicted_delay_days: Optional[float] = None
+    top_delay_drivers: List[Dict[str, Any]] = []
+
+
+class DatabaseImportResponse(BaseModel):
+    job_id: str
+    status: str
+    table_name: str
+    total_records: int
+    imported_count: int
+    duplicates_count: int
+    invalid_count: int
+    ml_refreshed_count: int
+    projects: List[DatabaseImportedProject] = []
+    message: str
 
 
 # ─── GIS Ingestion Schemas ────────────────────────────────────────────────────
@@ -151,12 +195,18 @@ class GISIngestionResponse(BaseModel):
     job_id: str
     file_name: str
     project_id: Optional[str] = None
+    project_code: Optional[str] = None
+    project_name: Optional[str] = None
     total_features: int
     valid_features: int
     invalid_features: int
     geometry_types: List[str]
     geojson_preview: Dict[str, Any]
     bounding_box: Optional[List[float]] = None  # [min_lng, min_lat, max_lng, max_lat]
+    centroid: Optional[Dict[str, float]] = None  # {"latitude": ..., "longitude": ...}
+    total_calculated_area_ha: Optional[float] = None
+    ml_refreshed: bool = False
+    prediction: Optional[Dict[str, Any]] = None
     message: str
 
 
@@ -181,12 +231,45 @@ class DocumentExtractResponse(BaseModel):
     review_status: str = "NEEDS_REVIEW"
 
 
-class DocumentConfirmRequest(BaseModel):
+class SingleDocumentSummary(BaseModel):
     document_id: str
+    file_name: str
+    file_size_bytes: int
+    document_type: str
+    extracted_text_preview: str
+    extracted_fields: Dict[str, Any]
+    field_details: Dict[str, ExtractedFieldDetail] = {}
+
+
+class MultiDocumentExtractResponse(BaseModel):
+    documents: List[SingleDocumentSummary]
+    merged_fields: Dict[str, Any]
+    field_sources: Dict[str, str] = {}
+    primary_document_id: str
+    document_ids: List[str]
+    suggested_project_id: Optional[str] = None
+    review_status: str = "NEEDS_REVIEW"
+    total_files: int = 1
+
+
+class DocumentConfirmRequest(BaseModel):
+    document_id: Optional[str] = None
+    document_ids: Optional[List[str]] = None
     confirmed_fields: Dict[str, Any]
     create_project: bool = True
     project_id: Optional[str] = None
     target_entity: str = "PROJECT"
+
+
+class DocumentConfirmResponse(BaseModel):
+    document_id: Optional[str] = None
+    document_ids: List[str] = []
+    project_id: Optional[str] = None
+    project_code: Optional[str] = None
+    status: str = "CONFIRMED"
+    ml_refreshed: bool = False
+    message: str
+    prediction: Optional[Dict[str, Any]] = None
 
 
 # ─── Ingestion Jobs & History Schemas ─────────────────────────────────────────

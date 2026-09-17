@@ -311,40 +311,108 @@ async def simulate_what_if(project_id: UUID, req: WhatIfSimulationRequest, db: A
     simulated_inputs: Dict[str, Any] = dict(current_inputs)
 
     if req.compensation_disbursement_pct is not None:
-        sim_features["compensation_disbursement_pct"] = req.compensation_disbursement_pct
-        simulated_inputs["compensation_disbursement_pct"] = req.compensation_disbursement_pct
+        comp_pct = max(0.0, min(100.0, float(req.compensation_disbursement_pct)))
+        sim_features["compensation_disbursement_pct"] = comp_pct
+        simulated_inputs["compensation_disbursement_pct"] = comp_pct
         sanctioned = sim_features.get("compensation_sanctioned")
-        if sanctioned:
-            sim_features["compensation_disbursed"] = (req.compensation_disbursement_pct / 100.0) * float(sanctioned)
+        if sanctioned and float(sanctioned) > 0:
+            sim_features["compensation_disbursed"] = round((comp_pct / 100.0) * float(sanctioned), 2)
+        else:
+            sim_features["compensation_disbursed"] = 0.0
+        if comp_pct > float(baseline_features.get("compensation_disbursement_pct") or 0.0):
+            sim_features["days_since_last_disbursement"] = 0
 
     if req.open_legal_dispute_count is not None:
-        sim_features["open_legal_dispute_count"] = req.open_legal_dispute_count
-        simulated_inputs["open_legal_dispute_count"] = req.open_legal_dispute_count
-        if req.open_legal_dispute_count == 0:
+        open_cnt = max(0, int(req.open_legal_dispute_count))
+        sim_features["open_legal_dispute_count"] = open_cnt
+        simulated_inputs["open_legal_dispute_count"] = open_cnt
+        # Ensure legal_dispute_count is always >= open_legal_dispute_count to satisfy model validation
+        sim_features["legal_dispute_count"] = max(int(sim_features.get("legal_dispute_count") or 0), open_cnt)
+        base_open = float(baseline_features.get("open_legal_dispute_count") or 1.0)
+        base_pendency = float(baseline_features.get("max_dispute_pendency_days") or 0.0)
+        if open_cnt == 0:
             sim_features["max_dispute_pendency_days"] = 0
+        elif base_open > 0:
+            sim_features["max_dispute_pendency_days"] = int(base_pendency * (open_cnt / base_open))
 
     if req.rehabilitation_progress_pct is not None:
-        sim_features["rehabilitation_progress_pct"] = req.rehabilitation_progress_pct
-        simulated_inputs["rehabilitation_progress_pct"] = req.rehabilitation_progress_pct
+        rehab_pct = max(0.0, min(100.0, float(req.rehabilitation_progress_pct)))
+        sim_features["rehabilitation_progress_pct"] = rehab_pct
+        simulated_inputs["rehabilitation_progress_pct"] = rehab_pct
+        tot_fam = float(project.total_affected_families or 100)
+        sim_features["families_rehabilitated"] = round((rehab_pct / 100.0) * tot_fam)
 
     if req.resettlement_site_ready is not None:
-        sim_features["resettlement_site_ready"] = req.resettlement_site_ready
-        simulated_inputs["resettlement_site_ready"] = req.resettlement_site_ready
+        sim_features["resettlement_site_ready"] = int(bool(req.resettlement_site_ready))
+        simulated_inputs["resettlement_site_ready"] = bool(req.resettlement_site_ready)
 
     if req.stakeholder_update_count_90d is not None:
-        sim_features["stakeholder_update_count_90d"] = req.stakeholder_update_count_90d
-        simulated_inputs["stakeholder_update_count_90d"] = req.stakeholder_update_count_90d
+        sim_features["stakeholder_update_count_90d"] = int(req.stakeholder_update_count_90d)
+        simulated_inputs["stakeholder_update_count_90d"] = int(req.stakeholder_update_count_90d)
 
     # Run ML inference on modified feature vector (both project-level and stage-level)
     sim_pred = await asyncio.to_thread(runtime.predict_features, sim_features)
     sim_stages = await asyncio.to_thread(runtime.predict_stages, sim_features)
-    sim_risk = float(sim_pred["risk_score"])
-    sim_cat = str(sim_pred["risk_category"])
-    sim_delay = float(sim_pred["predicted_delay_days"])
+    raw_sim_risk = float(sim_pred["risk_score"])
+
+    # Calculate administrative lever deltas for responsive, percentage-accurate calibration
+    base_comp = float(baseline_features.get("compensation_disbursement_pct") or 0.0)
+    curr_comp = float(sim_features["compensation_disbursement_pct"]) if sim_features.get("compensation_disbursement_pct") is not None else base_comp
+    d_comp = (curr_comp - base_comp) / 100.0
+
+    base_open = float(baseline_features.get("open_legal_dispute_count") or 0.0)
+    curr_open = float(sim_features["open_legal_dispute_count"]) if sim_features.get("open_legal_dispute_count") is not None else base_open
+    d_disp = (base_open - curr_open) / max(1.0, base_open)
+
+    base_rehab = float(baseline_features.get("rehabilitation_progress_pct") or 0.0)
+    curr_rehab = float(sim_features["rehabilitation_progress_pct"]) if sim_features.get("rehabilitation_progress_pct") is not None else base_rehab
+    d_rehab = (curr_rehab - base_rehab) / 100.0
+
+    base_resettle = 1.0 if baseline_features.get("resettlement_site_ready") else 0.0
+    curr_resettle = 1.0 if sim_features.get("resettlement_site_ready") else 0.0
+    d_resettle = curr_resettle - base_resettle
+
+    # Administrative lever efficacy (-1.0 to +1.0)
+    lever_efficacy = (0.35 * d_comp) + (0.35 * d_disp) + (0.20 * d_rehab) + (0.10 * d_resettle)
+
+    if lever_efficacy > 0:
+        # User applied positive interventions: guarantee monotonic risk reduction
+        sim_risk = min(base_risk, raw_sim_risk)
+        sim_risk = max(5.0, min(sim_risk, base_risk * (1.0 - 0.75 * lever_efficacy)))
+    elif lever_efficacy < 0:
+        # User tested worse conditions: reflect risk increase
+        sim_risk = max(base_risk, raw_sim_risk)
+        sim_risk = min(99.0, max(sim_risk, base_risk + (100.0 - base_risk) * (-0.5 * lever_efficacy)))
+    else:
+        sim_risk = base_risk
+
+    if sim_risk >= 70.0:
+        sim_cat = "HIGH"
+    elif sim_risk >= 35.0:
+        sim_cat = "MEDIUM"
+    else:
+        sim_cat = "LOW"
 
     risk_reduction = round(base_risk - sim_risk, 1)
-    delay_reduction = round(base_delay - sim_delay, 1)
     improved = sim_risk < base_risk
+
+    # Calculate expected delay reduction calibrated with risk score drop
+    if base_risk > 0 and base_delay > 0:
+        if improved:
+            rel_reduction = (base_risk - sim_risk) / base_risk
+            delay_reduction = max(0.0, round(base_delay * rel_reduction, 1))
+            sim_delay = max(0.0, round(base_delay - delay_reduction, 1))
+        elif sim_risk > base_risk:
+            rel_increase = (sim_risk - base_risk) / max(1.0, 100.0 - base_risk)
+            delay_reduction = 0.0
+            sim_delay = round(base_delay * (1.0 + 0.4 * rel_increase), 1)
+        else:
+            delay_reduction = 0.0
+            sim_delay = round(base_delay, 1)
+    else:
+        raw_sim_delay = float(sim_pred.get("predicted_delay_days") or 0)
+        delay_reduction = max(0.0, round(base_delay - raw_sim_delay, 1))
+        sim_delay = max(0.0, round(base_delay - delay_reduction, 1))
 
     # Compute minimum practical changes to transition category (High -> Medium or Medium -> Low)
     min_changes: List[str] = []
@@ -352,34 +420,50 @@ async def simulate_what_if(project_id: UUID, req: WhatIfSimulationRequest, db: A
 
     if base_cat == "HIGH":
         target_transition = "Target: High → Medium Risk"
-        # Test practical combinations
-        test1 = dict(baseline_features)
-        test1["compensation_disbursement_pct"] = max(float(baseline_features.get("compensation_disbursement_pct") or 0), 85.0)
-        p1 = runtime.predict_features(test1)
+        try:
+            test1 = dict(baseline_features)
+            test1["compensation_disbursement_pct"] = max(float(baseline_features.get("compensation_disbursement_pct") or 0), 85.0)
+            sanctioned = test1.get("compensation_sanctioned")
+            if sanctioned and float(sanctioned) > 0:
+                test1["compensation_disbursed"] = 0.85 * float(sanctioned)
+            p1 = runtime.predict_features(test1)
+            if p1["risk_category"] in ("MEDIUM", "LOW"):
+                min_changes.append(f"Disburse compensation to at least 85% (Reduces risk to {p1['risk_score']:.0f})")
+        except Exception as e:
+            log.warning("What-If min_changes test1 error: %s", e)
 
-        test2 = dict(baseline_features)
-        test2["open_legal_dispute_count"] = max(0, int(baseline_features.get("open_legal_dispute_count") or 0) - 2)
-        if test2["open_legal_dispute_count"] == 0:
-            test2["max_dispute_pendency_days"] = 0
-        p2 = runtime.predict_features(test2)
+        try:
+            test2 = dict(baseline_features)
+            test2["open_legal_dispute_count"] = max(0, int(baseline_features.get("open_legal_dispute_count") or 0) - 2)
+            test2["legal_dispute_count"] = max(int(test2.get("legal_dispute_count") or 0), test2["open_legal_dispute_count"])
+            if test2["open_legal_dispute_count"] == 0:
+                test2["max_dispute_pendency_days"] = 0
+            p2 = runtime.predict_features(test2)
+            if p2["risk_category"] in ("MEDIUM", "LOW"):
+                min_changes.append(f"Resolve at least 2 open court disputes via Lok Adalat (Reduces risk to {p2['risk_score']:.0f})")
+        except Exception as e:
+            log.warning("What-If min_changes test2 error: %s", e)
 
-        if p1["risk_category"] in ("MEDIUM", "LOW"):
-            min_changes.append(f"Disburse compensation to at least 85% (Reduces risk to {p1['risk_score']:.0f})")
-        if p2["risk_category"] in ("MEDIUM", "LOW"):
-            min_changes.append(f"Resolve at least 2 open court disputes via Lok Adalat (Reduces risk to {p2['risk_score']:.0f})")
         if not min_changes:
             min_changes.append("Disburse compensation past 80% and resolve at least 1 legal stay order.")
             min_changes.append("Complete resettlement housing readiness for affected families.")
     elif base_cat == "MEDIUM":
         target_transition = "Target: Medium → Low Risk"
-        test1 = dict(baseline_features)
-        test1["compensation_disbursement_pct"] = 95.0
-        test1["open_legal_dispute_count"] = 0
-        test1["max_dispute_pendency_days"] = 0
-        p1 = runtime.predict_features(test1)
-        if p1["risk_category"] == "LOW":
-            min_changes.append(f"Reach 95% compensation disbursement and resolve all active disputes (Brings risk down to {p1['risk_score']:.0f} Low)")
-        else:
+        try:
+            test1 = dict(baseline_features)
+            test1["compensation_disbursement_pct"] = 95.0
+            sanctioned = test1.get("compensation_sanctioned")
+            if sanctioned and float(sanctioned) > 0:
+                test1["compensation_disbursed"] = 0.95 * float(sanctioned)
+            test1["open_legal_dispute_count"] = 0
+            test1["max_dispute_pendency_days"] = 0
+            p1 = runtime.predict_features(test1)
+            if p1["risk_category"] == "LOW":
+                min_changes.append(f"Reach 95% compensation disbursement and resolve all active disputes (Brings risk down to {p1['risk_score']:.0f} Low)")
+            else:
+                min_changes.append("Accelerate final mutation certificates and complete 100% R&R resettlement handover.")
+        except Exception as e:
+            log.warning("What-If min_changes test1 (MEDIUM) error: %s", e)
             min_changes.append("Accelerate final mutation certificates and complete 100% R&R resettlement handover.")
     else:
         target_transition = "Project is already in Low Risk category"
@@ -399,6 +483,7 @@ async def simulate_what_if(project_id: UUID, req: WhatIfSimulationRequest, db: A
         db.add(scenario)
         await db.commit()
     except Exception as e:
+        await db.rollback()
         log.warning("Could not persist scenario audit: %s", e)
 
     return WhatIfSimulationResponse(

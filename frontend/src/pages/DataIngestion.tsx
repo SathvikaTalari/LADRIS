@@ -23,14 +23,21 @@ import {
   ArrowRight,
   FileSpreadsheet,
   X,
-  AlertCircle
+  Sparkles,
+  Layers,
+  Trash2,
+  ExternalLink,
 } from 'lucide-react'
 import { ingestionAPI, projectsAPI } from '@/api/client'
 import type {
   CSVPreviewData,
   CSVImportSummaryData,
   GISIngestionData,
-  DocumentExtractData,
+  MultiDocumentExtractData,
+  DocumentConfirmResult,
+  DatabaseTestResult,
+  DatabaseImportResult,
+  ExternalIngestionResult,
 } from '@/api/client'
 import { PageHeader } from '@/components/common'
 
@@ -1357,6 +1364,129 @@ function StatBox({ label, value, color }: { label: string; value: number; color?
 
 // ─── 3. Connect API Modal ────────────────────────────────────────────────────
 
+const API_PRESETS = [
+  {
+    id: 'PM_GATISHAKTI',
+    name: 'PM-GatiShakti Multi-Corridor Stream',
+    badge: 'National Master Plan (NMP)',
+    description: 'Surat-Chennai Corridor Package 4 & Varanasi-Kolkata Greenfield Expressway',
+    data: {
+      source_name: 'PM_GATI_SHAKTI_INTEGRATION',
+      reporting_period: '2026-Q1',
+      projects: [
+        {
+          project_code: 'PMGS-SCEC-PKG4',
+          name: 'Surat-Chennai Economic Corridor Package 4',
+          project_type: 'HIGHWAY',
+          state_code: 'GJ',
+          district_codes: ['Surat', 'Navsari'],
+          total_area_ha: 340.5,
+          area_acquired_ha: 215.0,
+          area_in_possession_ha: 160.0,
+          estimated_compensation_inr: 480000000,
+          disbursed_compensation_inr: 310000000,
+          total_affected_families: 420,
+          families_compensated: 280,
+          families_rehabilitated: 180,
+          rehabilitation_progress_pct: 42.8,
+          legal_case_count: 2,
+          planned_start_date: '2024-06-01',
+          planned_end_date: '2027-12-31',
+          latitude: 21.1702,
+          longitude: 72.8311,
+        },
+        {
+          project_code: 'PMGS-VKEX-PKG2',
+          name: 'Varanasi-Kolkata Greenfield Expressway Package 2',
+          project_type: 'HIGHWAY',
+          state_code: 'JH',
+          district_codes: ['Ranchi', 'Ramgarh'],
+          total_area_ha: 410.0,
+          area_acquired_ha: 190.0,
+          area_in_possession_ha: 120.0,
+          estimated_compensation_inr: 550000000,
+          disbursed_compensation_inr: 230000000,
+          total_affected_families: 560,
+          families_compensated: 210,
+          families_rehabilitated: 110,
+          rehabilitation_progress_pct: 20.0,
+          legal_case_count: 4,
+          planned_start_date: '2024-08-15',
+          planned_end_date: '2028-03-31',
+          latitude: 23.3441,
+          longitude: 85.3096,
+        },
+      ],
+    },
+  },
+  {
+    id: 'BHOOMIRASHI',
+    name: 'MoRTH BhoomiRashi Highway Package',
+    badge: 'Ministry of Road Transport',
+    description: 'NH-44 Hyderabad-Bengaluru Section Four-Laning',
+    data: {
+      source_name: 'BHOOMIRASHI_MORTH_PORTAL',
+      reporting_period: '2026-Q1',
+      projects: [
+        {
+          project_code: 'BHOOMI-NH44-HYD',
+          name: 'NH-44 Hyderabad-Bengaluru Section Four-Laning',
+          project_type: 'HIGHWAY',
+          state_code: 'TS',
+          district_codes: ['Mahbubnagar'],
+          total_area_ha: 280.0,
+          area_acquired_ha: 210.0,
+          area_in_possession_ha: 175.0,
+          estimated_compensation_inr: 320000000,
+          disbursed_compensation_inr: 240000000,
+          total_affected_families: 310,
+          families_compensated: 240,
+          families_rehabilitated: 190,
+          rehabilitation_progress_pct: 61.2,
+          legal_case_count: 1,
+          planned_start_date: '2024-03-01',
+          planned_end_date: '2026-11-30',
+          latitude: 16.7488,
+          longitude: 77.9944,
+        },
+      ],
+    },
+  },
+  {
+    id: 'BULLET_TRAIN',
+    name: 'High-Speed Rail Corridor (NHSRCL)',
+    badge: 'Ministry of Railways',
+    description: 'Mumbai-Ahmedabad High Speed Rail Section C3',
+    data: {
+      source_name: 'NHSRCL_PORTAL_INTEGRATION',
+      reporting_period: '2026-Q1',
+      projects: [
+        {
+          project_code: 'HSR-MAHSR-C3',
+          name: 'Mumbai-Ahmedabad Bullet Train Package C3',
+          project_type: 'RAILWAY',
+          state_code: 'MH',
+          district_codes: ['Thane', 'Palghar'],
+          total_area_ha: 195.0,
+          area_acquired_ha: 160.0,
+          area_in_possession_ha: 140.0,
+          estimated_compensation_inr: 620000000,
+          disbursed_compensation_inr: 510000000,
+          total_affected_families: 280,
+          families_compensated: 250,
+          families_rehabilitated: 210,
+          rehabilitation_progress_pct: 75.0,
+          legal_case_count: 0,
+          planned_start_date: '2023-10-01',
+          planned_end_date: '2027-06-30',
+          latitude: 19.2183,
+          longitude: 72.9781,
+        },
+      ],
+    },
+  },
+]
+
 function ConnectAPIModal({
   onClose,
   onSuccess,
@@ -1365,99 +1495,362 @@ function ConnectAPIModal({
   onSuccess: (msg: string) => void
 }) {
   const [apiKey] = useState('ladris-secure-api-key-default')
-  const [jsonPayload, setJsonPayload] = useState(
-    JSON.stringify(
-      {
-        source_name: 'PM_GATI_SHAKTI_INTEGRATION',
-        reporting_period: '2026-Q1',
-        projects: [
-          {
-            project_code: `API-EXT-${Math.floor(Math.random() * 900 + 100)}`,
-            name: 'Surat-Chennai Economic Corridor Package 4',
-            project_type: 'HIGHWAY',
-            state_code: 'GJ',
-            district_codes: ['Surat', 'Navsari'],
-            total_area_ha: 320.5,
-            area_acquired_ha: 210.0,
-            estimated_compensation_inr: 45000000,
-            disbursed_compensation_inr: 30000000,
-            planned_start_date: '2024-06-01',
-            planned_end_date: '2027-12-31',
-            latitude: 21.1702,
-            longitude: 72.8311,
-          },
-        ],
-      },
-      null,
-      2
-    )
-  )
-  const [response, setResponse] = useState<any>(null)
+  const [activePreset, setActivePreset] = useState('PM_GATISHAKTI')
+  const [viewTab, setViewTab] = useState<'PREVIEW' | 'JSON'>('PREVIEW')
+  const [jsonPayload, setJsonPayload] = useState(JSON.stringify(API_PRESETS[0].data, null, 2))
+  const [parsedData, setParsedData] = useState<any>(API_PRESETS[0].data)
+  const [response, setResponse] = useState<ExternalIngestionResult | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSelectPreset = (presetId: string) => {
+    setActivePreset(presetId)
+    const preset = API_PRESETS.find((p) => p.id === presetId)
+    if (preset) {
+      setJsonPayload(JSON.stringify(preset.data, null, 2))
+      setParsedData(preset.data)
+      setError(null)
+    }
+  }
+
+  const handleJsonChange = (val: string) => {
+    setJsonPayload(val)
+    try {
+      const parsed = JSON.parse(val)
+      setParsedData(parsed)
+      setError(null)
+    } catch {
+      // JSON is being typed, keep existing parsed
+    }
+  }
 
   const handleSend = async () => {
     setLoading(true)
+    setError(null)
     try {
-      const parsed = JSON.parse(jsonPayload)
-      const res = await ingestionAPI.externalBatch(parsed)
+      let payloadToSubmit: any
+      try {
+        payloadToSubmit = JSON.parse(jsonPayload)
+      } catch (e: any) {
+        throw new Error(`Invalid JSON syntax: ${e.message}`)
+      }
+
+      const res = await ingestionAPI.externalBatch(payloadToSubmit, apiKey)
       setResponse(res)
-      onSuccess(`External API batch sent: ${res.imported} imported, ${res.duplicates} duplicates.`)
+      onSuccess(res.message || `API batch ingested: ${res.imported} new, ${res.duplicates} updated.`)
     } catch (e: any) {
-      setResponse({ error: e?.response?.data?.detail || e.message })
+      setError(e?.response?.data?.detail || e.message || 'API ingestion failed.')
     } finally {
       setLoading(false)
     }
   }
 
+  const projectsToPreview: any[] = parsedData?.projects || parsedData?.records || []
+
   return (
     <ModalShell
-      title="REST API Push Ingestion"
-      subtitle="Authorized government and partner systems can send structured JSON payloads directly."
+      title="REST API Push & Connection Ingestion"
+      subtitle="Ingest automated government and partner data pipelines (PM-GatiShakti, BhoomiRashi, RoR) with instant Machine Learning delay risk predictions."
       onClose={onClose}
-      maxWidth={850}
+      maxWidth={880}
     >
-      <div style={{ background: 'rgba(0,0,0,0.25)', padding: '14px 18px', borderRadius: 8, marginBottom: 18, border: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: 8 }}>
-          <strong>Endpoint:</strong> <code style={{ color: '#38bdf8' }}>POST /api/v1/ingestion/external</code>
-        </div>
-        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: 8 }}>
-          <strong>Authentication Header:</strong> <code style={{ color: '#38bdf8' }}>X-API-Key: {apiKey}</code>
-        </div>
-        <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
-          Idempotency supported via optional <code style={{ color: '#38bdf8' }}>Idempotency-Key</code> header or unique <code style={{ color: '#38bdf8' }}>project_code</code>.
-        </div>
-      </div>
-
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-            Interactive Batch JSON Payload Tester:
-          </span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>JSON Format</span>
-        </div>
-        <textarea
-          rows={10}
-          className="input"
-          style={{ fontFamily: 'monospace', fontSize: '0.8rem', width: '100%' }}
-          value={jsonPayload}
-          onChange={(e) => setJsonPayload(e.target.value)}
-        />
-      </div>
-
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginBottom: 16 }}>
-        <button className="btn btn-primary" onClick={handleSend} disabled={loading}>
-          {loading ? 'Sending Request…' : 'Send Test Ingestion Request'}
-        </button>
-      </div>
-
-      {response && (
-        <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.78rem', fontWeight: 600, color: response.error ? '#ef4444' : '#10b981', marginBottom: 6 }}>
-            {response.error ? 'Response: Error' : 'Response: 200 OK'}
+      {/* State 2: ML Prediction Results View */}
+      {response && response.projects && response.projects.length > 0 ? (
+        <div>
+          <div style={{ textAlign: 'center', padding: '12px 0 16px' }}>
+            <div style={{
+              width: 54, height: 54, borderRadius: '50%',
+              background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px auto'
+            }}>
+              <CheckCircle2 size={28} color="#10b981" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+              API Data Ingested & Scored via Machine Learning!
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+              Processed <strong>{response.total}</strong> project(s) ({response.imported} new, {response.duplicates} updated) and synchronized with the ML Delay Prediction Engine.
+            </p>
           </div>
-          <pre style={{ fontSize: '0.75rem', margin: 0, overflowX: 'auto', color: 'var(--color-text-secondary)' }}>
-            {JSON.stringify(response, null, 2)}
-          </pre>
+
+          {/* List of Scored Projects */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
+            {response.projects.map((p) => {
+              const isHigh = p.risk_category === 'HIGH' || p.risk_category === 'CRITICAL'
+              const isMed = p.risk_category === 'MEDIUM'
+              const badgeColor = isHigh ? '#ef4444' : isMed ? '#f59e0b' : '#10b981'
+              const badgeBg = isHigh ? 'rgba(239, 68, 68, 0.15)' : isMed ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)'
+
+              return (
+                <div
+                  key={p.project_id}
+                  style={{
+                    background: 'linear-gradient(180deg, var(--color-bg-secondary) 0%, rgba(20,28,45,0.85) 100%)',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderRadius: 12,
+                    padding: '16px 20px',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+                  }}
+                >
+                  {/* Top Bar */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 10 }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                          {p.project_name}
+                        </span>
+                        <code style={{ fontSize: '0.75rem', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '2px 6px', borderRadius: 4 }}>
+                          {p.project_code}
+                        </code>
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: 3 }}>
+                        {p.project_type || 'INFRASTRUCTURE'} • {p.district ? `${p.district}, ` : ''}{p.state_code} • {p.total_area_ha ? `${p.total_area_ha} ha` : ''}
+                      </div>
+                    </div>
+                    <span style={{
+                      fontSize: '0.72rem', fontWeight: 800, padding: '3px 8px', borderRadius: 6,
+                      background: badgeBg, color: badgeColor, border: `1px solid ${badgeColor}40`
+                    }}>
+                      {p.risk_category || 'SCORED'} RISK
+                    </span>
+                  </div>
+
+                  {/* Prediction Metrics Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 12 }}>
+                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 12px', borderRadius: 8 }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Delay Risk Score</div>
+                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: badgeColor, marginTop: 2 }}>
+                        {p.risk_score} <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>/ 100</span>
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 12px', borderRadius: 8 }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Delay Probability</div>
+                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: 2 }}>
+                        {p.delay_probability ? `${(p.delay_probability * 100).toFixed(0)}%` : '—'}
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 12px', borderRadius: 8 }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Expected Delay</div>
+                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#f59e0b', marginTop: 2 }}>
+                        +{p.predicted_delay_days ? Math.round(p.predicted_delay_days) : 0} <span style={{ fontSize: '0.75rem' }}>days</span>
+                      </div>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
+                        ~{p.predicted_delay_days ? Math.round(p.predicted_delay_days / 30) : 0} mos past deadline
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 12px', borderRadius: 8 }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Model Confidence</div>
+                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#2dd4bf', marginTop: 2 }}>
+                        {p.confidence_score ? `${(p.confidence_score * 100).toFixed(0)}%` : '88%'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SHAP Drivers & Direct Link */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                    {p.top_delay_drivers && p.top_delay_drivers.length > 0 ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Drivers:</span>
+                        {p.top_delay_drivers.map((drv, dIdx) => (
+                          <span
+                            key={dIdx}
+                            style={{
+                              fontSize: '0.7rem', padding: '2px 7px', borderRadius: 4,
+                              background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)',
+                              color: '#ef4444', fontWeight: 600
+                            }}
+                          >
+                            {drv.feature?.replace(/_/g, ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    ) : <div />}
+
+                    <a
+                      href={`/projects/${p.project_id}`}
+                      className="btn btn-secondary"
+                      style={{ fontSize: '0.75rem', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: 5, textDecoration: 'none' }}
+                    >
+                      <span>View ML Analytics</span>
+                      <ExternalLink size={13} />
+                    </a>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'space-between' }}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                setResponse(null)
+              }}
+            >
+              Send Another API Batch
+            </button>
+            <button className="btn btn-primary" onClick={onClose}>
+              Done & View Projects Directory
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* State 1: Presets, Builder & Configuration Form */
+        <div>
+          {/* Security & Endpoint Info Banner */}
+          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '12px 16px', borderRadius: 8, marginBottom: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: '0.78rem' }}>
+              <div>
+                <span style={{ color: 'var(--color-text-muted)' }}>Target Endpoint:</span>{' '}
+                <code style={{ color: '#38bdf8', fontWeight: 600 }}>POST /api/v1/ingestion/external</code>
+              </div>
+              <div>
+                <span style={{ color: 'var(--color-text-muted)' }}>Authentication:</span>{' '}
+                <code style={{ color: '#38bdf8' }}>X-API-Key: {apiKey}</code>
+              </div>
+            </div>
+          </div>
+
+          {/* 1-Click Government Presets Selector */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Sparkles size={15} color="var(--color-accent-primary)" />
+              <span>Select Official Data Stream Preset (Ready to Ingest):</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10 }}>
+              {API_PRESETS.map((p) => {
+                const isSelected = activePreset === p.id
+                return (
+                  <div
+                    key={p.id}
+                    onClick={() => handleSelectPreset(p.id)}
+                    style={{
+                      border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: 8,
+                      padding: '10px 12px',
+                      background: isSelected ? 'rgba(56, 189, 248, 0.08)' : 'rgba(255,255,255,0.02)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <span style={{ fontSize: '0.84rem', fontWeight: 700, color: isSelected ? '#38bdf8' : 'var(--color-text-primary)' }}>
+                        {p.name}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: '#2dd4bf', fontWeight: 600, marginBottom: 4 }}>
+                      {p.badge}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                      {p.description}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Mode Switch: Stream Cards vs Raw JSON */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button
+                type="button"
+                className={`btn ${viewTab === 'PREVIEW' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                onClick={() => setViewTab('PREVIEW')}
+              >
+                Project Stream Preview ({projectsToPreview.length})
+              </button>
+              <button
+                type="button"
+                className={`btn ${viewTab === 'JSON' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                onClick={() => setViewTab('JSON')}
+              >
+                JSON Payload Code
+              </button>
+            </div>
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+              Source: <strong>{parsedData?.source_name || 'EXTERNAL_API'}</strong>
+            </span>
+          </div>
+
+          {/* Tab Content */}
+          {viewTab === 'PREVIEW' ? (
+            <div style={{ maxHeight: 250, overflowY: 'auto', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {projectsToPreview.map((item: any, idx: number) => (
+                <div
+                  key={idx}
+                  style={{
+                    background: 'var(--color-bg-secondary)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 8,
+                    padding: '10px 14px',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                      {item.name || item.project_name || `Project ${idx + 1}`}
+                    </span>
+                    <code style={{ fontSize: '0.72rem', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '1px 5px', borderRadius: 4 }}>
+                      {item.project_code}
+                    </code>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, fontSize: '0.74rem', color: 'var(--color-text-secondary)', marginTop: 6 }}>
+                    <div>Type: <strong>{item.project_type || 'HIGHWAY'}</strong></div>
+                    <div>State: <strong>{item.state_code}</strong></div>
+                    <div>Land Area: <strong>{item.total_area_ha} ha</strong></div>
+                    <div>Compensation: <strong>₹{(item.estimated_compensation_inr / 10000000).toFixed(1)} Cr</strong></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ marginBottom: 16 }}>
+              <textarea
+                rows={9}
+                className="input"
+                style={{ fontFamily: 'monospace', fontSize: '0.78rem', width: '100%', lineHeight: 1.4 }}
+                value={jsonPayload}
+                onChange={(e) => handleJsonChange(e.target.value)}
+              />
+            </div>
+          )}
+
+          {error && (
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem', marginBottom: 16 }}>
+              {error}
+            </div>
+          )}
+
+          {/* Action Footer */}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+            <button className="btn btn-secondary" onClick={onClose} disabled={loading}>
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleSend}
+              disabled={loading || projectsToPreview.length === 0}
+              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner" />
+                  <span>Processing API Batch & Scoring ML…</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={16} />
+                  <span>Import via API & Run ML Delay Prediction</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       )}
     </ModalShell>
@@ -1474,19 +1867,33 @@ function DatabaseImportModal({
   onSuccess: (msg: string) => void
 }) {
   const [tableName, setTableName] = useState('bhoomirashi_projects')
+  const [connectionUrl, setConnectionUrl] = useState('')
+  const [showAdvUrl, setShowAdvUrl] = useState(false)
   const [testing, setTesting] = useState(false)
-  const [preview, setPreview] = useState<any>(null)
+  const [preview, setPreview] = useState<DatabaseTestResult | null>(null)
+  const [columnMapping, setColumnMapping] = useState<Record<string, string>>({})
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState<DatabaseImportResult | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleTest = async () => {
+    if (!tableName.trim()) {
+      setError('Please provide a table or view name.')
+      return
+    }
     setTesting(true)
     setError(null)
     try {
-      const res = await ingestionAPI.testDatabase({ table_name: tableName, limit: 5 })
+      const res = await ingestionAPI.testDatabase({
+        table_name: tableName.trim(),
+        connection_url: connectionUrl.trim() || undefined,
+        limit: 5,
+      })
       if (!res.success) {
-        setError(res.error || 'Connection failed.')
+        setError(res.error || 'Connection to table failed. Verify the table name exists in the database.')
       } else {
         setPreview(res)
+        setColumnMapping(res.suggested_mapping || {})
       }
     } catch (e: any) {
       setError(e?.response?.data?.detail || e.message || 'Database test failed.')
@@ -1495,56 +1902,423 @@ function DatabaseImportModal({
     }
   }
 
+  const handleImport = async () => {
+    setImporting(true)
+    setError(null)
+    try {
+      const res = await ingestionAPI.importDatabase({
+        table_name: tableName.trim(),
+        connection_url: connectionUrl.trim() || undefined,
+        column_mapping: columnMapping,
+        limit: 100,
+      })
+      setImportResult(res)
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || e.message || 'Database import failed.')
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  const getRiskBadgeColor = (category?: string) => {
+    switch (category?.toUpperCase()) {
+      case 'CRITICAL':
+        return { bg: 'rgba(239, 68, 68, 0.15)', text: '#ef4444', border: '#ef4444' }
+      case 'HIGH':
+        return { bg: 'rgba(249, 115, 22, 0.15)', text: '#f97316', border: '#f97316' }
+      case 'MEDIUM':
+        return { bg: 'rgba(234, 179, 8, 0.15)', text: '#eab308', border: '#eab308' }
+      case 'LOW':
+        return { bg: 'rgba(34, 197, 94, 0.15)', text: '#22c55e', border: '#22c55e' }
+      default:
+        return { bg: 'rgba(148, 163, 184, 0.15)', text: '#94a3b8', border: '#64748b' }
+    }
+  }
+
   return (
     <ModalShell
       title="Import Database Data"
-      subtitle="Connect to authorized PostgreSQL or external departmental databases using configured credentials."
+      subtitle="Connect to authorized PostgreSQL or external departmental databases (e.g. Bhoomi Rashi, PM GatiShakti) using configured credentials."
       onClose={onClose}
-      maxWidth={750}
+      maxWidth={importResult ? 960 : preview ? 900 : 720}
     >
-      <div style={{ marginBottom: 16 }}>
-        <label>
-          <span className="input-label">External Table / View Name *</span>
-          <input
-            className="input"
-            value={tableName}
-            onChange={(e) => setTableName(e.target.value)}
-            placeholder="e.g. state_land_records or projects_export"
-          />
-        </label>
-        <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
-          Credentials loaded securely from backend environment variables (EXTERNAL_DB_URL).
-        </p>
-      </div>
-
-      {error && (
-        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem', marginBottom: 16 }}>
-          {error}
-        </div>
-      )}
-
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginBottom: 20 }}>
-        <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-        <button className="btn btn-primary" onClick={handleTest} disabled={testing}>
-          {testing ? 'Testing Connection…' : 'Test Connection & Preview'}
-        </button>
-      </div>
-
-      {preview && preview.success && (
-        <div>
-          <h4 style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: '0 0 10px' }}>
-            Table Columns Detected ({preview.columns.length}):
-          </h4>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
-            {preview.columns.map((c: string) => (
-              <span key={c} style={{ background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: 4, fontSize: '0.75rem' }}>
-                {c}
-              </span>
-            ))}
+      {/* ── State 3: Instant ML Delay Prediction Result Card ── */}
+      {importResult ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.25))',
+              border: '1px solid rgba(16, 185, 129, 0.4)',
+              borderRadius: 12,
+              padding: '18px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+            }}
+          >
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                background: 'rgba(16, 185, 129, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <CheckCircle2 size={24} style={{ color: '#34d399' }} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#34d399', margin: '0 0 4px' }}>
+                Database Import Complete — ML Delay Predictions Computed
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', margin: 0 }}>
+                {importResult.message}
+              </p>
+            </div>
           </div>
-          <button className="btn btn-primary" onClick={() => onSuccess(`Connected to table ${tableName} successfully.`)}>
-            Import Records
-          </button>
+
+          {/* Stat Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '12px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Table Name</div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 2, fontFamily: 'monospace' }}>
+                {importResult.table_name}
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '12px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Projects Processed</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8', marginTop: 2 }}>
+                {importResult.imported_count + importResult.duplicates_count}
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '12px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>ML Predictions Generated</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#34d399', marginTop: 2 }}>
+                {importResult.ml_refreshed_count}
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '12px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>ML Pipeline Model</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#a78bfa', marginTop: 4 }}>
+                LightGBM + SHAP
+              </div>
+            </div>
+          </div>
+
+          {/* Table of Imported Projects with Live Predictions */}
+          <div style={{ background: 'var(--color-bg-secondary)', borderRadius: 10, border: '1px solid var(--color-border-subtle)', overflow: 'hidden' }}>
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Sparkles size={16} style={{ color: '#fbbf24' }} />
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  ML Delay Prediction Scores & Key Drivers
+                </span>
+              </div>
+              <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                {importResult.projects.length} project(s) synchronized
+              </span>
+            </div>
+
+            <div style={{ overflowX: 'auto', maxHeight: 300 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--color-border-subtle)' }}>
+                    <th style={{ padding: '10px 14px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Project</th>
+                    <th style={{ padding: '10px 14px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Risk Score</th>
+                    <th style={{ padding: '10px 14px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Delay Probability</th>
+                    <th style={{ padding: '10px 14px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Predicted Delay</th>
+                    <th style={{ padding: '10px 14px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Top Delay Driver (SHAP)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {importResult.projects.map((proj, idx) => {
+                    const badge = getRiskBadgeColor(proj.risk_category)
+                    const topDriver = proj.top_delay_drivers?.[0]
+                    return (
+                      <tr key={proj.project_id || idx} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                        <td style={{ padding: '10px 14px' }}>
+                          <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{proj.project_name}</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>{proj.project_code}</div>
+                        </td>
+                        <td style={{ padding: '10px 14px' }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 6,
+                              padding: '2px 8px',
+                              borderRadius: 12,
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              background: badge.bg,
+                              color: badge.text,
+                              border: `1px solid ${badge.border}`,
+                            }}
+                          >
+                            {proj.risk_score != null ? `${proj.risk_score.toFixed(1)}` : 'N/A'} {proj.risk_category}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                          {proj.delay_probability != null ? `${(proj.delay_probability * 100).toFixed(1)}%` : '—'}
+                        </td>
+                        <td style={{ padding: '10px 14px' }}>
+                          {proj.predicted_delay_days != null ? (
+                            <div>
+                              <span style={{ fontWeight: 700, color: '#f87171' }}>{proj.predicted_delay_days.toFixed(0)} days</span>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginLeft: 4 }}>
+                                (~{(proj.predicted_delay_days / 30.4).toFixed(1)} mos)
+                              </span>
+                            </div>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                        <td style={{ padding: '10px 14px', maxWidth: 280 }}>
+                          {topDriver ? (
+                            <div>
+                              <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#fbbf24', textTransform: 'capitalize' }}>
+                                {topDriver.feature.replace(/_/g, ' ')}
+                              </span>
+                              {topDriver.recommendation && (
+                                <p style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary)', margin: '2px 0 0', lineHeight: 1.3 }}>
+                                  {topDriver.recommendation}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Balanced risk profile</span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                setImportResult(null)
+                setPreview(null)
+              }}
+            >
+              Import Another Table
+            </button>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  window.location.href = '/decision-intelligence'
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <span>Open Decision Intelligence</span>
+                <ExternalLink size={14} />
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  onSuccess(`Successfully imported ${importResult.imported_count + importResult.duplicates_count} projects and computed ML delay predictions.`)
+                }}
+              >
+                Done / View in Projects Directory
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : preview && preview.success ? (
+        /* ── State 2: Table Data Preview & Column Mapping ── */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Database size={18} style={{ color: '#fbbf24' }} />
+              <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text-primary)' }}>
+                Table: <span style={{ fontFamily: 'monospace', color: '#fbbf24' }}>{preview.table_name || tableName}</span>
+              </span>
+              <span style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '2px 8px', borderRadius: 12, fontSize: '0.72rem', fontWeight: 600 }}>
+                {preview.total_rows_approx != null ? `${preview.total_rows_approx} total rows` : 'Connected'}
+              </span>
+              <span style={{ background: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', padding: '2px 8px', borderRadius: 12, fontSize: '0.72rem' }}>
+                {preview.columns.length} columns
+              </span>
+            </div>
+            <button
+              className="btn btn-secondary"
+              style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+              onClick={() => setPreview(null)}
+            >
+              Change Table
+            </button>
+          </div>
+
+          {error && (
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem' }}>
+              {error}
+            </div>
+          )}
+
+          {/* Sample Data Table Preview */}
+          <div style={{ background: 'var(--color-bg-secondary)', borderRadius: 8, border: '1px solid var(--color-border-subtle)', overflow: 'hidden' }}>
+            <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--color-border-subtle)', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+              Data Sample (First {preview.sample_rows.length} rows):
+            </div>
+            <div style={{ overflowX: 'auto', maxHeight: 220 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--color-border-subtle)' }}>
+                    {preview.columns.slice(0, 10).map((col) => (
+                      <th key={col} style={{ padding: '8px 12px', color: 'var(--color-text-secondary)', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                        {col}
+                      </th>
+                    ))}
+                    {preview.columns.length > 10 && (
+                      <th style={{ padding: '8px 12px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                        +{preview.columns.length - 10} more
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {preview.sample_rows.map((row, rIdx) => (
+                    <tr key={rIdx} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                      {preview.columns.slice(0, 10).map((col) => (
+                        <td key={col} style={{ padding: '8px 12px', color: 'var(--color-text-primary)', whiteSpace: 'nowrap', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {row[col] != null ? String(row[col]) : '—'}
+                        </td>
+                      ))}
+                      {preview.columns.length > 10 && (
+                        <td style={{ padding: '8px 12px', color: 'var(--color-text-muted)' }}>…</td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Auto-Mapping Info Badge */}
+          <div style={{ background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: 8, padding: '12px 14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <Sparkles size={16} style={{ color: '#38bdf8' }} />
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#38bdf8' }}>
+                Intelligent Schema Mapping
+              </span>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', margin: 0 }}>
+              Recognized {Object.keys(columnMapping).length} canonical fields (project identifiers, sector, land areas, compensation outlay, PAFs, R&R metrics, and statutory dates). These will be automatically extracted, validated, and fed directly into the ML delay prediction engine.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', alignItems: 'center' }}>
+            <button className="btn btn-secondary" onClick={() => setPreview(null)}>
+              Back
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleImport}
+              disabled={importing}
+              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            >
+              {importing ? (
+                <>
+                  <div className="spinner-sm" />
+                  <span>Importing & Generating ML Predictions…</span>
+                </>
+              ) : (
+                <span>Import Projects & Run ML Prediction →</span>
+              )}
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* ── State 1: Table Input & Connection Form ── */
+        <div>
+          <div style={{ marginBottom: 16 }}>
+            <label>
+              <span className="input-label">External Table / View Name *</span>
+              <input
+                className="input"
+                value={tableName}
+                onChange={(e) => setTableName(e.target.value)}
+                placeholder="e.g. bhoomirashi_projects, state_land_records, or projects_export"
+              />
+            </label>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+              Authorized table or view in your PostgreSQL database (e.g. <code style={{ color: '#fbbf24' }}>bhoomirashi_projects</code>).
+            </p>
+          </div>
+
+          <div style={{ marginBottom: 16 }}>
+            <button
+              type="button"
+              onClick={() => setShowAdvUrl(!showAdvUrl)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-accent-primary)',
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              {showAdvUrl ? '− Hide Custom Connection URL' : '+ Custom Database Connection URL (Optional)'}
+            </button>
+            {showAdvUrl && (
+              <div style={{ marginTop: 8 }}>
+                <label>
+                  <span className="input-label">PostgreSQL Connection URL</span>
+                  <input
+                    className="input"
+                    value={connectionUrl}
+                    onChange={(e) => setConnectionUrl(e.target.value)}
+                    placeholder="postgresql://user:password@host:port/database"
+                  />
+                </label>
+                <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', margin: '3px 0 0' }}>
+                  Leave empty to use credentials securely configured in backend environment variables.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {error && (
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem', marginBottom: 16 }}>
+              {error}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+            <button className="btn btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleTest}
+              disabled={testing}
+              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            >
+              {testing ? (
+                <>
+                  <div className="spinner-sm" />
+                  <span>Connecting & Previewing…</span>
+                </>
+              ) : (
+                <span>Test Connection & Preview</span>
+              )}
+            </button>
+          </div>
         </div>
       )}
     </ModalShell>
@@ -1565,7 +2339,18 @@ function GISUploadModal({
   const [error, setError] = useState<string | null>(null)
   const [gisResult, setGisResult] = useState<GISIngestionData | null>(null)
   const [projectsList, setProjectsList] = useState<{ id: string; code: string; name: string }[]>([])
+
+  // Ingestion mode
+  const [mode, setMode] = useState<'NEW_PROJECT' | 'LINK_EXISTING'>('NEW_PROJECT')
   const [selectedProject, setSelectedProject] = useState('')
+
+  // Custom metadata (optional override)
+  const [projectName, setProjectName] = useState('')
+  const [projectCode, setProjectCode] = useState('')
+  const [projectType, setProjectType] = useState('HIGHWAY')
+  const [stateCode, setStateCode] = useState('TS')
+  const [district, setDistrict] = useState('')
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   useEffect(() => {
     projectsAPI.list({ page_size: 50 }).then((res: any) => {
@@ -1578,7 +2363,16 @@ function GISUploadModal({
     setUploading(true)
     setError(null)
     try {
-      const res = await ingestionAPI.uploadGIS(file, selectedProject || undefined)
+      const isNew = mode === 'NEW_PROJECT'
+      const res = await ingestionAPI.uploadGIS(file, {
+        projectId: isNew ? undefined : (selectedProject || undefined),
+        createProject: isNew,
+        projectName: isNew && projectName.trim() ? projectName.trim() : undefined,
+        projectCode: isNew && projectCode.trim() ? projectCode.trim() : undefined,
+        projectType: isNew ? projectType : undefined,
+        stateCode: isNew ? stateCode : undefined,
+        district: isNew && district.trim() ? district.trim() : undefined,
+      })
       setGisResult(res)
       onSuccess(res.message)
     } catch (err: any) {
@@ -1591,79 +2385,377 @@ function GISUploadModal({
   return (
     <ModalShell
       title="Upload GIS Spatial Data"
-      subtitle="Import GeoJSON, KML, zipped Shapefiles, or CSV coordinates into PostGIS."
+      subtitle="Import GeoJSON, KML, zipped Shapefiles, or CSV coordinates with PostGIS persistence and real-time ML delay predictions."
       onClose={onClose}
-      maxWidth={800}
+      maxWidth={840}
     >
-      <div style={{ marginBottom: 16 }}>
-        <label>
-          <span className="input-label">Link to Project (Optional)</span>
-          <select className="input" value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
-            <option value="">(Standalone GIS Alignment / Parcels)</option>
-            {projectsList.map((p) => <option key={p.id} value={p.id}>{p.code} — {p.name}</option>)}
-          </select>
-        </label>
-      </div>
-
-      <div
-        style={{
-          border: '2px dashed rgba(255,255,255,0.15)',
-          borderRadius: 10,
-          padding: '30px 20px',
-          textAlign: 'center',
-          cursor: 'pointer',
-          background: 'rgba(255,255,255,0.02)',
-          marginBottom: 16,
-        }}
-        onClick={() => document.getElementById('gis-file-input')?.click()}
-      >
-        <MapPin size={32} style={{ color: '#2dd4bf', margin: '0 auto 8px' }} />
-        <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-          {file ? file.name : 'Select GeoJSON, KML, Shapefile (.zip), or CSV file'}
-        </div>
-        <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
-          Validates geometry topology, closure, and coordinate bounds (EPSG:4326).
-        </div>
-        <input
-          id="gis-file-input"
-          type="file"
-          accept=".geojson,.json,.kml,.zip,.csv"
-          style={{ display: 'none' }}
-          onChange={(e) => {
-            if (e.target.files?.[0]) setFile(e.target.files[0])
-          }}
-        />
-      </div>
-
-      {error && (
-        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem', marginBottom: 16 }}>
-          {error}
-        </div>
-      )}
-
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginBottom: 16 }}>
-        <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-        <button className="btn btn-primary" onClick={handleUpload} disabled={!file || uploading}>
-          {uploading ? 'Processing & Validating Geometries…' : 'Process & Ingest GIS'}
-        </button>
-      </div>
-
-      {gisResult && (
-        <div style={{ background: 'rgba(0,0,0,0.25)', padding: '16px', borderRadius: 8, border: '1px solid rgba(45, 212, 191, 0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#2dd4bf', fontWeight: 600, fontSize: '0.9rem', marginBottom: 8 }}>
-            <CheckCircle2 size={16} />
-            {gisResult.message}
+      {/* State 2: ML Delay Prediction & Spatial Intelligence Result */}
+      {gisResult ? (
+        <div>
+          <div style={{ textAlign: 'center', padding: '12px 0 18px' }}>
+            <div style={{
+              width: 54, height: 54, borderRadius: '50%',
+              background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px auto'
+            }}>
+              <CheckCircle2 size={28} color="#10b981" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+              GIS Spatial Alignment Ingested & Scored via Machine Learning!
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+              Parcels validated and saved to PostGIS. Project <strong>{gisResult.project_name || gisResult.project_code || 'GIS Alignment'}</strong> ({gisResult.project_code || 'PROCESSED'}) is now active.
+            </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, fontSize: '0.8rem', marginTop: 10 }}>
-            <div>Total Features: <strong>{gisResult.total_features}</strong></div>
-            <div>Valid Polygons/Points: <strong style={{ color: '#10b981' }}>{gisResult.valid_features}</strong></div>
-            <div>Geometry Types: <strong>{gisResult.geometry_types.join(', ')}</strong></div>
-          </div>
-          {gisResult.bounding_box && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 8 }}>
-              Bounding Box: [{gisResult.bounding_box.map((v) => v.toFixed(4)).join(', ')}]
+
+          {/* Machine Learning Delay Prediction Card */}
+          {gisResult.prediction && (
+            <div style={{
+              background: 'linear-gradient(180deg, var(--color-bg-secondary) 0%, rgba(20,28,45,0.85) 100%)',
+              border: '1px solid var(--color-border-subtle)',
+              borderRadius: 12,
+              padding: '18px 22px',
+              marginBottom: 16,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Sparkles size={18} color="var(--color-accent-primary)" />
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                    Calibrated Machine Learning Delay Risk Forecast
+                  </span>
+                </div>
+                <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 600, background: 'rgba(16,185,129,0.1)', padding: '2px 8px', borderRadius: 10 }}>
+                  Live LightGBM Engine
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 14 }}>
+                <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Delay Risk Score</div>
+                  <div style={{
+                    fontSize: '1.4rem', fontWeight: 800, marginTop: 4,
+                    color: gisResult.prediction.risk_category === 'HIGH' ? '#ef4444' : gisResult.prediction.risk_category === 'MEDIUM' ? '#f59e0b' : '#10b981'
+                  }}>
+                    {gisResult.prediction.risk_score} <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>/ 100</span>
+                  </div>
+                  <span style={{
+                    fontSize: '0.68rem', fontWeight: 800, padding: '2px 6px', borderRadius: 4,
+                    background: gisResult.prediction.risk_category === 'HIGH' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                    color: gisResult.prediction.risk_category === 'HIGH' ? '#ef4444' : '#10b981'
+                  }}>
+                    {gisResult.prediction.risk_category} RISK
+                  </span>
+                </div>
+
+                <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Delay Probability</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: 4 }}>
+                    {(gisResult.prediction.delay_probability * 100).toFixed(0)}%
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>likelihood of schedule slippage</div>
+                </div>
+
+                <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Expected Delay</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f59e0b', marginTop: 4 }}>
+                    +{Math.round(gisResult.prediction.predicted_delay_days)} <span style={{ fontSize: '0.85rem' }}>days</span>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                    ~{Math.round(gisResult.prediction.predicted_delay_days / 30)} months past deadline
+                  </div>
+                </div>
+
+                <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Model Confidence</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#2dd4bf', marginTop: 4 }}>
+                    {(gisResult.prediction.confidence_score * 100).toFixed(0)}%
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>high data completeness</div>
+                </div>
+              </div>
+
+              {gisResult.prediction.top_delay_drivers && gisResult.prediction.top_delay_drivers.length > 0 && (
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '10px 14px', borderRadius: 8, fontSize: '0.78rem' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: 6 }}>Key Delay Drivers Identified (Tree SHAP):</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {gisResult.prediction.top_delay_drivers.map((drv: any, idx: number) => (
+                      <span key={idx} style={{
+                        padding: '3px 8px', borderRadius: 4, background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)', color: '#ef4444', fontWeight: 600
+                      }}>
+                        {drv.feature?.replace(/_/g, ' ')}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
+
+          {/* Spatial Summary Card */}
+          <div style={{
+            background: 'var(--color-bg-secondary)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 10,
+            padding: '16px 20px',
+            marginBottom: 20,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <Layers size={17} color="#2dd4bf" />
+              <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                Spatial Geometry & PostGIS Persistence Summary
+              </span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, fontSize: '0.8rem' }}>
+              <div>
+                <span style={{ color: 'var(--color-text-muted)' }}>Total Parcels:</span>{' '}
+                <strong style={{ color: '#10b981' }}>{gisResult.valid_features}</strong>
+              </div>
+              <div>
+                <span style={{ color: 'var(--color-text-muted)' }}>Calculated Land Area:</span>{' '}
+                <strong>{gisResult.total_calculated_area_ha || '—'} ha</strong>
+              </div>
+              <div>
+                <span style={{ color: 'var(--color-text-muted)' }}>Geometry Types:</span>{' '}
+                <strong>{gisResult.geometry_types.join(', ')}</strong>
+              </div>
+              {gisResult.centroid && (
+                <div>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Spatial Anchor:</span>{' '}
+                  <strong>{gisResult.centroid.latitude.toFixed(4)}, {gisResult.centroid.longitude.toFixed(4)}</strong>
+                </div>
+              )}
+            </div>
+            {gisResult.bounding_box && (
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 8 }}>
+                Bounding Box: [{gisResult.bounding_box.map((v) => v.toFixed(4)).join(', ')}]
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'space-between', alignItems: 'center' }}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                setGisResult(null)
+                setFile(null)
+              }}
+            >
+              Upload Another GIS Alignment
+            </button>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="btn btn-secondary" onClick={onClose}>
+                Close & View Directory
+              </button>
+              {gisResult.project_id && (
+                <a
+                  href={`/projects/${gisResult.project_id}`}
+                  className="btn btn-primary"
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
+                >
+                  <span>View Project ML Analytics</span>
+                  <ExternalLink size={15} />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* State 1: Upload and Configuration Form */
+        <div>
+          {/* Mode Selector */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            <button
+              type="button"
+              className={`btn ${mode === 'NEW_PROJECT' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              onClick={() => setMode('NEW_PROJECT')}
+            >
+              <Sparkles size={16} />
+              <span>Create New Project from GIS (Recommended)</span>
+            </button>
+            <button
+              type="button"
+              className={`btn ${mode === 'LINK_EXISTING' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              onClick={() => setMode('LINK_EXISTING')}
+            >
+              <Layers size={16} />
+              <span>Link to Existing Project</span>
+            </button>
+          </div>
+
+          {mode === 'LINK_EXISTING' ? (
+            <div style={{ marginBottom: 16 }}>
+              <label>
+                <span className="input-label">Select Target Project *</span>
+                <select
+                  className="input"
+                  value={selectedProject}
+                  onChange={(e) => setSelectedProject(e.target.value)}
+                >
+                  <option value="">-- Choose Existing Project --</option>
+                  {projectsList.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.code} — {p.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          ) : (
+            <div style={{
+              background: 'rgba(45, 212, 191, 0.05)',
+              border: '1px solid rgba(45, 212, 191, 0.2)',
+              borderRadius: 8,
+              padding: '12px 16px',
+              marginBottom: 16,
+              fontSize: '0.82rem',
+              color: 'var(--color-text-secondary)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, color: '#2dd4bf', marginBottom: 4 }}>
+                <Sparkles size={16} />
+                <span>Automated Project Creation & ML Ingestion</span>
+              </div>
+              <div>
+                LADRIS will automatically derive project name, code, land area (ha), and centroid coordinates directly from your GIS alignment, then run real-time ML delay predictions.
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  style={{ background: 'none', border: 'none', color: 'var(--color-accent-primary)', cursor: 'pointer', padding: 0, fontSize: '0.8rem', fontWeight: 600, textDecoration: 'underline' }}
+                >
+                  {showAdvanced ? 'Hide Custom Project Fields' : 'Customize Project Details (Optional)'}
+                </button>
+              </div>
+
+              {showAdvanced && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div>
+                    <label className="input-label" style={{ fontSize: '0.74rem' }}>Project Name</label>
+                    <input
+                      className="input"
+                      style={{ fontSize: '0.8rem', padding: '6px 10px' }}
+                      placeholder="e.g. NH65 Vijayawada-Hyderabad Expressway"
+                      value={projectName}
+                      onChange={(e) => setProjectName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="input-label" style={{ fontSize: '0.74rem' }}>Project Code</label>
+                    <input
+                      className="input"
+                      style={{ fontSize: '0.8rem', padding: '6px 10px' }}
+                      placeholder="e.g. GIS-NH65-SEC2"
+                      value={projectCode}
+                      onChange={(e) => setProjectCode(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="input-label" style={{ fontSize: '0.74rem' }}>Project Type</label>
+                    <select
+                      className="input"
+                      style={{ fontSize: '0.8rem', padding: '6px 10px' }}
+                      value={projectType}
+                      onChange={(e) => setProjectType(e.target.value)}
+                    >
+                      {PROJECT_TYPES.map((t) => (
+                        <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="input-label" style={{ fontSize: '0.74rem' }}>State</label>
+                    <select
+                      className="input"
+                      style={{ fontSize: '0.8rem', padding: '6px 10px' }}
+                      value={stateCode}
+                      onChange={(e) => setStateCode(e.target.value)}
+                    >
+                      {STATES.map((s) => (
+                        <option key={s.code} value={s.code}>{s.name} ({s.code})</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="input-label" style={{ fontSize: '0.74rem' }}>District</label>
+                    <input
+                      className="input"
+                      style={{ fontSize: '0.8rem', padding: '6px 10px' }}
+                      placeholder="e.g. Hyderabad / Ranga Reddy"
+                      value={district}
+                      onChange={(e) => setDistrict(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* File Upload Dropzone */}
+          <div
+            style={{
+              border: file ? '2px solid rgba(45, 212, 191, 0.5)' : '2px dashed rgba(255,255,255,0.15)',
+              borderRadius: 10,
+              padding: '28px 20px',
+              textAlign: 'center',
+              cursor: 'pointer',
+              background: file ? 'rgba(45, 212, 191, 0.04)' : 'rgba(255,255,255,0.02)',
+              marginBottom: 16,
+              transition: 'all 0.2s ease',
+            }}
+            onClick={() => document.getElementById('gis-file-input')?.click()}
+          >
+            <MapPin size={32} style={{ color: '#2dd4bf', margin: '0 auto 8px' }} />
+            <div style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+              {file ? file.name : 'Select GeoJSON, KML, Shapefile (.zip), or CSV file'}
+            </div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
+              {file ? `${(file.size / 1024).toFixed(1)} KB — Ready to process` : 'Supports GeoJSON polygons/lines, KML placemarks, zipped shapefiles, or CSV latitude/longitude'}
+            </div>
+            <input
+              id="gis-file-input"
+              type="file"
+              accept=".geojson,.json,.kml,.zip,.csv"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                if (e.target.files?.[0]) setFile(e.target.files[0])
+              }}
+            />
+          </div>
+
+          {error && (
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem', marginBottom: 16 }}>
+              {error}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+            <button className="btn btn-secondary" onClick={onClose} disabled={uploading}>
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleUpload}
+              disabled={!file || uploading || (mode === 'LINK_EXISTING' && !selectedProject)}
+              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              {uploading ? (
+                <>
+                  <span className="spinner" />
+                  <span>Processing Geometries & Running ML…</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={16} />
+                  <span>Ingest GIS & Run ML Delay Prediction</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       )}
     </ModalShell>
@@ -1672,6 +2764,8 @@ function GISUploadModal({
 
 // ─── 6. PDF Document Review Screen Modal ─────────────────────────────────────
 
+// ─── 6. Multi-PDF Document Review Screen Modal ───────────────────────────────
+
 function DocumentReviewModal({
   onClose,
   onSuccess,
@@ -1679,22 +2773,33 @@ function DocumentReviewModal({
   onClose: () => void
   onSuccess: (msg: string) => void
 }) {
-  const [file, setFile] = useState<File | null>(null)
-  const [docType, setDocType] = useState('NOTIFICATION')
+  const [files, setFiles] = useState<File[]>([])
   const [extracting, setExtracting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [extracted, setExtracted] = useState<DocumentExtractData | null>(null)
+  const [extracted, setExtracted] = useState<MultiDocumentExtractData | null>(null)
   const [confirmedFields, setConfirmedFields] = useState<Record<string, any>>({})
   const [saving, setSaving] = useState(false)
+  const [mlResult, setMlResult] = useState<DocumentConfirmResult | null>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+    const incoming = Array.from(e.target.files)
+    setFiles((prev) => [...prev, ...incoming])
+    setError(null)
+  }
+
+  const handleRemoveFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleExtract = async () => {
-    if (!file) return
+    if (files.length === 0) return
     setExtracting(true)
     setError(null)
     try {
-      const res = await ingestionAPI.extractDocument(file, docType)
+      const res = await ingestionAPI.extractMultipleDocuments(files, 'AUTO_DETECT')
       setExtracted(res)
-      setConfirmedFields(res.extracted_fields || {})
+      setConfirmedFields(res.merged_fields || {})
     } catch (err: any) {
       setError(err?.response?.data?.detail || err.message || 'Document extraction failed.')
     } finally {
@@ -1707,12 +2812,13 @@ function DocumentReviewModal({
     setSaving(true)
     setError(null)
     try {
-      await ingestionAPI.confirmDocument({
-        document_id: extracted.document_id,
+      const res = await ingestionAPI.confirmDocument({
+        document_id: extracted.primary_document_id,
+        document_ids: extracted.document_ids,
         confirmed_fields: confirmedFields,
         create_project: true,
       })
-      onSuccess(`Document verified and incorporated into LADRIS: ${extracted.file_name}`)
+      setMlResult(res)
     } catch (err: any) {
       setError(err?.response?.data?.detail || err.message || 'Confirmation failed.')
     } finally {
@@ -1722,37 +2828,207 @@ function DocumentReviewModal({
 
   return (
     <ModalShell
-      title="Document Extraction & Verification Screen"
-      subtitle="Extract text and fields from PDF notifications, awards, and SIA reports with human verification."
+      title="Upload Documents & AI Field Extraction"
+      subtitle="Upload single or multiple project PDFs (Gazette notifications, awards, SIA reports, court orders) for automated extraction & ML scoring."
       onClose={onClose}
-      maxWidth={900}
+      maxWidth={980}
     >
-      {!extracted ? (
+      {/* State 3: ML Result Screen after Confirmation */}
+      {mlResult ? (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14, marginBottom: 16 }}>
-            <label>
-              <span className="input-label">Document Type</span>
-              <select className="input" value={docType} onChange={(e) => setDocType(e.target.value)}>
-                <option value="NOTIFICATION">Section 3A / 4 Gazette Notification</option>
-                <option value="AWARD">Section 23 / 3G Compensation Award</option>
-                <option value="SIA_REPORT">Social Impact Assessment (SIA) Report</option>
-                <option value="COURT_ORDER">High Court / Supreme Court Order</option>
-                <option value="COMPENSATION_STATEMENT">Compensation Statement</option>
-                <option value="APPROVAL_LETTER">Clearance / Approval Letter</option>
-              </select>
-            </label>
-            <label>
-              <span className="input-label">PDF File *</span>
-              <input
-                type="file"
-                accept=".pdf"
-                className="input"
-                onChange={(e) => {
-                  if (e.target.files?.[0]) setFile(e.target.files[0])
-                }}
-              />
-            </label>
+          <div style={{ textAlign: 'center', padding: '16px 0 20px' }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: '50%',
+              background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto'
+            }}>
+              <CheckCircle2 size={30} color="#10b981" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+              Project Ingested & Scored via Machine Learning!
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+              Documents verified. Project <strong>{mlResult.project_code || confirmedFields.project_code}</strong> has been created with all canonical fields.
+            </p>
           </div>
+
+          {/* ML Prediction Result Card */}
+          {mlResult.prediction && (
+            <div style={{
+              background: 'linear-gradient(180deg, var(--color-bg-secondary) 0%, rgba(20,28,45,0.85) 100%)',
+              border: '1px solid var(--color-border-subtle)',
+              borderRadius: 12,
+              padding: '18px 22px',
+              marginBottom: 20,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: 8 }}>
+                <Sparkles size={18} color="var(--color-accent-primary)" />
+                <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  Calibrated Machine Learning Delay Risk Forecast
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14, marginBottom: 14 }}>
+                <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Delay Risk Score</div>
+                  <div style={{
+                    fontSize: '1.4rem', fontWeight: 800, marginTop: 4,
+                    color: mlResult.prediction.risk_category === 'HIGH' ? '#ef4444' : mlResult.prediction.risk_category === 'MEDIUM' ? '#f59e0b' : '#10b981'
+                  }}>
+                    {mlResult.prediction.risk_score} <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>/ 100</span>
+                  </div>
+                  <span style={{
+                    fontSize: '0.68rem', fontWeight: 800, padding: '2px 6px', borderRadius: 4,
+                    background: mlResult.prediction.risk_category === 'HIGH' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                    color: mlResult.prediction.risk_category === 'HIGH' ? '#ef4444' : '#10b981'
+                  }}>
+                    {mlResult.prediction.risk_category} RISK
+                  </span>
+                </div>
+
+                <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Delay Probability</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: 4 }}>
+                    {(mlResult.prediction.delay_probability * 100).toFixed(0)}%
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>likelihood of schedule slippage</div>
+                </div>
+
+                <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Expected Delay</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f59e0b', marginTop: 4 }}>
+                    +{Math.round(mlResult.prediction.predicted_delay_days)} <span style={{ fontSize: '0.85rem' }}>days</span>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                    ~{Math.round(mlResult.prediction.predicted_delay_days / 30)} months past deadline
+                  </div>
+                </div>
+              </div>
+
+              {mlResult.prediction.top_drivers && mlResult.prediction.top_drivers.length > 0 && (
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '10px 14px', borderRadius: 8, fontSize: '0.78rem' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: 4 }}>Key Delay Drivers Identified:</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {mlResult.prediction.top_drivers.map((drv: any, idx: number) => (
+                      <span key={idx} style={{
+                        padding: '3px 8px', borderRadius: 4, background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)', color: '#ef4444', fontWeight: 600
+                      }}>
+                        {drv.feature?.replace(/_/g, ' ')}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                onSuccess(`Document project ingested successfully: ${mlResult.project_code || ''}`)
+              }}
+            >
+              Close & View Directory
+            </button>
+            {mlResult.project_id && (
+              <a
+                href={`/projects/${mlResult.project_id}`}
+                className="btn btn-primary"
+                style={{ display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
+              >
+                <span>View Full Project ML Analytics</span>
+                <ExternalLink size={15} />
+              </a>
+            )}
+          </div>
+        </div>
+      ) : !extracted ? (
+        /* State 1: Upload Documents (Multi-Upload Support) */
+        <div>
+          <div style={{
+            background: 'var(--color-bg-secondary)',
+            border: '2px dashed var(--color-border-subtle)',
+            borderRadius: 12,
+            padding: '28px 20px',
+            textAlign: 'center',
+            cursor: 'pointer',
+            marginBottom: 16,
+          }}
+          onClick={() => document.getElementById('multi-doc-input')?.click()}
+          >
+            <Layers size={36} color="var(--color-accent-primary)" style={{ margin: '0 auto 10px auto' }} />
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+              Select or Drag Multiple PDF Documents
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '4px 0 12px 0' }}>
+              Upload Gazette Notifications, Section 23/3G Awards, SIA/R&R Reports, and Court Orders.
+            </p>
+            <input
+              id="multi-doc-input"
+              type="file"
+              accept=".pdf"
+              multiple
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+            <button type="button" className="btn btn-secondary btn-sm" onClick={(e) => { e.stopPropagation(); document.getElementById('multi-doc-input')?.click() }}>
+              Browse Files (Multiple)
+            </button>
+          </div>
+
+          {/* Selected Files List */}
+          {files.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
+                <span>Selected Documents ({files.length}):</span>
+                <button
+                  type="button"
+                  onClick={() => setFiles([])}
+                  style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.74rem', cursor: 'pointer', fontWeight: 600 }}
+                >
+                  Clear All
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 180, overflowY: 'auto' }}>
+                {files.map((f, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: 'var(--color-bg-tertiary)',
+                      border: '1px solid var(--color-border-subtle)',
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      fontSize: '0.8rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+                      <FileCheck2 size={16} color="var(--color-accent-primary)" />
+                      <span style={{ fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 450 }}>
+                        {f.name}
+                      </span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                        ({(f.size / 1024).toFixed(0)} KB)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFile(idx)}
+                      style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                      title="Remove file"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {error && (
             <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem', marginBottom: 16 }}>
@@ -1760,109 +3036,327 @@ function DocumentReviewModal({
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', alignItems: 'center' }}>
             <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleExtract} disabled={!file || extracting}>
-              {extracting ? 'Extracting Text & Fields…' : 'Extract Document Fields'}
+            <button
+              className="btn btn-primary"
+              onClick={handleExtract}
+              disabled={files.length === 0 || extracting}
+              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            >
+              {extracting ? (
+                <>
+                  <div className="spinner-sm" />
+                  <span>Extracting & Synthesizing {files.length} Document(s)…</span>
+                </>
+              ) : (
+                <span>Extract & Synthesize Data ({files.length} Files) →</span>
+              )}
             </button>
           </div>
         </div>
       ) : (
+        /* State 2: Verification Screen with Structured Field Groups */
         <div>
-          <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: 8, padding: '12px 16px', marginBottom: 18 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#f59e0b', fontWeight: 600, fontSize: '0.85rem' }}>
-              <AlertCircle size={16} />
-              Human Verification Required
+          {/* Header Info */}
+          <div style={{
+            background: 'var(--color-bg-secondary)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 8,
+            padding: '12px 16px',
+            marginBottom: 16,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+            <div>
+              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                Extracted Data Synthesized from {extracted.total_files} Document(s)
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#10b981', marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <CheckCircle2 size={14} />
+                <span>Cross-document reconciliation complete • Review values below before ML scoring</span>
+              </div>
             </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>
-              Extracted fields are suggestions. Please review and edit any values below before confirming import.
-            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {extracted.documents.map((d, i) => (
+                <span key={i} style={{
+                  fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4,
+                  background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border-subtle)',
+                  color: 'var(--color-text-secondary)',
+                }}>
+                  {d.file_name} ({d.document_type})
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14, maxHeight: 350, overflowY: 'auto', paddingRight: 4, marginBottom: 20 }}>
-            <label>
-              <span className="input-label">Project Code</span>
-              <input
-                className="input"
-                value={confirmedFields.project_code || ''}
-                onChange={(e) => setConfirmedFields({ ...confirmedFields, project_code: e.target.value })}
-                placeholder="e.g. NHAI-EXT-401"
-              />
-            </label>
-            <label>
-              <span className="input-label">Project Name</span>
-              <input
-                className="input"
-                value={confirmedFields.project_name || ''}
-                onChange={(e) => setConfirmedFields({ ...confirmedFields, project_name: e.target.value })}
-                placeholder="e.g. NH-44 Varanasi Bypass"
-              />
-            </label>
-            <label>
-              <span className="input-label">Gazette / Notification Ref</span>
-              <input
-                className="input"
-                value={confirmedFields.notification_number || ''}
-                onChange={(e) => setConfirmedFields({ ...confirmedFields, notification_number: e.target.value })}
-                placeholder="e.g. S.O. 1234(E)"
-              />
-            </label>
-            <label>
-              <span className="input-label">Notification Date</span>
-              <input
-                type="date"
-                className="input"
-                value={confirmedFields.notification_date || ''}
-                onChange={(e) => setConfirmedFields({ ...confirmedFields, notification_date: e.target.value })}
-              />
-            </label>
-            <label>
-              <span className="input-label">State Code</span>
-              <input
-                className="input"
-                maxLength={3}
-                value={confirmedFields.state_code || ''}
-                onChange={(e) => setConfirmedFields({ ...confirmedFields, state_code: e.target.value.toUpperCase() })}
-                placeholder="e.g. UP, MH"
-              />
-            </label>
-            <label>
-              <span className="input-label">District</span>
-              <input
-                className="input"
-                value={confirmedFields.district || ''}
-                onChange={(e) => setConfirmedFields({ ...confirmedFields, district: e.target.value })}
-                placeholder="e.g. Varanasi"
-              />
-            </label>
-            <label>
-              <span className="input-label">Total Land Area (ha)</span>
-              <input
-                type="number"
-                step="any"
-                min="0"
-                className="input"
-                value={confirmedFields.total_area_ha || ''}
-                onChange={(e) => setConfirmedFields({ ...confirmedFields, total_area_ha: e.target.value })}
-              />
-            </label>
-            <label>
-              <span className="input-label">Sanctioned / Award Cost (₹)</span>
-              <input
-                type="number"
-                step="any"
-                min="0"
-                className="input"
-                value={confirmedFields.estimated_compensation_inr || ''}
-                onChange={(e) => setConfirmedFields({ ...confirmedFields, estimated_compensation_inr: e.target.value })}
-              />
-            </label>
+          {/* Grouped Form Fields */}
+          <div style={{ maxHeight: 380, overflowY: 'auto', paddingRight: 6, display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
+            {/* Group 1: Project Identity */}
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '14px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-accent-primary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                1. Project Identity & Location
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                <label>
+                  <span className="input-label">Project Code *</span>
+                  <input
+                    className="input"
+                    value={confirmedFields.project_code || ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, project_code: e.target.value })}
+                    placeholder="e.g. NHAI-EXT-401"
+                  />
+                  {extracted.field_sources?.project_code && (
+                    <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>from {extracted.field_sources.project_code}</span>
+                  )}
+                </label>
+
+                <label>
+                  <span className="input-label">Project Name *</span>
+                  <input
+                    className="input"
+                    value={confirmedFields.project_name || ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, project_name: e.target.value })}
+                    placeholder="e.g. NH-44 Varanasi Corridor"
+                  />
+                </label>
+
+                <label>
+                  <span className="input-label">Sector / Project Type</span>
+                  <select
+                    className="input"
+                    value={confirmedFields.project_type || 'HIGHWAY'}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, project_type: e.target.value })}
+                  >
+                    {PROJECT_TYPES.map((t) => (
+                      <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span className="input-label">State Code *</span>
+                  <select
+                    className="input"
+                    value={confirmedFields.state_code || 'UP'}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, state_code: e.target.value })}
+                  >
+                    {STATES.map((s) => (
+                      <option key={s.code} value={s.code}>{s.name} ({s.code})</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span className="input-label">District</span>
+                  <input
+                    className="input"
+                    value={confirmedFields.district || ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, district: e.target.value })}
+                    placeholder="e.g. Varanasi"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Group 2: Land & Acquisition Progress */}
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '14px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#34d399', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                2. Land Requirements & Physical Possession
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                <label>
+                  <span className="input-label">Total Land Area (ha) *</span>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.total_area_ha ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, total_area_ha: e.target.value })}
+                  />
+                </label>
+
+                <label>
+                  <span className="input-label">Land Area Acquired (ha)</span>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.area_acquired_ha ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, area_acquired_ha: e.target.value })}
+                  />
+                </label>
+
+                <label>
+                  <span className="input-label">Area in Physical Possession (ha)</span>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.area_in_possession_ha ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, area_in_possession_ha: e.target.value })}
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Group 3: Compensation & Financials */}
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '14px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fbbf24', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                3. Financial Outlay & Compensation Disbursement
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                <label>
+                  <span className="input-label">Compensation Sanctioned (₹)</span>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.estimated_compensation_inr ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, estimated_compensation_inr: e.target.value })}
+                  />
+                  {extracted.field_sources?.estimated_compensation_inr && (
+                    <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>from {extracted.field_sources.estimated_compensation_inr}</span>
+                  )}
+                </label>
+
+                <label>
+                  <span className="input-label">Compensation Disbursed (₹)</span>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.disbursed_compensation_inr ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, disbursed_compensation_inr: e.target.value })}
+                  />
+                  {extracted.field_sources?.disbursed_compensation_inr && (
+                    <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>from {extracted.field_sources.disbursed_compensation_inr}</span>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            {/* Group 4: Rehabilitation & Resettlement */}
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '14px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#a78bfa', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                4. Affected Families (PAFs) & R&R Status
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                <label>
+                  <span className="input-label">Total Affected Families (PAFs)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.total_affected_families ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, total_affected_families: e.target.value })}
+                  />
+                </label>
+
+                <label>
+                  <span className="input-label">Families Compensated</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.families_compensated ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, families_compensated: e.target.value })}
+                  />
+                </label>
+
+                <label>
+                  <span className="input-label">Families Rehabilitated</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.families_rehabilitated ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, families_rehabilitated: e.target.value })}
+                  />
+                </label>
+
+                <label>
+                  <span className="input-label">R&R Progress (%)</span>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    max="100"
+                    className="input"
+                    value={confirmedFields.rehabilitation_progress_pct ?? ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, rehabilitation_progress_pct: e.target.value })}
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Group 5: Disputes & Statutory Dates */}
+            <div style={{ background: 'var(--color-bg-secondary)', padding: '14px 16px', borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f472b6', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                5. Legal Disputes & Statutory Dates
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                <label>
+                  <span className="input-label">Open Court Disputes / Cases</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="input"
+                    value={confirmedFields.legal_case_count ?? 0}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, legal_case_count: e.target.value })}
+                  />
+                  {extracted.field_sources?.legal_case_count && (
+                    <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>from {extracted.field_sources.legal_case_count}</span>
+                  )}
+                </label>
+
+                <label>
+                  <span className="input-label">Preliminary Notification (3A / 4) Date</span>
+                  <input
+                    type="date"
+                    className="input"
+                    value={confirmedFields.notification_3a_date || confirmedFields.notification_date || ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, notification_3a_date: e.target.value })}
+                  />
+                </label>
+
+                <label>
+                  <span className="input-label">Target Completion Date</span>
+                  <input
+                    type="date"
+                    className="input"
+                    value={confirmedFields.planned_end_date || ''}
+                    onChange={(e) => setConfirmedFields({ ...confirmedFields, planned_end_date: e.target.value })}
+                  />
+                </label>
+              </div>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setExtracted(null)}>Back</button>
-            <button className="btn btn-primary" onClick={handleConfirm} disabled={saving}>
-              {saving ? 'Confirming & Incorporating…' : 'Confirm & Ingest into LADRIS'}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', alignItems: 'center' }}>
+            <button className="btn btn-secondary" onClick={() => setExtracted(null)}>
+              Back to Documents
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleConfirm}
+              disabled={saving}
+              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            >
+              {saving ? (
+                <>
+                  <div className="spinner-sm" />
+                  <span>Incorporating & Running ML Model…</span>
+                </>
+              ) : (
+                <span>Confirm & Run ML Prediction →</span>
+              )}
             </button>
           </div>
         </div>

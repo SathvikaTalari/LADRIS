@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Hyderabad Metro Phase-2 Corridor-B Alignment</name>
+    <Placemark>
+      <name>Raidurg Station Terminal</name>
+      <description>Phase-2 Airport Express Connection</description>
+      <Point>
+        <coordinates>78.3752,17.4428,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Biodiversity Junction Interchange</name>
+      <description>Elevated viaduct curve</description>
+      <Point>
+        <coordinates>78.3680,17.4310,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Nanakramguda Financial District Station</name>
+      <description>IT Corridor Station</description>
+      <Point>
+        <coordinates>78.3490,17.4190,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Corridor B Main Alignment</name>
+      <description>Viaduct path connecting Hitec City to Financial District</description>
+      <LineString>
+        <coordinates>
+          78.3752,17.4428,0
+          78.3680,17.4310,0
+          78.3490,17.4190,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+  </Document>
+</kml>
