@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Pause, Play, Square, Sparkles } from 'lucide-react'
+import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Pause, Play, Square } from 'lucide-react'
 import { voiceEngine } from '@/components/voice/voiceEngine'
 import { collectPageContent } from '@/components/voice/pageContentCollector'
 import { useAuthStore } from '@/store/authStore'
@@ -18,7 +18,7 @@ interface TopNavProps {
 }
 
 const PAGE_LABELS: Record<string, string> = {
-  '/dashboard': 'Executive Dashboard',
+  '/dashboard': 'Land Acquisition Overview',
   '/la-workbench': 'Officer Workbench',
   '/agency-portal': 'Agency Portal',
   '/priority-intelligence': 'Priority Watchlist',
@@ -38,7 +38,6 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [time, setTime] = useState(new Date())
   const [voiceState, setVoiceState] = useState({
     isSpeaking: false,
     isPaused: false,
@@ -89,19 +88,10 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
 
   const currentTitle = pageTitle ?? PAGE_LABELS[location.pathname] ?? 'LADRIS'
 
-  // Live clock
-  useEffect(() => {
-    const id = setInterval(() => setTime(new Date()), 1000)
-    return () => clearInterval(id)
-  }, [])
-
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
-
-  const timeStr = time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false })
-  const dateStr = time.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
     <motion.header
@@ -118,18 +108,18 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
         zIndex: 40,
       }}
     >
-      {/* Left: Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1 }}>
+      {/* Left: Title + Search */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
         {currentTitle && (
           <motion.div
             key={currentTitle}
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}
+            style={{ display: 'flex', alignItems: 'center' }}
           >
             <h1 style={{
-              fontSize: '1rem',
+              fontSize: '0.9375rem',
               fontWeight: 700,
               color: 'var(--color-text-primary)',
               margin: 0,
@@ -138,23 +128,6 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
             }}>
               {currentTitle}
             </h1>
-            {/* Decorative separator */}
-            <span style={{
-              width: 4, height: 4,
-              borderRadius: '50%',
-              background: 'rgba(64,128,255,0.4)',
-              display: 'inline-block',
-              flexShrink: 0,
-            }} />
-            {/* Date chip */}
-            <span style={{
-              fontSize: '0.72rem',
-              color: '#4a5880',
-              fontWeight: 500,
-              whiteSpace: 'nowrap',
-            }}>
-              {dateStr}
-            </span>
           </motion.div>
         )}
         <div style={{ flex: 1, maxWidth: 380 }}>
@@ -163,69 +136,12 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
       </div>
 
       {/* Right: Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
 
-        {/* Live Clock */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '5px 12px',
-          background: 'var(--color-bg-elevated)',
-          border: '1px solid var(--color-border-default)',
-          borderRadius: 'var(--radius-full)',
-          fontSize: '0.75rem',
-          color: 'var(--color-text-muted)',
-          fontFamily: 'var(--font-mono)',
-          letterSpacing: '0.04em',
-        }}>
-          <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{timeStr}</span>
-        </div>
-
-        {/* System Status */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 7,
-          padding: '5px 12px',
-          background: 'rgba(19, 136, 8, 0.1)',
-          border: '1px solid rgba(19, 136, 8, 0.25)',
-          borderRadius: 'var(--radius-full)',
-          fontSize: '0.72rem',
-          fontWeight: 700,
-          color: '#138808',
-          letterSpacing: '0.03em',
-        }}>
-          <span style={{
-            width: 7, height: 7,
-            borderRadius: '50%',
-            background: '#138808',
-            animation: 'pulse-glow 1.5s ease-in-out infinite',
-            flexShrink: 0,
-            display: 'inline-block',
-          }} />
-          Live
-        </div>
-
-        {/* Saarthi AI Assistant Trigger */}
-        <NavIconButton
-          icon={<Sparkles size={16} strokeWidth={2.2} color="#f47721" />}
-          onClick={() => window.dispatchEvent(new CustomEvent('open-saarthi'))}
-          title="Ask Saarthi AI Assistant"
-        />
-
-        {/* Alerts Button */}
-        <NavIconButton
-          icon={<Bell size={15} strokeWidth={2} />}
-          onClick={() => navigate('/alerts')}
-          badge={3}
-          title="Alerts"
-        />
-
-        {/* Voice Playback Controls */}
+        {/* Speaker / Voice Playback Controls */}
         {!voiceState.isSpeaking ? (
           <NavIconButton
-            icon={<Volume2 size={16} strokeWidth={2} />}
+            icon={<Volume2 size={20} strokeWidth={1.8} />}
             onClick={handleSpeak}
             title="Start Voice Guidance"
             ariaLabel="Start Voice Guidance"
@@ -235,7 +151,7 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {voiceState.isPaused ? (
               <NavIconButton
-                icon={<Play size={15} strokeWidth={2} color="var(--color-primary-400, #4080ff)" />}
+                icon={<Play size={18} strokeWidth={1.8} color="var(--color-primary-400, #4080ff)" />}
                 onClick={handleResume}
                 title="Resume Voice Guidance"
                 ariaLabel="Resume Voice Guidance"
@@ -243,7 +159,7 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
               />
             ) : (
               <NavIconButton
-                icon={<Pause size={15} strokeWidth={2} color="var(--color-primary-400, #4080ff)" />}
+                icon={<Pause size={18} strokeWidth={1.8} color="var(--color-primary-400, #4080ff)" />}
                 onClick={handlePause}
                 title="Pause Voice Guidance"
                 ariaLabel="Pause Voice Guidance"
@@ -251,7 +167,7 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
               />
             )}
             <NavIconButton
-              icon={<Square size={13} strokeWidth={2} fill="currentColor" color="var(--color-risk-critical, #ef4444)" />}
+              icon={<Square size={14} strokeWidth={1.8} fill="currentColor" color="var(--color-risk-critical, #ef4444)" />}
               onClick={handleStop}
               title="Stop Voice Guidance"
               ariaLabel="Stop Voice Guidance"
@@ -259,14 +175,33 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
           </div>
         )}
 
-        {/* Theme Toggle Button (Light / Dark) */}
+        {/* Alerts / Notifications Button */}
         <NavIconButton
-          icon={theme === 'dark' ? <Sun size={16} color="#facc15" strokeWidth={2} /> : <Moon size={16} color="#2563eb" strokeWidth={2} />}
+          icon={<Bell size={20} strokeWidth={1.8} />}
+          onClick={() => navigate('/alerts')}
+          badge={3}
+          title="Notifications"
+        />
+
+        {/* Theme Toggle Button (Moon / Sun) */}
+        <NavIconButton
+          icon={theme === 'dark' ? <Sun size={20} strokeWidth={1.8} /> : <Moon size={20} strokeWidth={1.8} />}
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
         />
 
-        {/* User Dropdown */}
+        {/* Subtle Vertical Divider */}
+        <div
+          style={{
+            width: 1,
+            height: 20,
+            backgroundColor: 'var(--color-border-subtle)',
+            opacity: 0.8,
+            margin: '0 2px',
+          }}
+        />
+
+        {/* Profile Control */}
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -274,55 +209,52 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
               display: 'flex',
               alignItems: 'center',
               gap: 9,
-              padding: '7px 13px 7px 8px',
-              background: 'var(--color-bg-elevated)',
-              border: '1px solid var(--color-border-default)',
-              borderRadius: 'var(--radius-lg)',
+              padding: '4px 6px',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: 6,
               cursor: 'pointer',
               color: 'var(--color-text-primary)',
-              transition: 'all 0.15s',
-              boxShadow: 'var(--shadow-sm)',
+              transition: 'background 0.15s ease',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = 'var(--color-border-strong)'
               e.currentTarget.style.background = 'var(--color-bg-card-hover)'
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.borderColor = 'var(--color-border-default)'
-              e.currentTarget.style.background = 'var(--color-bg-elevated)'
+              e.currentTarget.style.background = 'transparent'
             }}
           >
-            {/* Avatar with gradient */}
+            {/* Small circular avatar */}
             <div style={{
               width: 28, height: 28,
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, rgba(64,128,255,0.4) 0%, rgba(124,92,252,0.4) 100%)',
-              border: '1.5px solid rgba(64,128,255,0.35)',
+              background: 'var(--color-accent-secondary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '0.6875rem',
-              fontWeight: 800,
-              color: '#7daaff',
-              boxShadow: '0 0 10px rgba(64,128,255,0.2)',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              color: '#ffffff',
               flexShrink: 0,
             }}>
-              {user?.full_name?.charAt(0)?.toUpperCase() ?? 'U'}
+              {user?.full_name?.charAt(0)?.toUpperCase() ?? 'S'}
             </div>
+
+            {/* Profile Information: Name & Role */}
             <div style={{ textAlign: 'left', lineHeight: 1.25 }}>
-              <div style={{ fontSize: '0.8125rem', fontWeight: 600 }}>
-                {user?.full_name?.split(' ')[0] ?? 'User'}
+              <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap' }}>
+                {user?.full_name ?? 'System Administrator'}
               </div>
-              <div style={{ fontSize: '0.625rem', color: 'rgba(64,128,255,0.8)', fontWeight: 600, letterSpacing: '0.04em' }}>
-                {roleLabel(user?.role ?? 'VIEWER')}
-                {user?.district_code ? ` · ${user.district_code}` : user?.state_code ? ` · ${user.state_code}` : user?.agency_name ? ` · ${user.agency_name.split(' ')[0]}` : ''}
+              <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontWeight: 400, whiteSpace: 'nowrap' }}>
+                {roleLabel(user?.role ?? 'SUPER_ADMIN')}
               </div>
             </div>
 
+            {/* Small chevron */}
             <ChevronDown
               size={13}
-              color="rgba(74,88,128,0.8)"
-              style={{ transition: 'transform 0.15s', transform: dropdownOpen ? 'rotate(180deg)' : 'none' }}
+              color="var(--color-text-muted)"
+              style={{ transition: 'transform 0.15s', transform: dropdownOpen ? 'rotate(180deg)' : 'none', marginLeft: 2 }}
             />
           </button>
 
@@ -335,52 +267,51 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
                   onClick={() => setDropdownOpen(false)}
                 />
                 <motion.div
-                  initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                  initial={{ opacity: 0, y: -4, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -6, scale: 0.97 }}
-                  transition={{ duration: 0.15 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                  transition={{ duration: 0.12 }}
                   style={{
                     position: 'absolute',
-                    top: 'calc(100% + 8px)',
+                    top: 'calc(100% + 6px)',
                     right: 0,
-                    width: 220,
-                    background: 'linear-gradient(145deg, #0e1a2e 0%, #080f1c 100%)',
-                    border: '1px solid rgba(64,128,255,0.15)',
-                    borderRadius: 14,
+                    width: 210,
+                    background: 'var(--color-bg-secondary)',
+                    border: '1px solid var(--color-border-default)',
+                    borderRadius: 8,
                     padding: 6,
                     zIndex: 100,
-                    boxShadow: '0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03)',
-                    backdropFilter: 'blur(12px)',
+                    boxShadow: 'var(--shadow-md)',
                   }}
                 >
                   {/* User Info Header */}
                   <div style={{
-                    padding: '10px 12px 12px',
-                    borderBottom: '1px solid rgba(64,128,255,0.08)',
-                    marginBottom: 6,
+                    padding: '8px 10px 10px',
+                    borderBottom: '1px solid var(--color-border-subtle)',
+                    marginBottom: 4,
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                       <div style={{
-                        width: 36, height: 36,
+                        width: 32, height: 32,
                         borderRadius: '50%',
-                        background: 'linear-gradient(135deg, rgba(64,128,255,0.3) 0%, rgba(124,92,252,0.3) 100%)',
-                        border: '1.5px solid rgba(64,128,255,0.3)',
+                        background: 'var(--color-accent-secondary)',
+                        border: '1px solid var(--color-border-subtle)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '0.875rem',
-                        fontWeight: 800,
-                        color: '#7daaff',
+                        fontSize: '0.8125rem',
+                        fontWeight: 700,
+                        color: '#ffffff',
                         flexShrink: 0,
                       }}>
-                        {user?.full_name?.charAt(0)?.toUpperCase() ?? 'U'}
+                        {user?.full_name?.charAt(0)?.toUpperCase() ?? 'S'}
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#eef2ff' }}>
-                          {user?.full_name}
+                        <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                          {user?.full_name ?? 'System Administrator'}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: '#4a5880', marginTop: 2 }}>
-                          {user?.email}
+                        <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: 1 }}>
+                          {user?.email ?? 'admin@ladris.gov.in'}
                         </div>
                       </div>
                     </div>
@@ -390,7 +321,7 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
                   {(user?.role === 'SUPER_ADMIN' || user?.role === 'STATE_ADMIN') && (
                     <DropdownItem icon={Shield} label="Admin Panel" onClick={() => { navigate('/admin'); setDropdownOpen(false) }} />
                   )}
-                  <div style={{ height: 1, background: 'rgba(64,128,255,0.08)', margin: '6px 4px' }} />
+                  <div style={{ height: 1, background: 'var(--color-border-subtle)', margin: '4px' }} />
                   <DropdownItem icon={LogOut} label="Sign Out"    onClick={handleLogout} danger />
                 </motion.div>
               </>
@@ -427,38 +358,34 @@ function NavIconButton({
       style={{
         position: 'relative',
         width: 36, height: 36,
-        borderRadius: 'var(--radius-lg)',
-        background: 'var(--color-bg-elevated)',
-        border: '1px solid var(--color-border-default)',
+        borderRadius: 6,
+        background: 'transparent',
+        border: 'none',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
         color: 'var(--color-text-secondary)',
-        transition: 'all 0.15s',
+        transition: 'background 0.15s ease, color 0.15s ease',
         flexShrink: 0,
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.borderColor = 'var(--color-border-strong)'
         e.currentTarget.style.color = 'var(--color-text-primary)'
         e.currentTarget.style.background = 'var(--color-bg-card-hover)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.borderColor = 'var(--color-border-default)'
         e.currentTarget.style.color = 'var(--color-text-secondary)'
-        e.currentTarget.style.background = 'var(--color-bg-elevated)'
+        e.currentTarget.style.background = 'transparent'
       }}
     >
       {icon}
       {badge ? (
-        <div style={{
+        <span style={{
           position: 'absolute',
-          top: 5, right: 5,
-          width: 7, height: 7,
+          top: 6, right: 6,
+          width: 6, height: 6,
           borderRadius: '50%',
-          background: 'var(--color-risk-critical)',
-          border: '1.5px solid var(--color-bg-primary)',
-          boxShadow: '0 0 6px rgba(255,71,87,0.5)',
+          backgroundColor: '#ff4757',
         }} />
       ) : null}
     </button>
