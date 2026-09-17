@@ -10,11 +10,6 @@ import {
   FolderKanban,
   AlertTriangle,
   Map as MapIcon,
-  Activity,
-  ChevronRight,
-  Database,
-  BarChart3,
-  PieChart,
   AlertCircle,
   DollarSign,
   Flame
@@ -23,10 +18,11 @@ import ReactECharts from 'echarts-for-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { analyticsAPI, alertsAPI } from '@/api/client'
+import { analyticsAPI, alertsAPI, projectsAPI } from '@/api/client'
 import { MetricCard, DataNotice } from '@/components/common'
 import { Link, useNavigate } from 'react-router-dom'
 
+<<<<<<< HEAD
 // Official State Centroids (Latitude, Longitude) for georeferencing
 const STATE_COORDINATES: Record<string, [number, number]> = {
   UP: [26.8467, 80.9462],
@@ -61,41 +57,29 @@ function createRiskMarkerIcon(riskLevel: string, priorityScore?: number) {
   if (riskLevel === 'CRITICAL' || (priorityScore && priorityScore >= 80)) color = '#ff4757' // Red
   else if (riskLevel === 'HIGH' || (priorityScore && priorityScore >= 65)) color = '#f47721' // Saffron
   else if (riskLevel === 'MEDIUM' || (priorityScore && priorityScore >= 45)) color = '#d97706' // Orange/Yellow
+=======
+function createRestrainedMarkerIcon(riskLevel: string) {
+  let color = '#138808' // Low
+  if (riskLevel === 'CRITICAL' || riskLevel === 'HIGH') color = '#dc2626'
+  else if (riskLevel === 'MEDIUM') color = '#d97706'
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
 
   const html = `
     <div style="
-      position: relative;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    ">
-      <div style="
-        position: absolute;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background-color: ${color};
-        opacity: 0.35;
-        animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-      "></div>
-      <div style="
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background-color: ${color};
-        border: 2px solid #060f1e;
-        box-shadow: 0 0 10px ${color}, 0 0 4px rgba(0,0,0,0.8);
-      "></div>
-    </div>
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: ${color};
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    "></div>
   `
 
   return L.divIcon({
     html: html,
-    className: 'custom-risk-marker',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
+    className: 'clean-risk-marker',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6],
   })
 }
 
@@ -103,6 +87,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
 
   const [executiveData, setExecutiveData] = useState<any>(null)
+  const [allProjects, setAllProjects] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeAlerts, setActiveAlerts] = useState<any[]>([])
 
@@ -118,9 +103,10 @@ export default function Dashboard() {
     async function loadExecutiveDashboard() {
       try {
         setIsLoading(true)
-        const [execRes, alertsRes] = await Promise.all([
+        const [execRes, alertsRes, projectsRes] = await Promise.all([
           analyticsAPI.executive().catch(() => null),
           alertsAPI.list().catch(() => []),
+          projectsAPI.list({ page_size: 100 }).catch(() => null),
         ])
 
         if (execRes && execRes.status === 'success') {
@@ -128,6 +114,9 @@ export default function Dashboard() {
         }
         if (Array.isArray(alertsRes)) {
           setActiveAlerts(alertsRes.slice(0, 4))
+        }
+        if (projectsRes && Array.isArray(projectsRes.items)) {
+          setAllProjects(projectsRes.items)
         }
       } catch (err) {
         console.error('Failed to load executive dashboard', err)
@@ -142,6 +131,22 @@ export default function Dashboard() {
   const kpis = executiveData?.executive_kpis
   const priorityQueue = executiveData?.needs_attention_today || []
   const distributions = executiveData?.risk_distributions
+<<<<<<< HEAD
+=======
+  const geoProjects = useMemo(() => {
+    const list = allProjects.filter((p: any) =>
+      Number.isFinite(p.latitude) && Number.isFinite(p.longitude)
+    )
+    if (list.length > 0) return list
+    return priorityQueue.filter((p: any) =>
+      Number.isFinite(p.latitude) && Number.isFinite(p.longitude)
+    )
+  }, [allProjects, priorityQueue])
+  const topStates = executiveData?.state_district_comparison?.top_states || []
+  const topDistricts = executiveData?.state_district_comparison?.top_districts || []
+  const dataHealth = executiveData?.data_health
+  const reliability = executiveData?.ai_reliability_distinction?.prediction_status
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
 
   // ECharts Risk Distribution Donut / Bar Chart
   const distributionChartOption = useMemo(() => {
@@ -263,6 +268,7 @@ export default function Dashboard() {
         />
       </div>
 
+<<<<<<< HEAD
       {/* Additional Quick Stats Pill Header */}
       <div style={{
         display: 'flex',
@@ -288,6 +294,9 @@ export default function Dashboard() {
       </div>
 
       {/* ─── 3-COLUMN MID ROW: RISK DISTRIBUTION | STAGE BOTTLENECKS | PRIORITY QUEUE ─── */}
+=======
+      {/* ─── UPPER DASHBOARD ROW (3 COLUMNS): RISK BREAKDOWN | STAGE DELAYS | PRIORITY PROJECTS ─── */}
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
@@ -295,12 +304,16 @@ export default function Dashboard() {
         marginBottom: 24,
       }}>
         
-        {/* 1. Portfolio Risk Distribution */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 430 }}>
+        {/* LOGO 1 → PROJECT DELAY RISK BREAKDOWN */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 440 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <PieChart size={18} color="var(--color-accent-primary)" />
+                <img
+                  src="/assets/dashboard/logo1_delay_clock.png"
+                  alt="Project Delay Risk"
+                  style={{ height: 22, width: 'auto', maxHeight: 22, objectFit: 'contain' }}
+                />
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Portfolio Risk Distribution
                 </h3>
@@ -366,6 +379,7 @@ export default function Dashboard() {
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* 2. Stage-wise Acquisition Bottleneck Panel */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 430 }}>
           <div>
@@ -381,25 +395,43 @@ export default function Dashboard() {
 
             <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
               Quantifies timeline congestion across RFCTLARR / NH Act acquisition stages.
+=======
+        {/* LOGO 2 → WHERE PROJECTS GET DELAYED MOST */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', minHeight: 440 }}>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <img
+                src="/assets/dashboard/logo2_warning_triangle.png"
+                alt="Where Projects Get Delayed Most"
+                style={{ height: 22, width: 'auto', maxHeight: 22, objectFit: 'contain' }}
+              />
+              <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                Where Projects Get Delayed Most
+              </h3>
+            </div>
+
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: 0 }}>
+              Percentage of projects affected at each land acquisition stage.
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
             </p>
           </div>
 
           {/* Stage Progress Bars */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1, justifyContent: 'center' }}>
             {[
               { name: 'Notification (Section 3A)', pct: 41, color: '#138808' },
               { name: 'Objection (Section 3C)', pct: 37, color: '#138808' },
               { name: 'Award Declaration', pct: 52, color: '#d97706' },
-              { name: 'Compensation Disbursement', pct: 78, color: '#ff4757', isBottleneck: true },
+              { name: 'Compensation Disbursement', pct: 78, color: '#ff4757' },
               { name: 'R&R Implementation', pct: 49, color: '#d97706' },
               { name: 'Land Possession (Section 3E)', pct: 66, color: '#f47721' },
             ].map((s) => (
               <div key={s.name}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', marginBottom: 3 }}>
-                  <span style={{ fontWeight: s.isBottleneck ? 800 : 500, color: s.isBottleneck ? 'var(--color-risk-critical)' : 'var(--color-text-primary)' }}>
-                    {s.name} {s.isBottleneck && '★'}
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: 5 }}>
+                  <span style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                    {s.name}
                   </span>
-                  <strong style={{ fontFamily: 'var(--font-mono)', color: s.color }}>{s.pct}%</strong>
+                  <strong style={{ fontFamily: 'var(--font-mono)', color: s.color, fontWeight: 700 }}>{s.pct}%</strong>
                 </div>
                 <div style={{
                   height: 6,
@@ -418,6 +450,7 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
+<<<<<<< HEAD
 
           {/* Dominant Bottleneck Badge */}
           <div style={{
@@ -438,15 +471,22 @@ export default function Dashboard() {
               State: Possession
             </span>
           </div>
+=======
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
         </div>
 
-        {/* 3. Compact Priority Intervention Queue ("Needs Attention Today") */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 430 }}>
+        {/* LOGO 3 → PROJECTS REQUIRING ATTENTION */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', minHeight: 440 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Flame size={16} color="var(--color-risk-critical)" />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <img
+                  src="/assets/dashboard/logo3_attention_stamp.png"
+                  alt="Projects Requiring Attention"
+                  style={{ height: 22, width: 'auto', maxHeight: 22, objectFit: 'contain' }}
+                />
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+<<<<<<< HEAD
                   Needs Attention Today
                 </h3>
               </div>
@@ -456,89 +496,51 @@ export default function Dashboard() {
             </div>
             <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: 10 }}>
               Urgent intervention queue ranked by risk signal & bottleneck.
+=======
+                  Projects Requiring Attention
+                </h3>
+              </div>
+              <Link to="/priority-intelligence" style={{ fontSize: '0.74rem', color: 'var(--color-accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
+                View all →
+              </Link>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
+              Urgent projects ranked by likelihood of delay and key bottleneck.
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
             </p>
           </div>
 
-          {/* Scrollable Compact List */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            overflowY: 'auto',
-            maxHeight: 310,
-            paddingRight: 4,
-          }}>
-            {priorityQueue.map((item: any) => (
-              <div
-                key={item.id}
-                style={{
-                  padding: '8px 10px',
-                  background: 'var(--color-bg-tertiary)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--color-border-subtle)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 8,
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
-                  <span style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: '50%',
-                    background: item.priority_rank <= 3 ? 'rgba(255,71,87,0.15)' : 'var(--color-bg-elevated)',
-                    border: item.priority_rank <= 3 ? '1px solid var(--color-risk-critical)' : '1px solid var(--color-border-subtle)',
-                    color: item.priority_rank <= 3 ? 'var(--color-risk-critical)' : 'var(--color-text-secondary)',
-                    fontWeight: 800,
-                    fontSize: '0.68rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    fontFamily: 'var(--font-mono)',
-                  }}>
-                    {item.priority_rank}
-                  </span>
-
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <Link
-                      to={`/projects/${item.id}`}
-                      style={{
-                        fontSize: '0.78rem',
-                        fontWeight: 700,
-                        color: 'var(--color-text-primary)',
-                        textDecoration: 'none',
-                        display: 'block',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {item.name}
-                    </Link>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
-                      <span>{item.location}</span>
-                      <span>•</span>
-                      <span style={{ color: item.critical_stage === 'Compensation' ? 'var(--color-risk-critical)' : 'var(--color-text-secondary)' }}>
-                        {item.critical_stage}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  <div style={{ textAlign: 'right' }}>
-                    <strong style={{ fontSize: '0.82rem', color: item.priority_score >= 80 ? 'var(--color-risk-critical)' : 'var(--color-risk-high)', fontFamily: 'var(--font-mono)' }}>
-                      {item.priority_score}
-                    </strong>
-                  </div>
-
-                  <button
-                    onClick={() => navigate(`/projects/${item.id}`)}
-                    className="btn btn-ghost btn-sm"
-                    style={{ padding: '2px 6px', fontSize: '0.65rem' }}
+          {/* Compact Government-Style Table */}
+          <div style={{ overflowX: 'auto', flex: 1 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+              <thead>
+                <tr style={{
+                  borderBottom: '1px solid var(--color-border-default)',
+                  textAlign: 'left',
+                  color: 'var(--color-text-muted)',
+                  fontSize: '0.67rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                }}>
+                  <th style={{ padding: '8px 6px', fontWeight: 600 }}>Project</th>
+                  <th style={{ padding: '8px 6px', fontWeight: 600 }}>Location</th>
+                  <th style={{ padding: '8px 6px', fontWeight: 600 }}>Stage</th>
+                  <th style={{ padding: '8px 6px', fontWeight: 600, textAlign: 'center' }}>Risk Score</th>
+                  <th style={{ padding: '8px 6px', fontWeight: 600, textAlign: 'right' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {priorityQueue.map((item: any) => (
+                  <tr
+                    key={item.id}
+                    style={{
+                      borderBottom: '1px solid var(--color-border-subtle)',
+                      transition: 'background 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg-card-hover)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
+<<<<<<< HEAD
                     Review <ChevronRight size={10} />
                   </button>
                 </div>
@@ -550,17 +552,69 @@ export default function Dashboard() {
             <Link to="/priority-intelligence" style={{ fontSize: '0.72rem', color: 'var(--color-accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
               Open Decision Priority Engine →
             </Link>
+=======
+                    <td style={{ padding: '9px 6px', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <Link
+                        to={`/projects/${item.id}`}
+                        style={{ fontWeight: 600, color: 'var(--color-text-primary)', textDecoration: 'none' }}
+                        title={item.name}
+                      >
+                        {item.name}
+                      </Link>
+                    </td>
+                    <td style={{ padding: '9px 6px', color: 'var(--color-text-secondary)', maxWidth: 85, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.location}>
+                      {item.location || '—'}
+                    </td>
+                    <td style={{ padding: '9px 6px', color: 'var(--color-text-secondary)', maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.critical_stage}>
+                      {item.critical_stage || '—'}
+                    </td>
+                    <td style={{ padding: '9px 6px', textAlign: 'center' }}>
+                      <span style={{
+                        fontWeight: 700,
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.78rem',
+                        color: item.priority_score >= 80 ? 'var(--color-risk-critical)' : 'var(--color-risk-high)',
+                      }}>
+                        {item.priority_score}
+                      </span>
+                    </td>
+                    <td style={{ padding: '9px 6px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <Link
+                        to={`/projects/${item.id}`}
+                        style={{
+                          fontSize: '0.74rem',
+                          color: 'var(--color-accent-primary)',
+                          textDecoration: 'none',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Review →
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
           </div>
         </div>
 
       </div>
 
-      {/* ─── ROW 2 — COMPACT GIS MAP ──────────────────────────── */}
-      <div style={{ marginBottom: 24 }}>
-        {/* Compact GIS Risk Map */}
-        <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--color-bg-card)' }}>
+      {/* ─── GEOGRAPHIC RISK OVERVIEW ──────────────────────────── */}
+      <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 24 }}>
+        <div style={{
+          padding: '14px 18px',
+          borderBottom: '1px solid var(--color-border-subtle)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 12,
+        }}>
+          <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+<<<<<<< HEAD
               <MapIcon size={18} color="var(--color-accent-primary)" />
               <h3 style={{ fontSize: '0.9rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 Compact GIS Risk Map
@@ -568,20 +622,58 @@ export default function Dashboard() {
             </div>
             <Link to="/gis" className="btn btn-secondary btn-sm" style={{ padding: '2px 8px', fontSize: '0.72rem' }}>
               Open GIS Intelligence →
-            </Link>
+=======
+              <img
+                src="/assets/dashboard/logo_geo_overview.png"
+                alt="Geographic Risk Overview"
+                style={{ height: 22, width: 'auto', maxHeight: 22, objectFit: 'contain' }}
+              />
+              <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                Geographic Risk Overview
+              </h3>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>
+              Geographic distribution of monitored land acquisition risk.
+            </p>
           </div>
 
-          <div style={{ height: 320, width: '100%', position: 'relative' }}>
-            <MapContainer
-              center={[21.1458, 79.0882]}
-              zoom={5}
-              style={{ height: '100%', width: '100%', background: '#060b14' }}
-            >
-              <TileLayer
-                attribution='&copy; OpenStreetMap'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            {/* Small Low / Medium / High Legend */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#138808', display: 'inline-block' }} />
+                Low Risk
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d97706', display: 'inline-block' }} />
+                Medium Risk
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#dc2626', display: 'inline-block' }} />
+                High Risk
+              </span>
+            </div>
 
+            <Link to="/gis" style={{ fontSize: '0.72rem', color: 'var(--color-accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
+              Interactive Map →
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
+            </Link>
+          </div>
+        </div>
+
+        <div style={{ height: 340, width: '100%', position: 'relative' }}>
+          <MapContainer
+            center={[21.1458, 79.0882]}
+            zoom={5}
+            scrollWheelZoom={false}
+            style={{ height: '100%', width: '100%', background: 'var(--color-bg-primary)' }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+<<<<<<< HEAD
               {/* Map Markers */}
               {priorityQueue.map((p: any, idx: number) => {
                 const base = STATE_COORDINATES[p.state_code] || STATE_COORDINATES['MH']
@@ -612,16 +704,56 @@ export default function Dashboard() {
               })}
             </MapContainer>
           </div>
+=======
+            {geoProjects.map((p: any) => (
+              <Marker
+                key={p.id}
+                position={[p.latitude, p.longitude]}
+                icon={createRestrainedMarkerIcon(p.risk_level || (p.priority_score >= 80 ? 'CRITICAL' : p.priority_score >= 50 ? 'MEDIUM' : 'LOW'))}
+              >
+                <Popup>
+                  <div style={{ padding: 4, minWidth: 160, color: '#0f172a', fontSize: '0.75rem' }}>
+                    <strong style={{ fontSize: '0.8rem', display: 'block', marginBottom: 4 }}>{p.name}</strong>
+                    <div>District: {p.district || p.district_codes?.[0] || p.state_code || 'N/A'}</div>
+                    <div>Stage: {p.critical_stage || p.current_stage || 'N/A'}</div>
+                    <Link to={`/projects/${p.id}`} style={{ color: '#003366', fontWeight: 700, display: 'inline-block', marginTop: 6, textDecoration: 'none' }}>
+                      Review Project Details →
+                    </Link>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+
+          {geoProjects.length === 0 && (
+            <div style={{
+              position: 'absolute',
+              zIndex: 500,
+              bottom: 16,
+              left: 16,
+              right: 16,
+              padding: '8px 12px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--color-bg-glass)',
+              border: '1px solid var(--color-border-subtle)',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.74rem',
+            }}>
+              Connecting to project geographic coordinates. Monitored projects without coordinates are listed in the tables above.
+            </div>
+          )}
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
         </div>
       </div>
 
-      {/* ─── ROW 3 — STATE COMPARISON, ALERTS & DATA QUALITY ────────────── */}
+      {/* ─── LOWER DASHBOARD ROW (3 COLUMNS): STATES | ALERTS | DATA HEALTH ────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
         
-        {/* State / District Comparison */}
-        <div className="card">
+        {/* LOGO 4 → STATES WITH HIGHEST DELAY RISK */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+<<<<<<< HEAD
               <BarChart3 size={18} color="var(--color-accent-primary)" />
               <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 State / District Comparison
@@ -665,15 +797,66 @@ export default function Dashboard() {
                 </strong>
               </div>
             ))}
+=======
+              <img
+                src="/assets/dashboard/logo_states_risk_gauge.png"
+                alt="States with Highest Delay Risk"
+                style={{ height: 22, width: 'auto', maxHeight: 22, objectFit: 'contain' }}
+              />
+              <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                States with Highest Delay Risk
+              </h3>
+            </div>
+            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.68rem' }}>Ranked by avg score</span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            {topStates.slice(0, 4).map((state: any) => {
+              const district = topDistricts.find((item: any) => item.state === state.code)
+              return (
+                <div
+                  key={state.code}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '10px 4px',
+                    borderBottom: '1px solid var(--color-border-subtle)',
+                  }}
+                >
+                  <div>
+                    <strong style={{ fontSize: '0.82rem', color: 'var(--color-text-primary)' }}>
+                      {state.state} ({state.code})
+                    </strong>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                      Highest Risk District: {district ? `${district.district} (${district.score}/100)` : 'Unavailable'}
+                    </div>
+                  </div>
+                  <strong style={{
+                    fontSize: '0.92rem',
+                    fontFamily: 'var(--font-mono)',
+                    color: state.score >= 70 ? 'var(--color-risk-critical)' : 'var(--color-risk-high)',
+                  }}>
+                    {state.score}
+                  </strong>
+                </div>
+              )
+            })}
+            {topStates.length === 0 && <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', padding: '12px 0' }}>No state predictions available.</div>}
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
           </div>
         </div>
 
-        {/* Top Automated Alerts Panel */}
-        <div className="card">
+        {/* LOGO 5 → TOP ACTIVE ALERTS */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <AlertCircle size={18} color="var(--color-risk-critical)" />
-              <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+              <img
+                src="/assets/dashboard/logo5_active_alerts.png"
+                alt="Top Active Alerts"
+                style={{ height: 22, width: 'auto', maxHeight: 22, objectFit: 'contain' }}
+              />
+              <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 Top Active Alerts
               </h3>
             </div>
@@ -682,6 +865,7 @@ export default function Dashboard() {
             </Link>
           </div>
 
+<<<<<<< HEAD
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {(activeAlerts.length > 0 ? activeAlerts : [
               { id: 'a1', severity: 'CRITICAL', title: 'Project X Risk Rapidly Increased', time: '2h ago' },
@@ -699,39 +883,100 @@ export default function Dashboard() {
                 justifyContent: 'space-between',
                 gap: 8,
               }}>
+=======
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            {activeAlerts.map((a: any) => (
+              <div
+                key={a.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '9px 0',
+                  borderBottom: '1px solid var(--color-border-subtle)',
+                  gap: 10,
+                }}
+              >
+                {/* Solid Red Vertical Bar */}
+                <div
+                  style={{
+                    width: 4,
+                    alignSelf: 'stretch',
+                    minHeight: 28,
+                    backgroundColor: '#dc2626',
+                    borderRadius: 2,
+                    flexShrink: 0,
+                  }}
+                />
+
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                    <span className={`badge ${a.severity === 'CRITICAL' ? 'badge-red' : a.severity === 'HIGH' ? 'badge-yellow' : 'badge-blue'}`} style={{ fontSize: '0.62rem' }}>
-                      {a.severity}
-                    </span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>{a.time || 'Today'}</span>
+                  <div style={{ fontSize: '0.67rem', color: 'var(--color-text-muted)', marginBottom: 2 }}>
+                    {a.time || 'Today'}
                   </div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    color: 'var(--color-text-primary)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
                     {a.title || a.message}
                   </div>
                 </div>
-                <button className="btn btn-ghost btn-sm" style={{ padding: '2px 6px', fontSize: '0.68rem' }}>
+
+                <button
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--color-accent-primary)',
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    padding: '2px 4px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   Acknowledge
                 </button>
               </div>
             ))}
+<<<<<<< HEAD
+=======
+            {activeAlerts.length === 0 && (
+              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', padding: '12px 0' }}>
+                No active alerts returned by the API.
+              </div>
+            )}
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
           </div>
         </div>
 
-        {/* Data Quality / AI Reliability Panel */}
+        {/* LOGO 6 → DATA HEALTH & COMPLETENESS */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+<<<<<<< HEAD
                 <Database size={18} color="var(--color-accent-tertiary)" />
                 <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Data Health & AI Reliability
+=======
+                <img
+                  src="/assets/dashboard/logo_data_health_checklist.png"
+                  alt="Data Health & Completeness"
+                  style={{ height: 22, width: 'auto', maxHeight: 22, objectFit: 'contain', filter: 'brightness(0) invert(0.9)' }}
+                />
+                <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                  Data Health & Completeness
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
                 </h3>
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.78rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 9, fontSize: '0.78rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+<<<<<<< HEAD
                 <span>Projects Complete Data:</span>
                 <strong style={{ color: '#138808' }}>61%</strong>
               </div>
@@ -750,15 +995,48 @@ export default function Dashboard() {
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Low-Reliability Predictions:</span>
                 <strong style={{ color: 'var(--color-risk-critical)' }}>7</strong>
+=======
+                <span style={{ color: 'var(--color-text-secondary)' }}>Projects with Full Predictions:</span>
+                <strong style={{ color: '#138808', fontFamily: 'var(--font-mono)' }}>{dataHealth?.prediction_available ?? 0}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--color-text-secondary)' }}>Projects Awaiting Assessment:</span>
+                <strong style={{ color: '#d97706', fontFamily: 'var(--font-mono)' }}>{dataHealth?.prediction_unavailable ?? 0}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--color-text-secondary)' }}>Total Monitored Projects:</span>
+                <strong style={{ color: '#7daaff', fontFamily: 'var(--font-mono)' }}>{dataHealth?.total_projects ?? 0}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--color-border-subtle)', paddingTop: 7 }}>
+                <span style={{ color: 'var(--color-text-secondary)' }}>Average Data Completeness:</span>
+                <strong style={{ color: 'var(--color-accent-tertiary)', fontFamily: 'var(--font-mono)' }}>{dataHealth?.average_trust_score ?? 0}/100</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--color-text-secondary)' }}>Incomplete Data Warnings:</span>
+                <strong style={{ color: 'var(--color-risk-critical)', fontFamily: 'var(--font-mono)' }}>{reliability?.low_reliability ?? 0}</strong>
+>>>>>>> 6b84d27 (Dasboard 2.0 extended version)
               </div>
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid var(--color-border-subtle)', paddingTop: 10, marginTop: 12 }}>
+          <div style={{ borderTop: '1px solid var(--color-border-subtle)', paddingTop: 12, marginTop: 14 }}>
             <button
               onClick={() => navigate('/data-quality')}
-              className="btn btn-secondary btn-sm"
-              style={{ width: '100%', justifyContent: 'center', fontSize: '0.75rem' }}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                background: 'transparent',
+                border: '1px solid var(--color-border-subtle)',
+                borderRadius: 'var(--radius-sm)',
+                color: 'var(--color-accent-primary)',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textAlign: 'center',
+                transition: 'background 0.15s ease',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg-tertiary)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               Review Data Quality →
             </button>

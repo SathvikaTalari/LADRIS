@@ -108,7 +108,7 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
             </span>
           </motion.div>
         )}
-        <div style={{ flex: 1, maxWidth: 380 }}>
+        <div style={{ flex: 1, maxWidth: 500 }}>
           <GlobalSearch />
         </div>
       </div>
