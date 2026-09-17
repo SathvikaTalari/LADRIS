@@ -20,6 +20,8 @@ from app.api.v1.reports import router as reports_router
 from app.api.v1.etl import etl_router
 from app.api.v1.audit import audit_router
 from app.api.v1.chatbot import router as chatbot_router
+from app.api.v1.ingestion import router as ingestion_router
+from app.api.v1.decision_intelligence import router as decision_intelligence_router
 from app.api.v1.stubs import (
     analytics_router,
     gis_router,
@@ -30,6 +32,7 @@ api_router = APIRouter(prefix="/api/v1")
 
 api_router.include_router(auth_router)
 api_router.include_router(projects_router)
+api_router.include_router(ingestion_router)
 api_router.include_router(stages_router)
 api_router.include_router(predictions_router)
 api_router.include_router(models_router)
@@ -46,3 +49,4 @@ api_router.include_router(analytics_router)
 api_router.include_router(etl_router)
 api_router.include_router(audit_router)
 api_router.include_router(chatbot_router)
+api_router.include_router(decision_intelligence_router)

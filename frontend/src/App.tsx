@@ -37,6 +37,12 @@ import ResearchPapers from '@/pages/documents/ResearchPapers'
 import CaseStudies from '@/pages/documents/CaseStudies'
 import RealWorldExamples from '@/pages/documents/RealWorldExamples'
 
+import PriorityIntelligence from '@/pages/PriorityIntelligence'
+import DecisionIntelligence from '@/pages/DecisionIntelligence'
+import LAWorkbench from '@/pages/LAWorkbench'
+import AgencyPortal from '@/pages/AgencyPortal'
+import { useThemeStore } from '@/store/themeStore'
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, fetchMe } = useAuthStore()
   const token = localStorage.getItem('access_token')
@@ -53,12 +59,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>
 }
-
-import PriorityIntelligence from '@/pages/PriorityIntelligence'
-import Intelligence from '@/pages/Intelligence'
-import LAWorkbench from '@/pages/LAWorkbench'
-import AgencyPortal from '@/pages/AgencyPortal'
-import { useThemeStore } from '@/store/themeStore'
 
 export default function App() {
   const { theme } = useThemeStore()
@@ -105,9 +105,11 @@ export default function App() {
           <Route path="la-workbench" element={<LAWorkbench />} />
           <Route path="agency-portal" element={<AgencyPortal />} />
           <Route path="priority-intelligence" element={<PriorityIntelligence />} />
-          <Route path="intelligence" element={<Intelligence />} />
+          <Route path="intelligence" element={<DecisionIntelligence />} />
+          <Route path="decision-intelligence" element={<DecisionIntelligence />} />
           <Route path="projects" element={<ProjectList />} />
-          <Route path="projects/new" element={<ProjectForm />} />
+          <Route path="projects/new" element={<Navigate to="/projects?new=true" replace />} />
+          <Route path="ingestion" element={<Navigate to="/projects?new=true" replace />} />
           <Route path="projects/:id/edit" element={<ProjectForm />} />
           <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="gis" element={<GIS />} />

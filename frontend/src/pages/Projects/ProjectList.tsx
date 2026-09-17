@@ -3,13 +3,14 @@
  * Multi-criteria filterable directory by Status, Risk Level, State, District, and Agency.
  */
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Plus, Search, Filter, FolderKanban, ChevronRight, RotateCcw, MapPin, Building2 } from 'lucide-react'
+import { Plus, Search, Filter, FolderKanban, ChevronRight, RotateCcw, MapPin, Building2, Edit3, CheckCircle2, X } from 'lucide-react'
 import { projectsAPI } from '@/api/client'
 import type { ProjectListItem, ProjectStatus, RiskLevel } from '@/types'
 import { RiskBadge, StatusBadge, EmptyState, LoadingState, PageHeader } from '@/components/common'
 import { formatDate, formatHa } from '@/utils'
+import { NewProjectModal } from '@/pages/DataIngestion'
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: '', label: 'All Statuses' },
@@ -59,10 +60,14 @@ const AGENCY_OPTIONS: { value: string; label: string }[] = [
 
 export default function ProjectList() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [showNewProjectModal, setShowNewProjectModal] = useState<boolean>(searchParams.get('new') === 'true')
+  const [deletedAlert, setDeletedAlert] = useState<{ code: string; name: string } | null>(null)
   const [projects, setProjects] = useState<ProjectListItem[]>([])
   const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
+  const [page, setPage] = useState(1)
 
   // Filters
   const [search, setSearch] = useState('')
@@ -111,6 +116,23 @@ export default function ProjectList() {
     return () => clearTimeout(timer)
   }, [loadProjects])
 
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      setShowNewProjectModal(true)
+    }
+  }, [searchParams])
+
+  useEffect(() => {
+    if (location.state?.deletedProjectCode) {
+      setDeletedAlert({
+        code: location.state.deletedProjectCode,
+        name: location.state.deletedProjectName || location.state.deletedProjectCode,
+      })
+      window.history.replaceState({}, document.title)
+      loadProjects()
+    }
+  }, [location.state, loadProjects])
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -123,12 +145,59 @@ export default function ProjectList() {
         actions={
           <button
             className="btn btn-primary"
-            onClick={() => navigate('/projects/new')}
+            onClick={() => setShowNewProjectModal(true)}
           >
             <Plus size={16} />
             New Project
           </button>
         }
+      />
+
+      {/* Deleted Project Success Alert */}
+      {deletedAlert && (
+        <div
+          className="card"
+          style={{
+            background: 'rgba(34, 197, 94, 0.1)',
+            border: '1px solid rgba(34, 197, 94, 0.35)',
+            color: '#22c55e',
+            padding: '12px 18px',
+            marginBottom: 20,
+            borderRadius: 8,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <CheckCircle2 size={18} />
+            <span style={{ fontSize: '0.9rem' }}>
+              Project <strong>{deletedAlert.code}</strong> {deletedAlert.name && deletedAlert.name !== deletedAlert.code ? `(${deletedAlert.name})` : ''} has been successfully deleted from the active directory.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setDeletedAlert(null)}
+            className="btn btn-ghost"
+            style={{ padding: '2px 6px', color: '#22c55e', minHeight: 'auto' }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* New Project Modal with all 6 data ingestion methods */}
+      <NewProjectModal
+        isOpen={showNewProjectModal}
+        onClose={() => {
+          setShowNewProjectModal(false)
+          if (searchParams.get('new')) {
+            setSearchParams({})
+          }
+        }}
+        onProjectCreated={() => {
+          loadProjects()
+        }}
       />
 
       {/* Filter Control Bar */}
@@ -278,7 +347,7 @@ export default function ProjectList() {
                   <th>State & District</th>
                   <th>Land Area (ha)</th>
                   <th>Target Completion</th>
-                  <th></th>
+                  <th style={{ textAlign: 'right', minWidth: 100 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -334,8 +403,28 @@ export default function ProjectList() {
                       </td>
                       <td>{formatHa(project.total_area_ha)}</td>
                       <td>{formatDate(project.planned_end_date)}</td>
-                      <td>
-                        <ChevronRight size={16} color="var(--color-text-muted)" />
+                      <td style={{ textAlign: 'right' }} onClick={(e) => e.stopPropagation()}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <button
+                            type="button"
+                            className="btn btn-ghost"
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '0.78rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              color: 'var(--color-text-secondary)',
+                              borderRadius: 4,
+                            }}
+                            title="Edit Project"
+                            onClick={() => navigate(`/projects/${project.id}/edit`)}
+                          >
+                            <Edit3 size={13} />
+                            Edit
+                          </button>
+                          <ChevronRight size={16} color="var(--color-text-muted)" onClick={() => navigate(`/projects/${project.id}`)} />
+                        </div>
                       </td>
                     </motion.tr>
                   )

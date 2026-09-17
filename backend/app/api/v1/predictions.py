@@ -27,10 +27,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user, require_analyst
+from app.models.ml_models import MLPrediction
 from app.models.project import Project
 from app.models.user import User
 from app.services.ml_feature_service import validate_project_consistency
-from app.services.production_ml_service import _runtime, latest_prediction, latest_predictions, serialize_prediction
+from app.services.production_ml_service import (
+    _runtime,
+    ensure_current_prediction,
+    latest_prediction,
+    latest_predictions,
+    serialize_prediction,
+)
 
 predictions_router = APIRouter(prefix="/predictions", tags=["Risk Predictions"])
 models_router = APIRouter(prefix="/models", tags=["ML Models"])
@@ -47,13 +54,9 @@ async def get_project_prediction(
 ) -> Dict[str, Any]:
     """
     Get risk prediction for a project.
-
-    Returns two clearly separated signals:
-    - **anomaly_risk**: IsolationForest structural anomaly score (trained on BhoomiRashi data)
-    - **delay_risk**: null — supervised delay prediction DEFERRED (no fabricated scores)
-
-    Also returns SHAP feature contributions, data completeness, and provenance.
-    If project lacks sufficient data, returns INSUFFICIENT_DATA status.
+    Returns the complete 12 Core ML outputs with calibrated risk score,
+    delay probability, delay range, stage-wise risk, stage completion estimates,
+    critical stage, top delay drivers, risk trend, and high-risk alerts.
     """
     project = await db.get(Project, project_id)
     if not project:
@@ -63,8 +66,19 @@ async def get_project_prediction(
         )
     row = await latest_prediction(db, project_id)
     if row is None:
-        raise HTTPException(status_code=404, detail="No stored production ML prediction for this project")
-    return serialize_prediction(row)
+        try:
+            return await ensure_current_prediction(db, project_id)
+        except Exception as exc:
+            raise HTTPException(status_code=404, detail=f"No stored production ML prediction for this project: {exc}")
+
+    prev_pred = (await db.execute(
+        select(MLPrediction)
+        .where(MLPrediction.project_id == project_id, MLPrediction.id != row.id)
+        .order_by(MLPrediction.predicted_at.desc())
+        .limit(1)
+    )).scalar_one_or_none()
+    prev_score = prev_pred.risk_score if prev_pred else None
+    return serialize_prediction(row, previous_score=prev_score)
 
 
 @predictions_router.get("/{project_id}/stages")

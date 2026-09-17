@@ -350,6 +350,14 @@ async def delete_project(
         .where(Project.id == project_id)
         .values(deleted_at=datetime.now(tz=timezone.utc))
     )
+    await db.commit()
+
+    try:
+        from app.services.project_csv_service import remove_project_from_csv
+        remove_project_from_csv(project.project_code)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("Failed to remove deleted project %s from CSV: %s", project.project_code, exc)
 
     await record_audit_log(
         db=db,

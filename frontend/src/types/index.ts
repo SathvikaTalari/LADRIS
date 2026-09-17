@@ -139,6 +139,7 @@ export interface Project {
   actual_end_date: string | null
   estimated_compensation_inr: number | null
   disbursed_compensation_inr: number | null
+  rehabilitation_progress_pct?: number | null
   notification_3a_date?: string | null
   notification_3d_date?: string | null
   milestone_data_status?: string | null
@@ -413,6 +414,55 @@ export interface PredictionResult {
   // Phase 3 dual-signal architecture
   anomaly_risk?: AnomalyRiskSignal
   delay_risk?: DelayRiskSignal
+
+  // Core 12 ML Predictions
+  estimated_delay_days?: number | null
+  delay_range?: {
+    lower_days: number | null
+    upper_days: number | null
+    range_text: string
+  }
+  stage_wise_risk?: Array<{
+    stage: string
+    delay_probability: number
+    risk_score: number
+    risk_category: 'HIGH' | 'MEDIUM' | 'LOW'
+  }>
+  stage_completion_estimates?: Array<{
+    stage: string
+    stage_name_display: string
+    baseline_days: number
+    estimated_duration_days: number
+    delay_probability: number
+    risk_score: number
+    risk_category: 'HIGH' | 'MEDIUM' | 'LOW'
+    expected_completion_date: string
+  }>
+  critical_stage?: {
+    stage: string
+    stage_name_display: string
+    risk_score: number
+    delay_probability: number
+    reason: string
+  }
+  top_delay_drivers?: Array<{
+    feature: string
+    value: unknown
+    contribution: number
+    direction: string
+    recommendation?: string | null
+  }>
+  risk_trend?: {
+    trend: 'INCREASING' | 'DECREASING' | 'STABLE'
+    delta: number
+    previous_score?: number | null
+  }
+  recommended_action?: string | null
+  high_risk_alert?: {
+    requires_immediate_attention: boolean
+    alert_level: 'HIGH' | 'MEDIUM' | 'LOW'
+    alert_message: string
+  }
 
   // Legacy compatibility (still returned for backward compat)
   overall_risk_score?: number

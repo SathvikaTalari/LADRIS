@@ -33,7 +33,7 @@ def test_intelligence_endpoints_auth_protection():
     r2 = client.get("/api/v1/intelligence/priority-queue")
     assert r2.status_code == 401
 
-    r3 = client.post("/api/v1/intelligence/resource-scenario", json={"capacity_constraints": {"LEGAL": 1}})
+    r3 = client.get("/api/v1/intelligence/gis-heatmap")
     assert r3.status_code == 401
 
     r4 = client.get("/api/v1/intelligence/risk-dna/a0000000-0000-0000-0000-000000000001")

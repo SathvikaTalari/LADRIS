@@ -14,11 +14,12 @@ const PAGE_TITLES: Record<string, string> = {
   '/agency-portal': 'Implementing Agency Portal',
   '/priority-intelligence': 'Priority Intelligence',
   '/intelligence': 'Decision Intelligence',
+  '/decision-intelligence': 'Decision Intelligence',
   '/projects': 'Projects',
   '/gis': 'GIS Risk Map',
   '/analytics': 'Analytics',
   '/alerts': 'Alerts & Notifications',
-  '/data-sources': 'Data Sources',
+  '/data-sources': 'Data Sources & Provenance',
   '/data-quality': 'Data Quality',
   '/admin': 'Administration',
 }

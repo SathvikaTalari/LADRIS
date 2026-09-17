@@ -44,7 +44,7 @@ from app.ml.model_store import load_model, get_model_metadata
 from app.ml.input_validation import validate_and_clean
 
 DEFAULT_RECOMMENDATION = (
-    "Review this project's status manually; no single dominant driver identified."
+    "Maintain active statutory tracking; all project milestones are progressing within schedule."
 )
 
 

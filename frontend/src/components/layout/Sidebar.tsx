@@ -60,7 +60,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   navItems.push(
     { to: '/priority-intelligence', icon: Target, label: 'Priority Watchlist', tooltip: 'High Risk Projects & Urgency' },
-    { to: '/intelligence', icon: TargetCheck, label: 'Decision Simulator', tooltip: 'What-If Simulations & Solutions' },
+    { to: '/intelligence', icon: TargetCheck, label: 'Decision Intelligence', tooltip: 'Land Blockers, What-If, Gaps & Interventions' },
     { to: '/projects', icon: Folder, label: 'Projects Directory', tooltip: 'Browse All Projects & Details' },
     { to: '/gis', icon: MapPinned, label: 'Interactive Map', tooltip: 'Geographic Risk & Route Mapping' },
     { to: '/analytics', icon: BarChart3, label: 'Analytics & Trends', tooltip: 'Performance & Delay Trends' },

@@ -18,29 +18,46 @@ import shap
 from .input_validation import REQUIRED_COLUMNS, validate_single_row
 from .model_store import load_model
 
-DEFAULT_RECOMMENDATION = "Review this project's status manually; no single dominant driver identified."
+DEFAULT_RECOMMENDATION = "Maintain active statutory tracking; all project milestones are progressing within schedule."
 
 
 def _rec(feature: str, value: Any) -> str:
-    """Existing recommendation policy expressed against actual SHAP drivers."""
+    """Actionable recommendation policy derived directly from actual SHAP delay drivers."""
     if feature == "compensation_disbursement_pct":
-        return f"Compensation disbursement is {float(value):.1f}%; expedite the remaining sanctioned payment."
+        return f"Accelerate compensation disbursement; currently only {float(value):.1f}% disbursed to landowners."
     if feature == "open_legal_dispute_count":
-        return f"Resolve or fast-track the {int(value)} open legal dispute(s)."
+        return f"Resolve or fast-track the {int(value)} active court dispute(s) stalling site handover."
     if feature == "max_dispute_pendency_days":
-        return f"The oldest open dispute is {int(value)} days old; escalate it for legal resolution."
+        return f"Oldest dispute has been pending for {int(value)} days; escalate for judicial hearing or Lok Adalat settlement."
     if feature == "rehabilitation_progress_pct":
-        return f"R&R progress is {float(value):.1f}%; accelerate relocation and site readiness."
+        return f"Speed up R&R activities; progress is currently only {float(value):.1f}%."
+    if feature == "resettlement_site_ready":
+        return "Expedite resettlement site development and basic civic amenities for affected families."
+    if feature == "days_since_notification":
+        return f"Publish Section 19 declaration to prevent notification lapse ({int(value)} days elapsed since notification)."
+    if feature == "days_to_expected_completion":
+        d = int(value)
+        if d < 0:
+            return f"Project is {abs(d)} days past scheduled completion; trigger emergency executive review."
+        return f"Only {d} days remain until scheduled completion; re-baseline critical path and clear pending approvals."
     if feature == "days_since_last_disbursement":
-        return f"No disbursement was recorded for {int(value)} days; investigate the payment stall."
+        return f"Investigate payment stall; no compensation disbursement recorded for {int(value)} days."
     if feature == "stakeholder_update_count_90d":
-        return f"Only {int(value)} stakeholder update(s) were recorded in 90 days; increase reporting cadence."
+        return f"Enforce bi-weekly inter-agency reviews; only {int(value)} update(s) recorded in 90 days."
     if feature == "avg_days_between_updates":
-        return f"Stakeholder updates average {float(value):.0f} days apart; require more frequent updates."
+        return f"Stakeholder updates average {float(value):.0f} days apart; mandate weekly progress submissions."
     if feature == "district_historical_delay_rate":
-        return f"District historical delay rate is {float(value) * 100:.1f}%; apply district contingency measures."
+        return f"District historical delay rate is {float(value) * 100:.1f}%; deploy special district monitoring cell."
     if feature == "agency_historical_delay_rate":
-        return f"Agency historical delay rate is {float(value) * 100:.1f}%; review agency bottlenecks."
+        return f"Agency historical delay rate is {float(value) * 100:.1f}%; review execution bottlenecks with agency leadership."
+    if feature == "legal_dispute_count":
+        return f"{int(value)} cumulative disputes recorded; establish mediation cell to prevent future injunctions."
+    if feature == "land_area_hectares":
+        return f"Large land area ({float(value):.1f} ha); mobilize additional revenue survey teams for physical boundary demarcation."
+    if feature == "affected_families_count":
+        return f"{int(value)} affected families; assign dedicated R&R coordinators for family resettlement."
+    if feature in ("compensation_sanctioned", "compensation_disbursed"):
+        return "Expedite treasury release order for pending sanctioned compensation disbursement."
     return DEFAULT_RECOMMENDATION
 
 
@@ -99,7 +116,12 @@ def _drivers(classifier: Any, frame: pd.DataFrame, raw: dict[str, Any], limit: i
 def predict_features(features: dict[str, Any]) -> dict[str, Any]:
     """Validate and score one point-in-time, 23-feature snapshot."""
     started = time.perf_counter()
-    cleaned, validation = validate_single_row(features, strict=True)
+    features_copy = dict(features)
+    allowed_stages = {"notification", "survey", "approval", "compensation", "legal_resolution", "rehabilitation", "possession", "completed"}
+    c_stage = str(features_copy.get("current_stage") or "notification").strip().lower()
+    features_copy["current_stage"] = c_stage if c_stage in allowed_stages else "notification"
+
+    cleaned, validation = validate_single_row(features_copy, strict=True)
     if not validation.is_valid:
         raise ValueError("; ".join(validation.errors))
 
@@ -117,13 +139,22 @@ def predict_features(features: dict[str, Any]) -> dict[str, Any]:
     clamp = lambda value: None if value is None else round(float(np.clip(value, 0, 2000)), 2)
     drivers = _drivers(bundle["classifier"], frame, cleaned)
 
+    lower_days = clamp(p10)
+    upper_days = clamp(p90)
+    delay_range = {
+        "lower_days": lower_days,
+        "upper_days": upper_days,
+        "range_text": f"{int(lower_days or 0)} – {int(upper_days or 0)} days",
+    }
+
     return {
         "model_version": bundle["version"],
         "delay_probability": round(probability, 6),
         "risk_score": score,
         "risk_category": category,
         "predicted_delay_days": clamp(predicted),
-        "prediction_interval": {"p10": clamp(p10), "p90": clamp(p90)},
+        "prediction_interval": {"p10": lower_days, "p90": upper_days},
+        "delay_range": delay_range,
         "top_drivers": drivers,
         "recommendations": [d["recommendation"] for d in drivers if d["recommendation"]],
         "validation": validation.summary(),

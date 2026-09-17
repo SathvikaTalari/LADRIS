@@ -156,22 +156,6 @@ async def priority_queue(filter_state: str | None = None, filter_agency: str | N
     return {"output_type": "D", "output_type_label": "Production ML risk queue", "total_projects": len(queue), "tier_summary": dict(Counter(item["queue_tier"] for item in queue)), "active_filters": {"state": filter_state, "agency": filter_agency, "tier": filter_tier}, "queue": queue, "queue_disclaimer": "Priority equals the production model risk score; no independent risk scoring is applied.", "computed_at": datetime.now(timezone.utc).isoformat()}
 
 
-@intelligence_router.post("/resource-scenario")
-async def resource_scenario(payload: dict[str, Any], db: AsyncSession = Depends(get_db), _: User = Depends(require_analyst)):
-    capacities = {key: max(0, int(value)) for key, value in (payload.get("capacity_constraints") or {}).items()}
-    remaining = dict(capacities)
-    queue = await _queue(db, payload.get("filter_state"), payload.get("filter_agency"))
-    assigned, deferred = [], []
-    for item in queue:
-        resource = item["recommended_resource"]["type"]
-        if remaining.get(resource, 0) > 0:
-            remaining[resource] -= 1
-            assigned.append({**item, "allocation_status": "ASSIGNED", "assigned_resource_type": resource, "assigned_resource_label": item["recommended_resource"]["label"], "allocation_note": "Assigned in descending stored ML risk order."})
-        else:
-            deferred.append({**item, "allocation_status": "DEFERRED", "deferral_reason": f"No {resource} capacity supplied"})
-    return {"output_type": "E", "output_type_label": "Capacity scenario", "simulation_type": "deterministic_capacity_assignment", "disclaimer": "Decision-support allocation only; no project or prediction records are changed.", "input_constraints": capacities, "total_projects": len(queue), "assigned_count": len(assigned), "deferred_count": len(deferred), "remaining_capacity": remaining, "assigned_projects": assigned, "deferred_projects": deferred, "simulation_note": "Uses ML risk ordering and SHAP-driver resource mapping.", "computed_at": datetime.now(timezone.utc).isoformat(), "available": True, "reason": None}
-
-
 @intelligence_router.get("/gis-heatmap")
 async def gis_heatmap(db: AsyncSession = Depends(get_db), _: User = Depends(get_current_user)):
     projects = {p.id: p for p in await _projects(db)}

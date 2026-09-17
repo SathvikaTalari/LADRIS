@@ -345,5 +345,8 @@ async def root():
 
 
 # ─── Mount API Router ─────────────────────────────────────────────────────────
+from app.api.v1.decision_intelligence import router as decision_intelligence_router
 app.include_router(api_router)
 app.include_router(ml_router)
+app.include_router(decision_intelligence_router, prefix="/api")
+
