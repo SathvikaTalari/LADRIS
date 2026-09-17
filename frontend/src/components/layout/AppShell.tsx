@@ -9,7 +9,7 @@ import { TopNav } from './TopNav'
 import { SaarthiWidget } from '@/components/chatbot/SaarthiWidget'
 
 const PAGE_TITLES: Record<string, string> = {
-  '/dashboard': 'Command Dashboard',
+  '/dashboard': 'Land Acquisition Overview',
   '/la-workbench': 'LA Officer Workbench',
   '/agency-portal': 'Implementing Agency Portal',
   '/priority-intelligence': 'Priority Intelligence',
@@ -46,8 +46,8 @@ export function AppShell() {
         transition={{ duration: 0.22, ease: 'easeInOut' }}
         style={{
           boxSizing: 'border-box',
-          marginTop: 'var(--topnav-height)',
-          minHeight: 'calc(100vh - var(--topnav-height))',
+          marginTop: 'calc(var(--topnav-height) + 14px)',
+          minHeight: 'calc(100vh - var(--topnav-height) - 14px)',
           background: 'var(--color-bg-primary)',
           overflowX: 'hidden',
         }}

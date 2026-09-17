@@ -236,30 +236,6 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Additional Quick Stats Pill Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '10px 16px',
-        borderRadius: 'var(--radius-lg)',
-        background: 'var(--color-bg-card)',
-        border: '1px solid var(--color-border-subtle)',
-        marginBottom: 20,
-        fontSize: '0.82rem',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <span>Projects Requiring Intervention: <strong style={{ color: 'var(--color-risk-critical)' }}>{kpis?.projects_requiring_intervention ?? 0}</strong></span>
-          <span>•</span>
-          <span>Average Data Completeness: <strong style={{ color: 'var(--color-accent-primary)' }}>{kpis?.avg_data_completeness ?? 0}%</strong></span>
-          <span>•</span>
-          <span>Data Quality Score: <strong style={{ color: 'var(--color-accent-tertiary)' }}>{kpis?.data_trust_score ?? 0}/100</strong></span>
-        </div>
-        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
-          * AI delay predictions based on active project records
-        </span>
-      </div>
-
       {/* ─── 3-COLUMN MID ROW: RISK DISTRIBUTION | STAGE BOTTLENECKS | PRIORITY QUEUE ─── */}
       <div style={{
         display: 'grid',

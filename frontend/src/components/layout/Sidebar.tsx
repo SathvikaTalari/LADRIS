@@ -98,8 +98,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       }}>
         {/* Logo mark */}
         <div style={{
-          width: 36, height: 36,
-          borderRadius: 10,
+          width: 38, height: 38,
+          borderRadius: 8,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -107,7 +107,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           overflow: 'hidden',
           background: 'rgba(14,22,40,0.85)',
           border: '1px solid rgba(64,128,255,0.25)',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.35)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
           padding: 2,
         }}>
           <img
@@ -134,14 +134,16 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 LADRIS
               </div>
               <div style={{
-                fontSize: '0.6rem',
+                fontSize: '0.5rem',
                 color: 'var(--color-accent-primary)',
                 fontWeight: 700,
-                letterSpacing: '0.12em',
+                letterSpacing: '0.04em',
                 textTransform: 'uppercase',
-                marginTop: 1,
+                lineHeight: 1.25,
+                marginTop: 2,
               }}>
-                Intelligence Platform
+                <div>LAND ACQUISITION DELAY RISK</div>
+                <div>INTELLIGENCE SYSTEM</div>
               </div>
             </motion.div>
           )}
