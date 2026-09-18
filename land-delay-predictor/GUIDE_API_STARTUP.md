@@ -1,5 +1,11 @@
 # API Startup & Dashboard Access Guide
 
+> **⚠️ IMPORTANT NOTE FOR LADRIS DEVELOPERS**:
+> In the main LADRIS integrated repository, you **DO NOT need to follow this guide or start a separate API server on port 8000**.
+> The ML model is embedded directly in-process within the main FastAPI backend (`backend/app/services/production_ml_service.py`).
+> To run the application, simply follow the main root instructions (`.\setup_team.ps1` or `python doctor.py`).
+> This guide is retained only as legacy documentation for standalone testing.
+
 ## Prerequisites
 
 1. **PostgreSQL with PostGIS**

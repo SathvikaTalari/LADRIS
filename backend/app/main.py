@@ -190,6 +190,11 @@ async def lifespan(app: FastAPI):
         try:
             async with engine.connect() as raw_conn:
                 raw_conn = await raw_conn.execution_options(isolation_level="AUTOCOMMIT")
+                for ext in ['uuid-ossp', 'postgis', 'pg_trgm']:
+                    try:
+                        await raw_conn.execute(text(f'CREATE EXTENSION IF NOT EXISTS "{ext}"'))
+                    except Exception:
+                        pass
                 for r in ['CENTRAL_ADMIN', 'LA_OFFICER', 'PROJECT_AGENCY', 'POLICY_ANALYST']:
                     try:
                         await raw_conn.execute(text(f"ALTER TYPE user_role ADD VALUE IF NOT EXISTS '{r}'"))
@@ -216,7 +221,7 @@ async def lifespan(app: FastAPI):
                     ADD COLUMN IF NOT EXISTS longitude NUMERIC(9, 6),
                     ADD COLUMN IF NOT EXISTS lacrris_integration_status VARCHAR(50) DEFAULT 'PLANNED'
             """))
-            await conn.execute(text("ALTER TABLE projects ALTER COLUMN district_codes TYPE TEXT[]"))
+            await conn.execute(text("ALTER TABLE projects ALTER COLUMN district_codes TYPE TEXT[] USING district_codes::text[]"))
             await conn.execute(text("ALTER TABLE projects ALTER COLUMN milestone_data_status SET DEFAULT 'USER_ENTERED'"))
             await conn.execute(text("ALTER TABLE rr_records ADD COLUMN IF NOT EXISTS resettlement_site_ready BOOLEAN"))
         print("   ✅ Database tables & PostGIS schema verified")
@@ -224,11 +229,12 @@ async def lifespan(app: FastAPI):
         print(f"   ⚠️  Database auto-migration warning: {e}")
     db_ok = await check_db_connection()
     if db_ok:
-        print("   ✅ Database connection: OK")
+        print(f"   ✅ Database connection: OK ({settings.effective_host}:{settings.effective_port}/{settings.POSTGRES_DB})")
         await ensure_default_users()
         await ensure_default_data_sources()
     else:
-        print("   ⚠️  Database connection: FAILED — check DB service")
+        print(f"   ⚠️  Database connection: FAILED ({settings.effective_host}:{settings.effective_port}/{settings.POSTGRES_DB})")
+        print("       Tip: Start Docker with 'docker compose up -d db' or run 'python doctor.py'")
     model_ready = False
     try:
         info = warm_production_model()
@@ -236,6 +242,7 @@ async def lifespan(app: FastAPI):
         print(f"   ✅ Production ML model loaded: {info['model_version']}")
     except Exception as exc:
         print(f"   ⚠️  Production ML model unavailable: {exc}")
+        print("       Tip: Run 'python doctor.py' to verify ML dependencies and model artifacts.")
     if db_ok and settings.SYNC_PROJECTS_FROM_CSV:
         try:
             from app.services.project_csv_service import sync_projects_from_csv

@@ -25,7 +25,7 @@ echo -e "\n[2/5] Starting PostGIS database container (landpulse_db)..."
 docker compose up -d db || echo "   [WARN] Docker command failed or Docker is not running. If you have local Postgres, that will be used."
 
 # 3. Backend virtual environment & dependencies
-echo -e "\n[3/5] Setting up Backend Python virtual environment..."
+echo -e "\n[3/6] Setting up Backend Python virtual environment..."
 cd "$REPO_ROOT/backend"
 if [ ! -d "venv" ]; then
     python3 -m venv venv
@@ -35,13 +35,18 @@ pip install --quiet --upgrade pip
 pip install --quiet -r requirements.txt
 echo -e "   [OK] Backend dependencies installed."
 
-# 4. Sync my_raw_projects.csv and generate ML delay predictions
-echo -e "\n[4/5] Loading 25 projects from my_raw_projects.csv & generating ML predictions..."
+# 4. Apply all database migrations & verify PostGIS
+echo -e "\n[4/6] Running database migrations & schema synchronization..."
+python run_migrations.py
+echo -e "   [OK] Database schema & PostGIS extensions verified."
+
+# 5. Sync my_raw_projects.csv and generate ML delay predictions
+echo -e "\n[5/6] Loading projects from my_raw_projects.csv & generating ML predictions..."
 python seed_my_raw_projects.py
 echo -e "   [OK] ML predictions & SHAP explanations synchronized."
 
-# 5. Frontend dependencies
-echo -e "\n[5/5] Checking Frontend npm dependencies..."
+# 6. Frontend dependencies
+echo -e "\n[6/6] Checking Frontend npm dependencies..."
 cd "$REPO_ROOT/frontend"
 if [ ! -d "node_modules" ]; then
     npm install
@@ -49,6 +54,9 @@ fi
 echo -e "   [OK] Frontend ready."
 
 cd "$REPO_ROOT"
+
+# Run environment doctor check
+python doctor.py
 
 echo -e "\n========================================================"
 echo -e "   [SUCCESS] LADRIS Environment Setup Complete!"

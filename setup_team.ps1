@@ -27,7 +27,7 @@ try {
 }
 
 # 3. Backend virtual environment & dependencies
-Write-Host "`n[3/5] Setting up Backend Python virtual environment..." -ForegroundColor Yellow
+Write-Host "`n[3/6] Setting up Backend Python virtual environment..." -ForegroundColor Yellow
 Set-Location "$RepoRoot\backend"
 if (-not (Test-Path "venv")) {
     python -m venv venv
@@ -37,13 +37,18 @@ $BackendPy = "$RepoRoot\backend\venv\Scripts\python.exe"
 & $BackendPy -m pip install --quiet -r requirements.txt
 Write-Host "   [OK] Backend dependencies installed." -ForegroundColor Green
 
-# 4. Sync my_raw_projects.csv and generate ML delay predictions
-Write-Host "`n[4/5] Loading 25 projects from my_raw_projects.csv and generating ML predictions..." -ForegroundColor Yellow
+# 4. Apply all database migrations & verify PostGIS
+Write-Host "`n[4/6] Running database migrations & schema synchronization..." -ForegroundColor Yellow
+& $BackendPy run_migrations.py
+Write-Host "   [OK] Database schema & PostGIS extensions verified." -ForegroundColor Green
+
+# 5. Sync my_raw_projects.csv and generate ML delay predictions
+Write-Host "`n[5/6] Loading projects from my_raw_projects.csv and generating ML predictions..." -ForegroundColor Yellow
 & $BackendPy seed_my_raw_projects.py
 Write-Host "   [OK] ML predictions and SHAP explanations synchronized." -ForegroundColor Green
 
-# 5. Frontend dependencies
-Write-Host "`n[5/5] Checking Frontend npm dependencies..." -ForegroundColor Yellow
+# 6. Frontend dependencies
+Write-Host "`n[6/6] Checking Frontend npm dependencies..." -ForegroundColor Yellow
 Set-Location "$RepoRoot\frontend"
 if (-not (Test-Path "node_modules")) {
     npm install
@@ -51,6 +56,9 @@ if (-not (Test-Path "node_modules")) {
 Write-Host "   [OK] Frontend ready." -ForegroundColor Green
 
 Set-Location $RepoRoot
+
+# Run environment doctor check
+& $BackendPy "$RepoRoot\doctor.py"
 
 Write-Host "`n========================================================" -ForegroundColor Green
 Write-Host "   [SUCCESS] LADRIS Environment Setup Complete!" -ForegroundColor Green

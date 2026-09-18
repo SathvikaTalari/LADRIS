@@ -16,7 +16,7 @@ from app.db.schema import Base
 from app.db.staging import RawRecord  # noqa: F401 - import registers the table on Base.metadata
 
 DATABASE_URL = os.environ.get(
-    "DATABASE_URL", "postgresql+psycopg2://ladris_user:landpulse_pass@localhost:15432/land_delay"
+    "DATABASE_URL", "postgresql+psycopg2://ladris_user:landpulse_pass@localhost:15432/ladris"
 )
 
 engine = create_engine(DATABASE_URL, future=True)

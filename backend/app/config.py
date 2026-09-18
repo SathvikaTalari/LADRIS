@@ -110,9 +110,12 @@ class Settings(BaseSettings):
     @staticmethod
     def _get_ml_root() -> Path:
         base = Path(__file__).resolve().parents[2]
-        pred_dir = base / "land-delay-prediction"
-        if pred_dir.exists():
-            return pred_dir
+        for folder in ["land-delay-predictor", "land-delay-prediction", "ml"]:
+            candidate = base / folder
+            if candidate.exists() and (candidate / "models").exists():
+                return candidate
+        if (base / "land-delay-predictor").exists():
+            return base / "land-delay-predictor"
         return base / "land-delay-predictor"
 
     ML_MODULE_PATH: str = str(_get_ml_root() / "app")
@@ -127,10 +130,13 @@ class Settings(BaseSettings):
             if p.is_absolute() and p.exists():
                 return str(p)
             base_root = Path(__file__).resolve().parents[2]
-            clean = ml_path.replace("\\", "/").lstrip("./")
-            candidate = base_root / clean
-            if candidate.exists():
-                return str(candidate)
+            clean = ml_path.replace("\\", "/")
+            for prefix in ["./", "../", ".\\", "..\\"]:
+                while clean.startswith(prefix):
+                    clean = clean[len(prefix):]
+            for candidate in [base_root / clean, Path(__file__).resolve().parents[1] / clean, Path.cwd() / clean]:
+                if candidate.exists():
+                    return str(candidate)
         return str(self._get_ml_root() / "app")
 
     @property
@@ -141,10 +147,13 @@ class Settings(BaseSettings):
             if p.is_absolute() and p.exists():
                 return str(p)
             base_root = Path(__file__).resolve().parents[2]
-            clean = models_path.replace("\\", "/").lstrip("./")
-            candidate = base_root / clean
-            if candidate.exists():
-                return str(candidate)
+            clean = models_path.replace("\\", "/")
+            for prefix in ["./", "../", ".\\", "..\\"]:
+                while clean.startswith(prefix):
+                    clean = clean[len(prefix):]
+            for candidate in [base_root / clean, Path(__file__).resolve().parents[1] / clean, Path.cwd() / clean]:
+                if candidate.exists():
+                    return str(candidate)
         return str(self._get_ml_root() / "models")
 
     # ─── Project CSV Source ─────────────────────────────────────────────────
@@ -161,10 +170,13 @@ class Settings(BaseSettings):
             if p.is_absolute() and p.exists():
                 return str(p)
             base_root = Path(__file__).resolve().parents[2]
-            clean = csv_path.replace("\\", "/").lstrip("./")
-            candidate = base_root / clean
-            if candidate.exists():
-                return str(candidate)
+            clean = csv_path.replace("\\", "/")
+            for prefix in ["./", "../", ".\\", "..\\"]:
+                while clean.startswith(prefix):
+                    clean = clean[len(prefix):]
+            for candidate in [base_root / clean, Path(__file__).resolve().parents[1] / clean, Path.cwd() / clean]:
+                if candidate.exists():
+                    return str(candidate)
         return str(self._get_ml_root() / "my_raw_projects.csv")
 
     # ─── First Admin Seed ─────────────────────────────────────────────────────

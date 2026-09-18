@@ -1,6 +1,11 @@
 # Land Acquisition Delay Predictor (SIH 25017)
 
+> **💡 LADRIS Integration Note for Team Members**:
+> In this integrated repository, this ML module is **directly embedded in-process** into the main LADRIS backend (`backend/app/services/production_ml_service.py`).
+> **You do NOT need to run this sub-project as a standalone server on port 8000** (which would conflict with the main backend). The main backend handles ML predictions, SHAP explanations, and model loading automatically. Run `python doctor.py` at the repo root to verify that your ML environment is healthy.
+
 ## Overview
+
 
 An AI-powered decision support system that ingests land acquisition project data from multiple sources, trains ML models to predict delay risk, and provides actionable insights for proactive governance.
 

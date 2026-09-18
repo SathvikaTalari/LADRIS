@@ -86,6 +86,9 @@ Run the automated setup script from the root `LADRIS` directory. It configures `
 chmod +x ./setup_team.sh && ./setup_team.sh
 ```
 
+> 🩺 **Team Troubleshooting**: Facing database or ML model errors?
+> Run `python doctor.py` (or `python doctor.py --fix`) for instant automated diagnosis. See the [Team Onboarding & Troubleshooting Guide](docs/TEAM_ONBOARDING_AND_TROUBLESHOOTING.md) for full details on Docker, native PostgreSQL, and ML dependencies.
+
 ---
 
 ### 🛠️ Manual Step-by-Step Setup
