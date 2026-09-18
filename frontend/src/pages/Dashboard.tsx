@@ -7,17 +7,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
-  FolderKanban,
-  AlertTriangle,
-  Map as MapIcon,
-  Activity,
   ChevronRight,
-  Database,
-  BarChart3,
   PieChart,
-  AlertCircle,
-  DollarSign,
-  Flame
 } from 'lucide-react'
 import ReactECharts from 'echarts-for-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
@@ -189,7 +180,6 @@ export default function Dashboard() {
         <MetricCard
           label="Total Active Projects"
           value={isLoading ? null : (kpis?.total_active_projects ?? 0)}
-          icon={<FolderKanban size={16} />}
           accent="var(--color-accent-navy)"
           description="Total projects"
           isLoading={isLoading}
@@ -197,7 +187,6 @@ export default function Dashboard() {
         <MetricCard
           label="Total Land Required"
           value={isLoading ? null : `${(kpis?.total_land_required_ha ?? 0).toLocaleString()} ha`}
-          icon={<MapIcon size={16} />}
           accent="var(--color-accent-primary)"
           description="Land needed"
           isLoading={isLoading}
@@ -205,7 +194,6 @@ export default function Dashboard() {
         <MetricCard
           label="Financial Outlay"
           value={isLoading ? null : `₹${(kpis?.financial_outlay_cr ?? 0).toLocaleString()} Cr`}
-          icon={<DollarSign size={16} />}
           accent="var(--color-accent-tertiary)"
           description="Expected compensation"
           isLoading={isLoading}
@@ -213,7 +201,6 @@ export default function Dashboard() {
         <MetricCard
           label="High/Critical Risk"
           value={isLoading ? null : (kpis?.high_critical_projects ?? 0)}
-          icon={<AlertTriangle size={16} />}
           accent="var(--color-risk-critical)"
           description="Projects needing urgent intervention"
           isLoading={isLoading}
@@ -221,7 +208,6 @@ export default function Dashboard() {
         <MetricCard
           label="Projects Delayed"
           value={isLoading ? null : (kpis?.projects_delayed ?? 0)}
-          icon={<Flame size={16} />}
           accent="var(--color-risk-high)"
           description="Already behind original deadline"
           isLoading={isLoading}
@@ -229,7 +215,6 @@ export default function Dashboard() {
         <MetricCard
           label="Active Alerts"
           value={isLoading ? null : (kpis?.active_alerts ?? 0)}
-          icon={<AlertCircle size={16} />}
           accent="var(--color-accent-primary)"
           description="Urgent early warnings"
           isLoading={isLoading}
@@ -256,36 +241,25 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* View By Toggle Radio Selector */}
+            {/* Simple Subtitle / Indicator */}
             <div style={{
+              fontSize: '0.74rem',
+              color: 'var(--color-text-muted)',
+              fontWeight: 600,
+              letterSpacing: '0.02em',
+              marginBottom: 8,
               display: 'flex',
-              gap: 4,
-              background: 'var(--color-bg-tertiary)',
-              padding: 3,
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--color-border-subtle)',
-              marginBottom: 10,
+              alignItems: 'center',
+              gap: 6,
             }}>
-              {[{ id: 'verified_delay_risk', label: 'All Projects Delay Risk' }].map((t) => (
-                <button
-                  key={t.id}
-                  style={{
-                    flex: 1,
-                    padding: '4px 6px',
-                    fontSize: '0.68rem',
-                    fontWeight: distributionView === t.id ? 700 : 500,
-                    borderRadius: 'var(--radius-sm)',
-                    background: distributionView === t.id ? 'var(--color-accent-primary)' : 'transparent',
-                    color: distributionView === t.id ? '#ffffff' : 'var(--color-text-muted)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {t.label}
-                </button>
-              ))}
+              <span style={{
+                display: 'inline-block',
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor: 'var(--color-accent-primary)',
+              }}></span>
+              All Projects Delay Risk
             </div>
           </div>
 
@@ -296,16 +270,17 @@ export default function Dashboard() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 6,
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            gap: 4,
             borderTop: '1px solid var(--color-border-subtle)',
             paddingTop: 8,
             textAlign: 'center',
           }}>
-            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>LOW</span><br /><strong style={{ color: '#138808', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.LOW ?? 0}</strong></div>
-            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>MEDIUM</span><br /><strong style={{ color: '#d97706', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.MEDIUM ?? 0}</strong></div>
-            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>HIGH</span><br /><strong style={{ color: '#f47721', fontSize: '0.9rem' }}>{distributions?.verified_delay_risk?.HIGH ?? 0}</strong></div>
-            <div><span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>UNAVAILABLE</span><br /><strong style={{ color: '#7daaff', fontSize: '0.9rem' }}>{Math.max(0, (kpis?.total_active_projects ?? 0) - ((distributions?.verified_delay_risk?.LOW ?? 0) + (distributions?.verified_delay_risk?.MEDIUM ?? 0) + (distributions?.verified_delay_risk?.HIGH ?? 0)))}</strong></div>
+            <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>LOW</span><br /><strong style={{ color: '#138808', fontSize: '0.88rem' }}>{distributions?.verified_delay_risk?.LOW ?? 0}</strong></div>
+            <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>MEDIUM</span><br /><strong style={{ color: '#d97706', fontSize: '0.88rem' }}>{distributions?.verified_delay_risk?.MEDIUM ?? 0}</strong></div>
+            <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>HIGH</span><br /><strong style={{ color: '#f47721', fontSize: '0.88rem' }}>{distributions?.verified_delay_risk?.HIGH ?? 0}</strong></div>
+            <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>CRITICAL</span><br /><strong style={{ color: '#ff4757', fontSize: '0.88rem' }}>{distributions?.verified_delay_risk?.CRITICAL ?? 0}</strong></div>
+            <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>UNAVAILABLE</span><br /><strong style={{ color: '#7daaff', fontSize: '0.88rem' }}>{Math.max(0, (kpis?.total_active_projects ?? 0) - ((distributions?.verified_delay_risk?.LOW ?? 0) + (distributions?.verified_delay_risk?.MEDIUM ?? 0) + (distributions?.verified_delay_risk?.HIGH ?? 0) + (distributions?.verified_delay_risk?.CRITICAL ?? 0)))}</strong></div>
           </div>
         </div>
 
@@ -313,8 +288,7 @@ export default function Dashboard() {
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 430 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Activity size={18} color="var(--color-accent-saffron)" />
+              <div>
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Most Delayed Stage
                 </h3>
@@ -387,8 +361,7 @@ export default function Dashboard() {
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 430 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Flame size={16} color="var(--color-risk-critical)" />
+              <div>
                 <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Priority Projects
                 </h3>
@@ -503,8 +476,7 @@ export default function Dashboard() {
         {/* Compact GIS Risk Map */}
         <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--color-bg-card)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <MapIcon size={18} color="var(--color-accent-primary)" />
+            <div>
               <h3 style={{ fontSize: '0.9rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 National Project Map
               </h3>
@@ -563,8 +535,7 @@ export default function Dashboard() {
         {/* State / District Comparison */}
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <BarChart3 size={18} color="var(--color-accent-primary)" />
+            <div>
               <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 States with Highest Delay Risk
               </h3>
@@ -600,8 +571,7 @@ export default function Dashboard() {
         {/* Top Automated Alerts Panel */}
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <AlertCircle size={18} color="var(--color-risk-critical)" />
+            <div>
               <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 Top Active Alerts
               </h3>
@@ -647,8 +617,7 @@ export default function Dashboard() {
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Database size={18} color="var(--color-accent-tertiary)" />
+              <div>
                 <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Data Health & Completeness
                 </h3>

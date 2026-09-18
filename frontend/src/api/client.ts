@@ -834,13 +834,36 @@ export const gisAPI = {
   getProjects: () =>
     apiClient.get('/api/v1/gis/projects').then((r) => r.data),
 
+  getDetailedProjects: (params?: {
+    state?: string
+    district?: string
+    risk_level?: string
+    issue_type?: string
+  }) =>
+    apiClient
+      .get<{ total: number; projects: any[] }>('/api/v1/gis/detailed-projects', { params })
+      .then((r) => r.data),
+
   getProjectGIS: async (projectId: string) => {
     try {
       const res = await apiClient.get(`/api/v1/gis/projects/${projectId}`)
       return res.data
     } catch {
       return {
+        status: 'UNAVAILABLE',
+        has_spatial_data: false,
+        message: 'Detailed GIS data not available.',
         project_id: projectId,
+        project: {
+          id: projectId,
+          project_code: 'UNKNOWN',
+          name: 'Project',
+          state_code: '',
+          district: '',
+          risk_level: 'MEDIUM',
+          status: 'ACTIVE',
+          total_area_ha: 0,
+        },
         risk_summary: {
           total_parcels: 0,
           acquired_parcels: 0,
@@ -849,6 +872,16 @@ export const gisAPI = {
           possession_pct: 0,
           compensation_disbursed_pct: 0,
         },
+        summary: {
+          total_parcels: 0,
+          clear_count: 0,
+          attention_count: 0,
+          disputed_count: 0,
+          hotspots_count: 0,
+          total_area_ha: 0,
+          villages_count: 0,
+        },
+        villages: [],
         parcels: {
           type: 'FeatureCollection',
           features: [],

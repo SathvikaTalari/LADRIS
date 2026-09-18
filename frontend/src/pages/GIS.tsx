@@ -33,6 +33,7 @@ import {
 } from 'lucide-react'
 import { PageHeader } from '@/components/common'
 import { projectsAPI, gisAPI } from '@/api/client'
+import DetailedMapView from '@/components/gis/DetailedMapView'
 import {
   MapContainer,
   TileLayer,
@@ -375,6 +376,7 @@ function DetailedMapModal({ project, onClose }: DetailedMapProps) {
 
 // Main Component
 export default function GIS() {
+  const [activeTab, setActiveTab] = useState<'PROJECT_MAP' | 'DETAILED_MAP'>('PROJECT_MAP')
   const [projects, setProjects] = useState<any[]>([])
   const [tileKey, setTileKey] = useState<keyof typeof MAP_TILES>('SATELLITE')
   const [mapCenter, setMapCenter] = useState<[number, number]>([21.1458, 79.0882])
@@ -475,11 +477,51 @@ export default function GIS() {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
         <div style={{ display: 'flex', background: 'var(--color-bg-card)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-lg)', padding: 4, gap: 4 }}>
-          <div id="gis-view-risk-map" style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 18px', borderRadius: 'var(--radius-md)', fontSize: '0.82rem', fontWeight: 700, background: 'var(--color-accent-primary)', color: '#ffffff' }}>
-            <MapPin size={14} /> Project Map View
-          </div>
+          <button
+            id="gis-view-risk-map"
+            onClick={() => setActiveTab('PROJECT_MAP')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 7,
+              padding: '7px 18px',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              background: activeTab === 'PROJECT_MAP' ? 'var(--color-accent-primary)' : 'transparent',
+              color: activeTab === 'PROJECT_MAP' ? '#ffffff' : 'var(--color-text-muted)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Project Map View
+          </button>
+          <button
+            id="gis-view-detailed-map"
+            onClick={() => setActiveTab('DETAILED_MAP')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 7,
+              padding: '7px 18px',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              background: activeTab === 'DETAILED_MAP' ? 'var(--color-accent-primary)' : 'transparent',
+              color: activeTab === 'DETAILED_MAP' ? '#ffffff' : 'var(--color-text-muted)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Detailed Map View
+          </button>
         </div>
       </div>
+
+      {activeTab === 'PROJECT_MAP' ? (
+        <>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 16 }}>
         {[
@@ -682,6 +724,10 @@ export default function GIS() {
           <DetailedMapModal project={detailedMapProject} onClose={() => setDetailedMapProject(null)} />
         )}
       </AnimatePresence>
+      </>
+      ) : (
+        <DetailedMapView initialProjectId={detailedMapProject?.id} />
+      )}
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </motion.div>
