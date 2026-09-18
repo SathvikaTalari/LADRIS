@@ -607,19 +607,63 @@ export interface DataSourceItem {
   created_at: string
 }
 
+export interface ProjectReadinessItem {
+  id: string
+  name: string
+  project_code: string
+  state_code: string
+  project_type: string
+  completeness_pct: number
+  missing_critical_data: string
+  ml_status: 'Ready' | 'Needs Data' | 'Not Ready'
+}
+
+export interface TechnicalFieldItem {
+  field: string
+  label: string
+  null_rate: number
+}
+
+export interface GroupedCategoryItem {
+  id: string
+  name: string
+  completeness_pct: number
+  status: string
+  description: string
+  technical_fields: TechnicalFieldItem[]
+}
+
+export interface DataIssueItem {
+  id: string
+  title: string
+  project_name: string
+  project_code: string
+  severity: 'HIGH' | 'MEDIUM' | 'LOW'
+  description: string
+  action: string
+}
+
 export interface DataQualityMetrics {
   summary: {
+    overall_quality?: number
+    prediction_ready?: number
+    total_projects?: number
+    avg_completeness?: number
+    projects_needing_data?: number
     total_real_records: number
     valid_records: number
     invalid_records: number
     duplicate_records: number
     missing_value_rate: number
-    source_coverage_count: number
+    source_coverage_count?: number
     prediction_eligible_records: number
-    quality_issues_count: number
+    quality_issues_count?: number
     generated_at: string
-    data_authenticity_statement: string
+    data_authenticity_statement?: string
   }
+  projects_readiness?: ProjectReadinessItem[]
+  grouped_categories?: GroupedCategoryItem[]
+  data_issues?: DataIssueItem[]
   field_null_rates: Record<string, number>
   sources: {
     name: string
