@@ -34,6 +34,7 @@ import {
   IndianRupee,
 } from 'lucide-react'
 import { projectsAPI, decisionIntelligenceAPI } from '@/api/client'
+import { PageHeader } from '@/components/common'
 import type {
   ProjectSummaryHeaderData,
   LandBlockersData,
@@ -323,100 +324,62 @@ export default function DecisionIntelligence() {
 
   return (
     <div style={{ padding: '4px 0 60px 0', width: '100%' }}>
-      {/* ─── Top Control Bar: Title & Project Switcher ─── */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 16,
-          marginBottom: 16,
-          padding: '12px 16px',
-          background: 'var(--color-bg-secondary)',
-          borderRadius: 12,
-          border: '1px solid var(--color-border-subtle)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 10,
-              background: 'linear-gradient(135deg, #f47721 0%, #d97706 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(244,119,33,0.25)',
-              flexShrink: 0,
-            }}
-          >
-            <Brain size={22} color="#fff" />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
-                Decision Intelligence
-              </h1>
-            </div>
-            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-              Identify delays and prioritize actions.
-            </p>
-          </div>
-        </div>
-
-        {/* Project Selector & Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
-            type="button"
-            onClick={() => setShowGuide(!showGuide)}
-            className="btn btn-ghost btn-sm"
-            style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 5 }}
-            title="Toggle user guide"
-          >
-            <HelpCircle size={14} />
-            <span>{showGuide ? 'Hide Guide' : 'Guide'}</span>
-          </button>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <label htmlFor="decision-intel-select" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-              Project:
-            </label>
-            <select
-              id="decision-intel-select"
-              className="input"
-              value={selectedProjectId}
-              onChange={(e) => setSelectedProjectId(e.target.value)}
-              style={{
-                minWidth: 260,
-                maxWidth: 380,
-                fontWeight: 600,
-                fontSize: '0.84rem',
-                borderColor: 'var(--color-border-strong)',
-                background: 'var(--color-bg-primary)',
-                padding: '6px 12px',
-                height: 36,
-              }}
+      {/* ─── Standardized Page Header ─── */}
+      <PageHeader
+        title="Decision Intelligence"
+        subtitle="Identify delays and prioritize actions."
+        actions={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setShowGuide(!showGuide)}
+              className="btn btn-ghost btn-sm"
+              style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 5 }}
+              title="Toggle user guide"
             >
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.state_code || 'IN'})
-                </option>
-              ))}
-            </select>
-          </div>
+              <HelpCircle size={14} />
+              <span>{showGuide ? 'Hide Guide' : 'Guide'}</span>
+            </button>
 
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => selectedProjectId && loadProjectData(selectedProjectId)}
-            title="Refresh analytics data"
-            style={{ height: 36, padding: '0 10px' }}
-          >
-            <RefreshCw size={14} className={loading ? 'spin' : ''} />
-          </button>
-        </div>
-      </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <label htmlFor="decision-intel-select" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+                Project:
+              </label>
+              <select
+                id="decision-intel-select"
+                className="input"
+                value={selectedProjectId}
+                onChange={(e) => setSelectedProjectId(e.target.value)}
+                style={{
+                  minWidth: 260,
+                  maxWidth: 380,
+                  fontWeight: 600,
+                  fontSize: '0.84rem',
+                  borderColor: 'var(--color-border-strong)',
+                  background: 'var(--color-bg-primary)',
+                  padding: '6px 12px',
+                  height: 36,
+                }}
+              >
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.state_code || 'IN'})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => selectedProjectId && loadProjectData(selectedProjectId)}
+              title="Refresh analytics data"
+              style={{ height: 36, padding: '0 10px' }}
+            >
+              <RefreshCw size={14} className={loading ? 'spin' : ''} />
+            </button>
+          </div>
+        }
+      />
 
       {/* ─── Expandable Quick Reference Guide ─── */}
       <AnimatePresence>

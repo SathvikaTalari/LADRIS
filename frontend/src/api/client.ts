@@ -194,12 +194,45 @@ export const monitoringAPI = {
     apiClient.get<Record<string, any>>('/api/v1/monitoring/data-gap-report').then((r) => r.data),
 }
 
+export interface DataSourceOverviewCard {
+  id: string
+  name: string
+  status: 'Available' | 'Partial' | 'Missing'
+  record_count: string
+  last_updated: string
+}
+
+export interface ProjectCoverageCategory {
+  id: string
+  name: string
+  status: 'Available' | 'Partial' | 'Missing'
+  detail: string
+}
+
+export interface ProjectCoverageItem {
+  id: string
+  project_code: string
+  name: string
+  state_code: string
+  district: string
+  risk_level: string
+  categories: ProjectCoverageCategory[]
+}
+
+export interface DataSourceOverviewResponse {
+  overview_cards: DataSourceOverviewCard[]
+  projects: ProjectCoverageItem[]
+}
+
 export const dataSourcesAPI = {
   list: () =>
     apiClient.get<{ total: number; data_sources: DataSourceItem[] }>('/api/v1/data-sources/').then((r) => r.data),
 
   get: (id: string) =>
     apiClient.get<DataSourceItem>(`/api/v1/data-sources/${id}`).then((r) => r.data),
+
+  overview: () =>
+    apiClient.get<DataSourceOverviewResponse>('/api/v1/data-sources/overview').then((r) => r.data),
 }
 
 export const dataQualityAPI = {

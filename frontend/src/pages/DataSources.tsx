@@ -1,13 +1,17 @@
 /**
  * LADRIS — Data Sources & Provenance Registry Page
- * Registry of official, verified public datasets with lineage, retrieval metadata, and classification status.
+ * 
+ * Simplified, officer-friendly registry:
+ * 1. Data Source Overview: 6 cards for Project Records, Compensation, Legal & Ownership, R&R, GIS, and Administrative Data.
+ *    Shows only Available / Partial / Missing, Record Count, and Last Updated.
+ * 2. Project Data Coverage: Category completeness for any selected project.
+ * 3. Recent Ingestion Jobs & Provenance: Undisturbed ingestion run history with source type, status, tallies, and error reports.
  */
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Database, ExternalLink, RefreshCw, Download } from 'lucide-react'
+import { RefreshCw, Download } from 'lucide-react'
 import { dataSourcesAPI, ingestionAPI } from '@/api/client'
-import type { IngestionJobItem } from '@/api/client'
-import type { DataSourceItem } from '@/types'
+import type { IngestionJobItem, DataSourceOverviewCard, ProjectCoverageItem } from '@/api/client'
 import { PageHeader, EmptyState } from '@/components/common'
 
 function StatusPill({ status }: { status: string }) {
@@ -26,20 +30,62 @@ function StatusPill({ status }: { status: string }) {
   )
 }
 
+function CoverageStatusBadge({ status }: { status: 'Available' | 'Partial' | 'Missing' }) {
+  const cfg = {
+    Available: { bg: 'rgba(16, 185, 129, 0.12)', border: 'rgba(16, 185, 129, 0.3)', text: '#10b981' },
+    Partial: { bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.3)', text: '#f59e0b' },
+    Missing: { bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.3)', text: '#ef4444' },
+  }[status] || { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.15)', text: 'var(--color-text-secondary)' }
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        fontSize: '0.72rem',
+        fontWeight: 700,
+        background: cfg.bg,
+        border: `1px solid ${cfg.border}`,
+        color: cfg.text,
+        padding: '2px 8px',
+        borderRadius: 12,
+        letterSpacing: '0.02em',
+      }}
+    >
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: cfg.text }} />
+      {status}
+    </span>
+  )
+}
+
 export default function DataSources() {
-  const [sources, setSources] = useState<DataSourceItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [overviewCards, setOverviewCards] = useState<DataSourceOverviewCard[]>([])
+  const [projectsCoverage, setProjectsCoverage] = useState<ProjectCoverageItem[]>([])
+  const [selectedProjectId, setSelectedProjectId] = useState<string>('')
+  const [overviewLoading, setOverviewLoading] = useState(true)
+  const [overviewError, setOverviewError] = useState<string | null>(null)
+
   const [history, setHistory] = useState<IngestionJobItem[]>([])
   const [historyLoading, setHistoryLoading] = useState(false)
 
-  const fetchSources = () => {
-    setIsLoading(true)
-    setError(null)
-    dataSourcesAPI.list()
-      .then((res) => setSources(res.data_sources))
-      .catch(() => setError('Could not load data sources.'))
-      .finally(() => setIsLoading(false))
+  const loadOverview = () => {
+    setOverviewLoading(true)
+    setOverviewError(null)
+    dataSourcesAPI.overview()
+      .then((res) => {
+        setOverviewCards(res.overview_cards || [])
+        const projs = res.projects || []
+        setProjectsCoverage(projs)
+        if (projs.length > 0 && !selectedProjectId) {
+          setSelectedProjectId(projs[0].id)
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load data sources overview:', err)
+        setOverviewError('Could not load data source overview.')
+      })
+      .finally(() => setOverviewLoading(false))
   }
 
   const loadHistory = async () => {
@@ -55,108 +101,199 @@ export default function DataSources() {
   }
 
   useEffect(() => {
-    fetchSources()
+    loadOverview()
     loadHistory()
   }, [])
 
+  const currentProjectCoverage = projectsCoverage.find((p) => p.id === selectedProjectId) || projectsCoverage[0]
+
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ paddingBottom: 60 }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ paddingBottom: 60, width: '100%' }}>
       <PageHeader
-        title="Official Data Sources"
-        subtitle="Browse verified government project records and data feeds used for delay predictions."
+        title="Data Sources & Provenance"
+        subtitle="Overview of verified data categories, project coverage completeness, and recent ingestion history."
         actions={
-          <button className="btn btn-secondary btn-sm" onClick={() => { fetchSources(); loadHistory(); }}>
-            <RefreshCw size={14} className={isLoading || historyLoading ? 'spin' : ''} /> Refresh Sources
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => {
+              loadOverview()
+              loadHistory()
+            }}
+          >
+            <RefreshCw size={14} className={overviewLoading || historyLoading ? 'spin' : ''} /> Refresh
           </button>
         }
       />
 
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {[1, 2].map((i) => (
-            <div key={i} className="skeleton" style={{ height: 80 }} />
-          ))}
+      {/* ─── 1. Simple Data Source Overview (6 Cards) ─── */}
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ marginBottom: 14 }}>
+          <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+            Data Source Overview
+          </h2>
+          <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '3px 0 0' }}>
+            Current availability, verified record tallies, and latest updates across core acquisition data categories.
+          </p>
         </div>
-      ) : error ? (
-        <EmptyState
-          icon={<Database size={28} />}
-          title="Error Loading Data Sources"
-          description={error}
-        />
-      ) : sources.length === 0 ? (
-        <EmptyState
-          icon={<Database size={28} />}
-          title="No Data Sources Found"
-          description="No active project data sources were detected in the database."
-        />
-      ) : (
-        <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 32 }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Dataset Name</th>
-                <th>Source Agency / Department</th>
-                <th>Status</th>
-                <th>File Type</th>
-                <th>Projects Count</th>
-                <th>Information Included</th>
-                <th>Last Synced</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sources.map((ds) => (
-                <tr key={ds.id}>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <Database size={16} color="var(--color-accent-primary)" />
-                      <div>
-                        <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{ds.dataset_name}</div>
-                        {ds.source_url && (
-                          <a
-                            href={ds.source_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            style={{ fontSize: '0.75rem', color: 'var(--color-accent-primary)', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                          >
-                            Source Link <ExternalLink size={10} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ fontSize: '0.85rem' }}>{ds.source_organization}</td>
-                  <td>
-                    <span className="badge badge-green">
-                      {ds.data_status}
-                    </span>
-                  </td>
-                  <td style={{ fontSize: '0.85rem' }}>{ds.file_format || 'CSV'}</td>
-                  <td style={{ fontWeight: 600 }}>{ds.record_count?.toLocaleString('en-IN') ?? 0}</td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', maxWidth: 260 }}>
-                      {(ds.fields_obtained || []).slice(0, 4).map((f) => (
-                        <span key={f} className="badge badge-gray" style={{ fontSize: '0.65rem' }}>
-                          {f}
-                        </span>
-                      ))}
-                      {(ds.fields_obtained || []).length > 4 && (
-                        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
-                          +{(ds.fields_obtained || []).length - 4} more
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                    {ds.retrieval_date ? new Date(ds.retrieval_date).toLocaleDateString('en-IN') : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
 
-      {/* Recent Ingestion Jobs & Provenance Table moved to Data Sources */}
+        {overviewLoading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="skeleton" style={{ height: 110, borderRadius: 12 }} />
+            ))}
+          </div>
+        ) : overviewError ? (
+          <EmptyState
+            title="Error Loading Data Source Overview"
+            description={overviewError}
+          />
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: 14,
+            }}
+          >
+            {overviewCards.map((card) => (
+              <div
+                key={card.id}
+                className="card"
+                style={{
+                  padding: '16px 18px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  minHeight: 110,
+                  background: 'var(--color-bg-card)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 12,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                    {card.name}
+                  </span>
+                  <CoverageStatusBadge status={card.status} />
+                </div>
+
+                <div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.01em' }}>
+                    {card.record_count}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
+                    Last Updated: {card.last_updated}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ─── 2. Project Data Coverage View ─── */}
+      <div
+        className="card"
+        style={{
+          padding: '20px 22px',
+          marginBottom: 28,
+          background: 'var(--color-bg-card)',
+          borderRadius: 12,
+          border: '1px solid var(--color-border-subtle)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 14,
+            marginBottom: 18,
+            borderBottom: '1px solid var(--color-border-subtle)',
+            paddingBottom: 14,
+          }}
+        >
+          <div>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+              Project Data Coverage
+            </h3>
+            <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '3px 0 0' }}>
+              Inspect data category availability and completeness for any monitored project.
+            </p>
+          </div>
+
+          {/* Project Selector Dropdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label htmlFor="coverage-project-select" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+              PROJECT:
+            </label>
+            <select
+              id="coverage-project-select"
+              className="input"
+              value={selectedProjectId}
+              onChange={(e) => setSelectedProjectId(e.target.value)}
+              style={{
+                minWidth: 260,
+                maxWidth: 420,
+                height: 36,
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                background: 'var(--color-bg-primary)',
+                borderColor: 'var(--color-border-strong)',
+              }}
+            >
+              {projectsCoverage.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.project_code} — {p.name} ({p.risk_level})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* 6 Category Items for Selected Project */}
+        {currentProjectCoverage ? (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: 12,
+            }}
+          >
+            {currentProjectCoverage.categories.map((cat) => (
+              <div
+                key={cat.id}
+                style={{
+                  background: 'var(--color-bg-secondary)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 10,
+                  padding: '12px 14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 6,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                  <strong style={{ fontSize: '0.82rem', color: 'var(--color-text-primary)' }}>
+                    {cat.name}
+                  </strong>
+                  <CoverageStatusBadge status={cat.status} />
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
+                  {cat.detail}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'center', padding: '16px 0' }}>
+            No project data available.
+          </div>
+        )}
+      </div>
+
+      {/* ─── 3. Recent Ingestion Jobs & Provenance Table (Undisturbed) ─── */}
       <div className="card" style={{ padding: '22px 26px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
           <div>
