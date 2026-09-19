@@ -377,7 +377,7 @@ export default function Login() {
           style={{ width: '100%', maxWidth: 360 }}
         >
           {/* Form Header */}
-          <div style={{ marginBottom: 36 }}>
+          <div style={{ marginBottom: 24 }}>
             <h2 style={{
               fontSize: '2.0rem',
               fontWeight: 800,
@@ -388,8 +388,16 @@ export default function Login() {
             }}>
               Welcome to LADRIS
             </h2>
-            <p style={{ color: isDark ? '#4a5880' : '#5a7194', fontSize: '0.875rem', lineHeight: 1.6 }}>
+            <p style={{ color: isDark ? '#4a5880' : '#5a7194', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: 6 }}>
               Sign in to your account
+            </p>
+            <p style={{
+              fontSize: '0.75rem',
+              color: isDark ? '#788ca8' : '#64748b',
+              margin: 0,
+              letterSpacing: '0.01em',
+            }}>
+              Username: <span style={{ color: isDark ? '#9dbcf8' : '#1e3a8a', fontWeight: 500 }}>admin@ladris.gov.in</span> &nbsp;|&nbsp; password: <span style={{ color: isDark ? '#9dbcf8' : '#1e3a8a', fontWeight: 500 }}>Password123!</span>
             </p>
           </div>
 

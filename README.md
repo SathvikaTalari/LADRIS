@@ -132,8 +132,11 @@ python -m venv venv
 python3 -m venv venv
 source venv/bin/activate
 
-# Install dependencies
+# Install dependencies (requires Python 3.10 - 3.12)
 pip install -r requirements.txt
+
+# Apply database migrations & sync schema:
+python run_migrations.py
 
 # Sync projects from my_raw_projects.csv and generate ML predictions:
 python seed_my_raw_projects.py

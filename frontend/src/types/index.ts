@@ -216,6 +216,9 @@ export interface Alert {
   title: string
   message: string
   alert_metadata?: Record<string, any>
+  email_sent?: boolean
+  email_sent_at?: string | null
+  email_recipient?: string | null
   triggered_at: string
   acknowledged_by?: string | null
   acknowledged_at: string | null

@@ -3,7 +3,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   AlertTriangle,
   ArrowLeft,
-  Brain,
   Edit3,
   MapPin,
   RefreshCw,
@@ -12,8 +11,6 @@ import {
   Calendar,
   Building2,
   ShieldAlert,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react'
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import L from 'leaflet'
@@ -534,7 +531,6 @@ export default function ProjectDetail() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
-  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false)
   const [recalculatedNotice, setRecalculatedNotice] = useState<{
     timestamp: Date
     latencyMs?: number | null
@@ -840,6 +836,13 @@ export default function ProjectDetail() {
         ? '#f59e0b'
         : '#10b981'
 
+  const isHighRisk =
+    (riskCategory as string) === 'HIGH' ||
+    (riskCategory as string) === 'CRITICAL' ||
+    Boolean(prediction?.high_risk_alert?.requires_immediate_attention) ||
+    prediction?.high_risk_alert?.alert_level === 'HIGH' ||
+    (prediction?.risk_score != null && prediction.risk_score >= 70)
+
   const delayProb = prediction ? Math.round(prediction.delay_probability * 100) : null
   const delayDays = prediction?.predicted_delay_days ?? prediction?.estimated_delay_days ?? null
 
@@ -1089,8 +1092,8 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* 3. Compact High-Risk Escalation Banner (Only if required) */}
-      {prediction?.high_risk_alert && (
+      {/* 3. Compact High-Risk Escalation Banner (Only for high risk projects) */}
+      {isHighRisk && prediction?.high_risk_alert && (
         <div
           className="card"
           style={{
@@ -1702,91 +1705,6 @@ export default function ProjectDetail() {
               </div>
             )}
           </div>
-
-          {/* Collapsible Technical Details Section */}
-          <div
-            className="card"
-            style={{
-              padding: '16px 22px',
-              borderRadius: 10,
-              background: 'var(--color-bg-secondary, #f8fafc)',
-              border: '1px solid var(--color-border-subtle, #e2e8f0)',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-                color: 'var(--color-text-primary)',
-                fontWeight: 700,
-                fontSize: '0.88rem',
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Brain size={16} color="var(--color-accent-primary)" />
-                Technical Details (AI Diagnostics &amp; SHAP Values)
-              </span>
-              <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                {showTechnicalDetails ? 'Hide technical details' : 'Show technical details'}
-                {showTechnicalDetails ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-              </span>
-            </button>
-
-            {showTechnicalDetails && (
-              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--color-border-subtle, #e2e8f0)' }}>
-                {/* Diagnostics Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 14, marginBottom: 18 }}>
-                  <Info label="Pipeline Engine" value="LightGBM Regressor + Classifier" />
-                  <Info label="Model Version" value={prediction?.model_version || 'v1.0 (Production)'} />
-                  <Info label="Feature Snapshot" value={prediction ? `${prediction.data_completeness_pct}% completeness` : 'Complete'} />
-                  <Info label="Inference Latency" value={prediction?.latency_ms ? `${prediction.latency_ms} ms (Instant)` : 'Instant'} />
-                  <Info label="Prediction Timestamp" value={prediction?.predicted_at ? formatDate(prediction.predicted_at) : 'Live'} />
-                  <Info label="Model Policy" value="Classification thresholds are loaded from model metadata" />
-                </div>
-
-                {/* Raw SHAP Feature Contributions Table */}
-                <div style={{ marginTop: 12 }}>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.04em' }}>
-                    Raw SHAP Feature Contributions
-                  </div>
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid var(--color-border-subtle, #e2e8f0)', color: 'var(--color-text-muted)' }}>
-                          <th style={{ padding: '6px 10px', textAlign: 'left' }}>Feature</th>
-                          <th style={{ padding: '6px 10px', textAlign: 'left' }}>Raw Value</th>
-                          <th style={{ padding: '6px 10px', textAlign: 'right' }}>SHAP Contribution</th>
-                          <th style={{ padding: '6px 10px', textAlign: 'left' }}>Direction</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(prediction?.top_delay_drivers || prediction?.top_drivers || []).map((d: any, idx: number) => (
-                          <tr key={idx} style={{ borderBottom: '1px solid var(--color-border-subtle, #f1f5f9)' }}>
-                            <td style={{ padding: '6px 10px', fontFamily: 'var(--font-mono)' }}>{d.feature}</td>
-                            <td style={{ padding: '6px 10px' }}>{String(d.value)}</td>
-                            <td style={{ padding: '6px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 600, color: Number(d.contribution) > 0 ? '#ef4444' : '#10b981' }}>
-                              {Number(d.contribution) > 0 ? `+${Number(d.contribution).toFixed(4)}` : Number(d.contribution).toFixed(4)}
-                            </td>
-                            <td style={{ padding: '6px 10px', color: d.direction === 'increases_risk' ? '#ef4444' : '#10b981' }}>
-                              {d.direction}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       )}
 
@@ -2058,23 +1976,6 @@ function StatTile({
       {subtext && (
         <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>{subtext}</div>
       )}
-    </div>
-  )
-}
-
-function Info({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '10px 0',
-        borderBottom: '1px solid var(--color-border-subtle, #f1f5f9)',
-        fontSize: '0.85rem',
-      }}
-    >
-      <span style={{ color: 'var(--color-text-muted)' }}>{label}</span>
-      <strong>{value}</strong>
     </div>
   )
 }

@@ -25,7 +25,7 @@ class Settings(BaseSettings):
 
     # ─── Database ─────────────────────────────────────────────────────────────
     POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: int = 5432
+    POSTGRES_PORT: int = 15432
     POSTGRES_DB: str = "ladris"
     POSTGRES_USER: str = "ladris_user"
     POSTGRES_PASSWORD: str = "landpulse_pass"
@@ -85,9 +85,20 @@ class Settings(BaseSettings):
     def cors_origins(self) -> List[str]:
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
 
-    # ─── Server ───────────────────────────────────────────────────────────────
     BACKEND_HOST: str = "0.0.0.0"
     BACKEND_PORT: int = 8000
+
+    # ─── Email & Notifications (SMTP) ────────────────────────────────────────
+    SMTP_ENABLED: bool = True
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "alerts@ladris.gov.in"
+    SMTP_FROM_NAME: str = "LADRIS Delay Intelligence"
+    SMTP_USE_TLS: bool = True
+    APP_FRONTEND_URL: str = "http://localhost:5173"
+    DEFAULT_ALERT_EMAIL: str = "officer@ladris.gov.in"
 
     # ─── Data.gov.in Integration ──────────────────────────────────────────────
     DATAGOV_API_KEY: str = ""

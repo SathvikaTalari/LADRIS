@@ -16,6 +16,7 @@ from app.models.ml_models import MLPrediction, MLModelRegistry, MLModelType
 from app.models.project import Project, RiskLevel
 from app.models.misc import Alert, AlertSeverity, AlertStatus, AlertType
 from app.services.ml_feature_service import build_features, load_project_context, validate_project_consistency
+from app.services.email_service import trigger_alert_email_if_needed
 
 log = logging.getLogger(__name__)
 
@@ -148,20 +149,29 @@ async def sync_prediction_alert(db: AsyncSession, project, result: dict[str, Any
             "top_drivers": result["top_drivers"],
         }
         if active is None:
-            db.add(Alert(
-                project_id=project.id, alert_type=AlertType.RISK_ESCALATION,
+            new_alert = Alert(
+                project_id=project.id,
+                alert_type=AlertType.RISK_ESCALATION,
                 severity=AlertSeverity.CRITICAL if result["risk_score"] >= 90 else AlertSeverity.HIGH,
                 status=AlertStatus.ACTIVE,
                 title=reason,
                 message=explanation,
                 alert_metadata=metadata,
-            ))
+            )
+            db.add(new_alert)
+            await trigger_alert_email_if_needed(db, new_alert, project, current_risk_score=result["risk_score"])
         else:
             active.title = reason
             active.message = explanation
             active.severity = AlertSeverity.CRITICAL if result["risk_score"] >= 90 else AlertSeverity.HIGH
+            # Preserve existing email delivery metadata
+            old_meta = active.alert_metadata or {}
+            for k in ("email_sent", "email_sent_at", "email_recipient", "email_status", "last_sent_risk_score"):
+                if k in old_meta:
+                    metadata[k] = old_meta[k]
             active.alert_metadata = metadata
             active.triggered_at = datetime.now(timezone.utc)
+            await trigger_alert_email_if_needed(db, active, project, current_risk_score=result["risk_score"])
     elif active is not None:
         active.status = AlertStatus.RESOLVED
         active.resolved_at = datetime.now(timezone.utc)

@@ -128,6 +128,14 @@ DEMO_USERS = {
         "district_code": None,
         "agency_name": "Telangana Revenue Dept",
     },
+    "state.authority@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "Telangana State Nodal Officer",
+        "role": UserRole.STATE_ADMIN,
+        "state_code": "TG",
+        "district_code": None,
+        "agency_name": "Telangana Revenue Dept",
+    },
     "state.admin.tg@ladris.gov.in": {
         "password": "Password123!",
         "full_name": "Telangana State Nodal Officer",
@@ -138,6 +146,14 @@ DEMO_USERS = {
     },
     # District Administration
     "district@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "District Collector Sangareddy",
+        "role": UserRole.DISTRICT_OFFICER,
+        "state_code": "TG",
+        "district_code": "TG-SR",
+        "agency_name": "Sangareddy District Admin",
+    },
+    "district.admin@ladris.gov.in": {
         "password": "Password123!",
         "full_name": "District Collector Sangareddy",
         "role": UserRole.DISTRICT_OFFICER,
@@ -188,6 +204,14 @@ DEMO_USERS = {
         "district_code": None,
         "agency_name": "National Highways Authority of India (NHAI)",
     },
+    "agency.user@ladris.gov.in": {
+        "password": "Password123!",
+        "full_name": "NHAI Project Manager",
+        "role": UserRole.PROJECT_AGENCY,
+        "state_code": "TG",
+        "district_code": None,
+        "agency_name": "National Highways Authority of India (NHAI)",
+    },
     "project.agency@nhai.gov.in": {
         "password": "Password123!",
         "full_name": "NHAI Project Manager",
@@ -228,14 +252,17 @@ DEMO_USERS = {
 # compatibility with bookmarks, documentation, and existing seeded databases.
 DEMO_USER_ALIASES = {
     "central@ladris.gov.in": "central.admin@ladris.gov.in",
-    "state@ladris.gov.in": "state.admin.tg@ladris.gov.in",
-    "district@ladris.gov.in": "district.officer.sangareddy@ladris.gov.in",
+    "state@ladris.gov.in": "state.authority@ladris.gov.in",
+    "state.admin.tg@ladris.gov.in": "state.authority@ladris.gov.in",
+    "district@ladris.gov.in": "district.admin@ladris.gov.in",
+    "district.officer.sangareddy@ladris.gov.in": "district.admin@ladris.gov.in",
     "authority@ladris.gov.in": "la.officer@ladris.gov.in",
-    "agency@ladris.gov.in": "project.agency@nhai.gov.in",
+    "agency@ladris.gov.in": "agency.user@ladris.gov.in",
+    "project.agency@nhai.gov.in": "agency.user@ladris.gov.in",
     "policy@ladris.gov.in": "policy.analyst@niti.gov.in",
 }
 DEMO_USERS.update(
-    {alias: DEMO_USERS[canonical] for alias, canonical in DEMO_USER_ALIASES.items()}
+    {alias: DEMO_USERS[canonical] for alias, canonical in DEMO_USER_ALIASES.items() if canonical in DEMO_USERS}
 )
 DEMO_USERS["lrb@ladris.gov.in"] = {
     "password": "Password123!",

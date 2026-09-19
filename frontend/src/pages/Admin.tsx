@@ -16,11 +16,12 @@ import {
   Search,
   Check,
   X,
+  Mail,
 } from 'lucide-react'
 import { PageHeader } from '@/components/common'
 import { useAuthStore } from '@/store/authStore'
 import { roleLabel } from '@/utils'
-import { modelsAPI, auditAPI, usersAPI } from '@/api/client'
+import { modelsAPI, auditAPI, usersAPI, alertsAPI } from '@/api/client'
 import type { UserRole } from '@/types'
 
 export default function Admin() {
@@ -49,10 +50,11 @@ export default function Admin() {
 
   // Alert Settings Tab State
   const [alertSettings, setAlertSettings] = useState({
-    highRiskAlertScore: 75,
-    priorityActionScore: 70,
-    minimumDataCompleteness: 60,
+    email_notifications_enabled: true,
+    send_high_critical_only: true,
+    reminder_hours: 24,
   })
+  const [isLoadingAlertSettings, setIsLoadingAlertSettings] = useState(false)
   const [isAlertSaved, setIsAlertSaved] = useState(false)
 
   // AI Health & Model Tab State
@@ -68,6 +70,36 @@ export default function Admin() {
   const [auditLogs, setAuditLogs] = useState<any[]>([])
   const [isLoadingAudit, setIsLoadingAudit] = useState(false)
   const [selectedAuditLog, setSelectedAuditLog] = useState<any | null>(null)
+
+  // Load Alert Settings
+  const loadAlertSettings = async () => {
+    setIsLoadingAlertSettings(true)
+    try {
+      const data = await alertsAPI.getSettings()
+      if (data) {
+        setAlertSettings({
+          email_notifications_enabled: data.email_notifications_enabled ?? true,
+          send_high_critical_only: data.send_high_critical_only ?? true,
+          reminder_hours: data.reminder_hours ?? 24,
+        })
+      }
+    } catch (e) {
+      console.error('Failed to load alert settings:', e)
+    } finally {
+      setIsLoadingAlertSettings(false)
+    }
+  }
+
+  // Save Alert Settings
+  const handleSaveAlertSettings = async () => {
+    try {
+      await alertsAPI.updateSettings(alertSettings)
+      setIsAlertSaved(true)
+      setTimeout(() => setIsAlertSaved(false), 3500)
+    } catch (e: any) {
+      alert(e?.response?.data?.detail || 'Failed to save alert settings')
+    }
+  }
 
   // Load Users Data
   const loadUsers = async () => {
@@ -112,14 +144,17 @@ export default function Admin() {
   }
 
   useEffect(() => {
-    // Initial fetch of users and model metadata for AI health card
+    // Initial fetch of users, model metadata, and alert settings
     loadUsers()
     loadModelData()
+    loadAlertSettings()
   }, [])
 
   useEffect(() => {
     if (activeTab === 'users') {
       loadUsers()
+    } else if (activeTab === 'alerts') {
+      loadAlertSettings()
     } else if (activeTab === 'models') {
       loadModelData()
     } else if (activeTab === 'audit') {
@@ -218,72 +253,6 @@ export default function Admin() {
         title="Admin & AI Settings"
         subtitle="Manage users and permissions, alert trigger thresholds, AI model status, and system activity logs"
       />
-
-      {/* Small AI Health Overview Card */}
-      <div
-        className="card"
-        style={{
-          padding: '12px 18px',
-          marginBottom: 20,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 16,
-          background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.06) 100%)',
-          border: '1px solid rgba(16, 185, 129, 0.25)',
-          borderRadius: 8,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 6,
-              background: 'rgba(16, 185, 129, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#10b981',
-            }}
-          >
-            <Cpu size={18} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              AI Model Status
-            </div>
-            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>Active</span>
-              <span>LADRIS Delay Predictor</span>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', fontSize: '0.78rem' }}>
-          <div>
-            <span style={{ color: 'var(--color-text-muted)' }}>Data Quality: </span>
-            <strong style={{ color: '#10b981' }}>
-              {monitoringInfo?.mean_data_completeness_pct != null ? `${monitoringInfo.mean_data_completeness_pct}%` : '85.4%'}
-            </strong>
-          </div>
-
-          <div>
-            <span style={{ color: 'var(--color-text-muted)' }}>Drift Status: </span>
-            <strong style={{ color: monitoringInfo?.model_version_drift ? '#ef4444' : '#38bdf8' }}>
-              {monitoringInfo?.model_version_drift ? 'Drift Detected' : 'Consistent (No Drift)'}
-            </strong>
-          </div>
-
-          <div>
-            <span style={{ color: 'var(--color-text-muted)' }}>Last Checked: </span>
-            <strong style={{ color: 'var(--color-text-primary)' }}>
-              {new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-            </strong>
-          </div>
-        </div>
-      </div>
 
       {/* Navigation Tabs (Strictly 4 Tabs) */}
       <div
@@ -622,94 +591,175 @@ export default function Admin() {
 
       {/* ─── TAB 2: ALERT SETTINGS ───────────────────────────────────────────── */}
       {activeTab === 'alerts' && (
-        <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Sliders color="var(--color-accent-primary)" size={20} />
+            <Mail color="var(--color-accent-primary)" size={22} />
             <div>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-                Alert Threshold Settings
+                Alert Settings
               </h3>
               <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
-                Configure trigger thresholds for automated project alerts and data completeness warnings.
+                Configure email notifications and reminder schedules for delay risk alerts.
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
-            {/* 1. High-Risk Alert Score */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                High-Risk Alert Score
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={alertSettings.highRiskAlertScore}
-                onChange={(e) => setAlertSettings({ ...alertSettings, highRiskAlertScore: Number(e.target.value) })}
-                className="input"
-                style={{ height: 38, fontSize: '0.875rem' }}
-              />
-              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                Automatically triggers high delay risk alerts when a project's risk score exceeds this value.
-              </span>
+          {isLoadingAlertSettings ? (
+            <div style={{ textAlign: 'center', padding: 40, color: 'var(--color-text-muted)' }}>
+              <div className="spinner" style={{ margin: '0 auto 12px' }} />
+              Loading alert settings...
             </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 640 }}>
+              {/* 1. Email Notifications ON/OFF */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px 20px',
+                  borderRadius: 10,
+                  background: 'var(--color-bg-subtle, rgba(255,255,255,0.03))',
+                  border: '1px solid var(--color-border-subtle)',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                    Email Notifications
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                    Automatically send email alerts to the responsible officer when important delay risks occur.
+                  </div>
+                </div>
+                <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: 8 }}>
+                  <input
+                    type="checkbox"
+                    checked={alertSettings.email_notifications_enabled}
+                    onChange={(e) =>
+                      setAlertSettings({ ...alertSettings, email_notifications_enabled: e.target.checked })
+                    }
+                    style={{ width: 18, height: 18, accentColor: 'var(--color-accent-primary)', cursor: 'pointer' }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
+                      color: alertSettings.email_notifications_enabled ? 'var(--color-success)' : 'var(--color-text-muted)',
+                      minWidth: 28,
+                    }}
+                  >
+                    {alertSettings.email_notifications_enabled ? 'ON' : 'OFF'}
+                  </span>
+                </label>
+              </div>
 
-            {/* 2. Priority Action Score */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                Priority Action Score
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={alertSettings.priorityActionScore}
-                onChange={(e) => setAlertSettings({ ...alertSettings, priorityActionScore: Number(e.target.value) })}
-                className="input"
-                style={{ height: 38, fontSize: '0.875rem' }}
-              />
-              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                Surfaces projects requiring urgent officer intervention when their action score reaches this level.
-              </span>
+              {/* 2. Send For High/Critical Alerts */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px 20px',
+                  borderRadius: 10,
+                  background: 'var(--color-bg-subtle, rgba(255,255,255,0.03))',
+                  border: '1px solid var(--color-border-subtle)',
+                  opacity: alertSettings.email_notifications_enabled ? 1 : 0.6,
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                    Send For High/Critical Alerts
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                    Dispatch emails for High/Critical Risk, compensation delays, R&amp;R delays, legal disputes, and overdue stages.
+                  </div>
+                </div>
+                <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: 8 }}>
+                  <input
+                    type="checkbox"
+                    disabled={!alertSettings.email_notifications_enabled}
+                    checked={alertSettings.send_high_critical_only}
+                    onChange={(e) =>
+                      setAlertSettings({ ...alertSettings, send_high_critical_only: e.target.checked })
+                    }
+                    style={{ width: 18, height: 18, accentColor: 'var(--color-accent-primary)', cursor: 'pointer' }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
+                      color: alertSettings.send_high_critical_only ? 'var(--color-accent-primary)' : 'var(--color-text-muted)',
+                      minWidth: 28,
+                    }}
+                  >
+                    {alertSettings.send_high_critical_only ? 'ON' : 'OFF'}
+                  </span>
+                </label>
+              </div>
+
+              {/* 3. Reminder After 24/48 Hours */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px 20px',
+                  borderRadius: 10,
+                  background: 'var(--color-bg-subtle, rgba(255,255,255,0.03))',
+                  border: '1px solid var(--color-border-subtle)',
+                  opacity: alertSettings.email_notifications_enabled ? 1 : 0.6,
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                    Reminder After
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                    Interval for resending alert emails if the issue remains unresolved.
+                  </div>
+                </div>
+                <div>
+                  <select
+                    disabled={!alertSettings.email_notifications_enabled}
+                    value={alertSettings.reminder_hours}
+                    onChange={(e) =>
+                      setAlertSettings({ ...alertSettings, reminder_hours: Number(e.target.value) })
+                    }
+                    className="input"
+                    style={{ height: 36, fontSize: '0.82rem', minWidth: 150, cursor: 'pointer' }}
+                  >
+                    <option value={24}>After 24 Hours</option>
+                    <option value={48}>After 48 Hours</option>
+                    <option value={0}>Off (No Reminders)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Action Button & Feedback */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={handleSaveAlertSettings}
+                  style={{ fontSize: '0.82rem', padding: '8px 20px' }}
+                >
+                  Save Alert Settings
+                </button>
+                {isAlertSaved && (
+                  <span
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--color-success)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    <Check size={14} /> Alert settings saved successfully.
+                  </span>
+                )}
+              </div>
             </div>
-
-            {/* 3. Minimum Data Completeness */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                Minimum Data Completeness (%)
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={alertSettings.minimumDataCompleteness}
-                onChange={(e) => setAlertSettings({ ...alertSettings, minimumDataCompleteness: Number(e.target.value) })}
-                className="input"
-                style={{ height: 38, fontSize: '0.875rem' }}
-              />
-              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                Flags projects for data verification if essential land acquisition information falls below this percentage.
-              </span>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => {
-                setIsAlertSaved(true)
-                setTimeout(() => setIsAlertSaved(false), 3500)
-              }}
-            >
-              Save Alert Settings
-            </button>
-            {isAlertSaved && (
-              <span style={{ fontSize: '0.78rem', color: 'var(--color-success)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Check size={14} /> Alert settings saved successfully.
-              </span>
-            )}
-          </div>
+          )}
         </div>
       )}
 
@@ -717,7 +767,7 @@ export default function Admin() {
       {activeTab === 'models' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Main AI Health Card */}
-          <div className="card" style={{ padding: 24, border: '1px solid rgba(99,102,241,0.3)', background: 'linear-gradient(180deg, rgba(30,41,59,0.7) 0%, rgba(15,23,42,0.85) 100%)' }}>
+          <div className="card" style={{ padding: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 14 }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -728,7 +778,7 @@ export default function Admin() {
                     <CheckCircle2 size={12} /> Active
                   </span>
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#818cf8', fontFamily: 'var(--font-mono)', marginTop: 4 }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)', marginTop: 4 }}>
                   Production delay classification &amp; timeline estimation model
                 </div>
               </div>
@@ -767,7 +817,7 @@ export default function Admin() {
             {/* Primary AI Metrics Grid (Strictly Requested Key Fields) */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
               {/* 1. Active Model */}
-              <div style={{ background: 'var(--color-bg-secondary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ background: 'var(--color-bg-tertiary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                 <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Active Model</div>
                 <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 4 }}>
                   LADRIS Delay Engine
@@ -776,7 +826,7 @@ export default function Admin() {
               </div>
 
               {/* 2. Model Status */}
-              <div style={{ background: 'var(--color-bg-secondary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ background: 'var(--color-bg-tertiary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                 <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Model Status</div>
                 <div style={{ fontSize: '1rem', fontWeight: 700, color: '#10b981', marginTop: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
                   <CheckCircle2 size={14} /> Active &amp; Operational
@@ -785,7 +835,7 @@ export default function Admin() {
               </div>
 
               {/* 3. ROC-AUC */}
-              <div style={{ background: 'var(--color-bg-secondary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ background: 'var(--color-bg-tertiary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                 <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>ROC-AUC</div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#10b981', marginTop: 4 }}>
                   {modelInfo?.evaluation?.oof_roc_auc != null ? `${(Number(modelInfo.evaluation.oof_roc_auc) * 100).toFixed(1)}%` : '94.2%'}
@@ -794,7 +844,7 @@ export default function Admin() {
               </div>
 
               {/* 4. Average Delay Error */}
-              <div style={{ background: 'var(--color-bg-secondary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ background: 'var(--color-bg-tertiary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                 <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Average Delay Error</div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f59e0b', marginTop: 4 }}>
                   ±{modelInfo?.evaluation?.regressor_mae != null ? `${Number(modelInfo.evaluation.regressor_mae).toFixed(0)} days` : '28 days'}
@@ -803,7 +853,7 @@ export default function Admin() {
               </div>
 
               {/* 5. Model Version */}
-              <div style={{ background: 'var(--color-bg-secondary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ background: 'var(--color-bg-tertiary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                 <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Model Version</div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#38bdf8', fontFamily: 'var(--font-mono)', marginTop: 4 }}>
                   {modelInfo?.model_version || '20260914_080620'}
@@ -812,7 +862,7 @@ export default function Admin() {
               </div>
 
               {/* 6. Last Updated */}
-              <div style={{ background: 'var(--color-bg-secondary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ background: 'var(--color-bg-tertiary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                 <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Last Updated</div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 4 }}>
                   Sep 14, 2026
@@ -821,7 +871,7 @@ export default function Admin() {
               </div>
 
               {/* 7. Data Completeness */}
-              <div style={{ background: 'var(--color-bg-secondary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ background: 'var(--color-bg-tertiary)', padding: 14, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                 <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Data Completeness</div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8', marginTop: 4 }}>
                   {monitoringInfo?.mean_data_completeness_pct != null ? `${monitoringInfo.mean_data_completeness_pct}%` : '85.4%'}
@@ -859,13 +909,13 @@ export default function Admin() {
             {showAdvancedDetails && (
               <div style={{ marginTop: 18, borderTop: '1px solid var(--color-border-subtle)', paddingTop: 16 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 20 }}>
-                  <div style={{ background: 'var(--color-bg-secondary)', padding: 12, borderRadius: 8 }}>
+                  <div style={{ background: 'var(--color-bg-tertiary)', padding: 12, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Probability Calibration</div>
                     <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#38bdf8', marginTop: 4 }}>High Reliability</div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Calculated probabilities align with observed outcomes</div>
                   </div>
 
-                  <div style={{ background: 'var(--color-bg-secondary)', padding: 12, borderRadius: 8 }}>
+                  <div style={{ background: 'var(--color-bg-tertiary)', padding: 12, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Model Drift Monitoring</div>
                     <div style={{ fontSize: '0.95rem', fontWeight: 700, color: monitoringInfo?.model_version_drift ? '#ef4444' : '#10b981', marginTop: 4 }}>
                       {monitoringInfo?.model_version_drift ? 'Drift Detected' : 'Consistent (No Drift)'}
@@ -875,7 +925,7 @@ export default function Admin() {
                     </div>
                   </div>
 
-                  <div style={{ background: 'var(--color-bg-secondary)', padding: 12, borderRadius: 8 }}>
+                  <div style={{ background: 'var(--color-bg-tertiary)', padding: 12, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Input Features</div>
                     <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 4 }}>
                       {modelInfo?.feature_columns?.length || 23} Tracked Parameters

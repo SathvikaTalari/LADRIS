@@ -556,7 +556,6 @@ export default function DecisionIntelligence() {
         }}
       >
         {tabs.map((tab) => {
-          const IconComponent = tab.icon
           const isActive = activeTab === tab.key
           return (
             <button
@@ -574,7 +573,6 @@ export default function DecisionIntelligence() {
                 borderBottom: isActive ? '2px solid var(--color-accent-primary)' : '2px solid transparent',
               }}
             >
-              <IconComponent size={14} />
               <span>{tab.label}</span>
               {tab.count !== undefined && (
                 <span
@@ -613,23 +611,22 @@ export default function DecisionIntelligence() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
 
                 {/* 1. Primary Obstacle Card */}
-                <div className="card" style={{ padding: 18, borderRadius: 12, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div className="card" style={{ padding: 20, borderRadius: 12, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#ef4444', fontWeight: 700, fontSize: '0.86rem' }}>
-                        <AlertTriangle size={16} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                         Primary Obstacle
-                      </div>
-                      <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontWeight: 700 }}>
+                      </span>
+                      <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontWeight: 700 }}>
                         {blockers?.days_pending ?? 0} days pending
                       </span>
                     </div>
 
-                    <div style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 6 }}>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 6 }}>
                       {blockers?.most_blocking_issue || summary?.main_blocker || 'No critical blockers identified'}
                     </div>
 
-                    <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: 14 }}>
                       Stuck with: <strong style={{ color: 'var(--color-text-secondary)' }}>{blockers?.responsible_department || 'District Administration'}</strong>
                     </div>
 
@@ -642,23 +639,22 @@ export default function DecisionIntelligence() {
                   <button
                     className="btn btn-ghost btn-sm"
                     onClick={() => setActiveTab('blockers')}
-                    style={{ marginTop: 12, justifyContent: 'flex-start', paddingLeft: 0, color: 'var(--color-accent-primary)', fontSize: '0.8rem', fontWeight: 700 }}
+                    style={{ marginTop: 14, justifyContent: 'flex-start', paddingLeft: 0, color: 'var(--color-accent-primary)', fontSize: '0.8rem', fontWeight: 700 }}
                   >
                     View land clearance journey <ArrowRight size={13} style={{ marginLeft: 4 }} />
                   </button>
                 </div>
 
                 {/* 2. Money vs. Land Balance Card */}
-                <div className="card" style={{ padding: 18, borderRadius: 12, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div className="card" style={{ padding: 20, borderRadius: 12, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-accent-primary)', fontWeight: 700, fontSize: '0.86rem' }}>
-                        <Scale size={16} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <span style={{ color: 'var(--color-text-secondary)', fontWeight: 700, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                         Disbursement vs. Possession
-                      </div>
+                      </span>
                       {gap && (
                         <span style={{
-                          fontSize: '0.7rem',
+                          fontSize: '0.72rem',
                           padding: '2px 8px',
                           borderRadius: 4,
                           fontWeight: 700,
@@ -671,9 +667,9 @@ export default function DecisionIntelligence() {
                     </div>
 
                     {gap && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: 3 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>
                             <span>Funds Disbursed</span>
                             <strong style={{ color: 'var(--color-text-primary)' }}>{gap.payment_pct}%</strong>
                           </div>
@@ -683,7 +679,7 @@ export default function DecisionIntelligence() {
                         </div>
 
                         <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: 3 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>
                             <span>Physical Possession</span>
                             <strong style={{ color: '#10b981' }}>{gap.possession_pct}%</strong>
                           </div>
@@ -692,7 +688,7 @@ export default function DecisionIntelligence() {
                           </div>
                         </div>
 
-                        <div style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
                           {gap.has_abnormal_gap
                             ? `Payment is ${Math.round(gap.payment_pct - gap.possession_pct)}% ahead of physical possession.`
                             : 'Disbursement and physical possession are progressing in sync.'}
@@ -704,31 +700,32 @@ export default function DecisionIntelligence() {
                   <button
                     className="btn btn-ghost btn-sm"
                     onClick={() => setActiveTab('gap')}
-                    style={{ marginTop: 12, justifyContent: 'flex-start', paddingLeft: 0, color: 'var(--color-accent-primary)', fontSize: '0.8rem', fontWeight: 700 }}
+                    style={{ marginTop: 14, justifyContent: 'flex-start', paddingLeft: 0, color: 'var(--color-accent-primary)', fontSize: '0.8rem', fontWeight: 700 }}
                   >
                     Examine spending vs possession gap <ArrowRight size={13} style={{ marginLeft: 4 }} />
                   </button>
                 </div>
 
                 {/* 3. What-If Planner Card */}
-                <div className="card" style={{ padding: 18, borderRadius: 12, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(244,119,33,0.04) 100%)' }}>
+                <div className="card" style={{ padding: 20, borderRadius: 12, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-accent-primary)', fontWeight: 700, fontSize: '0.86rem', marginBottom: 10 }}>
-                      <Sparkles size={16} />
-                      Solution Simulation (What-If)
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <span style={{ color: 'var(--color-text-secondary)', fontWeight: 700, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        Solution Simulation (What-If)
+                      </span>
                     </div>
 
-                    <div style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 6 }}>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 6 }}>
                       Forecast delay days saved
                     </div>
 
-                    <p style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, margin: '0 0 10px 0' }}>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: '0 0 14px 0' }}>
                       Model out how many days can be saved by settling court stays or speeding up compensation payments.
                     </p>
 
                     {whatIf && (
                       <div style={{
-                        padding: '8px 12px',
+                        padding: '10px 14px',
                         borderRadius: 8,
                         background: 'rgba(59, 130, 246, 0.08)',
                         border: '1px solid rgba(59, 130, 246, 0.2)',
@@ -736,8 +733,8 @@ export default function DecisionIntelligence() {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                       }}>
-                        <span style={{ fontSize: '0.76rem', fontWeight: 600, color: '#3b82f6' }}>Potential time saved:</span>
-                        <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#3b82f6' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#3b82f6' }}>Potential time saved:</span>
+                        <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#3b82f6' }}>
                           {whatIf.delay_reduction_days > 0 ? `${Math.round(whatIf.delay_reduction_days)} days` : 'Up to 90 days'}
                         </span>
                       </div>
@@ -747,7 +744,7 @@ export default function DecisionIntelligence() {
                   <button
                     className="btn btn-primary btn-sm"
                     onClick={() => setActiveTab('simulator')}
-                    style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                    style={{ marginTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   >
                     Open What-If Simulator <ArrowRight size={13} />
                   </button>
@@ -756,14 +753,13 @@ export default function DecisionIntelligence() {
 
               {/* Approval Pipeline Quick Row */}
               {bottlenecks && (
-                <div className="card" style={{ padding: 18, borderRadius: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div className="card" style={{ padding: 20, borderRadius: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Building size={16} color="var(--color-accent-primary)" />
+                      <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                         Statutory Approval Sequence
                       </h3>
-                      <p style={{ margin: '2px 0 0 0', fontSize: '0.76rem', color: 'var(--color-text-muted)' }}>
+                      <p style={{ margin: '3px 0 0 0', fontSize: '0.76rem', color: 'var(--color-text-muted)' }}>
                         Currently stuck at: <strong style={{ color: '#ef4444' }}>{bottlenecks.blocked_at}</strong> ({bottlenecks.responsible_department})
                       </p>
                     </div>

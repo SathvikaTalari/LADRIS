@@ -16,6 +16,7 @@ import {
   Coins,
   ShieldAlert,
   Building2,
+  Mail,
 } from 'lucide-react'
 import { alertsAPI, projectsAPI } from '@/api/client'
 import { PageHeader, EmptyState } from '@/components/common'
@@ -456,6 +457,31 @@ export default function Alerts() {
                               </span>
                             )}
                           </span>
+
+                          {/* Email Sent Status Badge */}
+                          {(alert.email_sent || alert.alert_metadata?.email_sent) && (
+                            <span
+                              className="badge"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                fontSize: '0.72rem',
+                                background: 'rgba(59, 130, 246, 0.12)',
+                                color: '#60a5fa',
+                                border: '1px solid rgba(59, 130, 246, 0.3)',
+                                padding: '2px 8px',
+                                borderRadius: 6,
+                              }}
+                              title={
+                                alert.email_recipient || alert.alert_metadata?.email_recipient
+                                  ? `Email sent to ${alert.email_recipient || alert.alert_metadata?.email_recipient}`
+                                  : 'Email notification sent to responsible officer'
+                              }
+                            >
+                              <Mail size={11} /> Email Sent
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

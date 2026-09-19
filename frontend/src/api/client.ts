@@ -263,6 +263,12 @@ export const alertsAPI = {
 
   update: (id: string, data: { status: string }) =>
     apiClient.patch(`/api/v1/alerts/${id}`, data).then((r) => r.data),
+
+  getSettings: () =>
+    apiClient.get('/api/v1/alerts/settings').then((r) => r.data),
+
+  updateSettings: (data: any) =>
+    apiClient.post('/api/v1/alerts/settings', data).then((r) => r.data),
 }
 
 export const searchAPI = {

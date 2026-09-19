@@ -41,43 +41,50 @@ from sqlalchemy import select, text
 async def ensure_default_users():
     """Ensure default system accounts exist with valid hashed passwords."""
     try:
+        from app.api.v1.auth import DEMO_USERS
+
         async with AsyncSessionLocal() as session:
-            default_hash = hash_password("admin123")
+            pass_hash = hash_password("Password123!")
 
-            # 1. Admin account
-            res = await session.execute(select(User).where(User.email == "admin@ladris.gov.in"))
-            admin = res.scalar_one_or_none()
-            if not admin:
-                admin = User(
-                    email="admin@ladris.gov.in",
-                    full_name="System Administrator",
-                    hashed_password=default_hash,
-                    role=UserRole.SUPER_ADMIN,
-                    is_active=True,
-                    is_verified=True,
-                )
-                session.add(admin)
-            else:
-                admin.hashed_password = default_hash
+            # Seed or verify all demo accounts from DEMO_USERS
+            for email, info in DEMO_USERS.items():
+                res = await session.execute(select(User).where(User.email == email))
+                existing_user = res.scalar_one_or_none()
+                if not existing_user:
+                    new_user = User(
+                        email=email,
+                        full_name=info["full_name"],
+                        hashed_password=pass_hash,
+                        role=info["role"],
+                        state_code=info.get("state_code"),
+                        district_code=info.get("district_code"),
+                        agency_name=info.get("agency_name"),
+                        is_active=True,
+                        is_verified=True,
+                    )
+                    session.add(new_user)
+                else:
+                    existing_user.hashed_password = pass_hash
+                    existing_user.is_active = True
+                    existing_user.is_verified = True
 
-            # 2. Officer account
+            # Also ensure legacy officer@ladris.gov.in exists
             res = await session.execute(select(User).where(User.email == "officer@ladris.gov.in"))
             officer = res.scalar_one_or_none()
             if not officer:
-                officer = User(
-                    email="officer@ladris.gov.in",
-                    full_name="Test Officer",
-                    hashed_password=default_hash,
-                    role=UserRole.PROJECT_OFFICER,
-                    is_active=True,
-                    is_verified=True,
+                session.add(
+                    User(
+                        email="officer@ladris.gov.in",
+                        full_name="Test Officer",
+                        hashed_password=pass_hash,
+                        role=UserRole.PROJECT_OFFICER,
+                        is_active=True,
+                        is_verified=True,
+                    )
                 )
-                session.add(officer)
-            else:
-                officer.hashed_password = default_hash
 
             await session.commit()
-            print("   ✅ Default user accounts verified (admin & officer)")
+            print("   ✅ Default user accounts verified (all role accounts active)")
     except Exception as e:
         print(f"   ⚠️ Could not seed default users: {e}")
 

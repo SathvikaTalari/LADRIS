@@ -15,7 +15,12 @@ from app.models.user import User, UserRole
 from app.models.misc import Alert, AlertStatus, AlertType, AlertSeverity
 from app.models.project import Project
 from app.models.ml_models import MLPrediction
-from app.schemas.misc import AlertResponse, AlertUpdate
+from app.schemas.misc import AlertResponse, AlertUpdate, AlertSettingsSchema
+from app.services.email_service import (
+    get_alert_settings,
+    save_alert_settings,
+    trigger_alert_email_if_needed,
+)
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
@@ -136,7 +141,7 @@ async def _seed_alerts_from_projects(db: AsyncSession):
             reason = "Stage Overdue"
             explanation = f"{project.name} has critical delay risk in {peak.get('stage')} stage."
 
-        db.add(Alert(
+        new_alert = Alert(
             project_id=project.id,
             alert_type=AlertType.RISK_ESCALATION,
             severity=AlertSeverity.CRITICAL if prediction.risk_score >= 90 else AlertSeverity.HIGH,
@@ -158,8 +163,37 @@ async def _seed_alerts_from_projects(db: AsyncSession):
                 "critical_stage_risk_score": peak.get("risk_score"),
             },
             triggered_at=prediction.predicted_at,
-        ))
+        )
+        db.add(new_alert)
+        await trigger_alert_email_if_needed(db, new_alert, project, current_risk_score=prediction.risk_score)
     await db.commit()
+
+
+@router.get("/settings", response_model=AlertSettingsSchema)
+async def get_settings(
+    current_user: User = Depends(get_current_user),
+):
+    """Retrieve current alert and email notification settings."""
+    return get_alert_settings()
+
+
+@router.post("/settings", response_model=AlertSettingsSchema)
+async def update_settings(
+    settings_data: AlertSettingsSchema,
+    current_user: User = Depends(get_current_user),
+):
+    """Update alert and email notification settings."""
+    if current_user.role not in [
+        UserRole.SUPER_ADMIN,
+        UserRole.STATE_ADMIN,
+        UserRole.DISTRICT_OFFICER,
+    ]:
+        raise HTTPException(
+            status_code=403, detail="Insufficient privileges to update alert settings"
+        )
+    saved = save_alert_settings(settings_data.model_dump())
+    return saved
+
 
 @router.get("/", response_model=List[AlertResponse])
 async def get_alerts(
@@ -184,10 +218,31 @@ async def get_alerts(
         result = await db.execute(query)
         alerts = result.scalars().all()
 
+    # Dispatch email notification for any existing active critical/high alerts not yet emailed
+    needs_commit = False
+    for a in alerts:
+        meta = a.alert_metadata or {}
+        if a.status == AlertStatus.ACTIVE and not meta.get("email_sent"):
+            sent = await trigger_alert_email_if_needed(db, a, a.project)
+            if sent:
+                needs_commit = True
+    if needs_commit:
+        await db.commit()
+
     response_items = []
     for a in alerts:
         pname = a.project.name if a.project else (a.alert_metadata or {}).get("project_name")
         reason, explanation = classify_alert_reason(a, a.project)
+        meta = a.alert_metadata or {}
+        email_sent = bool(meta.get("email_sent", False))
+        sent_at_val = meta.get("email_sent_at")
+        email_sent_at = None
+        if sent_at_val:
+            try:
+                email_sent_at = datetime.fromisoformat(sent_at_val.replace("Z", "+00:00"))
+            except Exception:
+                pass
+
         response_items.append(AlertResponse(
             id=a.id,
             project_id=a.project_id,
@@ -200,6 +255,9 @@ async def get_alerts(
             title=reason if a.title.startswith("ML") or "ML HIGH-RISK" in a.title else a.title,
             message=explanation if a.message.startswith("ML") or "ML delay risk" in a.message else a.message,
             alert_metadata=a.alert_metadata or {},
+            email_sent=email_sent,
+            email_sent_at=email_sent_at,
+            email_recipient=meta.get("email_recipient"),
             triggered_at=a.triggered_at,
             acknowledged_by=a.acknowledged_by,
             acknowledged_at=a.acknowledged_at,
@@ -242,6 +300,16 @@ async def update_alert(
     
     pname = alert.project.name if alert.project else (alert.alert_metadata or {}).get("project_name")
     reason, explanation = classify_alert_reason(alert, alert.project)
+    meta = alert.alert_metadata or {}
+    email_sent = bool(meta.get("email_sent", False))
+    sent_at_val = meta.get("email_sent_at")
+    email_sent_at = None
+    if sent_at_val:
+        try:
+            email_sent_at = datetime.fromisoformat(sent_at_val.replace("Z", "+00:00"))
+        except Exception:
+            pass
+
     return AlertResponse(
         id=alert.id,
         project_id=alert.project_id,
@@ -254,6 +322,9 @@ async def update_alert(
         title=reason if alert.title.startswith("ML") or "ML HIGH-RISK" in alert.title else alert.title,
         message=explanation if alert.message.startswith("ML") or "ML delay risk" in alert.message else alert.message,
         alert_metadata=alert.alert_metadata or {},
+        email_sent=email_sent,
+        email_sent_at=email_sent_at,
+        email_recipient=meta.get("email_recipient"),
         triggered_at=alert.triggered_at,
         acknowledged_by=alert.acknowledged_by,
         acknowledged_at=alert.acknowledged_at,

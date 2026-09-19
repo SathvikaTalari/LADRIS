@@ -18,12 +18,23 @@ class AlertCreate(AlertBase):
 class AlertUpdate(BaseModel):
     status: AlertStatus
 
+class AlertSettingsSchema(BaseModel):
+    email_notifications_enabled: bool = True
+    send_high_critical_only: bool = True
+    reminder_hours: int = 24  # 24, 48, or 0 (Off)
+    high_risk_alert_score: int = 75
+    priority_action_score: int = 70
+    minimum_data_completeness: int = 60
+
 class AlertResponse(AlertBase):
     id: UUID
     project_id: Optional[UUID] = None
     project_name: Optional[str] = None
     alert_reason: Optional[str] = None
     explanation: Optional[str] = None
+    email_sent: bool = False
+    email_sent_at: Optional[datetime] = None
+    email_recipient: Optional[str] = None
     triggered_at: datetime
     acknowledged_by: Optional[UUID] = None
     acknowledged_at: Optional[datetime] = None

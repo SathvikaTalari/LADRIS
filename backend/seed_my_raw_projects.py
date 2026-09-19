@@ -49,6 +49,20 @@ async def main():
     csv_path = settings.resolved_project_data_csv
     print(f"Syncing projects from: {csv_path}")
 
+    # Verify tables exist; if database is freshly initialized, run migrations automatically
+    try:
+        from run_migrations import run_all_migrations
+        from sqlalchemy import text
+        from app.database import engine
+        async with engine.connect() as conn:
+            res = await conn.execute(text("SELECT to_regclass('public.ml_models');"))
+            has_tables = res.scalar() is not None
+        if not has_tables:
+            print("[INFO] Database tables not found. Automatically applying migrations...")
+            await run_all_migrations()
+    except Exception as mig_err:
+        print(f"[WARN] Auto-migration check note: {mig_err}")
+
     async with AsyncSessionLocal() as session:
         await sync_model_registry(session)
         imported_ids = await sync_projects_from_csv(session, csv_path, exclusive=settings.PROJECT_CSV_EXCLUSIVE)

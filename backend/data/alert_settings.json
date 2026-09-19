@@ -1,0 +1,8 @@
+{
+  "email_notifications_enabled": true,
+  "send_high_critical_only": true,
+  "reminder_hours": 24,
+  "high_risk_alert_score": 75,
+  "priority_action_score": 70,
+  "minimum_data_completeness": 60
+}
