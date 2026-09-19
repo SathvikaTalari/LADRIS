@@ -1,311 +1,112 @@
 /**
- * LADRIS — Controlled DOM-based Page Content Collector (V2)
+ * LADRIS — Comprehensive Page Voice Descriptions
  *
- * Extracts meaningful, visible content from the authenticated page container
- * and organizes it into a natural accessibility-style sequence:
- *
- * 1. Page introduction
- * 2. Important summary/metric information
- * 3. Current filters or selections
- * 4. Important risks/status information
- * 5. Main available actions
- * 6. Relevant table/list information
- *
- * Dynamically reads live DOM data without hardcoding. Zero fake statistics.
+ * Provides thorough, clear, and comprehensive voice descriptions for each main page
+ * so that officials and users can understand everything about that particular page:
+ * its core purpose, key sections and metrics, and how to use it effectively.
+ * Spoken in clear, professional Indian English female voice.
  */
 
-function isElementVisible(el: Element | null): boolean {
-  if (!el || !(el instanceof HTMLElement)) return false
-
-  // Check element geometry
-  if (el.offsetWidth === 0 && el.offsetHeight === 0 && el.getClientRects().length === 0) {
-    return false
-  }
-
-  // Check computed styles
-  const style = window.getComputedStyle(el)
-  if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
-    return false
-  }
-
-  // Exclude elements marked hidden for accessibility
-  if (el.closest('[aria-hidden="true"]')) {
-    return false
-  }
-
-  return true
-}
-
-function cleanText(text: string): string {
-  return text
-    .replace(/\s+/g, ' ')
-    .replace(/[\r\n\t]+/g, ' ')
-    .trim()
-}
-
-const ROUTE_INTRODUCTIONS: Record<string, string> = {
+export const PAGE_VOICE_INSTRUCTIONS: Record<string, string> = {
+  // 1. Dashboard
   '/dashboard':
-    'Welcome to the Command Dashboard, providing a national overview of land acquisition velocity, delay risks, and project portfolios.',
-  '/projects':
-    'You are on the Land Acquisition Projects directory, where you can search, filter, and track infrastructure projects across states and agencies.',
-  '/gis':
-    'This is the GIS Command Map, displaying geospatial project alignments, district risk heatmaps, and spatial delay patterns.',
-  '/analytics':
-    'You are viewing the Analytics dashboard, providing delay risk modeling, compensation outlay analysis, and stage progression metrics.',
-  '/alerts':
-    'This is the Alerts and Early-Warning Command Center, monitoring real-time risk escalations, project delays, and system notifications.',
-  '/intelligence':
-    'Welcome to Decision Intelligence, delivering AI-driven delay root-cause analysis and proactive risk mitigation insights.',
-  '/priority-intelligence':
-    'You are on Priority Intelligence, highlighting high-impact projects that require urgent administrative review and intervention.',
-  '/la-workbench':
-    'This is the Land Acquisition Officer Workbench, designed for milestone tracking, field verification, and district workflow management.',
-  '/agency-portal':
-    'Welcome to the Implementing Agency Portal, allowing executing agencies to monitor assigned land acquisition packages and project progress.',
-  '/data-sources':
-    'You are on the Data Sources registry, managing official dataset integrations, sync schedules, and API connections.',
-  '/data-quality':
-    'This is the Data Quality and AI Reliability monitor, evaluating data completeness, validation health, and model confidence scores.',
-  '/admin':
-    'You are in the Administration panel, managing user accounts, access roles, district assignments, and system configurations.',
-}
+    'Welcome to the LADRIS Executive Command Dashboard. This page gives officials and decision-makers a comprehensive overview of active linear infrastructure and highway projects across India. At the top, you can track verified project counts, corridors facing critical delay risk, active statutory alerts, and overall compensation disbursement progress. Below, the dashboard features state and district delay distributions, a priority intervention queue for critical projects, and quick-action links. Use this page to monitor national portfolio velocity and prioritize high-risk corridors that require urgent administrative intervention.',
 
-function getRouteIntroduction(): string | null {
-  if (typeof window === 'undefined' || !window.location) return null
-  const pathname = window.location.pathname.replace(/\/+$/, '') || '/'
-  return ROUTE_INTRODUCTIONS[pathname] || null
+  // 2. Projects Directory
+  '/projects':
+    'You are on the Land Acquisition Projects Directory. This central management hub lists all infrastructure corridors monitored by LADRIS across National Highways, state expressways, and economic corridors. You can quickly search projects by name or code, filter by state, district, implementing agency such as NHAI, current acquisition stage, and AI delay risk tier. Each project card displays vital metrics, including predicted delay days, total land area required, compensation disbursement progress, and open court disputes. Clicking on any project will open its detailed intelligence and risk breakdown view.',
+
+  // 3. Project Details
+  'project-details':
+    'This is the Project Details and Deep-Dive view. It provides an exhaustive breakdown of the selected infrastructure corridor across its entire acquisition lifecycle—from Section 3A preliminary notification and 3D declaration, to compensation award, dispute resolution, and physical possession. On this page, you can review calibrated Machine Learning delay predictions, explainable SHAP risk drivers, compensation sanctioned versus disbursed, active litigation pendency, and real-time milestone progress. You will also find actionable AI recommendations and an intervention history log to help expedite project clearances.',
+
+  // 4. Decision Intelligence & What-If Simulator
+  '/decision-intelligence':
+    'Welcome to Decision Intelligence and Policy Simulation. This strategic module helps administrative leaders understand why delays occur and evaluate the exact impact of corrective actions before deploying resources. In the Executive Overview, you can analyze systemic bottlenecks, dispute timelines, and statutory lapse cliffs. Using the interactive What-If Policy Simulator below, officials can test scenarios such as allocating special fast-track arbitration budgets or expanding field disbursement teams to calculate precisely how many months of project delay can be compressed.',
+  '/intelligence':
+    'Welcome to Decision Intelligence and Policy Simulation. This strategic module helps administrative leaders understand why delays occur and evaluate the exact impact of corrective actions before deploying resources. In the Executive Overview, you can analyze systemic bottlenecks, dispute timelines, and statutory lapse cliffs. Using the interactive What-If Policy Simulator below, officials can test scenarios such as allocating special fast-track arbitration budgets or expanding field disbursement teams to calculate precisely how many months of project delay can be compressed.',
+  '/priority-intelligence':
+    'This is the Priority Intelligence Watchlist. It automatically ranks infrastructure projects that require urgent intervention based on multidimensional risk criteria—including statutory lapse proximity, prolonged stage tenure, severe compensation bottlenecks, and critical court cases. Officials can review high-risk corridors, inspect their primary delay drivers, and immediately assign action items to resolve field bottlenecks.',
+
+  // 5. Interactive Map (GIS)
+  '/gis':
+    'This is the GIS Geospatial Risk Map. It provides a spatial overview of linear infrastructure corridors across Indian states and districts using verified coordinates. Projects are color-coded by AI delay risk—red for critical risk, amber for high risk, yellow for medium risk, and green for on-track corridors. You can zoom into highway alignments, filter by state and risk level, click on corridor pins to view real-time stage progress, and identify geographic clusters where land acquisition encumbrances are heavily concentrated.',
+
+  // 6. Analytics & Trends
+  '/analytics':
+    'You are viewing the District and State Analytics portal. This page delivers macro-level analytical intelligence on land acquisition velocity and delay trends across India. Key sections include historical delay trends across districts, agency-wise performance benchmarks, compensation outlay versus actual payment ratios, and average tenure spent in each statutory stage. Planners and policy researchers can utilize these trends to pinpoint systemic procedural delays, forecast future land acquisition timelines, and guide institutional policy reforms.',
+
+  // 7. Alerts & Early Warnings
+  '/alerts':
+    'This is the Alerts and Early-Warning Command Center. It continuously audits project timelines against Indian statutory deadlines, such as the mandatory one-year Section 3D lapse rule under the National Highways Act. Alerts are classified by severity—Critical, High, and Medium—covering legal disputes, compensation bottlenecks, and stage overruns. On this page, officials can acknowledge active alerts, inspect automated email notification delivery statuses, view responsible officers, and initiate rapid mitigation measures to prevent legal lapses.',
+
+  // 8. Data Sources & Pipelines
+  '/data-sources':
+    'This is the Official Data Sources and Ingestion Center. LADRIS integrates directly with verified public and government portals, including the Ministry of Road Transport and Highways BhoomiRashi gazette feed, the Data.gov.in national repository, and judicial court databases. On this page, administrators can inspect synchronization schedules, review API connector health, verify source organizations and licensing, and trigger manual or scheduled data refreshes to ensure all project intelligence is always up to date.',
+
+  // 9. Data Quality & AI Reliability
+  '/data-quality':
+    'This is the Data Quality and AI Reliability monitor. It rigorously audits the integrity, completeness, and validity of all incoming project records across eighty-two statutory fields. The page displays data validation health scores, anomaly detection flags, and machine learning model confidence ratings. This comprehensive auditing ensures that all delay predictions, risk categories, and executive decisions are grounded in authenticated, high-quality data.',
+
+  // 10. Admin & AI Settings
+  '/admin':
+    'This is the Administration and AI Settings panel. System administrators can manage user accounts, assign role-based permissions for Central, State, and District authorities, and configure alert thresholds. You can also monitor machine learning model health, review feature importance metrics, inspect audit logs, and customize automated email notification settings for high-risk project alerts.',
+
+  // 11. Saarthi AI Copilot
+  'saarthi':
+    'This is Saarthi, your AI-powered conversational copilot for land acquisition. Saarthi is grounded in real-time project database metrics and Indian statutory laws, including the National Highways Act of 1956 and RFCTLARR 2013. You can ask Saarthi questions in natural speech or text to check project status, identify high-risk corridors, calculate statutory deadlines, or understand legal delay factors instantly.',
+
+  // 12. LA Officer Workbench
+  '/la-workbench':
+    'This is the Competent Authority Land Acquisition Workbench. Designed specifically for CALA and district revenue officers, this dashboard streamlines field operations. Officers can track Section 3A, 3D, and 3G notifications, manage public objection hearings, verify land ownership parcels, and coordinate direct compensation payments into beneficiary bank accounts.',
+
+  // 13. Implementing Agency Portal
+  '/agency-portal':
+    'This is the Implementing Agency Portal for executing bodies such as the National Highways Authority of India and state road corporations. It focuses on project execution milestones, tracking encumbrance-free Right-of-Way clearance, utility shifting, and physical possession handovers to ensure civil construction can proceed without site disputes.',
 }
 
 /**
- * Collects visible, meaningful page content from the current authenticated view.
- * If no content is found, returns the fallback string: "LADRIS voice guidance is ready."
+ * Returns a proper, comprehensive description of the current page.
  */
-export function collectPageContent(): string {
-  if (typeof document === 'undefined') {
-    return 'LADRIS voice guidance is ready.'
+export function getPageVoiceInstruction(pathname?: string, isSaarthiOpen?: boolean): string {
+  // If Saarthi chatbot window is open, describe Saarthi
+  const saarthiActive =
+    isSaarthiOpen ??
+    (typeof document !== 'undefined' &&
+      Boolean(
+        document.getElementById('saarthi-chat-window') ||
+        document.querySelector('[data-saarthi-open="true"]')
+      ))
+
+  if (saarthiActive) {
+    return PAGE_VOICE_INSTRUCTIONS['saarthi']
   }
 
-  // Target the authenticated page container inside main
-  const root =
-    document.querySelector('main .page-container') ||
-    document.querySelector('main') ||
-    document.querySelector('.page-container')
+  const rawPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/dashboard')
+  const cleanPath = (rawPath || '').replace(/\/+$/, '') || '/dashboard'
 
-  if (!root || !isElementVisible(root)) {
-    return 'LADRIS voice guidance is ready.'
+  // Exact route match
+  if (PAGE_VOICE_INSTRUCTIONS[cleanPath]) {
+    return PAGE_VOICE_INSTRUCTIONS[cleanPath]
   }
 
-  const sections: string[] = []
-  const seenTexts = new Set<string>()
-
-  const addSnippet = (snippet: string) => {
-    const cleaned = cleanText(snippet)
-    if (!cleaned || cleaned.length < 2) return
-
-    const normalized = cleaned.toLowerCase()
-    if (seenTexts.has(normalized)) return
-    seenTexts.add(normalized)
-    sections.push(cleaned)
+  // Project Details match: /projects/:id (excluding /projects/new)
+  if (cleanPath.startsWith('/projects/') && !cleanPath.endsWith('/new')) {
+    return PAGE_VOICE_INSTRUCTIONS['project-details']
   }
 
-  // ─── 1. PAGE INTRODUCTION ───────────────────────────────────────────────────
-  const intro = getRouteIntroduction()
-  const introParts: string[] = []
-
-  if (intro) {
-    introParts.push(intro)
+  // Root fallback to Dashboard
+  if (cleanPath === '' || cleanPath === '/') {
+    return PAGE_VOICE_INSTRUCTIONS['/dashboard']
   }
 
-  const pageTitleEl = root.querySelector('.page-header-title, h1') || document.querySelector('header h1')
-  const titleText = pageTitleEl && isElementVisible(pageTitleEl) ? cleanText(pageTitleEl.textContent || '') : ''
+  // Default fallback
+  return "Welcome to LADRIS, India's AI-Powered Land Acquisition Early-Warning and Decision Support Intelligence System. Use the top navigation bar and sidebar to explore infrastructure projects, delay predictions, GIS spatial maps, and decision support tools across national highway corridors."
+}
 
-  const pageSubtitleEl = root.querySelector('.page-header-subtitle')
-  const subtitleText = pageSubtitleEl && isElementVisible(pageSubtitleEl) ? cleanText(pageSubtitleEl.textContent || '') : ''
-
-  if (!intro && titleText) {
-    introParts.push(`You are viewing ${titleText}.`)
-  }
-
-  if (subtitleText) {
-    const cleanedSub = subtitleText.endsWith('.') ? subtitleText : `${subtitleText}.`
-    introParts.push(cleanedSub)
-  }
-
-  if (introParts.length > 0) {
-    addSnippet(introParts.join(' '))
-  }
-
-  // ─── 2. IMPORTANT SUMMARY / METRIC INFORMATION ─────────────────────────────
-  const metricSummaries: string[] = []
-  const metricCards = root.querySelectorAll('.metric-card')
-  metricCards.forEach((card) => {
-    if (!isElementVisible(card)) return
-    const labelEl = card.querySelector('.metric-label')
-    const valueEl = card.querySelector('.metric-value')
-    if (labelEl && valueEl) {
-      const label = cleanText(labelEl.textContent || '')
-      const val = cleanText(valueEl.textContent || '')
-      if (label && val && val !== '—') {
-        metricSummaries.push(`${label} at ${val}`)
-      }
-    }
-  })
-
-  // Extract key figures in cards if metric-cards are absent
-  const cardFigures: string[] = []
-  const cards = root.querySelectorAll('.card')
-  cards.forEach((card) => {
-    if (!isElementVisible(card) || card.querySelector('table')) return
-    const strongPairs = card.querySelectorAll('div > span:first-child + strong')
-    strongPairs.forEach((strong) => {
-      const parent = strong.parentElement
-      if (parent && isElementVisible(parent)) {
-        const span = parent.querySelector('span')
-        if (span) {
-          const k = cleanText(span.textContent || '').replace(/:$/, '')
-          const v = cleanText(strong.textContent || '')
-          if (k && v && k.length < 40 && !metricSummaries.some((m) => m.includes(k))) {
-            cardFigures.push(`${k} at ${v}`)
-          }
-        }
-      }
-    })
-  })
-
-  if (metricSummaries.length > 0) {
-    addSnippet(`Key metrics show ${metricSummaries.slice(0, 6).join(', ')}.`)
-  } else if (cardFigures.length > 0) {
-    addSnippet(`Key summary figures include ${cardFigures.slice(0, 3).join(', ')}.`)
-  }
-
-  // ─── 3. CURRENT FILTERS OR SELECTIONS ──────────────────────────────────────
-  const filters: string[] = []
-  const selects = root.querySelectorAll('select')
-  selects.forEach((select) => {
-    if (!isElementVisible(select)) return
-    const selectedOption = cleanText(select.options[select.selectedIndex]?.text || '')
-    const label = cleanText(select.getAttribute('aria-label') || select.name || '')
-    if (selectedOption && !selectedOption.toLowerCase().includes('select')) {
-      filters.push(label ? `${label} set to ${selectedOption}` : selectedOption)
-    }
-  })
-
-  const activeTabs = root.querySelectorAll('[role="tab"][aria-selected="true"], .btn-tab.active, [data-state="active"]')
-  activeTabs.forEach((tab) => {
-    if (!isElementVisible(tab)) return
-    const tabText = cleanText(tab.textContent || '')
-    if (tabText && tabText.length < 30) {
-      filters.push(tabText)
-    }
-  })
-
-  if (filters.length > 0) {
-    addSnippet(`Current filters and selections are ${filters.slice(0, 4).join(', ')}.`)
-  }
-
-  // ─── 4. IMPORTANT RISKS / STATUS INFORMATION ───────────────────────────────
-  const alertElements = root.querySelectorAll('[role="alert"], .badge-red, .badge-yellow, .risk-badge')
-  const riskNotices: string[] = []
-  alertElements.forEach((el) => {
-    if (!isElementVisible(el)) return
-    const parentItem = el.closest('[style*="border"], .card, div')
-    const alertTitle = parentItem?.querySelector('[style*="ellipsis"], [style*="bold"], strong, h4')
-    const badgeText = cleanText(el.textContent || '')
-
-    if (alertTitle && isElementVisible(alertTitle) && parentItem !== el) {
-      const titleStr = cleanText(alertTitle.textContent || '')
-      if (titleStr && titleStr.length < 60 && !riskNotices.some((r) => r.includes(titleStr))) {
-        riskNotices.push(`${badgeText}: ${titleStr}`)
-        return
-      }
-    }
-
-    if (badgeText && !seenTexts.has(badgeText.toLowerCase()) && riskNotices.length < 4) {
-      riskNotices.push(badgeText)
-    }
-  })
-
-  if (riskNotices.length > 0) {
-    addSnippet(`Important risk notices highlight ${riskNotices.slice(0, 4).join(', ')}.`)
-  }
-
-  // ─── 5. MAIN AVAILABLE ACTIONS ─────────────────────────────────────────────
-  const actionButtons: string[] = []
-  const buttons = root.querySelectorAll(
-    '.page-header button, .page-header .btn, button.btn-primary, button.btn-secondary, button:not([aria-hidden="true"])'
-  )
-  buttons.forEach((btn) => {
-    if (!isElementVisible(btn)) return
-    if (btn.closest('header') || btn.closest('.sidebar') || btn.closest('nav')) return
-    const btnText = cleanText(btn.textContent || '')
-    if (
-      btnText &&
-      btnText.length > 2 &&
-      btnText.length < 30 &&
-      !/^[\W_\d]+$/.test(btnText) &&
-      !actionButtons.includes(btnText)
-    ) {
-      actionButtons.push(btnText)
-    }
-  })
-
-  if (actionButtons.length > 0) {
-    addSnippet(`Available actions include ${actionButtons.slice(0, 3).join(', ')}.`)
-  }
-
-  // ─── 6. RELEVANT TABLE / LIST INFORMATION ──────────────────────────────────
-  const tables = root.querySelectorAll('table')
-  tables.forEach((table) => {
-    if (!isElementVisible(table)) return
-
-    const ths = table.querySelectorAll('thead th')
-    const colNames: string[] = []
-    ths.forEach((th) => {
-      if (isElementVisible(th)) {
-        const text = cleanText(th.textContent || '')
-        if (text && text.length < 30) colNames.push(text)
-      }
-    })
-
-    if (colNames.length > 0) {
-      addSnippet(`The table displays columns for ${colNames.slice(0, 5).join(', ')}.`)
-    }
-
-    const rows = table.querySelectorAll('tbody tr')
-    const rowSummaries: string[] = []
-    let rowCount = 0
-    rows.forEach((row) => {
-      if (rowCount >= 2 || !isElementVisible(row)) return
-      const cells = row.querySelectorAll('td')
-      const cellTexts: string[] = []
-      cells.forEach((td) => {
-        if (isElementVisible(td)) {
-          const text = cleanText(td.textContent || '')
-          if (text && text.length < 40) cellTexts.push(text)
-        }
-      })
-      if (cellTexts.length > 0) {
-        rowSummaries.push(cellTexts.slice(0, 4).join(', '))
-        rowCount++
-      }
-    })
-
-    if (rowSummaries.length > 0) {
-      addSnippet(`Top records include: ${rowSummaries.join('; and ')}.`)
-    }
-  })
-
-  // Fallback if no meaningful text collected
-  if (sections.length === 0) {
-    return 'LADRIS voice guidance is ready.'
-  }
-
-  // Limit narration length for very long pages (~200 words max)
-  const fullNarration = sections.join(' ')
-  const words = fullNarration.split(' ')
-  if (words.length > 200) {
-    return words.slice(0, 200).join(' ') + '... and additional details visible on page.'
-  }
-
-  return fullNarration
+/**
+ * Backwards-compatible collector returning the comprehensive page description.
+ */
+export function collectPageContent(pathname?: string): string {
+  return getPageVoiceInstruction(pathname)
 }

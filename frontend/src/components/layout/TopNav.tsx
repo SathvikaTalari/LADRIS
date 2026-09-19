@@ -4,9 +4,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Pause, Play, Square } from 'lucide-react'
+import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Square } from 'lucide-react'
 import { voiceEngine } from '@/components/voice/voiceEngine'
-import { collectPageContent } from '@/components/voice/pageContentCollector'
+import { getPageVoiceInstruction } from '@/components/voice/pageContentCollector'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { roleLabel } from '@/utils'
@@ -54,35 +54,36 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
     })
   }, [])
 
-  const handleSpeak = () => {
+  // Automatically stop previous audio when navigating to another page
+  useEffect(() => {
+    if (voiceEngine.isSpeaking()) {
+      voiceEngine.stop()
+    }
+  }, [location.pathname])
+
+  // Cleanup when unmounting
+  useEffect(() => {
+    return () => {
+      if (voiceEngine.isSpeaking()) {
+        voiceEngine.stop()
+      }
+    }
+  }, [])
+
+  const handleToggleVoice = () => {
     const now = Date.now()
-    if (now - lastVoiceClickRef.current < 400) {
-      return // Prevent duplicate speech when clicked repeatedly
+    if (now - lastVoiceClickRef.current < 300) {
+      return // Debounce rapid clicks
     }
     lastVoiceClickRef.current = now
 
     if (voiceEngine.isSpeaking()) {
-      return
+      voiceEngine.stop()
+    } else {
+      const isSaarthiOpen = Boolean(document.getElementById('saarthi-chat-window'))
+      const textToSpeak = getPageVoiceInstruction(location.pathname, isSaarthiOpen)
+      voiceEngine.speak(textToSpeak)
     }
-
-    const content = collectPageContent()
-    const textToSpeak = content && content.trim().length > 0
-      ? content
-      : 'LADRIS voice guidance is ready.'
-
-    voiceEngine.speak(textToSpeak)
-  }
-
-  const handlePause = () => {
-    voiceEngine.pause()
-  }
-
-  const handleResume = () => {
-    voiceEngine.resume()
-  }
-
-  const handleStop = () => {
-    voiceEngine.stop()
   }
 
   const sidebarWidth = sidebarCollapsed ? 68 : 252
@@ -139,41 +140,27 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
       {/* Right: Controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
 
-        {/* Speaker / Voice Playback Controls */}
+        {/* Speaker / Voice Play & Stop Control */}
         {!voiceState.isSpeaking ? (
           <NavIconButton
-            icon={<Volume2 size={20} strokeWidth={1.8} />}
-            onClick={handleSpeak}
-            title="Start Voice Guidance"
-            ariaLabel="Start Voice Guidance"
+            icon={<Volume2 size={19} strokeWidth={1.8} />}
+            onClick={handleToggleVoice}
+            title="Listen to page instructions (Play)"
+            ariaLabel="Play voice instructions"
             ariaPressed={false}
           />
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {voiceState.isPaused ? (
-              <NavIconButton
-                icon={<Play size={18} strokeWidth={1.8} color="var(--color-primary-400, #4080ff)" />}
-                onClick={handleResume}
-                title="Resume Voice Guidance"
-                ariaLabel="Resume Voice Guidance"
-                ariaPressed={false}
-              />
-            ) : (
-              <NavIconButton
-                icon={<Pause size={18} strokeWidth={1.8} color="var(--color-primary-400, #4080ff)" />}
-                onClick={handlePause}
-                title="Pause Voice Guidance"
-                ariaLabel="Pause Voice Guidance"
-                ariaPressed={true}
-              />
-            )}
-            <NavIconButton
-              icon={<Square size={14} strokeWidth={1.8} fill="currentColor" color="var(--color-risk-critical, #ef4444)" />}
-              onClick={handleStop}
-              title="Stop Voice Guidance"
-              ariaLabel="Stop Voice Guidance"
-            />
-          </div>
+          <NavIconButton
+            icon={<Square size={13} strokeWidth={2} fill="currentColor" style={{ color: 'var(--color-risk-critical, #ef4444)' }} />}
+            onClick={handleToggleVoice}
+            title="Stop voice instructions"
+            ariaLabel="Stop voice instructions"
+            ariaPressed={true}
+            style={{
+              border: '1px solid rgba(239, 68, 68, 0.45)',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            }}
+          />
         )}
 
         {/* Alerts / Notifications Button */}
@@ -342,6 +329,7 @@ function NavIconButton({
   title,
   ariaLabel,
   ariaPressed,
+  style,
 }: {
   icon: React.ReactNode
   onClick: () => void
@@ -349,6 +337,7 @@ function NavIconButton({
   title?: string
   ariaLabel?: string
   ariaPressed?: boolean
+  style?: React.CSSProperties
 }) {
   return (
     <button
@@ -367,16 +356,17 @@ function NavIconButton({
         justifyContent: 'center',
         cursor: 'pointer',
         color: 'var(--color-text-secondary)',
-        transition: 'background 0.15s ease, color 0.15s ease',
+        transition: 'background 0.15s ease, color 0.15s ease, border-color 0.15s ease',
         flexShrink: 0,
+        ...style,
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.color = 'var(--color-text-primary)'
-        e.currentTarget.style.background = 'var(--color-bg-card-hover)'
+        if (!style?.color) e.currentTarget.style.color = 'var(--color-text-primary)'
+        if (!style?.backgroundColor) e.currentTarget.style.background = 'var(--color-bg-card-hover)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.color = 'var(--color-text-secondary)'
-        e.currentTarget.style.background = 'transparent'
+        if (!style?.color) e.currentTarget.style.color = 'var(--color-text-secondary)'
+        if (!style?.backgroundColor) e.currentTarget.style.background = style?.background?.toString() || 'transparent'
       }}
     >
       {icon}
