@@ -31,7 +31,6 @@ import {
 import { dataQualityAPI } from '@/api/client'
 import type {
   DataQualityMetrics,
-  ProjectReadinessItem,
   GroupedCategoryItem,
   DataIssueItem,
 } from '@/types'

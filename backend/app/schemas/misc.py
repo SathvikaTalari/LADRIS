@@ -20,11 +20,14 @@ class AlertUpdate(BaseModel):
 
 class AlertResponse(AlertBase):
     id: UUID
-    project_id: Optional[UUID]
+    project_id: Optional[UUID] = None
+    project_name: Optional[str] = None
+    alert_reason: Optional[str] = None
+    explanation: Optional[str] = None
     triggered_at: datetime
-    acknowledged_by: Optional[UUID]
-    acknowledged_at: Optional[datetime]
-    resolved_at: Optional[datetime]
+    acknowledged_by: Optional[UUID] = None
+    acknowledged_at: Optional[datetime] = None
+    resolved_at: Optional[datetime] = None
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 

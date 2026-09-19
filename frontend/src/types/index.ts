@@ -207,14 +207,20 @@ export interface ProjectCreate {
 export interface Alert {
   id: string
   project_id: string | null
+  project_name?: string | null
+  alert_reason?: string | null
+  explanation?: string | null
   alert_type: AlertType
   severity: AlertSeverity
   status: AlertStatus
   title: string
   message: string
+  alert_metadata?: Record<string, any>
   triggered_at: string
+  acknowledged_by?: string | null
   acknowledged_at: string | null
   resolved_at: string | null
+  created_at?: string
 }
 
 export interface GlobalSearchResult {

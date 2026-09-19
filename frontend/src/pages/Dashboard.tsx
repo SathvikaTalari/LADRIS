@@ -96,6 +96,18 @@ export default function Dashboard() {
     loadExecutiveDashboard()
   }, [])
 
+  const handleUpdateAlertStatus = async (alertId: string, status: 'ACKNOWLEDGED' | 'RESOLVED') => {
+    try {
+      await alertsAPI.update(alertId, { status })
+      const res = await alertsAPI.list().catch(() => [])
+      if (Array.isArray(res)) {
+        setActiveAlerts(res.slice(0, 4))
+      }
+    } catch (e) {
+      console.error('Failed to update alert:', e)
+    }
+  }
+
   const kpis = executiveData?.executive_kpis
   const priorityQueue = executiveData?.needs_attention_today || []
   const distributions = executiveData?.risk_distributions
@@ -582,33 +594,68 @@ export default function Dashboard() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {activeAlerts.map((a: any) => (
-              <div key={a.id} style={{
-                padding: '8px 12px',
-                background: 'var(--color-bg-tertiary)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-subtle)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 8,
-              }}>
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                    <span className={`badge ${a.severity === 'CRITICAL' ? 'badge-red' : a.severity === 'HIGH' ? 'badge-yellow' : 'badge-blue'}`} style={{ fontSize: '0.62rem' }}>
-                      {a.severity}
-                    </span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>{a.time || 'Today'}</span>
+            {activeAlerts.map((a: any) => {
+              const projectName = a.project_name || a.alert_metadata?.project_name || 'Project'
+              const reason = a.alert_reason || (a.title && !a.title.startsWith('ML') ? a.title : 'High Delay Risk')
+              const explanation = a.explanation || a.message || ''
+              return (
+                <div key={a.id} style={{
+                  padding: '10px 12px',
+                  background: 'var(--color-bg-tertiary)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border-subtle)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                }}>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
+                      <strong style={{ fontSize: '0.8rem', color: 'var(--color-text-primary)' }}>
+                        {projectName}
+                      </strong>
+                      <span className="badge badge-purple" style={{ fontSize: '0.62rem' }}>
+                        {reason}
+                      </span>
+                      <span className={`badge ${a.severity === 'CRITICAL' ? 'badge-red' : a.severity === 'HIGH' ? 'badge-yellow' : 'badge-blue'}`} style={{ fontSize: '0.62rem' }}>
+                        {a.severity}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, marginBottom: 4 }}>
+                      {explanation}
+                    </div>
+                    <div style={{ fontSize: '0.66rem', color: 'var(--color-text-muted)' }}>
+                      {a.triggered_at ? new Date(a.triggered_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
+                    </div>
                   </div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {a.title || a.message}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0 }}>
+                    {a.project_id && (
+                      <Link to={`/projects/${a.project_id}`} className="btn btn-ghost btn-sm" style={{ padding: '2px 8px', fontSize: '0.68rem', textAlign: 'center' }}>
+                        View
+                      </Link>
+                    )}
+                    {a.status === 'ACTIVE' && (
+                      <button
+                        onClick={() => handleUpdateAlertStatus(a.id, 'ACKNOWLEDGED')}
+                        className="btn btn-secondary btn-sm"
+                        style={{ padding: '2px 8px', fontSize: '0.68rem' }}
+                      >
+                        Acknowledge
+                      </button>
+                    )}
+                    {a.status !== 'RESOLVED' && (
+                      <button
+                        onClick={() => handleUpdateAlertStatus(a.id, 'RESOLVED')}
+                        className="btn btn-secondary btn-sm"
+                        style={{ padding: '2px 8px', fontSize: '0.68rem', color: 'var(--color-success)' }}
+                      >
+                        Resolve
+                      </button>
+                    )}
                   </div>
                 </div>
-                <button className="btn btn-ghost btn-sm" style={{ padding: '2px 6px', fontSize: '0.68rem' }}>
-                  Acknowledge
-                </button>
-              </div>
-            ))}
+              )
+            })}
             {activeAlerts.length === 0 && <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>No active alerts returned by the API.</div>}
           </div>
         </div>

@@ -90,17 +90,57 @@ async def sync_model_registry(db: AsyncSession) -> None:
 
 
 async def sync_prediction_alert(db: AsyncSession, project, result: dict[str, Any]) -> None:
-    """Create or resolve the active alert sourced from the latest ML result."""
-    title = "ML HIGH-RISK DELAY PREDICTION"
+    """Create or resolve the active alert sourced from the latest ML result with a specific reason."""
     active = (await db.execute(select(Alert).where(
         Alert.project_id == project.id,
         Alert.alert_type == AlertType.RISK_ESCALATION,
-        Alert.title == title,
         Alert.status.in_([AlertStatus.ACTIVE, AlertStatus.ACKNOWLEDGED]),
-    ))).scalar_one_or_none()
+    ))).scalars().first()
+
+    top_drivers = result.get("top_drivers") or []
+    reason = "High Delay Risk"
+    predicted_days = result.get("predicted_delay_days", 0)
+    explanation = f"{project.name} has severe ML delay risk ({result['risk_score']:.1f}/100) with predicted {predicted_days:.0f} days timeline slippage."
+
+    # Identify dominant root cause from drivers
+    for driver in top_drivers:
+        feat = driver.get("feature")
+        direction = driver.get("direction")
+        rec = driver.get("recommendation")
+        if direction == "increases_risk":
+            if feat == "compensation_disbursement_pct":
+                reason = "Compensation Pending"
+                explanation = rec or f"{project.name}: Compensation disbursement is lagging behind schedule."
+                break
+            elif feat == "legal_dispute_count" or (getattr(project, "legal_case_count", 0) or 0) > 0:
+                reason = "Legal Dispute"
+                explanation = rec or f"{project.name}: Legal disputes pending in court require mediation resolution."
+                break
+            elif feat == "rehabilitation_progress_pct":
+                reason = "R&R Delay"
+                explanation = rec or f"{project.name}: R&R activities are progressing behind statutory milestones."
+                break
+
+    if reason == "High Delay Risk":
+        if (getattr(project, "legal_case_count", 0) or 0) > 0:
+            reason = "Legal Dispute"
+            explanation = f"{project.name} has {project.legal_case_count} active court disputes creating high timeline risk."
+        elif getattr(project, "delay_months", 0) and project.delay_months > 0:
+            reason = "Stage Overdue"
+            explanation = f"{project.name} is overdue on statutory stage milestones by {project.delay_months} month(s)."
+        elif (getattr(project, "rehabilitation_progress_pct", 100) or 100) < 65:
+            pct = project.rehabilitation_progress_pct or 0
+            reason = "R&R Delay"
+            explanation = f"{project.name} R&R progress ({pct:.0f}%) is behind statutory schedule."
+        elif getattr(project, "total_affected_families", 0) and (getattr(project, "families_compensated", 0) or 0) < project.total_affected_families * 0.7:
+            reason = "Compensation Pending"
+            explanation = f"{project.name} compensation disbursement pending for affected land parcels."
+
     if result["risk_category"] == "HIGH":
         metadata = {
             "source": "production_ml_prediction",
+            "alert_reason": reason,
+            "project_name": project.name,
             "model_version": result["model_version"],
             "risk_score": result["risk_score"],
             "delay_probability": result["delay_probability"],
@@ -110,12 +150,16 @@ async def sync_prediction_alert(db: AsyncSession, project, result: dict[str, Any
         if active is None:
             db.add(Alert(
                 project_id=project.id, alert_type=AlertType.RISK_ESCALATION,
-                severity=AlertSeverity.HIGH, status=AlertStatus.ACTIVE, title=title,
-                message=f"{project.name} has ML delay risk {result['risk_score']:.2f}/100.",
+                severity=AlertSeverity.CRITICAL if result["risk_score"] >= 90 else AlertSeverity.HIGH,
+                status=AlertStatus.ACTIVE,
+                title=reason,
+                message=explanation,
                 alert_metadata=metadata,
             ))
         else:
-            active.message = f"{project.name} has ML delay risk {result['risk_score']:.2f}/100."
+            active.title = reason
+            active.message = explanation
+            active.severity = AlertSeverity.CRITICAL if result["risk_score"] >= 90 else AlertSeverity.HIGH
             active.alert_metadata = metadata
             active.triggered_at = datetime.now(timezone.utc)
     elif active is not None:
