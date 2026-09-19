@@ -1,5 +1,7 @@
 """
 LADRIS — Async SQLAlchemy Database Engine & Session
+Handles missing database gracefully on startup — the app will start
+and retry on first request rather than crashing immediately.
 """
 from typing import AsyncGenerator
 
@@ -15,13 +17,19 @@ from app.config import get_settings
 settings = get_settings()
 
 
-# Create async engine
+# Create async engine with connection retry / resilience settings
 engine = create_async_engine(
     settings.DATABASE_URL,
-    echo=settings.APP_ENV == "development",
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    echo=False,           # set True only for deep SQL debugging
+    pool_pre_ping=True,   # verify connection health before checkout
+    pool_size=5,
+    max_overflow=10,
+    pool_recycle=300,     # recycle connections every 5 minutes
+    pool_timeout=10,      # wait up to 10s for a connection slot
+    connect_args={
+        "timeout": 10,    # asyncpg connect timeout (seconds)
+        "command_timeout": 30,
+    },
 )
 
 # Session factory
@@ -53,7 +61,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def check_db_connection() -> bool:
-    """Health check: ping the database."""
+    """Health check: ping the database. Returns False instead of raising."""
     try:
         async with AsyncSessionLocal() as session:
             await session.execute(__import__("sqlalchemy").text("SELECT 1"))

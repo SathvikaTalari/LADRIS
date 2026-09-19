@@ -65,16 +65,15 @@ LADRIS/
 ## ⚡ Quick Start Guide (Run in 3 Minutes)
 
 ### 📋 Prerequisites
-- **Git** installed
-- **Docker Desktop** (for PostgreSQL + PostGIS database)
-- **Python 3.10+**
+- **Docker Desktop** (for PostgreSQL + PostGIS) — https://www.docker.com/products/docker-desktop/
+- **Python 3.10, 3.11, or 3.12** (3.13 not yet supported)
 - **Node.js 18+** & `npm`
 
 ---
 
 ### 🚀 One-Click Automated Team Setup (Fastest)
 
-Run the automated setup script from the root `LADRIS` directory. It configures `.env`, starts the PostGIS database, installs all Python & npm dependencies, and loads the 25 projects with pre-computed ML predictions automatically:
+Run the automated setup script from the root `LADRIS` directory. It handles **everything**: creates `.env`, starts PostGIS, installs dependencies, runs migrations, and loads all 25 demo projects with ML predictions:
 
 ```powershell
 # Windows PowerShell:
@@ -86,8 +85,8 @@ Run the automated setup script from the root `LADRIS` directory. It configures `
 chmod +x ./setup_team.sh && ./setup_team.sh
 ```
 
-> 🩺 **Team Troubleshooting**: Facing database or ML model errors?
-> Run `python doctor.py` (or `python doctor.py --fix`) for instant automated diagnosis. See the [Team Onboarding & Troubleshooting Guide](docs/TEAM_ONBOARDING_AND_TROUBLESHOOTING.md) for full details on Docker, native PostgreSQL, and ML dependencies.
+> 📖 **Full setup guide & troubleshooting**: See [TEAM_SETUP.md](./TEAM_SETUP.md)
+> 🩺 **Facing errors?** Run `python doctor.py` (from the `backend/` folder with venv active) for automated diagnosis.
 
 ---
 
