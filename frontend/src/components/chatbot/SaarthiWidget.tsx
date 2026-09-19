@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { chatbotAPI, type ChatActionItem } from '@/api/client'
 import { useThemeStore } from '@/store/themeStore'
+import { getPreferredVoice } from '@/components/voice/voiceEngine'
 
 interface Message {
   id: string
@@ -264,8 +265,16 @@ export function SaarthiWidget() {
     window.speechSynthesis.cancel()
     const cleanText = text.replace(/[*#`_>|]/g, ' ').replace(/\s+/g, ' ').trim()
     const utterance = new SpeechSynthesisUtterance(cleanText)
-    utterance.rate = 1.05
+    const voice = getPreferredVoice()
+    if (voice) {
+      utterance.voice = voice
+      utterance.lang = voice.lang
+    } else {
+      utterance.lang = 'en-IN'
+    }
+    utterance.rate = 1.0
     utterance.pitch = 1.0
+    utterance.volume = 1.0
     window.speechSynthesis.speak(utterance)
   }
 

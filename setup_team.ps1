@@ -2,7 +2,13 @@
 # LADRIS - One-Click Team Setup Script (Windows PowerShell)
 # Run from the project root: .\setup_team.ps1
 # =============================================================================
-$ErrorActionPreference = "Stop"
+
+# Allow native commands (docker, pip, npm) to write progress to stderr without
+# triggering PowerShell NativeCommandError false alarms
+$ErrorActionPreference = "Continue"
+if (Test-Path variable:global:PSNativeCommandUseErrorActionPreference) {
+    $global:PSNativeCommandUseErrorActionPreference = $false
+}
 
 Write-Host "`n========================================================" -ForegroundColor Cyan
 Write-Host "   LADRIS - Automated Team Onboarding Setup" -ForegroundColor Cyan
@@ -37,17 +43,22 @@ if (-not (Test-Path "$RepoRoot\.env")) {
 Write-Host "`n[2/6] Starting PostGIS database container..." -ForegroundColor Yellow
 $dockerAvailable = $false
 try {
-    docker info 2>&1 | Out-Null
-    $dockerAvailable = $true
+    $null = docker info 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        $dockerAvailable = $true
+    }
 } catch {
+    # docker not found
+}
+
+if (-not $dockerAvailable) {
     Write-Host "   [WARN] Docker is not running or not installed." -ForegroundColor Yellow
     Write-Host "          If you have a LOCAL PostgreSQL on port 5432, the app will try to use it." -ForegroundColor Yellow
     Write-Host "          For full PostGIS + GIS map support, install Docker Desktop and re-run." -ForegroundColor Yellow
-}
-
-if ($dockerAvailable) {
+} else {
     Set-Location $RepoRoot
-    docker compose up -d db 2>&1 | Out-Null
+    # Start container without 2>&1 pipeline redirection to prevent PowerShell NativeCommandError
+    docker compose up -d db
     Write-Host "   [OK] Docker container started. Waiting for PostgreSQL to be ready..." -ForegroundColor Green
 
     # Wait for DB to be healthy (up to 60 seconds)
@@ -92,11 +103,11 @@ Write-Host "   [OK] Python dependencies installed." -ForegroundColor Green
 # ─── Step 4: Database Migrations & Schema Sync ───────────────────────────────
 Write-Host "`n[4/6] Running database migrations & schema synchronization..." -ForegroundColor Yellow
 Set-Location "$RepoRoot\backend"
-try {
-    & $BackendPy run_migrations.py
+& $BackendPy run_migrations.py
+if ($LASTEXITCODE -eq 0) {
     Write-Host "   [OK] Database schema & PostGIS extensions verified." -ForegroundColor Green
-} catch {
-    Write-Host "   [ERROR] Migration failed: $_" -ForegroundColor Red
+} else {
+    Write-Host "   [ERROR] Migration failed (exit code $LASTEXITCODE)." -ForegroundColor Red
     Write-Host "           Check that your database container is running: docker compose up -d db" -ForegroundColor Yellow
     Write-Host "           Then re-run: .\setup_team.ps1" -ForegroundColor Yellow
     exit 1
@@ -105,11 +116,11 @@ try {
 # ─── Step 5: Load Projects & Generate ML Predictions ─────────────────────────
 Write-Host "`n[5/6] Loading projects from CSV & generating ML predictions..." -ForegroundColor Yellow
 Set-Location "$RepoRoot\backend"
-try {
-    & $BackendPy seed_my_raw_projects.py
+& $BackendPy seed_my_raw_projects.py
+if ($LASTEXITCODE -eq 0) {
     Write-Host "   [OK] Projects loaded and ML predictions generated." -ForegroundColor Green
-} catch {
-    Write-Host "   [WARN] Project seeding had issues: $_" -ForegroundColor Yellow
+} else {
+    Write-Host "   [WARN] Project seeding had non-zero exit code: $LASTEXITCODE" -ForegroundColor Yellow
     Write-Host "          The app will still work; you can re-run seed_my_raw_projects.py later." -ForegroundColor Yellow
 }
 
@@ -127,7 +138,7 @@ Set-Location $RepoRoot
 # ─── Doctor Health Check ─────────────────────────────────────────────────────
 Write-Host "`n[*] Running environment health check..." -ForegroundColor Cyan
 Set-Location "$RepoRoot\backend"
-& $BackendPy "$RepoRoot\doctor.py" 2>&1 | Select-Object -First 40
+& $BackendPy "$RepoRoot\doctor.py"
 
 Set-Location $RepoRoot
 
@@ -137,12 +148,12 @@ Write-Host "   [SUCCESS] LADRIS Setup Complete!" -ForegroundColor Green
 Write-Host "========================================================" -ForegroundColor Green
 Write-Host "`nTo start the application, open TWO terminal windows:" -ForegroundColor White
 Write-Host ""
-Write-Host "  Terminal 1 — Backend:" -ForegroundColor Yellow
+Write-Host "  Terminal 1 - Backend:" -ForegroundColor Yellow
 Write-Host "    cd backend" -ForegroundColor Gray
 Write-Host "    .\venv\Scripts\Activate.ps1" -ForegroundColor Gray
 Write-Host "    uvicorn app.main:app --reload --port 8000" -ForegroundColor Gray
 Write-Host ""
-Write-Host "  Terminal 2 — Frontend:" -ForegroundColor Yellow
+Write-Host "  Terminal 2 - Frontend:" -ForegroundColor Yellow
 Write-Host "    cd frontend" -ForegroundColor Gray
 Write-Host "    npm run dev" -ForegroundColor Gray
 Write-Host ""
