@@ -2,7 +2,18 @@
  * LADRIS — Browser Native Voice Engine
  * Built using the Web Speech API (window.speechSynthesis & SpeechSynthesisUtterance).
  * Zero external dependencies, no API keys, purely client-side.
- * Selects an Indian English (en-IN) voice where supported, with closest English fallback.
+ *
+ * Prioritizes high-clarity Indian English (en-IN) female voices:
+ *   1. Microsoft Edge Natural Neural voices (e.g. Microsoft Neerja Online / Natural)
+ *   2. Google English (India) female voices
+ *   3. Windows OneCore / SAPI / macOS Indian female voices (Neerja, Heera, Veena, Isha)
+ *
+ * NOTE ON VOICE SHAKING / TREMOLO:
+ * In Chromium (Chrome & Edge) and Windows Speech synthesizers, setting utterance.pitch
+ * away from 1.0 (e.g. 1.05) runs the audio through a phase-vocoder pitch-shift filter.
+ * On female voices, this causes an unnatural fluttering / vibrating "shaking" sound.
+ * Keeping pitch at exactly 1.0 and rate at 1.0 eliminates this shaking completely,
+ * delivering crystal-clear, steady, and natural pronunciation.
  */
 
 export type SpeechRate = 0.75 | 1.0 | 1.25 | 1.5
@@ -14,6 +25,7 @@ export interface VoiceEngineState {
   isSupported: boolean
   error: string | null
   rate: number
+  activeVoiceName?: string
 }
 
 export interface SpeakOptions {
@@ -31,7 +43,8 @@ export function isSupported(): boolean {
   return typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
 }
 
-let currentRate: number = 0.96 // Natural, comfortable speaking speed
+// 1.0 is standard, steady natural conversational speed
+let currentRate: number = 1.0
 
 let currentState: VoiceEngineState = {
   isSpeaking: false,
@@ -39,6 +52,7 @@ let currentState: VoiceEngineState = {
   isSupported: isSupported(),
   error: null,
   rate: currentRate,
+  activeVoiceName: undefined,
 }
 
 const listeners = new Set<StateListener>()
@@ -59,21 +73,6 @@ if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
 }
 
 /**
- * Keywords for known Indian English female voices across Windows, Edge, Chrome, macOS, iOS, Android
- */
-const INDIAN_FEMALE_VOICES = [
-  'heera',     // Microsoft Heera (Windows/Edge - English India Female)
-  'neerja',    // Microsoft Neerja (Windows/Edge Natural - English India Female)
-  'veena',     // Apple Veena / Google Veena (English India Female)
-  'isha',      // Apple Isha (English India Female)
-  'sangeeta',  // Apple Sangeeta (English India Female)
-  'kavya',     // Indian English Female
-  'aditi',     // Indian English Female
-  'ananya',    // Indian English Female
-  'priya',     // Indian English Female
-]
-
-/**
  * Male voice keywords that must NEVER be selected for female voice playback
  */
 const MALE_VOICE_KEYWORDS = [
@@ -87,12 +86,22 @@ const MALE_VOICE_KEYWORDS = [
   'richard',
   'james',
   'daniel',
+  'stefan',
+  'sean',
+  'ryan',
+  'paul',
+  'cosmo',
+  'alok',
+  'amit',
+  'arun',
+  'hemant',
+  'kallum',
 ]
 
 /**
- * Find preferred Indian English (en-IN) FEMALE voice.
- * Strictly avoids male voices (like Ravi, David) and prioritizes Heera, Neerja, Veena, etc.
- * Falls back to closest English female voice if Indian female is not installed.
+ * Find preferred high-clarity Indian English (en-IN) FEMALE voice.
+ * Prioritizes natural neural voices (Neerja Online Natural) which eliminate robotic jitter,
+ * followed by standard Indian English female voices, and falls back to clean English female voices.
  */
 export function getPreferredVoice(): SpeechSynthesisVoice | null {
   if (!isSupported()) return null
@@ -105,74 +114,82 @@ export function getPreferredVoice(): SpeechSynthesisVoice | null {
     return MALE_VOICE_KEYWORDS.some((kw) => name.includes(kw) || id.includes(kw))
   }
 
-  // 1. TOP PRIORITY: Known Indian English Female voice (Heera, Neerja, Veena, Isha, etc.)
-  const exactIndianFemale = voices.find((v) => {
-    if (isMale(v)) return false
+  // Filter out any voice that matches male keywords
+  const femaleCandidates = voices.filter((v) => !isMale(v))
+  const pool = femaleCandidates.length > 0 ? femaleCandidates : voices
+
+  // Score each candidate to pick the clearest Indian English female voice
+  const scored = pool.map((v) => {
     const name = (v.name || '').toLowerCase()
     const id = (v.voiceURI || '').toLowerCase()
     const lang = (v.lang || '').replace('_', '-').toLowerCase()
-    const isNamedIndianFemale = INDIAN_FEMALE_VOICES.some(
-      (kw) => name.includes(kw) || id.includes(kw)
-    )
-    const isIndianLang = lang === 'en-in' || lang.startsWith('en-in') || name.includes('india')
-    return isNamedIndianFemale && isIndianLang
-  })
-  if (exactIndianFemale) return exactIndianFemale
 
-  // 1b. Any voice matching Indian female name even if lang is loosely formatted
-  const namedIndianFemaleAnyLang = voices.find((v) => {
-    if (isMale(v)) return false
-    const name = (v.name || '').toLowerCase()
-    const id = (v.voiceURI || '').toLowerCase()
-    return INDIAN_FEMALE_VOICES.some((kw) => name.includes(kw) || id.includes(kw))
-  })
-  if (namedIndianFemaleAnyLang) return namedIndianFemaleAnyLang
-
-  // 2. SECOND PRIORITY: en-IN voice with explicit 'female' or 'woman' tag and NOT male
-  const taggedIndianFemale = voices.find((v) => {
-    if (isMale(v)) return false
-    const lang = (v.lang || '').replace('_', '-').toLowerCase()
-    const name = (v.name || '').toLowerCase()
-    const id = (v.voiceURI || '').toLowerCase()
-    const isIndian = lang === 'en-in' || lang.startsWith('en-in') || name.includes('india')
-    const hasFemaleTag = name.includes('female') || id.includes('female') || name.includes('woman')
-    return isIndian && hasFemaleTag
-  })
-  if (taggedIndianFemale) return taggedIndianFemale
-
-  // 3. THIRD PRIORITY: Any Indian English ('en-in') voice that is NOT male
-  const generalIndianNonMale = voices.find((v) => {
-    if (isMale(v)) return false
-    const lang = (v.lang || '').replace('_', '-').toLowerCase()
-    const name = (v.name || '').toLowerCase()
-    return lang === 'en-in' || lang.startsWith('en-in') || name.includes('india')
-  })
-  if (generalIndianNonMale) return generalIndianNonMale
-
-  // 4. FOURTH PRIORITY: Commonwealth / English Female voice fallback (Zira, Sonia, Jenny, Libby, Mia, Samantha)
-  const commonwealthFemale = voices.find((v) => {
-    if (isMale(v)) return false
-    const name = (v.name || '').toLowerCase()
-    const id = (v.voiceURI || '').toLowerCase()
-    const lang = (v.lang || '').replace('_', '-').toLowerCase()
+    let score = 0
+    const isIndianLang =
+      lang === 'en-in' ||
+      lang.startsWith('en-in') ||
+      name.includes('india') ||
+      name.includes('en-in') ||
+      id.includes('en-in') ||
+      id.includes('india')
     const isEnglish = lang.startsWith('en')
-    const isFemaleNamed = ['zira', 'sonia', 'jenny', 'libby', 'mia', 'samantha', 'victoria', 'karen', 'serena'].some(
-      (kw) => name.includes(kw) || id.includes(kw)
-    )
-    const hasFemaleTag = name.includes('female') || id.includes('female')
-    return isEnglish && (isFemaleNamed || hasFemaleTag)
-  })
-  if (commonwealthFemale) return commonwealthFemale
+    const isNatural =
+      name.includes('natural') ||
+      name.includes('neural') ||
+      name.includes('online') ||
+      id.includes('natural') ||
+      id.includes('neural')
 
-  // 5. Any English voice that is NOT male
-  const anyNonMaleEnglish = voices.find((v) => {
-    const lang = (v.lang || '').replace('_', '-').toLowerCase()
-    return lang.startsWith('en') && !isMale(v)
-  })
-  if (anyNonMaleEnglish) return anyNonMaleEnglish
+    // 1. Language matching
+    if (isIndianLang) {
+      score += 600
+    } else if (isEnglish) {
+      score += 50
+    }
 
-  // 6. Default fallback
-  return voices.find((v) => v.default) || voices[0] || null
+    // 2. High-fidelity Natural / Neural quality (crystal clear, silky smooth, no shaking)
+    if (isNatural) {
+      score += 500
+    }
+
+    // 3. Indian Female Name Hierarchy
+    // Microsoft Neerja is known for exceptional clarity and natural conversational tone
+    if (name.includes('neerja') || id.includes('neerja')) {
+      score += 450
+    } else if (name.includes('veena') || name.includes('isha') || name.includes('sangeeta')) {
+      score += 350
+    } else if (name.includes('kavya') || name.includes('aditi') || name.includes('ananya') || name.includes('priya')) {
+      score += 300
+    } else if (name.includes('swara') || name.includes('madhur')) {
+      score += 280
+    } else if (name.includes('heera') || id.includes('heera')) {
+      // Heera Natural is great; legacy Heera is solid fallback
+      score += isNatural ? 400 : 250
+    } else if (name.includes('google') && isIndianLang) {
+      score += 320
+    }
+
+    // 4. Female markers
+    if (name.includes('female') || id.includes('female') || name.includes('woman')) {
+      score += 150
+    }
+
+    // 5. High-quality English female fallbacks (if no en-IN is installed on user's machine)
+    if (
+      ['jenny', 'aria', 'sonia', 'libby', 'samantha', 'zira', 'karen', 'victoria'].some(
+        (n) => name.includes(n) || id.includes(n)
+      )
+    ) {
+      score += 80
+    }
+
+    return { voice: v, score }
+  })
+
+  // Sort descending by score
+  scored.sort((a, b) => b.score - a.score)
+
+  return scored[0]?.voice || null
 }
 
 /**
@@ -229,7 +246,8 @@ export function subscribe(listener: StateListener): () => void {
 /**
  * Speak text using native SpeechSynthesisUtterance.
  * Cancels any currently running speech session first to prevent stacking.
- * Applies Indian English (en-IN) voice or closest English fallback.
+ * Applies Indian English (en-IN) female voice with pitch=1.0 and rate=1.0
+ * to ensure clear, steady, non-shaking pronunciation.
  */
 export function speak(text: string, options: SpeakOptions = {}): void {
   if (!isSupported()) {
@@ -256,15 +274,32 @@ export function speak(text: string, options: SpeakOptions = {}): void {
     utterance.lang = options.lang ?? 'en-IN'
   }
 
-  // Normal speaking speed and natural, warm feminine tone
-  utterance.rate = options.rate ?? currentRate ?? 0.95
-  utterance.pitch = options.pitch ?? 1.05
+  // CRITICAL FIX FOR VOICE SHAKING:
+  // Setting pitch to 1.0 (natural voice pitch) prevents Chromium/Windows DSP
+  // pitch-shifting filter from introducing tremolo/vibrato flutter.
+  utterance.pitch = options.pitch ?? 1.0
+
+  // Setting rate to 1.0 delivers natural, comfortable, and stable speaking speed
+  utterance.rate = options.rate ?? currentRate ?? 1.0
+
+  // Full volume clarity
+  utterance.volume = 1.0
 
   // Mark as speaking immediately to prevent duplicate triggers
-  updateState({ isSpeaking: true, isPaused: false, error: null })
+  updateState({
+    isSpeaking: true,
+    isPaused: false,
+    error: null,
+    activeVoiceName: preferredVoice ? preferredVoice.name : undefined,
+  })
 
   utterance.onstart = () => {
-    updateState({ isSpeaking: true, isPaused: false, error: null })
+    updateState({
+      isSpeaking: true,
+      isPaused: false,
+      error: null,
+      activeVoiceName: preferredVoice ? preferredVoice.name : undefined,
+    })
   }
 
   utterance.onend = () => {
@@ -290,7 +325,15 @@ export function speak(text: string, options: SpeakOptions = {}): void {
     }
   }
 
-  window.speechSynthesis.speak(utterance)
+  // Small delay helps prevent Chrome/Edge cancellation race conditions
+  setTimeout(() => {
+    try {
+      window.speechSynthesis.speak(utterance)
+    } catch {
+      // Fallback direct speak
+      window.speechSynthesis.speak(utterance)
+    }
+  }, 25)
 }
 
 /**

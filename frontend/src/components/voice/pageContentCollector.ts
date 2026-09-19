@@ -1,72 +1,79 @@
 /**
- * LADRIS — Comprehensive Page Voice Descriptions
+ * LADRIS — Clear & Easy-Language Page Voice Instructions
  *
- * Provides thorough, clear, and comprehensive voice descriptions for each main page
- * so that officials and users can understand everything about that particular page:
- * its core purpose, key sections and metrics, and how to use it effectively.
- * Spoken in clear, professional Indian English female voice.
+ * Provides clear, friendly, and easy-to-understand voice descriptions
+ * for each main page in LADRIS. Written in simple, non-technical English
+ * so that any official, evaluator, or user can easily understand:
+ *   1. What this page does
+ *   2. What key information is shown
+ *   3. How it helps them take quick, effective action
+ *
+ * Spoken in a smooth, clear Indian English female voice.
  */
 
 export const PAGE_VOICE_INSTRUCTIONS: Record<string, string> = {
   // 1. Dashboard
   '/dashboard':
-    'Welcome to the LADRIS Executive Command Dashboard. This page gives officials and decision-makers a comprehensive overview of active linear infrastructure and highway projects across India. At the top, you can track verified project counts, corridors facing critical delay risk, active statutory alerts, and overall compensation disbursement progress. Below, the dashboard features state and district delay distributions, a priority intervention queue for critical projects, and quick-action links. Use this page to monitor national portfolio velocity and prioritize high-risk corridors that require urgent administrative intervention.',
+    'Welcome to the LADRIS Dashboard. This page gives you a quick and clear overview of all highway and road projects in India. Here, you can see total active projects, projects with high delay risk, important alerts, and compensation payments to landowners. You can also spot which states and districts have the biggest delays, so officers can take quick action where it is needed most.',
 
   // 2. Projects Directory
   '/projects':
-    'You are on the Land Acquisition Projects Directory. This central management hub lists all infrastructure corridors monitored by LADRIS across National Highways, state expressways, and economic corridors. You can quickly search projects by name or code, filter by state, district, implementing agency such as NHAI, current acquisition stage, and AI delay risk tier. Each project card displays vital metrics, including predicted delay days, total land area required, compensation disbursement progress, and open court disputes. Clicking on any project will open its detailed intelligence and risk breakdown view.',
+    'This is the Projects Directory. Here, you can easily view and search all highway projects across different states and districts. You can filter projects by government agency, current work stage, or risk level. Each project card clearly shows how many days it might be delayed, the land required, and any open court cases. Simply click on any project to see its full details and smart recommendations.',
 
-  // 3. Project Details
+  // 3. Project Details (Deep-Dive)
   'project-details':
-    'This is the Project Details and Deep-Dive view. It provides an exhaustive breakdown of the selected infrastructure corridor across its entire acquisition lifecycle—from Section 3A preliminary notification and 3D declaration, to compensation award, dispute resolution, and physical possession. On this page, you can review calibrated Machine Learning delay predictions, explainable SHAP risk drivers, compensation sanctioned versus disbursed, active litigation pendency, and real-time milestone progress. You will also find actionable AI recommendations and an intervention history log to help expedite project clearances.',
+    'This is the Project Details page. It shows you the complete status of the selected highway project from start to finish. You can see how much land is acquired, compensation payments made to landowners, and predicted delay days. It also highlights the main reasons for delay, such as court disputes or pending approvals, and gives practical AI suggestions to speed up the work.',
 
   // 4. Decision Intelligence & What-If Simulator
   '/decision-intelligence':
-    'Welcome to Decision Intelligence and Policy Simulation. This strategic module helps administrative leaders understand why delays occur and evaluate the exact impact of corrective actions before deploying resources. In the Executive Overview, you can analyze systemic bottlenecks, dispute timelines, and statutory lapse cliffs. Using the interactive What-If Policy Simulator below, officials can test scenarios such as allocating special fast-track arbitration budgets or expanding field disbursement teams to calculate precisely how many months of project delay can be compressed.',
+    'Welcome to Decision Intelligence. This tool helps senior officers understand why delays happen and test solutions before making decisions. Using the simple What-If Simulator, you can see what happens if you add more field officers or resolve disputes faster. The system immediately calculates how many months of delay and cost you can save.',
+
   '/intelligence':
-    'Welcome to Decision Intelligence and Policy Simulation. This strategic module helps administrative leaders understand why delays occur and evaluate the exact impact of corrective actions before deploying resources. In the Executive Overview, you can analyze systemic bottlenecks, dispute timelines, and statutory lapse cliffs. Using the interactive What-If Policy Simulator below, officials can test scenarios such as allocating special fast-track arbitration budgets or expanding field disbursement teams to calculate precisely how many months of project delay can be compressed.',
+    'Welcome to Decision Intelligence. This tool helps senior officers understand why delays happen and test solutions before making decisions. Using the simple What-If Simulator, you can see what happens if you add more field officers or resolve disputes faster. The system immediately calculates how many months of delay and cost you can save.',
+
+  // 5. Priority Watchlist
   '/priority-intelligence':
-    'This is the Priority Intelligence Watchlist. It automatically ranks infrastructure projects that require urgent intervention based on multidimensional risk criteria—including statutory lapse proximity, prolonged stage tenure, severe compensation bottlenecks, and critical court cases. Officials can review high-risk corridors, inspect their primary delay drivers, and immediately assign action items to resolve field bottlenecks.',
+    'This is the Priority Watchlist. It automatically highlights the most urgent highway projects that need immediate attention. Projects are ranked by high delay risk, upcoming legal deadlines, and stalled compensation. Officers can quickly check the main issues and assign tasks to resolve them on priority.',
 
-  // 5. Interactive Map (GIS)
+  // 6. Interactive Map (GIS)
   '/gis':
-    'This is the GIS Geospatial Risk Map. It provides a spatial overview of linear infrastructure corridors across Indian states and districts using verified coordinates. Projects are color-coded by AI delay risk—red for critical risk, amber for high risk, yellow for medium risk, and green for on-track corridors. You can zoom into highway alignments, filter by state and risk level, click on corridor pins to view real-time stage progress, and identify geographic clusters where land acquisition encumbrances are heavily concentrated.',
+    'This is the Interactive Geospatial Map. It shows highway projects across India on an easy-to-read map. Each project is color-coded by risk level: red means critical risk, yellow means moderate risk, and green means on track. You can zoom in to your state or district, click on any route to see its live progress, and quickly find problem areas.',
 
-  // 6. Analytics & Trends
+  // 7. Analytics & Trends
   '/analytics':
-    'You are viewing the District and State Analytics portal. This page delivers macro-level analytical intelligence on land acquisition velocity and delay trends across India. Key sections include historical delay trends across districts, agency-wise performance benchmarks, compensation outlay versus actual payment ratios, and average tenure spent in each statutory stage. Planners and policy researchers can utilize these trends to pinpoint systemic procedural delays, forecast future land acquisition timelines, and guide institutional policy reforms.',
+    'This is the Analytics and Trends page. It helps you see the bigger picture of land acquisition across India. You can easily compare performance between different states, districts, and agencies. The clear charts show average time taken at each stage, common causes of delays, and compensation trends over time.',
 
-  // 7. Alerts & Early Warnings
+  // 8. Alerts & Warnings
   '/alerts':
-    'This is the Alerts and Early-Warning Command Center. It continuously audits project timelines against Indian statutory deadlines, such as the mandatory one-year Section 3D lapse rule under the National Highways Act. Alerts are classified by severity—Critical, High, and Medium—covering legal disputes, compensation bottlenecks, and stage overruns. On this page, officials can acknowledge active alerts, inspect automated email notification delivery statuses, view responsible officers, and initiate rapid mitigation measures to prevent legal lapses.',
+    'This is the Alerts and Early Warnings center. It constantly checks project deadlines to warn officers before delays become serious. Alerts are clearly marked as Critical, High, or Medium for legal disputes, pending payments, or overdue approvals. You can check email notifications sent to officers and take fast action to keep projects on track.',
 
-  // 8. Data Sources & Pipelines
+  // 9. Official Data Sources
   '/data-sources':
-    'This is the Official Data Sources and Ingestion Center. LADRIS integrates directly with verified public and government portals, including the Ministry of Road Transport and Highways BhoomiRashi gazette feed, the Data.gov.in national repository, and judicial court databases. On this page, administrators can inspect synchronization schedules, review API connector health, verify source organizations and licensing, and trigger manual or scheduled data refreshes to ensure all project intelligence is always up to date.',
+    'This is the Official Data Sources page. LADRIS securely connects with official government portals, including BhoomiRashi, the national data portal, and court records. Here, you can verify when data was last updated, check connection status, and refresh project information with a single click.',
 
-  // 9. Data Quality & AI Reliability
+  // 10. Data Health & Quality
   '/data-quality':
-    'This is the Data Quality and AI Reliability monitor. It rigorously audits the integrity, completeness, and validity of all incoming project records across eighty-two statutory fields. The page displays data validation health scores, anomaly detection flags, and machine learning model confidence ratings. This comprehensive auditing ensures that all delay predictions, risk categories, and executive decisions are grounded in authenticated, high-quality data.',
+    'This is the Data Health and Quality monitor. It automatically checks all project records for missing information or errors. A high health score means the project data is accurate and trustworthy. This ensures that all delay predictions and risk alerts are based on clean and reliable information.',
 
-  // 10. Admin & AI Settings
+  // 11. Admin & AI Settings
   '/admin':
-    'This is the Administration and AI Settings panel. System administrators can manage user accounts, assign role-based permissions for Central, State, and District authorities, and configure alert thresholds. You can also monitor machine learning model health, review feature importance metrics, inspect audit logs, and customize automated email notification settings for high-risk project alerts.',
+    'This is the Administration and AI Settings page. System administrators can manage user accounts, assign roles, and set alert rules. You can also configure automated email notifications for high-risk projects and review system activity logs to keep everything running smoothly.',
 
-  // 11. Saarthi AI Copilot
+  // 12. Saarthi AI Copilot
   'saarthi':
-    'This is Saarthi, your AI-powered conversational copilot for land acquisition. Saarthi is grounded in real-time project database metrics and Indian statutory laws, including the National Highways Act of 1956 and RFCTLARR 2013. You can ask Saarthi questions in natural speech or text to check project status, identify high-risk corridors, calculate statutory deadlines, or understand legal delay factors instantly.',
+    'This is Saarthi, your friendly AI assistant for land acquisition. You can ask Saarthi any question in simple words, either by speaking or typing. Saarthi can tell you project status, upcoming legal deadlines, reasons for delay, and helpful solutions based on official highway rules.',
 
-  // 12. LA Officer Workbench
+  // 13. LA Officer Workbench
   '/la-workbench':
-    'This is the Competent Authority Land Acquisition Workbench. Designed specifically for CALA and district revenue officers, this dashboard streamlines field operations. Officers can track Section 3A, 3D, and 3G notifications, manage public objection hearings, verify land ownership parcels, and coordinate direct compensation payments into beneficiary bank accounts.',
+    'This is the Land Acquisition Officer Workbench. Specially designed for district revenue officers and competent authorities, this page makes daily field work simple. Officers can track land notifications, handle landowner objections, verify land titles, and oversee direct bank payments to beneficiaries.',
 
-  // 13. Implementing Agency Portal
+  // 14. Implementing Agency Portal
   '/agency-portal':
-    'This is the Implementing Agency Portal for executing bodies such as the National Highways Authority of India and state road corporations. It focuses on project execution milestones, tracking encumbrance-free Right-of-Way clearance, utility shifting, and physical possession handovers to ensure civil construction can proceed without site disputes.',
+    'This is the Implementing Agency Portal for highway authorities and road corporations. It helps engineering teams track site handover, utility shifting, and right-of-way clearance, ensuring civil road construction can start on time without disputes.',
 }
 
 /**
- * Returns a proper, comprehensive description of the current page.
+ * Returns a clear, easy-language description of the current page.
  */
 export function getPageVoiceInstruction(pathname?: string, isSaarthiOpen?: boolean): string {
   // If Saarthi chatbot window is open, describe Saarthi
@@ -100,12 +107,12 @@ export function getPageVoiceInstruction(pathname?: string, isSaarthiOpen?: boole
     return PAGE_VOICE_INSTRUCTIONS['/dashboard']
   }
 
-  // Default fallback
-  return "Welcome to LADRIS, India's AI-Powered Land Acquisition Early-Warning and Decision Support Intelligence System. Use the top navigation bar and sidebar to explore infrastructure projects, delay predictions, GIS spatial maps, and decision support tools across national highway corridors."
+  // Default friendly fallback
+  return 'Welcome to LADRIS, your intelligent system for monitoring highway land acquisition. Use the top bar and left menu to explore projects, check delay predictions, view the interactive map, and access early warning alerts across India.'
 }
 
 /**
- * Backwards-compatible collector returning the comprehensive page description.
+ * Backwards-compatible collector returning the easy-language page description.
  */
 export function collectPageContent(pathname?: string): string {
   return getPageVoiceInstruction(pathname)
