@@ -1,9 +1,81 @@
 import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { AlertTriangle, Filter, ChevronRight, Zap, Search } from 'lucide-react'
+import { Filter, ChevronRight, Zap, Search } from 'lucide-react'
 import { projectsAPI, predictionsAPI } from '@/api/client'
 import { useNavigate } from 'react-router-dom'
-import { RiskBadge, StatusBadge } from '@/components/common'
+import { RiskBadge, StatusBadge, PageHeader } from '@/components/common'
+
+// ─── Directory-style Status & Delay Risk Badges (Rectangular Button Style) ────
+const renderDirectoryStatusBadge = (status: any) => {
+  const norm = String(status || '').toUpperCase()
+  if (norm === 'ACTIVE') {
+    return (
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 31,
+          padding: '0 14px',
+          borderRadius: 8,
+          backgroundColor: '#DCFCE7',
+          border: '1px solid #86EFAC',
+          color: '#15803D',
+          fontSize: '0.8125rem',
+          fontWeight: 600,
+          lineHeight: 1,
+          whiteSpace: 'nowrap',
+          verticalAlign: 'middle',
+          boxSizing: 'border-box',
+          boxShadow: 'none',
+        }}
+      >
+        Active
+      </span>
+    )
+  }
+  return <StatusBadge status={status} />
+}
+
+const renderDirectoryRiskBadge = (level: any) => {
+  const norm = String(level || '').toUpperCase()
+  const riskMap: Record<string, { bg: string; border: string; text: string; label: string }> = {
+    HIGH: { bg: '#FEE2E2', border: '#F87171', text: '#B91C1C', label: 'High' },
+    CRITICAL: { bg: '#FEE2E2', border: '#F87171', text: '#B91C1C', label: 'Critical' },
+    MEDIUM: { bg: '#FEF3C7', border: '#FBBF24', text: '#B45309', label: 'Medium' },
+    LOW: { bg: '#DBEAFE', border: '#60A5FA', text: '#1D4ED8', label: 'Low' },
+  }
+
+  const config = riskMap[norm]
+  if (!config) {
+    return <RiskBadge level={level} />
+  }
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 31,
+        padding: '0 14px',
+        borderRadius: 8,
+        backgroundColor: config.bg,
+        border: `1px solid ${config.border}`,
+        color: config.text,
+        fontSize: '0.8125rem',
+        fontWeight: 600,
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
+        verticalAlign: 'middle',
+        boxSizing: 'border-box',
+        boxShadow: 'none',
+      }}
+    >
+      {config.label}
+    </span>
+  )
+}
 
 export default function PriorityIntelligence() {
   const navigate = useNavigate()
@@ -87,25 +159,10 @@ export default function PriorityIntelligence() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
       {/* Page Header Title */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: 10,
-            background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <AlertTriangle size={22} color="#f59e0b" />
-          </div>
-          <div>
-            <h1 style={{ fontSize: '1.375rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-              Priority Project Watchlist
-            </h1>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>
-              Quickly identify high-risk projects that require immediate administrative intervention or attention
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Priority Project Watchlist"
+        subtitle="Quickly identify high-risk projects that require immediate administrative intervention or attention"
+      />
 
       {/* Filter Control Bar */}
       <div className="card" style={{ marginBottom: 24, background: 'var(--color-bg-card)', padding: 18, width: '100%' }}>
@@ -222,8 +279,8 @@ export default function PriorityIntelligence() {
                           {p.project_code}
                         </code>
                         <span className="badge badge-gray" style={{ fontSize: '0.7rem' }}>{p.state_code}</span>
-                        <StatusBadge status={p.status} />
-                        <RiskBadge level={p.risk_level} />
+                        {renderDirectoryStatusBadge(p.status)}
+                        {renderDirectoryRiskBadge(p.risk_level)}
                       </div>
                       <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
                         {p.name}
