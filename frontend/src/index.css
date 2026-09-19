@@ -884,3 +884,522 @@ header {
   border: 1px solid rgba(64,128,255,0.12);
   border-radius: var(--radius-xl);
 }
+
+/* =============================================================================
+   LADRIS - Dashboard & Data Health Scoped Design System
+   Prefix: db- (Dashboard), dq- (Data Quality)
+   These classes ONLY apply to Dashboard.tsx and DataQuality.tsx.
+   They do NOT affect GIS, Maps, Sidebar, TopNav, or any shared components.
+   ============================================================================= */
+
+/* Dashboard KPI Grid - replaces MetricCard row */
+.db-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.db-kpi-card {
+  background: var(--color-bg-card);
+  padding: 20px 18px 16px;
+  position: relative;
+  min-width: 0;
+  box-sizing: border-box;
+  transition: background-color 150ms ease;
+}
+
+.db-kpi-card:hover { background: var(--color-bg-card-hover); }
+
+.db-kpi-label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  display: block;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.db-kpi-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+  line-height: 1;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.db-kpi-value--risk-critical { color: var(--color-risk-critical); }
+.db-kpi-value--risk-high     { color: var(--color-risk-high); }
+.db-kpi-value--alert         { color: var(--color-risk-medium); }
+
+.db-kpi-desc {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  display: block;
+}
+
+/* Dashboard Section Titles */
+.db-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Dashboard Content Grids */
+.db-mid-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.db-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Dashboard Card Header */
+.db-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+/* Dashboard Stage Progress Rows */
+.db-stage-row { display: flex; flex-direction: column; gap: 9px; }
+
+.db-stage-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.db-stage-name {
+  font-size: 0.73rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.db-stage-name--critical { font-weight: 700; color: var(--color-risk-critical); }
+
+.db-stage-pct {
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  min-width: 30px;
+  text-align: right;
+}
+
+.db-progress-track {
+  height: 4px;
+  background: var(--color-bg-elevated);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 3px;
+  grid-column: 1 / -1;
+}
+
+.db-progress-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+
+/* Dashboard Priority Project Rows */
+.db-project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.db-project-row {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: var(--color-bg-card);
+  transition: background 120ms ease;
+}
+
+.db-project-row:hover { background: var(--color-bg-card-hover); }
+
+.db-project-rank {
+  font-size: 0.67rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.db-project-rank--top { color: var(--color-risk-critical); }
+
+.db-project-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  display: block;
+}
+
+.db-project-name:hover { color: var(--color-accent-primary); }
+
+.db-project-meta {
+  font-size: 0.67rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.db-project-score {
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+.db-project-score--critical { color: var(--color-risk-critical); }
+.db-project-score--high     { color: var(--color-risk-high); }
+
+/* Dashboard Alert Rows */
+.db-alert-list { display: flex; flex-direction: column; gap: 8px; }
+
+.db-alert-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  border-left-width: 3px;
+}
+
+.db-alert-row--critical { border-left-color: var(--color-risk-critical); }
+.db-alert-row--high     { border-left-color: var(--color-risk-high); }
+.db-alert-row--medium   { border-left-color: var(--color-risk-medium); }
+.db-alert-row--low      { border-left-color: var(--color-risk-low); }
+
+.db-alert-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.db-alert-reason {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+}
+
+.db-alert-time { font-size: 0.65rem; color: var(--color-text-muted); }
+
+.db-alert-severity {
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 3px;
+}
+
+/* Alert severity labels: neutral bg, muted text — status carried by left-border */
+.db-alert-severity--critical { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-default); }
+.db-alert-severity--high     { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-default); }
+.db-alert-severity--medium   { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-default); }
+
+/* Dashboard State Rows */
+.db-state-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.db-state-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--color-bg-card);
+  transition: background 120ms ease;
+}
+
+.db-state-row:hover { background: var(--color-bg-card-hover); }
+.db-state-name { font-size: 0.8rem; font-weight: 600; color: var(--color-text-primary); }
+.db-state-meta { font-size: 0.67rem; color: var(--color-text-muted); margin-top: 1px; }
+.db-state-score { font-size: 1rem; font-weight: 800; font-family: var(--font-mono); }
+.db-state-score--critical { color: var(--color-risk-critical); }
+.db-state-score--high     { color: var(--color-risk-high); }
+
+/* Dashboard Data Health Rows */
+.db-health-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: 0.78rem;
+}
+
+.db-health-row:last-child { border-bottom: none; }
+.db-health-label { color: var(--color-text-secondary); }
+.db-health-value { font-weight: 700; font-family: var(--font-mono); }
+
+/* Dashboard Risk Distribution Summary */
+.db-risk-summary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border-subtle);
+  text-align: center;
+}
+
+.db-risk-summary-label { font-size: 0.59rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); }
+.db-risk-summary-value { font-size: 0.9rem; font-weight: 800; font-family: var(--font-mono); }
+
+/* Dashboard Bottleneck Note */
+.db-bottleneck-note {
+  margin-top: 14px;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg-elevated);
+  font-size: 0.74rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.db-bottleneck-label { font-weight: 700; color: var(--color-text-primary); }
+.db-bottleneck-next  { font-size: 0.68rem; color: var(--color-text-muted); }
+
+/* Link style for dashboard */
+.db-link-muted {
+  font-size: 0.72rem;
+  color: var(--color-accent-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 120ms ease;
+}
+
+.db-link-muted:hover { opacity: 0.8; color: var(--color-accent-primary); }
+
+/* Data Quality KPI Grid */
+.dq-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--color-border-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.dq-kpi-card {
+  background: var(--color-bg-card);
+  padding: 20px 20px 16px;
+  min-width: 0;
+  box-sizing: border-box;
+  transition: background-color 150ms ease;
+}
+
+.dq-kpi-card:hover { background: var(--color-bg-card-hover); }
+
+.dq-kpi-label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.dq-kpi-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+  line-height: 1;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.dq-kpi-value--good    { color: #138808; }
+.dq-kpi-value--warning { color: var(--color-risk-medium); }
+
+.dq-kpi-badge {
+  display: inline-block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+/* kpi-badge variants: all neutral — value color communicates status */
+.dq-kpi-badge--good { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-subtle); }
+
+.dq-kpi-desc {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Data Quality Category Cards */
+.dq-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 12px;
+}
+
+.dq-category-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 18px 14px;
+  border-left-width: 3px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.dq-category-card--complete          { border-left-color: #138808; }
+.dq-category-card--needs-attention   { border-left-color: var(--color-risk-medium); }
+
+.dq-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dq-category-title { font-size: 0.875rem; font-weight: 700; color: var(--color-text-primary); margin: 0; }
+
+.dq-category-status {
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+/* Category status labels: neutral — status communicated by left-border accent */
+.dq-category-status--complete        { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-subtle); }
+.dq-category-status--needs-attention { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-subtle); }
+
+.dq-category-desc { font-size: 0.76rem; color: var(--color-text-muted); line-height: 1.45; margin: 8px 0 12px 0; }
+
+/* Data Quality Issue Rows */
+.dq-issue-row {
+  padding: 13px 16px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  border-left-width: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dq-issue-row--high   { border-left-color: var(--color-risk-critical); }
+.dq-issue-row--medium { border-left-color: var(--color-risk-medium); }
+.dq-issue-row--low    { border-left-color: var(--color-risk-low); }
+
+.dq-issue-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.dq-issue-severity {
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Issue severity labels: neutral — status communicated by left-border accent */
+.dq-issue-severity--high   { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-default); }
+.dq-issue-severity--medium { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-default); }
+.dq-issue-severity--low    { background: var(--color-bg-elevated); color: var(--color-text-muted); border: 1px solid var(--color-border-default); }
+
+.dq-issue-title   { font-size: 0.875rem; font-weight: 700; color: var(--color-text-primary); }
+.dq-issue-project { font-size: 0.75rem; color: var(--color-text-secondary); }
+.dq-issue-desc    { font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.5; }
+
+.dq-issue-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dq-issue-action-label { color: var(--color-text-muted); font-weight: 600; }
+.dq-issue-action-text  { color: var(--color-text-primary); }
+
+/* Responsive: Dashboard */
+@media (max-width: 1280px) {
+  .db-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 1024px) {
+  .db-mid-grid, .db-bottom-grid { grid-template-columns: 1fr 1fr; }
+  .dq-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .db-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .db-mid-grid, .db-bottom-grid { grid-template-columns: 1fr; }
+  .dq-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .dq-category-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .db-kpi-grid  { grid-template-columns: 1fr 1fr; }
+  .db-kpi-value { font-size: 1.45rem; }
+  .dq-kpi-grid  { grid-template-columns: 1fr 1fr; }
+  .dq-kpi-value { font-size: 1.45rem; }
+}
