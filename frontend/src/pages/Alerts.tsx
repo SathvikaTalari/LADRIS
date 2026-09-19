@@ -52,6 +52,24 @@ function getReasonBadgeStyle(reason: AlertReasonType | string) {
   }
 }
 
+function cleanAlertMessage(msg: string): string {
+  if (!msg) return ''
+  let text = msg.trim()
+
+  text = text.replace(/Speed up R&R activities;\s*progress is currently only\s*([\d.]+%?)\.?/gi, 'Expedite rehabilitation and resettlement; progress is currently at $1.')
+  text = text.replace(/Speed up R&R activities/gi, 'Expedite rehabilitation and resettlement')
+  text = text.replace(/Accelerate compensation disbursement;\s*currently only\s*([\d.]+%?)\s*disbursed to landowners\.?/gi, 'Expedite compensation payments; only $1 has been disbursed to landowners.')
+  text = text.replace(/Accelerate compensation disbursement/gi, 'Expedite compensation payments')
+  text = text.replace(/\bmonth\(s\)/gi, 'months')
+  text = text.replace(/\bdispute\(s\)/gi, 'disputes')
+  text = text.replace(/\bupdate\(s\)/gi, 'updates')
+  text = text.replace(/\bproject\(s\)/gi, 'projects')
+  text = text.replace(/lagging behind statutory schedule/gi, 'behind schedule')
+  text = text.replace(/behind statutory schedule/gi, 'behind schedule')
+
+  return text
+}
+
 export default function Alerts() {
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [projectsMap, setProjectsMap] = useState<Record<string, any>>({})
@@ -143,18 +161,18 @@ export default function Alerts() {
       ) {
         const meta = alert.alert_metadata || {}
         if (reason === 'Compensation Pending') {
-          explanation = 'Compensation disbursement is lagging behind schedule; milestone requires immediate officer review.'
+          explanation = 'Compensation payments are behind schedule; immediate officer review required.'
         } else if (reason === 'Legal Dispute') {
-          explanation = 'Active legal disputes pending in court require mediation to prevent stay orders on possession.'
+          explanation = 'Active court disputes require mediation to avoid stay orders on land possession.'
         } else if (reason === 'R&R Delay') {
-          explanation = 'Rehabilitation and resettlement activities are lagging behind statutory milestones.'
+          explanation = 'Rehabilitation and resettlement activities are behind schedule.'
         } else if (reason === 'Stage Overdue') {
-          explanation = 'Critical stage statutory clearance is overdue beyond the baseline schedule.'
+          explanation = 'Statutory clearances are overdue beyond the baseline schedule.'
         } else if (reason === 'Risk Increased') {
-          explanation = 'Project delay risk accelerated significantly over the recent evaluation window.'
+          explanation = 'Project delay risk has increased significantly in recent evaluations.'
         } else {
           const score = meta.risk_score ? Math.round(meta.risk_score) : 88
-          explanation = `Production delay model predicts elevated project timeline risk (${score}/100).`
+          explanation = `Delay risk model indicates elevated timeline risk (${score}/100).`
         }
       }
 
@@ -162,7 +180,7 @@ export default function Alerts() {
         ...alert,
         displayName: projectName,
         displayReason: reason,
-        displayExplanation: explanation,
+        displayExplanation: cleanAlertMessage(explanation),
       }
     })
   }, [alerts, projectsMap])
@@ -190,7 +208,7 @@ export default function Alerts() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <PageHeader
         title="Project Alerts & Notifications"
-        subtitle="Real-time alerts categorized by delay risk drivers, compensation roadblocks, court disputes, and statutory stage milestones"
+        subtitle="Real-time alerts for project delay risks, pending compensation, court disputes, and milestone delays"
       />
 
       {/* KPI Cards */}
@@ -200,7 +218,7 @@ export default function Alerts() {
             <Bell size={14} className="text-amber-400" /> Active Alerts
           </div>
           <div className="metric-value text-amber-400">{activeCount}</div>
-          <div className="text-xs text-slate-400">Needs officer action</div>
+          <div className="text-xs text-slate-400">Action required</div>
         </div>
 
         <div className="metric-card">
@@ -208,7 +226,7 @@ export default function Alerts() {
             <AlertTriangle size={14} className="text-rose-400" /> Critical Severity
           </div>
           <div className="metric-value text-rose-400">{criticalCount}</div>
-          <div className="text-xs text-slate-400">Immediate attention</div>
+          <div className="text-xs text-slate-400">Immediate attention required</div>
         </div>
 
         <div className="metric-card">
@@ -216,7 +234,7 @@ export default function Alerts() {
             <Info size={14} className="text-blue-400" /> Acknowledged
           </div>
           <div className="metric-value text-blue-400">{ackCount}</div>
-          <div className="text-xs text-slate-400">Under officer review</div>
+          <div className="text-xs text-slate-400">Under review</div>
         </div>
 
         <div className="metric-card">
@@ -256,9 +274,9 @@ export default function Alerts() {
               style={{ height: 36, fontSize: '0.8125rem' }}
             >
               <option value="ALL">All Statuses ({alerts.length})</option>
-              <option value="ACTIVE">ACTIVE ({activeCount})</option>
-              <option value="ACKNOWLEDGED">ACKNOWLEDGED ({ackCount})</option>
-              <option value="RESOLVED">RESOLVED ({resolvedCount})</option>
+              <option value="ACTIVE">Active ({activeCount})</option>
+              <option value="ACKNOWLEDGED">Acknowledged ({ackCount})</option>
+              <option value="RESOLVED">Resolved ({resolvedCount})</option>
             </select>
           </div>
 
@@ -286,10 +304,10 @@ export default function Alerts() {
               style={{ height: 36, fontSize: '0.8125rem' }}
             >
               <option value="ALL">All Severities</option>
-              <option value="CRITICAL">CRITICAL</option>
-              <option value="HIGH">HIGH</option>
-              <option value="MEDIUM">MEDIUM</option>
-              <option value="LOW">LOW</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
             </select>
           </div>
         </div>
@@ -306,7 +324,7 @@ export default function Alerts() {
           <EmptyState
             icon={<Bell size={32} />}
             title="No Matching Alerts"
-            description="No alerts match the selected status, reason, or severity filters."
+            description="No alerts match the selected filters."
           />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -503,7 +521,7 @@ export default function Alerts() {
                           onClick={() => handleUpdateStatus(alert.id, 'ACKNOWLEDGED')}
                           className="btn btn-secondary btn-sm"
                           style={{ fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                          title="Acknowledge this active alert"
+                          title="Acknowledge this alert"
                         >
                           <Info size={13} /> Acknowledge
                         </button>

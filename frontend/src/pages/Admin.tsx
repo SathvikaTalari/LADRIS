@@ -251,7 +251,7 @@ export default function Admin() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
       <PageHeader
         title="Admin & AI Settings"
-        subtitle="Manage users and permissions, alert trigger thresholds, AI model status, and system activity logs"
+        subtitle="Manage users, alert settings, AI models, and system activity logs"
       />
 
       {/* Navigation Tabs (Strictly 4 Tabs) */}
@@ -324,7 +324,7 @@ export default function Admin() {
                 System Users &amp; Roles
               </h3>
               <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
-                Manage user access, role assignments, and jurisdictions. System Admin maintains full administrative privileges.
+                Manage user access, roles, and jurisdictions. Administrators have full system access.
               </p>
             </div>
 
@@ -333,7 +333,7 @@ export default function Admin() {
                 <Search size={14} style={{ position: 'absolute', left: 10, top: 10, color: 'var(--color-text-muted)' }} />
                 <input
                   type="text"
-                  placeholder="Search user by name, role, or state..."
+                  placeholder="Search by name, role, or state..."
                   value={userSearchQuery}
                   onChange={(e) => setUserSearchQuery(e.target.value)}
                   className="input"
@@ -440,7 +440,7 @@ export default function Admin() {
             >
               <div className="card" style={{ maxWidth: 460, width: '100%', padding: 24, background: 'var(--color-bg-card)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Add New User Account</h3>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Add New User</h3>
                   <button className="btn btn-ghost btn-sm" onClick={() => setIsAddUserModalOpen(false)}>
                     <X size={16} />
                   </button>
@@ -454,7 +454,7 @@ export default function Admin() {
                       value={newUserForm.full_name}
                       onChange={(e) => setNewUserForm({ ...newUserForm, full_name: e.target.value })}
                       className="input"
-                      placeholder="e.g. Officer R. Sharma"
+                      placeholder="e.g. R. Sharma"
                       style={{ height: 36, fontSize: '0.8125rem' }}
                     />
                   </div>
@@ -471,7 +471,7 @@ export default function Admin() {
                     />
                   </div>
                   <div>
-                    <label className="input-label" style={{ fontSize: '0.75rem' }}>System Role</label>
+                    <label className="input-label" style={{ fontSize: '0.75rem' }}>Role</label>
                     <select
                       value={newUserForm.role}
                       onChange={(e) => setNewUserForm({ ...newUserForm, role: e.target.value as UserRole })}
@@ -493,7 +493,7 @@ export default function Admin() {
                       value={newUserForm.state_code}
                       onChange={(e) => setNewUserForm({ ...newUserForm, state_code: e.target.value.toUpperCase() })}
                       className="input"
-                      placeholder="Leave blank for National, or enter 2-letter state code (e.g. TG, MH)"
+                      placeholder="Leave blank for National, or enter a 2-letter state code (e.g. TG, MH)"
                       style={{ height: 36, fontSize: '0.8125rem' }}
                     />
                   </div>
@@ -570,7 +570,7 @@ export default function Admin() {
                       value={editingUser.state_code || ''}
                       onChange={(e) => setEditingUser({ ...editingUser, state_code: e.target.value.toUpperCase() })}
                       className="input"
-                      placeholder="Blank for National, or 2-letter state code (e.g. TG)"
+                      placeholder="Leave blank for National, or enter a 2-letter state code (e.g. TG)"
                       style={{ height: 36, fontSize: '0.8125rem' }}
                     />
                   </div>
@@ -599,7 +599,7 @@ export default function Admin() {
                 Alert Settings
               </h3>
               <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
-                Configure email notifications and reminder schedules for delay risk alerts.
+                Configure email notifications and reminder schedules for delay alerts.
               </p>
             </div>
           </div>
@@ -628,7 +628,7 @@ export default function Admin() {
                     Email Notifications
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                    Automatically send email alerts to the responsible officer when important delay risks occur.
+                    Send email alerts to responsible officers when delay risks are detected.
                   </div>
                 </div>
                 <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: 8 }}>
@@ -668,10 +668,10 @@ export default function Admin() {
               >
                 <div>
                   <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                    Send For High/Critical Alerts
+                    High and Critical Alerts Only
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                    Dispatch emails for High/Critical Risk, compensation delays, R&amp;R delays, legal disputes, and overdue stages.
+                    Send email alerts only for high-priority risks, compensation delays, R&amp;R delays, legal disputes, and overdue stages.
                   </div>
                 </div>
                 <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: 8 }}>
@@ -712,10 +712,10 @@ export default function Admin() {
               >
                 <div>
                   <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                    Reminder After
+                    Reminder Interval
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                    Interval for resending alert emails if the issue remains unresolved.
+                    Interval for resending email alerts if an issue remains unresolved.
                   </div>
                 </div>
                 <div>
@@ -728,9 +728,9 @@ export default function Admin() {
                     className="input"
                     style={{ height: 36, fontSize: '0.82rem', minWidth: 150, cursor: 'pointer' }}
                   >
-                    <option value={24}>After 24 Hours</option>
-                    <option value={48}>After 48 Hours</option>
-                    <option value={0}>Off (No Reminders)</option>
+                    <option value={24}>Every 24 hours</option>
+                    <option value={48}>Every 48 hours</option>
+                    <option value={0}>Off (No reminders)</option>
                   </select>
                 </div>
               </div>
@@ -779,7 +779,7 @@ export default function Admin() {
                   </span>
                 </div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)', marginTop: 4 }}>
-                  Production delay classification &amp; timeline estimation model
+                  Production delay classification and timeline estimation model
                 </div>
               </div>
 
@@ -791,7 +791,7 @@ export default function Admin() {
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.8rem' }}
               >
                 <Cpu size={14} className={isRetraining ? 'animate-spin' : ''} />
-                {isRetraining ? 'Updating AI Model...' : 'Update AI with Latest Verified Data'}
+                {isRetraining ? 'Updating AI Model...' : 'Update AI Model with Latest Data'}
               </button>
             </div>
 
@@ -822,7 +822,7 @@ export default function Admin() {
                 <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 4 }}>
                   LADRIS Delay Engine
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#10b981', marginTop: 2 }}>Delay Predictor</div>
+                <div style={{ fontSize: '0.72rem', color: '#10b981', marginTop: 2 }}>Production Model</div>
               </div>
 
               {/* 2. Model Status */}
@@ -831,7 +831,7 @@ export default function Admin() {
                 <div style={{ fontSize: '1rem', fontWeight: 700, color: '#10b981', marginTop: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
                   <CheckCircle2 size={14} /> Active &amp; Operational
                 </div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Ready for scoring</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Ready for predictions</div>
               </div>
 
               {/* 3. ROC-AUC */}
@@ -840,7 +840,7 @@ export default function Admin() {
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#10b981', marginTop: 4 }}>
                   {modelInfo?.evaluation?.oof_roc_auc != null ? `${(Number(modelInfo.evaluation.oof_roc_auc) * 100).toFixed(1)}%` : '94.2%'}
                 </div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Discrimination accuracy</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Prediction accuracy</div>
               </div>
 
               {/* 4. Average Delay Error */}
@@ -849,7 +849,7 @@ export default function Admin() {
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f59e0b', marginTop: 4 }}>
                   ±{modelInfo?.evaluation?.regressor_mae != null ? `${Number(modelInfo.evaluation.regressor_mae).toFixed(0)} days` : '28 days'}
                 </div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Mean absolute error</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Mean absolute error (MAE)</div>
               </div>
 
               {/* 5. Model Version */}
@@ -858,7 +858,7 @@ export default function Admin() {
                 <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#38bdf8', fontFamily: 'var(--font-mono)', marginTop: 4 }}>
                   {modelInfo?.model_version || '20260914_080620'}
                 </div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>LightGBM Bundle</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>LightGBM model</div>
               </div>
 
               {/* 6. Last Updated */}
@@ -867,7 +867,7 @@ export default function Admin() {
                 <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 4 }}>
                   Sep 14, 2026
                 </div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Verified baseline run</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Latest verified training run</div>
               </div>
 
               {/* 7. Data Completeness */}
@@ -876,7 +876,7 @@ export default function Admin() {
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8', marginTop: 4 }}>
                   {monitoringInfo?.mean_data_completeness_pct != null ? `${monitoringInfo.mean_data_completeness_pct}%` : '85.4%'}
                 </div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Across key project attributes</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Across key project fields</div>
               </div>
             </div>
           </div>
@@ -912,7 +912,7 @@ export default function Admin() {
                   <div style={{ background: 'var(--color-bg-tertiary)', padding: 12, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Probability Calibration</div>
                     <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#38bdf8', marginTop: 4 }}>High Reliability</div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Calculated probabilities align with observed outcomes</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Predicted probabilities closely match actual outcomes</div>
                   </div>
 
                   <div style={{ background: 'var(--color-bg-tertiary)', padding: 12, borderRadius: 8, border: '1px solid var(--color-border-subtle)' }}>
@@ -921,7 +921,7 @@ export default function Admin() {
                       {monitoringInfo?.model_version_drift ? 'Drift Detected' : 'Consistent (No Drift)'}
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                      {monitoringInfo?.prediction_count || 8} predictions recorded with active bundle
+                      {monitoringInfo?.prediction_count || 8} predictions recorded with current model
                     </div>
                   </div>
 
@@ -930,7 +930,7 @@ export default function Admin() {
                     <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: 4 }}>
                       {modelInfo?.feature_columns?.length || 23} Tracked Parameters
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Land area, compensation, court cases, R&amp;R</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>Land area, compensation, court cases, and R&amp;R</div>
                   </div>
                 </div>
 
@@ -938,7 +938,7 @@ export default function Admin() {
                 {trainingHistory?.models && trainingHistory.models.length > 0 && (
                   <div>
                     <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <History size={14} /> Training Run History ({trainingHistory.count} versions)
+                      <History size={14} /> Training History ({trainingHistory.count} versions)
                     </div>
                     <div style={{ overflowX: 'auto' }}>
                       <table className="data-table" style={{ width: '100%', fontSize: '0.78rem' }}>

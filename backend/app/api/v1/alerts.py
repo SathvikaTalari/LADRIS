@@ -121,25 +121,26 @@ async def _seed_alerts_from_projects(db: AsyncSession):
         # Determine specific alert reason
         reason = "High Delay Risk"
         explanation = (
-            f"{project.name} has production-model delay risk {prediction.risk_score:.2f}/100 "
-            f"({prediction.delay_probability:.1%}) at snapshot {prediction.snapshot_date}."
+            f"{project.name} has severe delay risk ({prediction.risk_score:.1f}/100) "
+            f"({prediction.delay_probability:.1%}) as of snapshot {prediction.snapshot_date}."
         )
         if (project.legal_case_count or 0) > 0:
             reason = "Legal Dispute"
-            explanation = f"{project.name} has {project.legal_case_count} active court disputes creating timeline risk."
+            explanation = f"{project.name} has {project.legal_case_count} active court disputes creating significant delay risk."
         elif project.delay_months and project.delay_months > 0:
             reason = "Stage Overdue"
-            explanation = f"{project.name} is overdue on statutory milestones by {project.delay_months} month(s)."
+            dm = project.delay_months
+            explanation = f"{project.name} is overdue on statutory milestones by {dm} {'month' if dm == 1 else 'months'}."
         elif (project.rehabilitation_progress_pct or 100) < 65:
             pct = project.rehabilitation_progress_pct if project.rehabilitation_progress_pct is not None else 0
             reason = "R&R Delay"
-            explanation = f"{project.name} R&R progress ({pct:.0f}%) is lagging behind statutory schedule."
+            explanation = f"{project.name}: Rehabilitation and resettlement progress ({pct:.0f}%) is behind schedule."
         elif project.total_affected_families and (project.families_compensated or 0) < project.total_affected_families * 0.7:
             reason = "Compensation Pending"
-            explanation = f"{project.name} compensation disbursement pending for affected land parcels."
+            explanation = f"{project.name}: Compensation disbursement is pending for affected land parcels."
         elif peak.get("risk_score", 0) >= 80 and peak.get("stage"):
             reason = "Stage Overdue"
-            explanation = f"{project.name} has critical delay risk in {peak.get('stage')} stage."
+            explanation = f"{project.name} has critical delay risk in the {peak.get('stage')} stage."
 
         new_alert = Alert(
             project_id=project.id,

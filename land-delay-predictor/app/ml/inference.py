@@ -18,46 +18,49 @@ import shap
 from .input_validation import REQUIRED_COLUMNS, validate_single_row
 from .model_store import load_model
 
-DEFAULT_RECOMMENDATION = "Maintain active statutory tracking; all project milestones are progressing within schedule."
+DEFAULT_RECOMMENDATION = "Project milestones are progressing on schedule; continue regular monitoring."
 
 
 def _rec(feature: str, value: Any) -> str:
     """Actionable recommendation policy derived directly from actual SHAP delay drivers."""
     if feature == "compensation_disbursement_pct":
-        return f"Accelerate compensation disbursement; currently only {float(value):.1f}% disbursed to landowners."
+        return f"Expedite compensation payments; only {float(value):.1f}% has been disbursed to landowners."
     if feature == "open_legal_dispute_count":
-        return f"Resolve or fast-track the {int(value)} active court dispute(s) stalling site handover."
+        cnt = int(value)
+        return f"Resolve or expedite the {cnt} active court {'dispute' if cnt == 1 else 'disputes'} delaying site handover."
     if feature == "max_dispute_pendency_days":
-        return f"Oldest dispute has been pending for {int(value)} days; escalate for judicial hearing or Lok Adalat settlement."
+        return f"The oldest legal dispute has been pending for {int(value)} days; escalate for hearing or Lok Adalat settlement."
     if feature == "rehabilitation_progress_pct":
-        return f"Speed up R&R activities; progress is currently only {float(value):.1f}%."
+        return f"Expedite rehabilitation and resettlement; progress is currently at {float(value):.1f}%."
     if feature == "resettlement_site_ready":
-        return "Expedite resettlement site development and basic civic amenities for affected families."
+        return "Expedite resettlement site development and basic amenities for affected families."
     if feature == "days_since_notification":
-        return f"Publish Section 19 declaration to prevent notification lapse ({int(value)} days elapsed since notification)."
+        return f"Issue Section 19 declaration to prevent notification lapse ({int(value)} days since notification)."
     if feature == "days_to_expected_completion":
         d = int(value)
         if d < 0:
-            return f"Project is {abs(d)} days past scheduled completion; trigger emergency executive review."
-        return f"Only {d} days remain until scheduled completion; re-baseline critical path and clear pending approvals."
+            return f"Project is {abs(d)} days past schedule; initiate executive review."
+        return f"{d} days remaining until scheduled completion; clear pending approvals."
     if feature == "days_since_last_disbursement":
-        return f"Investigate payment stall; no compensation disbursement recorded for {int(value)} days."
+        return f"Review compensation hold; no payments recorded for {int(value)} days."
     if feature == "stakeholder_update_count_90d":
-        return f"Enforce bi-weekly inter-agency reviews; only {int(value)} update(s) recorded in 90 days."
+        cnt = int(value)
+        return f"Hold bi-weekly inter-agency reviews; only {cnt} {'update' if cnt == 1 else 'updates'} recorded in 90 days."
     if feature == "avg_days_between_updates":
-        return f"Stakeholder updates average {float(value):.0f} days apart; mandate weekly progress submissions."
+        return f"Stakeholder updates average {float(value):.0f} days apart; require weekly progress updates."
     if feature == "district_historical_delay_rate":
-        return f"District historical delay rate is {float(value) * 100:.1f}%; deploy special district monitoring cell."
+        return f"District historical delay rate is {float(value) * 100:.1f}%; deploy dedicated district monitoring."
     if feature == "agency_historical_delay_rate":
-        return f"Agency historical delay rate is {float(value) * 100:.1f}%; review execution bottlenecks with agency leadership."
+        return f"Agency historical delay rate is {float(value) * 100:.1f}%; review execution bottlenecks with leadership."
     if feature == "legal_dispute_count":
-        return f"{int(value)} cumulative disputes recorded; establish mediation cell to prevent future injunctions."
+        cnt = int(value)
+        return f"{cnt} court {'dispute' if cnt == 1 else 'disputes'} recorded; establish mediation to prevent further injunctions."
     if feature == "land_area_hectares":
-        return f"Large land area ({float(value):.1f} ha); mobilize additional revenue survey teams for physical boundary demarcation."
+        return f"Large land area ({float(value):.1f} ha); deploy extra survey teams for boundary demarcation."
     if feature == "affected_families_count":
-        return f"{int(value)} affected families; assign dedicated R&R coordinators for family resettlement."
+        return f"{int(value)} affected families; assign dedicated coordinators for resettlement."
     if feature in ("compensation_sanctioned", "compensation_disbursed"):
-        return "Expedite treasury release order for pending sanctioned compensation disbursement."
+        return "Expedite treasury release for sanctioned compensation payments."
     return DEFAULT_RECOMMENDATION
 
 
