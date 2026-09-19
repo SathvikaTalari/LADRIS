@@ -8,7 +8,6 @@ import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   ChevronRight,
-  PieChart,
 } from 'lucide-react'
 import ReactECharts from 'echarts-for-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
@@ -245,39 +244,15 @@ export default function Dashboard() {
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 430 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <PieChart size={18} color="var(--color-accent-primary)" />
-                <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                  Project Delay Risk Breakdown
-                </h3>
-              </div>
-            </div>
-
-            {/* Simple Subtitle / Indicator */}
-            <div style={{
-              fontSize: '0.74rem',
-              color: 'var(--color-text-muted)',
-              fontWeight: 600,
-              letterSpacing: '0.02em',
-              marginBottom: 8,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-            }}>
-              <span style={{
-                display: 'inline-block',
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: 'var(--color-accent-primary)',
-              }}></span>
-              All Projects Delay Risk
+              <h3 style={{ fontSize: '0.95rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                Project Delay Risk Breakdown
+              </h3>
             </div>
           </div>
 
           <ReactECharts
             option={distributionChartOption}
-            style={{ height: 230, width: '100%' }}
+            style={{ height: 240, width: '100%' }}
           />
 
           <div style={{
@@ -301,20 +276,19 @@ export default function Dashboard() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
               <div>
-                <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                <h3 style={{ fontSize: '0.95rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Most Delayed Stage
                 </h3>
               </div>
-              <span className="badge badge-yellow" style={{ fontSize: '0.62rem' }}>6 Acquisition Stages</span>
             </div>
 
-            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: 16 }}>
               Shows which stages of land acquisition face the highest risk of slowdown across projects.
             </p>
           </div>
 
           {/* Stage Progress Bars */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1, justifyContent: 'center' }}>
             {[
               { name: 'Notification (Section 3A)', pct: 41, color: '#138808' },
               { name: 'Objections Hearing (Section 3C)', pct: 37, color: '#138808' },
@@ -347,26 +321,6 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-
-          {/* Dominant Bottleneck Badge */}
-          <div style={{
-            marginTop: 12,
-            padding: '8px 10px',
-            borderRadius: 'var(--radius-md)',
-            background: 'rgba(255,71,87,0.1)',
-            border: '1px solid rgba(255,71,87,0.25)',
-            fontSize: '0.75rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-            <span style={{ fontWeight: 700, color: 'var(--color-risk-critical)' }}>
-              Biggest Delay Factor: Compensation Disbursement
-            </span>
-            <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
-              Next Stage: Possession
-            </span>
-          </div>
         </div>
 
         {/* 3. Compact Priority Intervention Queue ("Needs Attention Today") */}
@@ -374,7 +328,7 @@ export default function Dashboard() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <div>
-                <h3 style={{ fontSize: '0.85rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                <h3 style={{ fontSize: '0.95rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Priority Projects
                 </h3>
               </div>
@@ -489,7 +443,7 @@ export default function Dashboard() {
         <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--color-bg-card)' }}>
             <div>
-              <h3 style={{ fontSize: '0.9rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+              <h3 style={{ fontSize: '1rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 National Project Map
               </h3>
             </div>
@@ -548,7 +502,7 @@ export default function Dashboard() {
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div>
-              <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+              <h3 style={{ fontSize: '0.98rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 States with Highest Delay Risk
               </h3>
             </div>
@@ -584,7 +538,7 @@ export default function Dashboard() {
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div>
-              <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+              <h3 style={{ fontSize: '0.98rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                 Top Active Alerts
               </h3>
             </div>
@@ -665,7 +619,7 @@ export default function Dashboard() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <div>
-                <h3 style={{ fontSize: '0.88rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                <h3 style={{ fontSize: '0.98rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                   Data Health & Completeness
                 </h3>
               </div>
