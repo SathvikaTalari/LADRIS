@@ -1,61 +1,195 @@
 import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Bell, AlertTriangle, Info, Check, Filter, ChevronRight, CheckCircle2 } from 'lucide-react'
-import { alertsAPI } from '@/api/client'
+import {
+  Bell,
+  AlertTriangle,
+  Info,
+  Check,
+  Filter,
+  ChevronRight,
+  CheckCircle2,
+  Clock,
+  Scale,
+  Calendar,
+  TrendingUp,
+  Users,
+  Coins,
+  ShieldAlert,
+  Building2,
+} from 'lucide-react'
+import { alertsAPI, projectsAPI } from '@/api/client'
 import { PageHeader, EmptyState } from '@/components/common'
 import type { Alert } from '@/types'
 import { Link } from 'react-router-dom'
 
+const SPECIFIC_REASONS = [
+  'High Delay Risk',
+  'Compensation Pending',
+  'Legal Dispute',
+  'R&R Delay',
+  'Stage Overdue',
+  'Risk Increased',
+] as const
+
+export type AlertReasonType = typeof SPECIFIC_REASONS[number]
+
+function getReasonBadgeStyle(reason: AlertReasonType | string) {
+  switch (reason) {
+    case 'Legal Dispute':
+      return { bg: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: 'rgba(168, 85, 247, 0.3)', icon: Scale }
+    case 'Compensation Pending':
+      return { bg: 'rgba(234, 179, 8, 0.15)', color: '#facc15', border: 'rgba(234, 179, 8, 0.3)', icon: Coins }
+    case 'R&R Delay':
+      return { bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)', icon: Users }
+    case 'Stage Overdue':
+      return { bg: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: 'rgba(249, 115, 22, 0.3)', icon: Calendar }
+    case 'Risk Increased':
+      return { bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)', icon: TrendingUp }
+    case 'High Delay Risk':
+    default:
+      return { bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)', icon: AlertTriangle }
+  }
+}
+
 export default function Alerts() {
   const [alerts, setAlerts] = useState<Alert[]>([])
+  const [projectsMap, setProjectsMap] = useState<Record<string, any>>({})
   const [isLoading, setIsLoading] = useState(true)
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('ALL')
   const [severityFilter, setSeverityFilter] = useState('ALL')
+  const [reasonFilter, setReasonFilter] = useState('ALL')
 
-  const fetchAlerts = () => {
+  const fetchAlertsAndProjects = async () => {
     setIsLoading(true)
-    alertsAPI.list()
-      .then((data) => setAlerts(Array.isArray(data) ? data : data.alerts || []))
-      .catch(console.error)
-      .finally(() => setIsLoading(false))
+    try {
+      const [alertsData, projectsData] = await Promise.all([
+        alertsAPI.list(),
+        projectsAPI.list({ page_size: 100 }).catch(() => ({ items: [] })),
+      ])
+
+      const alertList = Array.isArray(alertsData) ? alertsData : (alertsData as any)?.alerts || []
+      setAlerts(alertList)
+
+      const map: Record<string, any> = {}
+      if (projectsData && Array.isArray(projectsData.items)) {
+        for (const p of projectsData.items) {
+          map[p.id] = p
+        }
+      }
+      setProjectsMap(map)
+    } catch (e) {
+      console.error('Failed to load alerts or projects:', e)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   useEffect(() => {
-    fetchAlerts()
+    fetchAlertsAndProjects()
   }, [])
 
   const handleUpdateStatus = async (alertId: string, status: 'ACKNOWLEDGED' | 'RESOLVED') => {
     try {
       await alertsAPI.update(alertId, { status })
-      fetchAlerts()
+      // Refresh to keep server data consistent
+      fetchAlertsAndProjects()
     } catch (e) {
       console.error('Failed to update alert:', e)
     }
   }
 
-  const activeCount = useMemo(() => alerts.filter(a => a.status === 'ACTIVE').length, [alerts])
-  const criticalCount = useMemo(() => alerts.filter(a => a.severity === 'CRITICAL').length, [alerts])
-  const ackCount = useMemo(() => alerts.filter(a => a.status === 'ACKNOWLEDGED').length, [alerts])
-  const resolvedCount = useMemo(() => alerts.filter(a => a.status === 'RESOLVED').length, [alerts])
+  // Derive cleaned details for each alert
+  const resolvedAlerts = useMemo(() => {
+    return alerts.map((alert) => {
+      const project = alert.project_id ? projectsMap[alert.project_id] : null
+      const projectName =
+        alert.project_name ||
+        project?.name ||
+        alert.alert_metadata?.project_name ||
+        (alert.alert_metadata?.project_code ? `Project ${alert.alert_metadata.project_code}` : 'Infrastructure Project')
+
+      let reason: string = alert.alert_reason || ''
+      if (!reason || reason.startsWith('ML ') || reason.includes('ML HIGH-RISK')) {
+        const t = alert.title || ''
+        if (SPECIFIC_REASONS.includes(t as any)) {
+          reason = t
+        } else {
+          const meta = alert.alert_metadata || {}
+          const drivers = meta.top_drivers || []
+          const compDriver = drivers.find(
+            (d: any) => d.feature === 'compensation_disbursement_pct' && d.direction === 'increases_risk'
+          )
+          const disputeDriver = drivers.find((d: any) => d.feature === 'legal_dispute_count')
+          const rrDriver = drivers.find(
+            (d: any) => d.feature === 'rehabilitation_progress_pct' && d.direction === 'increases_risk'
+          )
+
+          if (compDriver) reason = 'Compensation Pending'
+          else if (disputeDriver || (project && project.legal_case_count > 0)) reason = 'Legal Dispute'
+          else if (rrDriver) reason = 'R&R Delay'
+          else if (meta.velocity_status === 'Rapidly Rising' || meta.velocity_status === 'Rising') reason = 'Risk Increased'
+          else if (meta.critical_stage || (project && project.delay_months > 0)) reason = 'Stage Overdue'
+          else reason = 'High Delay Risk'
+        }
+      }
+
+      let explanation: string = alert.explanation || alert.message || ''
+      if (
+        !alert.explanation &&
+        (explanation.startsWith('ML ') || explanation.includes('has ML delay risk') || explanation.includes('has production-model'))
+      ) {
+        const meta = alert.alert_metadata || {}
+        if (reason === 'Compensation Pending') {
+          explanation = 'Compensation disbursement is lagging behind schedule; milestone requires immediate officer review.'
+        } else if (reason === 'Legal Dispute') {
+          explanation = 'Active legal disputes pending in court require mediation to prevent stay orders on possession.'
+        } else if (reason === 'R&R Delay') {
+          explanation = 'Rehabilitation and resettlement activities are lagging behind statutory milestones.'
+        } else if (reason === 'Stage Overdue') {
+          explanation = 'Critical stage statutory clearance is overdue beyond the baseline schedule.'
+        } else if (reason === 'Risk Increased') {
+          explanation = 'Project delay risk accelerated significantly over the recent evaluation window.'
+        } else {
+          const score = meta.risk_score ? Math.round(meta.risk_score) : 88
+          explanation = `Production delay model predicts elevated project timeline risk (${score}/100).`
+        }
+      }
+
+      return {
+        ...alert,
+        displayName: projectName,
+        displayReason: reason,
+        displayExplanation: explanation,
+      }
+    })
+  }, [alerts, projectsMap])
+
+  const activeCount = useMemo(() => resolvedAlerts.filter((a) => a.status === 'ACTIVE').length, [resolvedAlerts])
+  const criticalCount = useMemo(() => resolvedAlerts.filter((a) => a.severity === 'CRITICAL').length, [resolvedAlerts])
+  const ackCount = useMemo(() => resolvedAlerts.filter((a) => a.status === 'ACKNOWLEDGED').length, [resolvedAlerts])
+  const resolvedCount = useMemo(() => resolvedAlerts.filter((a) => a.status === 'RESOLVED').length, [resolvedAlerts])
 
   const filteredAlerts = useMemo(() => {
-    let result = [...alerts]
+    let result = [...resolvedAlerts]
     if (statusFilter !== 'ALL') {
-      result = result.filter(a => a.status === statusFilter)
+      result = result.filter((a) => a.status === statusFilter)
     }
     if (severityFilter !== 'ALL') {
-      result = result.filter(a => a.severity === severityFilter)
+      result = result.filter((a) => a.severity === severityFilter)
+    }
+    if (reasonFilter !== 'ALL') {
+      result = result.filter((a) => a.displayReason === reasonFilter)
     }
     return result
-  }, [alerts, statusFilter, severityFilter])
+  }, [resolvedAlerts, statusFilter, severityFilter, reasonFilter])
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <PageHeader
         title="Project Alerts & Notifications"
-        subtitle="Real-time alerts for project timeline delays, pending court disputes, and compensation roadblocks"
+        subtitle="Real-time alerts categorized by delay risk drivers, compensation roadblocks, court disputes, and statutory stage milestones"
       />
 
       {/* KPI Cards */}
@@ -65,7 +199,7 @@ export default function Alerts() {
             <Bell size={14} className="text-amber-400" /> Active Alerts
           </div>
           <div className="metric-value text-amber-400">{activeCount}</div>
-          <div className="text-xs text-slate-400">Needs officer review</div>
+          <div className="text-xs text-slate-400">Needs officer action</div>
         </div>
 
         <div className="metric-card">
@@ -73,12 +207,12 @@ export default function Alerts() {
             <AlertTriangle size={14} className="text-rose-400" /> Critical Severity
           </div>
           <div className="metric-value text-rose-400">{criticalCount}</div>
-          <div className="text-xs text-slate-400">Severe delay risk</div>
+          <div className="text-xs text-slate-400">Immediate attention</div>
         </div>
 
         <div className="metric-card">
           <div className="metric-label flex items-center gap-1.5">
-            <Info size={14} className="text-blue-400" /> In Review
+            <Info size={14} className="text-blue-400" /> Acknowledged
           </div>
           <div className="metric-value text-blue-400">{ackCount}</div>
           <div className="text-xs text-slate-400">Under officer review</div>
@@ -95,7 +229,19 @@ export default function Alerts() {
 
       {/* Filter Control Bar */}
       <div className="card" style={{ marginBottom: 20, padding: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            marginBottom: 12,
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+          }}
+        >
           <Filter size={14} color="var(--color-accent-primary)" /> Alert Filters
         </div>
 
@@ -116,6 +262,21 @@ export default function Alerts() {
           </div>
 
           <div>
+            <label className="input-label" style={{ fontSize: '0.75rem' }}>Alert Reason</label>
+            <select
+              value={reasonFilter}
+              onChange={(e) => setReasonFilter(e.target.value)}
+              className="input"
+              style={{ height: 36, fontSize: '0.8125rem' }}
+            >
+              <option value="ALL">All Alert Reasons</option>
+              {SPECIFIC_REASONS.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
             <label className="input-label" style={{ fontSize: '0.75rem' }}>Severity Level</label>
             <select
               value={severityFilter}
@@ -127,6 +288,7 @@ export default function Alerts() {
               <option value="CRITICAL">CRITICAL</option>
               <option value="HIGH">HIGH</option>
               <option value="MEDIUM">MEDIUM</option>
+              <option value="LOW">LOW</option>
             </select>
           </div>
         </div>
@@ -137,134 +299,297 @@ export default function Alerts() {
         {isLoading ? (
           <div style={{ textAlign: 'center', padding: 40, color: 'var(--color-text-muted)' }}>
             <div className="spinner" style={{ margin: '0 auto 12px' }} />
-            Checking for new alerts...
+            Loading alerts...
           </div>
         ) : filteredAlerts.length === 0 ? (
           <EmptyState
             icon={<Bell size={32} />}
             title="No Matching Alerts"
-            description="No alerts match the selected filters."
+            description="No alerts match the selected status, reason, or severity filters."
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {filteredAlerts.map((alert: any) => {
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {filteredAlerts.map((alert) => {
               const isCritical = alert.severity === 'CRITICAL'
               const isHigh = alert.severity === 'HIGH'
+              const isActive = alert.status === 'ACTIVE'
               const isAck = alert.status === 'ACKNOWLEDGED'
               const isResolved = alert.status === 'RESOLVED'
+
+              const reasonStyle = getReasonBadgeStyle(alert.displayReason)
+              const ReasonIcon = reasonStyle.icon
 
               let borderColor = 'var(--color-border-subtle)'
               let bgGlow = 'var(--color-bg-secondary)'
 
-              if (isCritical) { borderColor = 'rgba(239,68,68,0.4)'; bgGlow = 'rgba(239,68,68,0.06)' }
-              else if (isHigh) { borderColor = 'rgba(249,115,22,0.4)'; bgGlow = 'rgba(249,115,22,0.06)' }
+              if (isCritical) {
+                borderColor = 'rgba(239,68,68,0.35)'
+                bgGlow = 'rgba(239,68,68,0.04)'
+              } else if (isHigh) {
+                borderColor = 'rgba(249,115,22,0.35)'
+                bgGlow = 'rgba(249,115,22,0.04)'
+              } else if (isResolved) {
+                borderColor = 'rgba(16,185,129,0.2)'
+                bgGlow = 'rgba(16,185,129,0.02)'
+              }
+
+              const formattedTriggeredTime = alert.triggered_at
+                ? new Date(alert.triggered_at).toLocaleString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : 'Recent'
 
               return (
                 <div
                   key={alert.id}
                   style={{
-                    padding: 16,
-                    borderRadius: 8,
+                    padding: '16px 20px',
+                    borderRadius: 10,
                     background: bgGlow,
                     border: `1px solid ${borderColor}`,
                     display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    gap: 16,
-                    transition: 'all 0.15s',
+                    flexDirection: 'column',
+                    gap: 12,
+                    transition: 'all 0.15s ease',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 8,
-                      background: isCritical ? 'rgba(239,68,68,0.15)' : 'rgba(249,115,22,0.15)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                    }}>
-                      <AlertTriangle size={18} color={isCritical ? '#ef4444' : '#f97316'} />
-                    </div>
-
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                          {alert.title}
-                        </span>
-                        <span className={`badge ${isCritical ? 'badge-red' : 'badge-yellow'}`}>
-                          {alert.severity}
-                        </span>
-                        <span className={`badge ${isResolved ? 'badge-green' : isAck ? 'badge-blue' : 'badge-red'}`}>
-                          {alert.status}
-                        </span>
-                      </div>
-
-                      <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', margin: '4px 0 8px', lineHeight: 1.5 }}>
-                        {alert.message}
-                      </p>
-
-                      {/* Location 4: Risk Velocity Early Warning Metadata */}
-                      {alert.alert_metadata?.velocity_status && (
-                        <div style={{
+                  {/* Top Header Row: Project Name + Badges + Actions */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 280 }}>
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 8,
+                          background: reasonStyle.bg,
+                          border: `1px solid ${reasonStyle.border}`,
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 16,
-                          marginBottom: 8,
-                          padding: '8px 12px',
-                          background: 'var(--color-bg-card)',
-                          borderRadius: 'var(--radius-md)',
-                          border: '1px solid var(--color-border-subtle)',
-                          fontSize: '0.75rem',
-                          flexWrap: 'wrap',
-                        }}>
-                          <div>Risk: <strong style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono)' }}>{Math.round(alert.alert_metadata.previous_score ?? 57)} → {Math.round(alert.alert_metadata.current_score ?? 79)}</strong></div>
-                          <div>7d Change: <strong style={{ color: 'var(--color-risk-critical)', fontFamily: 'var(--font-mono)' }}>{alert.alert_metadata.change_7d == null ? 'Unavailable' : `${alert.alert_metadata.change_7d > 0 ? '+' : ''}${Math.round(alert.alert_metadata.change_7d)} pts`}</strong></div>
-                          <div>Velocity: <span className="badge badge-red">↑↑ {alert.alert_metadata.velocity_label || 'Rapidly Rising'}</span></div>
-                          {alert.alert_metadata.critical_stage && (
-                            <div>Critical Stage: <strong style={{ color: 'var(--color-risk-critical)' }}>{alert.alert_metadata.critical_stage}</strong></div>
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          color: reasonStyle.color,
+                        }}
+                      >
+                        <ReasonIcon size={20} />
+                      </div>
+
+                      <div style={{ flex: 1 }}>
+                        {/* Project Name */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              fontSize: '1rem',
+                              fontWeight: 700,
+                              color: 'var(--color-text-primary)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 6,
+                            }}
+                          >
+                            <Building2 size={15} style={{ opacity: 0.7 }} />
+                            {alert.displayName}
+                          </span>
+
+                          {alert.alert_metadata?.project_code && (
+                            <code
+                              style={{
+                                fontSize: '0.72rem',
+                                padding: '2px 6px',
+                                background: 'var(--color-bg-card)',
+                                borderRadius: 4,
+                                border: '1px solid var(--color-border-subtle)',
+                                color: 'var(--color-accent-primary)',
+                              }}
+                            >
+                              {alert.alert_metadata.project_code}
+                            </code>
                           )}
                         </div>
+
+                        {/* Badges: Alert Reason, Severity, Status */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          {/* Alert Reason */}
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              padding: '2px 8px',
+                              borderRadius: 6,
+                              background: reasonStyle.bg,
+                              color: reasonStyle.color,
+                              border: `1px solid ${reasonStyle.border}`,
+                            }}
+                          >
+                            <ReasonIcon size={12} />
+                            {alert.displayReason}
+                          </span>
+
+                          {/* Severity */}
+                          <span className={`badge ${isCritical ? 'badge-red' : isHigh ? 'badge-yellow' : 'badge-blue'}`}>
+                            {alert.severity}
+                          </span>
+
+                          {/* Status */}
+                          <span
+                            className={`badge ${
+                              isResolved ? 'badge-green' : isAck ? 'badge-blue' : 'badge-red'
+                            }`}
+                          >
+                            {isResolved ? (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                <CheckCircle2 size={11} /> Resolved
+                              </span>
+                            ) : isAck ? (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                <Info size={11} /> Acknowledged
+                              </span>
+                            ) : (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                <ShieldAlert size={11} /> Active
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions: View Project, Acknowledge (Active only), Resolve (Active/Acknowledged). Resolved is read-only except View Project. */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      {alert.project_id && (
+                        <Link
+                          to={`/projects/${alert.project_id}`}
+                          className="btn btn-ghost btn-sm"
+                          style={{ fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                        >
+                          View Project <ChevronRight size={13} />
+                        </Link>
                       )}
 
-                      <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <span>Triggered: {new Date(alert.triggered_at).toLocaleString()}</span>
-                        <span>Type: Early warning</span>
-                        {alert.alert_metadata?.project_code && (
-                          <code style={{ color: 'var(--color-accent-primary)', fontFamily: 'var(--font-mono)' }}>
-                            {alert.alert_metadata.project_code}
-                          </code>
-                        )}
-                      </div>
+                      {isActive && (
+                        <button
+                          onClick={() => handleUpdateStatus(alert.id, 'ACKNOWLEDGED')}
+                          className="btn btn-secondary btn-sm"
+                          style={{ fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                          title="Acknowledge this active alert"
+                        >
+                          <Info size={13} /> Acknowledge
+                        </button>
+                      )}
+
+                      {!isResolved && (
+                        <button
+                          onClick={() => handleUpdateStatus(alert.id, 'RESOLVED')}
+                          className="btn btn-secondary btn-sm"
+                          style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--color-success)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                          title="Resolve this alert"
+                        >
+                          <Check size={13} /> Resolve
+                        </button>
+                      )}
+
+                      {isResolved && (
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            color: 'var(--color-text-muted)',
+                            padding: '4px 8px',
+                            background: 'var(--color-bg-card)',
+                            borderRadius: 4,
+                            border: '1px solid var(--color-border-subtle)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <CheckCircle2 size={12} className="text-emerald-400" /> Read-Only
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                    {alert.project_id && (
-                      <Link
-                        to={`/projects/${alert.project_id}`}
-                        className="btn btn-ghost btn-sm"
-                        style={{ fontSize: '0.75rem' }}
-                      >
-                        View Project <ChevronRight size={12} />
-                      </Link>
-                    )}
+                  {/* Short Explanation */}
+                  <p
+                    style={{
+                      fontSize: '0.84rem',
+                      color: 'var(--color-text-secondary)',
+                      margin: 0,
+                      lineHeight: 1.5,
+                      paddingLeft: 52,
+                    }}
+                  >
+                    {alert.displayExplanation}
+                  </p>
 
-                    {alert.status === 'ACTIVE' && (
-                      <button
-                        onClick={() => handleUpdateStatus(alert.id, 'ACKNOWLEDGED')}
-                        className="btn btn-secondary btn-sm"
-                        style={{ fontSize: '0.75rem' }}
-                      >
-                        <Info size={12} /> Acknowledge
-                      </button>
-                    )}
+                  {/* Metadata & Triggered Time Footer */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      fontSize: '0.72rem',
+                      color: 'var(--color-text-muted)',
+                      borderTop: '1px dashed var(--color-border-subtle)',
+                      paddingTop: 8,
+                      paddingLeft: 52,
+                      flexWrap: 'wrap',
+                      gap: 8,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <Clock size={12} /> Triggered: {formattedTriggeredTime}
+                      </span>
 
-                    {alert.status !== 'RESOLVED' && (
-                      <button
-                        onClick={() => handleUpdateStatus(alert.id, 'RESOLVED')}
-                        className="btn btn-secondary btn-sm"
-                        style={{ fontSize: '0.75rem', color: 'var(--color-success)' }}
-                      >
-                        <Check size={12} /> Resolve
-                      </button>
+                      {alert.resolved_at && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--color-success)' }}>
+                          <CheckCircle2 size={12} /> Resolved:{' '}
+                          {new Date(alert.resolved_at).toLocaleString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      )}
+
+                      {alert.acknowledged_at && !alert.resolved_at && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--color-accent-tertiary)' }}>
+                          <Info size={12} /> Acknowledged:{' '}
+                          {new Date(alert.acknowledged_at).toLocaleString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      )}
+                    </div>
+
+                    {alert.alert_metadata?.risk_score && (
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <span>Delay Risk Score:</span>
+                        <strong
+                          style={{
+                            fontFamily: 'var(--font-mono)',
+                            color: alert.alert_metadata.risk_score >= 85 ? 'var(--color-risk-critical)' : 'var(--color-risk-high)',
+                          }}
+                        >
+                          {Math.round(alert.alert_metadata.risk_score)}/100
+                        </strong>
+                      </div>
                     )}
                   </div>
                 </div>

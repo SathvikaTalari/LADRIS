@@ -7,6 +7,8 @@ GET  /api/v1/auth/me
 POST /api/v1/auth/logout
 """
 from datetime import datetime, timezone
+from typing import List, Optional
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select, update
@@ -389,3 +391,84 @@ async def refresh_token(
 async def get_me(current_user: User = Depends(get_current_user)) -> User:
     """Return the profile of the currently authenticated user."""
     return current_user
+
+
+@router.get("/users", response_model=List[UserResponse])
+async def list_users(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> List[User]:
+    """List all registered system users."""
+    result = await db.execute(select(User).where(User.deleted_at.is_(None)).order_by(User.created_at.asc()))
+    return list(result.scalars().all())
+
+
+@router.post("/users", response_model=UserResponse, status_code=201)
+async def create_user(
+    payload: RegisterRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Create a new user (System Admin only)."""
+    if current_user.role != UserRole.SUPER_ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only System Administrator can add new users.",
+        )
+    existing = await db.execute(select(User).where(User.email == payload.email.lower()))
+    if existing.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="An account with this email already exists.",
+        )
+    user = User(
+        email=payload.email.lower(),
+        full_name=payload.full_name,
+        hashed_password=hash_password(payload.password or "Password123!"),
+        role=payload.role,
+        state_code=payload.state_code,
+        district_code=payload.district_code,
+        is_active=True,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@router.patch("/users/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: str,
+    payload: dict,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Edit or activate/deactivate a user (System Admin only)."""
+    if current_user.role != UserRole.SUPER_ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only System Administrator can edit users.",
+        )
+    try:
+        uid = uuid.UUID(user_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid user ID format.")
+
+    result = await db.execute(select(User).where(User.id == uid, User.deleted_at.is_(None)))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    if "role" in payload and payload["role"]:
+        user.role = UserRole(payload["role"])
+    if "state_code" in payload:
+        user.state_code = payload["state_code"] or None
+    if "is_active" in payload:
+        user.is_active = bool(payload["is_active"])
+    if "full_name" in payload and payload["full_name"]:
+        user.full_name = payload["full_name"]
+
+    await db.commit()
+    await db.refresh(user)
+    return user
+

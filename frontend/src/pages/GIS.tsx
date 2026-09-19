@@ -14,7 +14,6 @@ import {
   Target,
   ExternalLink,
   ShieldCheck,
-  MapPin,
   Search,
   Maximize2,
   Minimize2,

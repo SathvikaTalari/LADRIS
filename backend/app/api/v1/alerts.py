@@ -3,6 +3,7 @@ LADRIS — Alerts API endpoints
 """
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, desc
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from datetime import datetime, timezone
@@ -17,6 +18,73 @@ from app.models.ml_models import MLPrediction
 from app.schemas.misc import AlertResponse, AlertUpdate
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
+
+VALID_ALERT_REASONS = {
+    "High Delay Risk",
+    "Compensation Pending",
+    "Legal Dispute",
+    "R&R Delay",
+    "Stage Overdue",
+    "Risk Increased",
+}
+
+def classify_alert_reason(alert: Alert, project: Optional[Project] = None) -> tuple[str, str]:
+    """
+    Map an alert into one of the specific alert reasons:
+    - High Delay Risk
+    - Compensation Pending
+    - Legal Dispute
+    - R&R Delay
+    - Stage Overdue
+    - Risk Increased
+    Returns (reason, short_explanation).
+    """
+    metadata = alert.alert_metadata or {}
+    drivers = metadata.get("top_drivers") or []
+    pname = (project.name if project else None) or metadata.get("project_name") or "Project"
+
+    # 1. Existing valid reason title
+    if alert.title in VALID_ALERT_REASONS:
+        return alert.title, alert.message
+
+    # 2. Check metadata top_drivers
+    for d in drivers:
+        feat = d.get("feature")
+        direction = d.get("direction")
+        rec = d.get("recommendation")
+        if direction == "increases_risk":
+            if feat == "compensation_disbursement_pct":
+                return "Compensation Pending", rec or f"{pname}: Compensation disbursement is lagging behind schedule."
+            if feat == "legal_dispute_count":
+                return "Legal Dispute", rec or f"{pname}: Active legal disputes require mediation cell resolution."
+            if feat == "rehabilitation_progress_pct":
+                return "R&R Delay", rec or f"{pname}: Rehabilitation and resettlement progress is lagging."
+
+    # 3. Check project attributes & alert types
+    if alert.alert_type == AlertType.LEGAL_CASE_FILED or (project and (project.legal_case_count or 0) > 0):
+        cases = project.legal_case_count if project else 1
+        return "Legal Dispute", f"{pname} has {cases} active court dispute{'s' if cases > 1 else ''} pending."
+
+    if alert.alert_type == AlertType.COMPENSATION_OVERDUE or (project and project.total_affected_families and (project.families_compensated or 0) < project.total_affected_families * 0.7):
+        return "Compensation Pending", f"{pname}: Compensation disbursement pending for affected land parcels."
+
+    if alert.alert_type == AlertType.RR_MILESTONE_MISSED or (project and (project.rehabilitation_progress_pct or 100) < 65):
+        pct = project.rehabilitation_progress_pct if project and project.rehabilitation_progress_pct is not None else 0
+        return "R&R Delay", f"{pname}: R&R progress ({pct:.0f}%) is behind statutory schedule."
+
+    if alert.alert_type == AlertType.STAGE_DELAY or (project and (project.delay_months or 0) > 0):
+        delay = project.delay_months if project and project.delay_months else 1
+        return "Stage Overdue", f"{pname} is overdue on statutory stage milestones by {delay} month(s)."
+
+    # 4. Check velocity / risk increase
+    if metadata.get("velocity_status") in ("Rapidly Rising", "Rising") or (metadata.get("change_7d") and metadata.get("change_7d") > 5):
+        change = round(metadata.get("change_7d", 0))
+        return "Risk Increased", f"{pname}: Delay risk velocity accelerated by +{change} pts over last 7 days."
+
+    # 5. Default High Delay Risk
+    score = metadata.get("risk_score")
+    score_str = f" ({score:.1f}/100)" if score is not None else ""
+    return "High Delay Risk", f"{pname} has severe ML delay risk{score_str} requiring proactive intervention."
 
 async def _seed_alerts_from_projects(db: AsyncSession):
     """Create one active alert per HIGH production prediction/model version."""
@@ -44,21 +112,44 @@ async def _seed_alerts_from_projects(db: AsyncSession):
             key=lambda item: float(item.get("risk_score", 0)),
             default={},
         )
+        
+        # Determine specific alert reason
+        reason = "High Delay Risk"
+        explanation = (
+            f"{project.name} has production-model delay risk {prediction.risk_score:.2f}/100 "
+            f"({prediction.delay_probability:.1%}) at snapshot {prediction.snapshot_date}."
+        )
+        if (project.legal_case_count or 0) > 0:
+            reason = "Legal Dispute"
+            explanation = f"{project.name} has {project.legal_case_count} active court disputes creating timeline risk."
+        elif project.delay_months and project.delay_months > 0:
+            reason = "Stage Overdue"
+            explanation = f"{project.name} is overdue on statutory milestones by {project.delay_months} month(s)."
+        elif (project.rehabilitation_progress_pct or 100) < 65:
+            pct = project.rehabilitation_progress_pct if project.rehabilitation_progress_pct is not None else 0
+            reason = "R&R Delay"
+            explanation = f"{project.name} R&R progress ({pct:.0f}%) is lagging behind statutory schedule."
+        elif project.total_affected_families and (project.families_compensated or 0) < project.total_affected_families * 0.7:
+            reason = "Compensation Pending"
+            explanation = f"{project.name} compensation disbursement pending for affected land parcels."
+        elif peak.get("risk_score", 0) >= 80 and peak.get("stage"):
+            reason = "Stage Overdue"
+            explanation = f"{project.name} has critical delay risk in {peak.get('stage')} stage."
+
         db.add(Alert(
             project_id=project.id,
             alert_type=AlertType.RISK_ESCALATION,
             severity=AlertSeverity.CRITICAL if prediction.risk_score >= 90 else AlertSeverity.HIGH,
             status=AlertStatus.ACTIVE,
-            title=f"ML high-risk project: {project.project_code}",
-            message=(
-                f"{project.name} has production-model delay risk {prediction.risk_score:.2f}/100 "
-                f"({prediction.delay_probability:.1%}) at snapshot {prediction.snapshot_date}."
-            ),
+            title=reason,
+            message=explanation,
             alert_metadata={
                 "prediction_source": "ml_predictions",
+                "alert_reason": reason,
                 "model_version": prediction.model_version,
                 "prediction_id": str(prediction.id),
                 "project_code": project.project_code,
+                "project_name": project.name,
                 "state_code": project.state_code,
                 "risk_level": prediction.risk_category,
                 "risk_score": prediction.risk_score,
@@ -77,7 +168,7 @@ async def get_alerts(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    query = select(Alert).order_by(desc(Alert.triggered_at))
+    query = select(Alert).options(joinedload(Alert.project)).order_by(desc(Alert.triggered_at))
     
     if project_id:
         query = query.where(Alert.project_id == project_id)
@@ -93,7 +184,30 @@ async def get_alerts(
         result = await db.execute(query)
         alerts = result.scalars().all()
 
-    return alerts
+    response_items = []
+    for a in alerts:
+        pname = a.project.name if a.project else (a.alert_metadata or {}).get("project_name")
+        reason, explanation = classify_alert_reason(a, a.project)
+        response_items.append(AlertResponse(
+            id=a.id,
+            project_id=a.project_id,
+            project_name=pname,
+            alert_reason=reason,
+            explanation=explanation,
+            alert_type=a.alert_type,
+            severity=a.severity,
+            status=a.status,
+            title=reason if a.title.startswith("ML") or "ML HIGH-RISK" in a.title else a.title,
+            message=explanation if a.message.startswith("ML") or "ML delay risk" in a.message else a.message,
+            alert_metadata=a.alert_metadata or {},
+            triggered_at=a.triggered_at,
+            acknowledged_by=a.acknowledged_by,
+            acknowledged_at=a.acknowledged_at,
+            resolved_at=a.resolved_at,
+            created_at=a.created_at,
+        ))
+
+    return response_items
 
 @router.patch("/{alert_id}", response_model=AlertResponse)
 async def update_alert(
@@ -106,7 +220,7 @@ async def update_alert(
     if current_user.role not in [UserRole.SUPER_ADMIN, UserRole.STATE_ADMIN, UserRole.DISTRICT_OFFICER, UserRole.PROJECT_OFFICER]:
         raise HTTPException(status_code=403, detail="Insufficient privileges")
 
-    query = select(Alert).where(Alert.id == alert_id)
+    query = select(Alert).options(joinedload(Alert.project)).where(Alert.id == alert_id)
     result = await db.execute(query)
     alert = result.scalar_one_or_none()
     
@@ -125,4 +239,24 @@ async def update_alert(
 
     await db.commit()
     await db.refresh(alert)
-    return alert
+    
+    pname = alert.project.name if alert.project else (alert.alert_metadata or {}).get("project_name")
+    reason, explanation = classify_alert_reason(alert, alert.project)
+    return AlertResponse(
+        id=alert.id,
+        project_id=alert.project_id,
+        project_name=pname,
+        alert_reason=reason,
+        explanation=explanation,
+        alert_type=alert.alert_type,
+        severity=alert.severity,
+        status=alert.status,
+        title=reason if alert.title.startswith("ML") or "ML HIGH-RISK" in alert.title else alert.title,
+        message=explanation if alert.message.startswith("ML") or "ML delay risk" in alert.message else alert.message,
+        alert_metadata=alert.alert_metadata or {},
+        triggered_at=alert.triggered_at,
+        acknowledged_by=alert.acknowledged_by,
+        acknowledged_at=alert.acknowledged_at,
+        resolved_at=alert.resolved_at,
+        created_at=alert.created_at,
+    )

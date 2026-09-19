@@ -110,6 +110,12 @@ export const authAPI = {
     apiClient.get<User>('/api/v1/auth/me').then((r) => r.data),
 }
 
+export const usersAPI = {
+  list: () => apiClient.get<User[]>('/api/v1/auth/users').then((r) => r.data),
+  create: (data: any) => apiClient.post<User>('/api/v1/auth/users', data).then((r) => r.data),
+  update: (id: string, data: any) => apiClient.patch<User>(`/api/v1/auth/users/${id}`, data).then((r) => r.data),
+}
+
 export const projectsAPI = {
   list: (params?: {
     page?: number

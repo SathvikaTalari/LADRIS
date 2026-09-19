@@ -18,7 +18,6 @@ import {
   Minimize2,
   Trash2,
   ChevronRight,
-  Compass,
   Shield,
   ArrowRight,
   Bot

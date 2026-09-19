@@ -9,19 +9,16 @@
  * - Simple, easy-to-understand controls: Project selector & Status filter tabs.
  * - Clear right-hand inspector showing parcel details or project overview.
  */
-import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import {
   ExternalLink,
-  CheckCircle2,
-  Clock,
   AlertTriangle,
   RotateCcw,
   Building2,
-  MapPin,
   Info,
   X,
 } from 'lucide-react'
@@ -114,7 +111,7 @@ export default function DetailedMapView({ initialProjectId }: DetailedMapViewPro
   // Spatial Data
   const [projectGIS, setProjectGIS] = useState<any | null>(null)
   const [loadingGIS, setLoadingGIS] = useState<boolean>(false)
-  const [gisError, setGisError] = useState<string | null>(null)
+  const [, setGisError] = useState<string | null>(null)
   const [mapTargetBounds, setMapTargetBounds] = useState<L.LatLngBoundsExpression | null>(null)
 
   // 1. Fetch available projects for selector
