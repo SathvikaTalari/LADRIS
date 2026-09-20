@@ -1473,11 +1473,13 @@ export default function ProjectDetail() {
                   <strong style={{ display: 'block', fontSize: '0.82rem', color: 'var(--color-text-primary)', marginBottom: 6, lineHeight: 1.3 }}>
                     {stage.stage.replace(/_/g, ' ')}
                   </strong>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: sColor, fontFamily: 'var(--font-mono)' }}>
-                      {stage.risk_score}
-                    </span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>/100</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: sColor, fontFamily: 'var(--font-mono)' }}>
+                        {stage.risk_score}
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>/100</span>
+                    </div>
                     <RiskIndicator level={stage.risk_category as any} />
                   </div>
                 </div>

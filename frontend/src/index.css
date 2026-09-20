@@ -2417,16 +2417,11 @@ header {
 
 /* ─── Risk Indicators ─────────────────────────────────────────────────────── */
 .pl-risk { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
-.pl-risk-bar { width: 3px; height: 14px; border-radius: 1px; flex-shrink: 0; }
-.pl-risk--critical .pl-risk-bar { background: #dc2626; }
+.pl-risk-bar { display: none; }
 .pl-risk--critical             { color: #dc2626; }
-.pl-risk--high     .pl-risk-bar { background: #ea580c; }
 .pl-risk--high                  { color: #ea580c; }
-.pl-risk--medium   .pl-risk-bar { background: #d97706; }
 .pl-risk--medium                { color: #b45309; }
-.pl-risk--low      .pl-risk-bar { background: #2563eb; }
-.pl-risk--low                   { color: #1d4ed8; }
-.pl-risk--unknown  .pl-risk-bar { background: var(--color-text-muted); }
+.pl-risk--low                   { color: #16a34a; }
 .pl-risk--unknown               { color: var(--color-text-muted); }
 
 /* ─── Location ────────────────────────────────────────────────────────────── */
