@@ -142,3 +142,18 @@ async def get_interventions(
         return await dis.get_interventions(project_id, db)
     except LookupError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.delete("/{project_id}/interventions/{intervention_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_intervention(
+    project_id: UUID,
+    intervention_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    """Delete an erroneously recorded intervention from the Action Ledger."""
+    try:
+        await dis.delete_intervention(project_id, intervention_id, db)
+    except LookupError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+

@@ -76,12 +76,41 @@ const renderDirectoryRiskBadge = (level: any) => {
     </span>
   )
 }
-
+const INDIA_STATES = [
+  { code: 'AP', name: 'Andhra Pradesh' },
+  { code: 'AR', name: 'Arunachal Pradesh' },
+  { code: 'AS', name: 'Assam' },
+  { code: 'BR', name: 'Bihar' },
+  { code: 'CG', name: 'Chhattisgarh' },
+  { code: 'GA', name: 'Goa' },
+  { code: 'GJ', name: 'Gujarat' },
+  { code: 'HR', name: 'Haryana' },
+  { code: 'HP', name: 'Himachal Pradesh' },
+  { code: 'JH', name: 'Jharkhand' },
+  { code: 'KA', name: 'Karnataka' },
+  { code: 'KL', name: 'Kerala' },
+  { code: 'MP', name: 'Madhya Pradesh' },
+  { code: 'MH', name: 'Maharashtra' },
+  { code: 'MN', name: 'Manipur' },
+  { code: 'ML', name: 'Meghalaya' },
+  { code: 'MZ', name: 'Mizoram' },
+  { code: 'NL', name: 'Nagaland' },
+  { code: 'OD', name: 'Odisha' },
+  { code: 'PB', name: 'Punjab' },
+  { code: 'RJ', name: 'Rajasthan' },
+  { code: 'SK', name: 'Sikkim' },
+  { code: 'TN', name: 'Tamil Nadu' },
+  { code: 'TG', name: 'Telangana' },
+  { code: 'TR', name: 'Tripura' },
+  { code: 'UP', name: 'Uttar Pradesh' },
+  { code: 'UK', name: 'Uttarakhand' },
+  { code: 'WB', name: 'West Bengal' },
+]
 export default function PriorityIntelligence() {
   const navigate = useNavigate()
   const [projects, setProjects] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  
+
   // Filters
   const [search, setSearch] = useState('')
   const [riskFilter, setRiskFilter] = useState('ALL')
@@ -126,7 +155,7 @@ export default function PriorityIntelligence() {
     loadProjects()
   }, [])
 
-  const states = useMemo(() => Array.from(new Set(projects.map(p => p.state_code))).filter(Boolean), [projects])
+
 
   const filteredProjects = useMemo(() => {
     let result = [...projects]
@@ -141,8 +170,8 @@ export default function PriorityIntelligence() {
 
     if (search.trim()) {
       const q = search.toLowerCase()
-      result = result.filter(p => 
-        p.name.toLowerCase().includes(q) || 
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(q) ||
         p.project_code.toLowerCase().includes(q)
       )
     }
@@ -214,9 +243,11 @@ export default function PriorityIntelligence() {
               className="input"
               style={{ height: 38, fontSize: '0.8125rem', padding: '0 32px 0 12px', lineHeight: '38px', boxSizing: 'border-box' }}
             >
-              <option value="ALL">All States ({states.length})</option>
-              {states.map(s => (
-                <option key={s} value={s}>{s}</option>
+              <option value="ALL">All States (28)</option>
+              {INDIA_STATES.map(state => (
+                <option key={state.code} value={state.code}>
+                  {state.name} ({state.code})
+                </option>
               ))}
             </select>
           </div>

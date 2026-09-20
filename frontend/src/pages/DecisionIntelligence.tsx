@@ -32,6 +32,7 @@ import {
   Clock,
   HelpCircle,
   IndianRupee,
+  Trash2,
 } from 'lucide-react'
 import { projectsAPI, decisionIntelligenceAPI } from '@/api/client'
 import { PageHeader } from '@/components/common'
@@ -83,6 +84,7 @@ export default function DecisionIntelligence() {
   const [actionCompRelease, setActionCompRelease] = useState(15)
   const [savingAction, setSavingAction] = useState(false)
   const [actionSuccessMsg, setActionSuccessMsg] = useState('')
+  const [deletingActionId, setDeletingActionId] = useState<string | null>(null)
 
   // 1. Initial Load of Projects
   useEffect(() => {
@@ -282,8 +284,23 @@ export default function DecisionIntelligence() {
     }
   }
 
+  // 5. Handle Deleting an Intervention
+  const handleDeleteIntervention = async (interventionId: string) => {
+    if (!selectedProjectId) return
+    if (!window.confirm('Delete this action record? This cannot be undone.')) return
+    setDeletingActionId(interventionId)
+    try {
+      await decisionIntelligenceAPI.deleteIntervention(selectedProjectId, interventionId)
+      setInterventions((prev) => prev.filter((i) => i.id !== interventionId))
+    } catch (err) {
+      console.error('Failed to delete intervention:', err)
+    } finally {
+      setDeletingActionId(null)
+    }
+  }
 
   const getRiskBadge = (level: string) => {
+
     if (level === 'HIGH') {
       return {
         label: 'High Risk',
@@ -1526,7 +1543,7 @@ export default function DecisionIntelligence() {
                         </div>
                       </div>
 
-                      {/* Before / After Metrics */}
+                      {/* Before / After Metrics + Delete */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ textAlign: 'center', background: 'var(--color-bg-primary)', padding: '6px 10px', borderRadius: 6 }}>
                           <div style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>RISK BEFORE</div>
@@ -1550,6 +1567,30 @@ export default function DecisionIntelligence() {
                             {Math.round(item.delay_reduction_days)} days
                           </div>
                         </div>
+
+                        {/* Delete button */}
+                        <button
+                          type="button"
+                          title="Delete this action record"
+                          onClick={() => handleDeleteIntervention(item.id)}
+                          disabled={deletingActionId === item.id}
+                          style={{
+                            background: 'transparent',
+                            border: '1px solid rgba(239,68,68,0.3)',
+                            borderRadius: 6,
+                            padding: '6px 8px',
+                            cursor: deletingActionId === item.id ? 'not-allowed' : 'pointer',
+                            color: '#ef4444',
+                            opacity: deletingActionId === item.id ? 0.5 : 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            transition: 'background 0.15s',
+                          }}
+                          onMouseEnter={(e) => { if (deletingActionId !== item.id) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.08)' }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </div>
                   ))}

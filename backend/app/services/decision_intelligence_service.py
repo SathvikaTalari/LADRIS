@@ -293,7 +293,7 @@ async def simulate_what_if(project_id: UUID, req: WhatIfSimulationRequest, db: A
     baseline_features, _ = build_features(project, population, now)
     runtime = _runtime()
 
-    baseline_pred = await asyncio.to_thread(runtime.predict_features, baseline_features)
+    baseline_pred = runtime.predict_features(baseline_features)
     base_risk = float(baseline_pred["risk_score"])
     base_cat = str(baseline_pred["risk_category"])
     base_delay = float(baseline_pred["predicted_delay_days"])
@@ -351,8 +351,8 @@ async def simulate_what_if(project_id: UUID, req: WhatIfSimulationRequest, db: A
         simulated_inputs["stakeholder_update_count_90d"] = int(req.stakeholder_update_count_90d)
 
     # Run ML inference on modified feature vector (both project-level and stage-level)
-    sim_pred = await asyncio.to_thread(runtime.predict_features, sim_features)
-    sim_stages = await asyncio.to_thread(runtime.predict_stages, sim_features)
+    sim_pred = runtime.predict_features(sim_features)
+    sim_stages = runtime.predict_stages(sim_features)
     raw_sim_risk = float(sim_pred["risk_score"])
 
     # Calculate administrative lever deltas for responsive, percentage-accurate calibration
@@ -861,6 +861,22 @@ async def get_interventions(project_id: UUID, db: AsyncSession) -> List[ProjectI
         )
         for r in rows
     ]
+
+
+async def delete_intervention(project_id: UUID, intervention_id: UUID, db: AsyncSession) -> None:
+    """Delete an erroneously recorded intervention from the Action Ledger."""
+    row = (await db.execute(
+        select(ProjectIntervention).where(
+            ProjectIntervention.id == intervention_id,
+            ProjectIntervention.project_id == project_id,
+        )
+    )).scalar_one_or_none()
+    if not row:
+        raise LookupError(f"Intervention {intervention_id} not found for project {project_id}")
+    await db.delete(row)
+    await db.commit()
+
+
 
 
 # ─── 7. Combined Overview ─────────────────────────────────────────────────────

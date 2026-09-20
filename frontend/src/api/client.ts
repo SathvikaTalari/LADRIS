@@ -873,6 +873,9 @@ export const decisionIntelligenceAPI = {
 
   getInterventions: (projectId: string) =>
     apiClient.get<ProjectInterventionData[]>(`/api/v1/decision-intelligence/${projectId}/interventions`).then((r) => r.data),
+
+  deleteIntervention: (projectId: string, interventionId: string) =>
+    apiClient.delete(`/api/v1/decision-intelligence/${projectId}/interventions/${interventionId}`),
 }
 
 export const gisAPI = {
