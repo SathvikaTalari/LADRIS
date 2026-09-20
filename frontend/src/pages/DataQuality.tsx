@@ -1,12 +1,12 @@
 /**
  * LADRIS - Data Quality & Health Dashboard
- * Redesigned for operational clarity. All information and functionality preserved.
- * Visual presentation simplified: neutral cards, left-border accents, restrained status colours.
+ * Government Portal Visual Language — structured, information-first, compact.
+ * All information and functionality preserved. Only visual presentation changed.
  *
  * Sections:
- * 1. Overall Quality (4 KPI cards)
+ * 1. Overall Quality KPI strip (4 compact cards)
  * 2. Project Data Readiness (table with search + filter)
- * 3. Missing Data by Category (grouped category cards with View Details)
+ * 3. Missing Data by Category (left-border accent cards)
  * 4. Priority Data Issues & Required Actions
  */
 import { useEffect, useState, useMemo } from 'react'
@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   AlertOctagon,
-  ShieldCheck,
   FileText,
   Scale,
   Users,
@@ -43,12 +42,12 @@ const DEFAULT_GROUPED_CATEGORIES: GroupedCategoryItem[] = [
     status: 'Complete',
     description: 'Project identifiers, executing agency, district boundaries, and governing acquisition act.',
     technical_fields: [
-      { field: 'project_code',    label: 'Project Identifier',             null_rate: 0.0 },
-      { field: 'name',            label: 'Project Title',                  null_rate: 0.0 },
-      { field: 'state_code',      label: 'State Code',                     null_rate: 0.0 },
-      { field: 'project_type',    label: 'Infrastructure Sector',          null_rate: 0.0 },
-      { field: 'executing_agency',label: 'Executing Agency',               null_rate: 0.0 },
-      { field: 'acquisition_act', label: 'Governing Land Acquisition Act', null_rate: 0.0 },
+      { field: 'project_code',     label: 'Project Identifier',             null_rate: 0.0 },
+      { field: 'name',             label: 'Project Title',                  null_rate: 0.0 },
+      { field: 'state_code',       label: 'State Code',                     null_rate: 0.0 },
+      { field: 'project_type',     label: 'Infrastructure Sector',          null_rate: 0.0 },
+      { field: 'executing_agency', label: 'Executing Agency',               null_rate: 0.0 },
+      { field: 'acquisition_act',  label: 'Governing Land Acquisition Act', null_rate: 0.0 },
     ],
   },
   {
@@ -70,9 +69,9 @@ const DEFAULT_GROUPED_CATEGORIES: GroupedCategoryItem[] = [
     status: 'Complete',
     description: 'Court litigation records, High Court stay injunctions, and disputed parcel numbers.',
     technical_fields: [
-      { field: 'legal_case_count',  label: 'Active Court Case Count',          null_rate: 0.0  },
-      { field: 'legal_case_status', label: 'Litigation Severity Classification',null_rate: 0.0  },
-      { field: 'has_legal_dispute', label: 'Parcel Dispute Flag',               null_rate: 0.06 },
+      { field: 'legal_case_count',  label: 'Active Court Case Count',           null_rate: 0.0  },
+      { field: 'legal_case_status', label: 'Litigation Severity Classification', null_rate: 0.0  },
+      { field: 'has_legal_dispute', label: 'Parcel Dispute Flag',                null_rate: 0.06 },
     ],
   },
   {
@@ -82,9 +81,9 @@ const DEFAULT_GROUPED_CATEGORIES: GroupedCategoryItem[] = [
     status: 'Needs Attention',
     description: 'Project-affected families (PAFs), rehabilitation packages, and resettlement site verification.',
     technical_fields: [
-      { field: 'total_affected_families',   label: 'Project Affected Families (PAFs)',         null_rate: 0.0  },
-      { field: 'families_rehabilitated',    label: 'Families Resettled & Rehabilitated',       null_rate: 0.17 },
-      { field: 'rehabilitation_progress_pct',label: 'Rehabilitation Progress %',               null_rate: 0.17 },
+      { field: 'total_affected_families',    label: 'Project Affected Families (PAFs)',   null_rate: 0.0  },
+      { field: 'families_rehabilitated',     label: 'Families Resettled & Rehabilitated', null_rate: 0.17 },
+      { field: 'rehabilitation_progress_pct',label: 'Rehabilitation Progress %',          null_rate: 0.17 },
     ],
   },
   {
@@ -94,11 +93,11 @@ const DEFAULT_GROUPED_CATEGORIES: GroupedCategoryItem[] = [
     status: 'Needs Attention',
     description: 'Target vs actual milestones, statutory Section 3A/3D gazette notifications, and recorded delays.',
     technical_fields: [
-      { field: 'planned_start_date',  label: 'Scheduled Start Date',             null_rate: 0.0  },
-      { field: 'planned_end_date',    label: 'Target Completion Date',           null_rate: 0.0  },
-      { field: 'notification_3a_date',label: 'Section 3A Preliminary Gazette',  null_rate: 0.08 },
-      { field: 'notification_3d_date',label: 'Section 3D Declaration Gazette',  null_rate: 0.17 },
-      { field: 'delay_months',        label: 'Recorded Schedule Delay',          null_rate: 0.0  },
+      { field: 'planned_start_date',  label: 'Scheduled Start Date',            null_rate: 0.0  },
+      { field: 'planned_end_date',    label: 'Target Completion Date',          null_rate: 0.0  },
+      { field: 'notification_3a_date',label: 'Section 3A Preliminary Gazette', null_rate: 0.08 },
+      { field: 'notification_3d_date',label: 'Section 3D Declaration Gazette', null_rate: 0.17 },
+      { field: 'delay_months',        label: 'Recorded Schedule Delay',         null_rate: 0.0  },
     ],
   },
   {
@@ -132,7 +131,7 @@ const DEFAULT_DATA_ISSUES: DataIssueItem[] = [
     project_name: 'Nellore Industrial Corridor Land Package',
     project_code: 'AP-NICDC-NLR-009',
     severity: 'HIGH',
-    description: 'Disbursed compensation (\u20B9175 Cr) lags baseline award estimate (\u20B9340 Cr) by >48% with 6 active title suits.',
+    description: 'Disbursed compensation (₹175 Cr) lags baseline award estimate (₹340 Cr) by >48% with 6 active title suits.',
     action: 'Reconcile award disbursement with CALA treasury portal',
   },
   {
@@ -193,15 +192,15 @@ export default function DataQuality() {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 16 }}>
-        <div className="skeleton" style={{ height: 60, borderRadius: 8 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '16px 0' }}>
+        <div className="skeleton" style={{ height: 40, borderRadius: 4 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, border: '1px solid var(--color-border-default)', borderRadius: 4, overflow: 'hidden' }}>
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="skeleton" style={{ height: 110 }} />
+            <div key={i} className="skeleton" style={{ height: 76 }} />
           ))}
         </div>
-        <div className="skeleton" style={{ height: 320, borderRadius: 8 }} />
-        <div className="skeleton" style={{ height: 260, borderRadius: 8 }} />
+        <div className="skeleton" style={{ height: 300, borderRadius: 4 }} />
+        <div className="skeleton" style={{ height: 240, borderRadius: 4 }} />
       </div>
     )
   }
@@ -217,10 +216,10 @@ export default function DataQuality() {
   }
 
   const { summary } = metrics
-  const overallQuality    = summary.overall_quality ?? Math.max(0, 100 - (summary.missing_value_rate || 0.074) * 100)
-  const totalProjects     = summary.total_projects ?? summary.total_real_records ?? 12
-  const predictionReady   = summary.prediction_ready ?? summary.prediction_eligible_records ?? 8
-  const avgCompleteness   = summary.avg_completeness ?? overallQuality
+  const overallQuality      = summary.overall_quality ?? Math.max(0, 100 - (summary.missing_value_rate || 0.074) * 100)
+  const totalProjects       = summary.total_projects ?? summary.total_real_records ?? 12
+  const predictionReady     = summary.prediction_ready ?? summary.prediction_eligible_records ?? 8
+  const avgCompleteness     = summary.avg_completeness ?? overallQuality
   const projectsNeedingData = summary.projects_needing_data ?? (totalProjects - predictionReady)
 
   const groupedCategories = metrics.grouped_categories && metrics.grouped_categories.length > 0
@@ -231,14 +230,14 @@ export default function DataQuality() {
     ? metrics.data_issues
     : DEFAULT_DATA_ISSUES
 
-  // Category icons - single muted colour for all, icon itself provides recognition
+  // Category icons — single muted colour, icon provides recognition
   const categoryIcons: Record<string, React.ReactNode> = {
-    project_info:   <FileText    size={16} color="var(--color-text-muted)" />,
-    compensation:   <IndianRupee size={16} color="var(--color-text-muted)" />,
-    legal:          <Scale       size={16} color="var(--color-text-muted)" />,
-    rr:             <Users       size={16} color="var(--color-text-muted)" />,
-    timeline_stage: <Calendar    size={16} color="var(--color-text-muted)" />,
-    gis:            <MapPin      size={16} color="var(--color-text-muted)" />,
+    project_info:   <FileText    size={15} color="var(--color-text-muted)" />,
+    compensation:   <IndianRupee size={15} color="var(--color-text-muted)" />,
+    legal:          <Scale       size={15} color="var(--color-text-muted)" />,
+    rr:             <Users       size={15} color="var(--color-text-muted)" />,
+    timeline_stage: <Calendar    size={15} color="var(--color-text-muted)" />,
+    gis:            <MapPin      size={15} color="var(--color-text-muted)" />,
   }
 
   function issueSeverityClass(severity: string) {
@@ -257,8 +256,8 @@ export default function DataQuality() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.25 }}
-      style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
+      transition={{ duration: 0.2 }}
+      style={{ display: 'flex', flexDirection: 'column', gap: 22 }}
     >
       {/* Page Header */}
       <PageHeader
@@ -268,14 +267,17 @@ export default function DataQuality() {
 
       {/* 1. OVERALL QUALITY KPI STRIP */}
       <section aria-labelledby="overall-quality-heading">
+        <h2 id="overall-quality-heading" style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-text-muted)', margin: '0 0 10px', paddingBottom: 6, borderBottom: '1px solid var(--color-border-subtle)' }}>
+          Overall Data Quality
+        </h2>
         <div className="dq-kpi-grid">
 
           {/* Overall Data Quality */}
           <div className="dq-kpi-card">
-            <span className="dq-kpi-label">Overall Data Quality</span>
+            <span className="dq-kpi-label">Data Quality</span>
             <span className="dq-kpi-value dq-kpi-value--good">{overallQuality.toFixed(1)}%</span>
             <span className="dq-kpi-badge dq-kpi-badge--good">Grade A</span>
-            <span className="dq-kpi-desc">High reliability · Validated by Registry</span>
+            <span className="dq-kpi-desc">High reliability · Validated</span>
           </div>
 
           {/* Prediction Ready */}
@@ -283,7 +285,7 @@ export default function DataQuality() {
             <span className="dq-kpi-label">Prediction Ready</span>
             <span className="dq-kpi-value">
               {predictionReady}
-              <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-text-muted)', marginLeft: 6 }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-muted)', marginLeft: 4 }}>
                 / {totalProjects}
               </span>
             </span>
@@ -292,7 +294,7 @@ export default function DataQuality() {
 
           {/* Average Completeness */}
           <div className="dq-kpi-card">
-            <span className="dq-kpi-label">Average Completeness</span>
+            <span className="dq-kpi-label">Avg Completeness</span>
             <span className={avgCompleteness >= 85 ? 'dq-kpi-value dq-kpi-value--good' : 'dq-kpi-value dq-kpi-value--warning'}>
               {avgCompleteness.toFixed(1)}%
             </span>
@@ -302,7 +304,7 @@ export default function DataQuality() {
 
           {/* Projects Needing Data */}
           <div className="dq-kpi-card">
-            <span className="dq-kpi-label">Projects Needing Data</span>
+            <span className="dq-kpi-label">Needs Data</span>
             <span className={projectsNeedingData > 0 ? 'dq-kpi-value dq-kpi-value--warning' : 'dq-kpi-value'}>
               {projectsNeedingData}
             </span>
@@ -314,68 +316,65 @@ export default function DataQuality() {
 
       {/* 2. PROJECT DATA READINESS TABLE */}
       <section aria-labelledby="project-readiness-heading">
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          {/* Section Header & Controls */}
-          <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--color-border-subtle)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+        <div className="card" style={{ padding: 0, overflow: 'hidden', borderRadius: 4, boxShadow: 'none', backgroundImage: 'none' }}>
+
+          {/* Table Header & Controls */}
+          <div className="dq-table-header">
             <div>
               <h2
                 id="project-readiness-heading"
-                style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}
+                style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}
               >
                 Project Data Readiness
-                <span style={{ fontSize: '0.72rem', fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'var(--color-bg-elevated)', color: 'var(--color-text-muted)' }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: 600, padding: '1px 7px', borderRadius: 3, background: 'var(--color-bg-elevated)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border-subtle)' }}>
                   {filteredProjects.length} of {projectsReadiness.length}
                 </span>
               </h2>
-              <p style={{ margin: '3px 0 0 0', fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+              <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                 Review individual project completeness, identify missing statutory data, and assess ML inference eligibility.
               </p>
             </div>
 
             {/* Search & Filter */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: 6, padding: '6px 12px', width: 240 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <div className="dq-search-box">
                 <Search size={13} color="var(--color-text-muted)" />
                 <input
                   type="text"
                   placeholder="Search project or code..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '0.8rem', color: 'var(--color-text-primary)', width: '100%' }}
                 />
               </div>
-              <div style={{ display: 'flex', background: 'var(--color-bg-surface)', padding: 3, borderRadius: 6, border: '1px solid var(--color-border-subtle)' }}>
-                {(['ALL', 'Ready', 'Needs Data'] as const).map((filterVal) => {
-                  const isActive = statusFilter === filterVal
-                  return (
-                    <button
-                      key={filterVal}
-                      onClick={() => setStatusFilter(filterVal)}
-                      style={{ padding: '4px 10px', fontSize: '0.75rem', fontWeight: isActive ? 700 : 500, borderRadius: 4, border: 'none', cursor: 'pointer', background: isActive ? 'var(--color-accent-primary)' : 'transparent', color: isActive ? '#ffffff' : 'var(--color-text-muted)', transition: 'all 0.15s ease' }}
-                    >
-                      {filterVal === 'ALL' ? 'All' : filterVal}
-                    </button>
-                  )
-                })}
+              <div className="dq-filter-tabs">
+                {(['ALL', 'Ready', 'Needs Data'] as const).map((filterVal) => (
+                  <button
+                    key={filterVal}
+                    onClick={() => setStatusFilter(filterVal)}
+                    className={statusFilter === filterVal ? 'dq-filter-tab dq-filter-tab--active' : 'dq-filter-tab'}
+                  >
+                    {filterVal === 'ALL' ? 'All' : filterVal}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Table */}
           <div style={{ overflowX: 'auto', width: '100%' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.84rem' }}>
               <thead>
-                <tr style={{ background: 'var(--color-bg-surface)', borderBottom: '1px solid var(--color-border-subtle)', color: 'var(--color-text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  <th style={{ padding: '11px 20px', fontWeight: 600 }}>Project Name</th>
-                  <th style={{ padding: '11px 20px', fontWeight: 600, width: '22%' }}>Completeness %</th>
-                  <th style={{ padding: '11px 20px', fontWeight: 600, width: '28%' }}>Missing Critical Data</th>
-                  <th style={{ padding: '11px 20px', fontWeight: 600, width: '16%' }}>ML Status</th>
+                <tr style={{ background: 'var(--color-bg-elevated)', borderBottom: '1px solid var(--color-border-default)', color: 'var(--color-text-muted)', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                  <th style={{ padding: '9px 18px', fontWeight: 700 }}>Project Name</th>
+                  <th style={{ padding: '9px 18px', fontWeight: 700, width: '22%' }}>Completeness</th>
+                  <th style={{ padding: '9px 18px', fontWeight: 700, width: '28%' }}>Missing Critical Data</th>
+                  <th style={{ padding: '9px 18px', fontWeight: 700, width: '14%' }}>ML Status</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredProjects.length === 0 ? (
                   <tr>
-                    <td colSpan={4} style={{ textAlign: 'center', padding: '32px 20px', color: 'var(--color-text-muted)', fontSize: '0.82rem' }}>
+                    <td colSpan={4} style={{ textAlign: 'center', padding: '28px 18px', color: 'var(--color-text-muted)', fontSize: '0.82rem' }}>
                       No projects found matching the filter criteria.
                     </td>
                   </tr>
@@ -386,67 +385,66 @@ export default function DataQuality() {
                     const barColor =
                       p.completeness_pct >= 90 ? '#138808' :
                       p.completeness_pct >= 80 ? '#d97706' : '#ff4757'
-                    const pctColor = barColor
 
                     return (
                       <tr
                         key={p.id}
-                        style={{ borderBottom: '1px solid var(--color-border-subtle)', transition: 'background-color 0.15s ease' }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-surface)')}
+                        style={{ borderBottom: '1px solid var(--color-border-subtle)', transition: 'background-color 0.1s ease' }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)')}
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       >
                         {/* Project Name */}
-                        <td style={{ padding: '13px 20px' }}>
-                          <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', fontSize: '0.875rem', marginBottom: 3 }}>
+                        <td style={{ padding: '11px 18px' }}>
+                          <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', fontSize: '0.845rem', marginBottom: 2 }}>
                             {p.name}
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.72rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.69rem' }}>
                             <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', fontWeight: 500 }}>{p.project_code}</span>
-                            <span style={{ color: 'var(--color-border-subtle)' }}>&bull;</span>
-                            <span style={{ background: 'var(--color-bg-elevated)', padding: '1px 5px', borderRadius: 3, color: 'var(--color-text-secondary)', fontWeight: 600, fontSize: '0.68rem' }}>{p.state_code}</span>
-                            <span style={{ color: 'var(--color-border-subtle)' }}>&bull;</span>
+                            <span style={{ color: 'var(--color-border-default)' }}>&bull;</span>
+                            <span style={{ background: 'var(--color-bg-elevated)', padding: '0px 4px', borderRadius: 2, color: 'var(--color-text-muted)', fontWeight: 600, fontSize: '0.65rem', border: '1px solid var(--color-border-subtle)' }}>{p.state_code}</span>
+                            <span style={{ color: 'var(--color-border-default)' }}>&bull;</span>
                             <span style={{ color: 'var(--color-text-muted)' }}>{p.project_type}</span>
                           </div>
                         </td>
 
-                        {/* Completeness % — bar fill is data-viz color; percentage text is neutral */}
-                        <td style={{ padding: '13px 20px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{ flex: 1, height: 5, background: 'var(--color-bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
-                              <div style={{ height: '100%', width: `${Math.min(100, Math.max(5, p.completeness_pct))}%`, background: barColor, borderRadius: 3, transition: 'width 0.4s ease' }} />
+                        {/* Completeness */}
+                        <td style={{ padding: '11px 18px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{ flex: 1, height: 4, background: 'var(--color-bg-elevated)', borderRadius: 2, overflow: 'hidden' }}>
+                              <div style={{ height: '100%', width: `${Math.min(100, Math.max(5, p.completeness_pct))}%`, background: barColor, borderRadius: 2 }} />
                             </div>
-                            <span style={{ fontSize: '0.82rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--color-text-primary)', minWidth: 36, textAlign: 'right' }}>
+                            <span style={{ fontSize: '0.8rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--color-text-primary)', minWidth: 34, textAlign: 'right' }}>
                               {p.completeness_pct}%
                             </span>
                           </div>
                         </td>
 
-                        {/* Missing Critical Data — neutral chip, icon provides visual signal */}
-                        <td style={{ padding: '13px 20px' }}>
+                        {/* Missing Critical Data */}
+                        <td style={{ padding: '11px 18px' }}>
                           {p.missing_critical_data.toLowerCase().includes('none') ? (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 500 }}>
-                              <Check size={13} /> None
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#138808', fontSize: '0.78rem', fontWeight: 500 }}>
+                              <Check size={12} /> None
                             </span>
                           ) : (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: 'var(--color-text-secondary)', fontSize: '0.8rem', fontWeight: 600, background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', padding: '3px 8px', borderRadius: 4 }}>
-                              <AlertTriangle size={12} /> {p.missing_critical_data}
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--color-text-secondary)', fontSize: '0.78rem', fontWeight: 600, background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', padding: '2px 7px', borderRadius: 3 }}>
+                              <AlertTriangle size={11} /> {p.missing_critical_data}
                             </span>
                           )}
                         </td>
 
-                        {/* ML Status — neutral chip, status text only */}
-                        <td style={{ padding: '13px 20px' }}>
+                        {/* ML Status */}
+                        <td style={{ padding: '11px 18px' }}>
                           {isReady ? (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '0.72rem', fontWeight: 600, background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-muted)', padding: '3px 9px', borderRadius: 4 }}>
-                              <CheckCircle2 size={12} /> Ready
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.7rem', fontWeight: 600, color: '#138808', background: 'rgba(19,136,8,0.07)', border: '1px solid rgba(19,136,8,0.25)', padding: '2px 8px', borderRadius: 3 }}>
+                              <CheckCircle2 size={11} /> Ready
                             </span>
                           ) : isNeedsData ? (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '0.72rem', fontWeight: 600, background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-muted)', padding: '3px 9px', borderRadius: 4 }}>
-                              <Clock size={12} /> Needs Data
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-risk-medium)', background: 'rgba(217,119,6,0.07)', border: '1px solid rgba(217,119,6,0.25)', padding: '2px 8px', borderRadius: 3 }}>
+                              <Clock size={11} /> Needs Data
                             </span>
                           ) : (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '0.72rem', fontWeight: 600, background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-muted)', padding: '3px 9px', borderRadius: 4 }}>
-                              <AlertOctagon size={12} /> Not Ready
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-risk-critical)', background: 'rgba(255,71,87,0.07)', border: '1px solid rgba(255,71,87,0.25)', padding: '2px 8px', borderRadius: 3 }}>
+                              <AlertOctagon size={11} /> Not Ready
                             </span>
                           )}
                         </td>
@@ -462,19 +460,19 @@ export default function DataQuality() {
 
       {/* 3. MISSING DATA BY CATEGORY */}
       <section aria-labelledby="grouped-categories-heading">
-        <div style={{ marginBottom: 14 }}>
-          <h2 id="grouped-categories-heading" style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+        <div style={{ marginBottom: 12 }}>
+          <h2 id="grouped-categories-heading" style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
             Missing Data by Category
           </h2>
-          <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
-            Statutory records organized into logical domains. Technical field definitions and null rates available under View Details.
+          <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+            Statutory records organised into logical domains. Technical field definitions and null rates available under View Details.
           </p>
         </div>
 
         <div className="dq-category-grid">
           {groupedCategories.map((cat) => {
-            const isExpanded  = !!expandedCategories[cat.id]
-            const isComplete  = cat.status === 'Complete'
+            const isExpanded = !!expandedCategories[cat.id]
+            const isComplete = cat.status === 'Complete'
 
             return (
               <div
@@ -483,8 +481,8 @@ export default function DataQuality() {
               >
                 {/* Header */}
                 <div className="dq-category-header">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {categoryIcons[cat.id] || <FileText size={16} color="var(--color-text-muted)" />}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    {categoryIcons[cat.id] || <FileText size={15} color="var(--color-text-muted)" />}
                     <h3 className="dq-category-title">{cat.name}</h3>
                   </div>
                   <span className={isComplete ? 'dq-category-status dq-category-status--complete' : 'dq-category-status dq-category-status--needs-attention'}>
@@ -493,8 +491,8 @@ export default function DataQuality() {
                 </div>
 
                 {/* Completeness Bar */}
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', marginBottom: 5, color: 'var(--color-text-muted)' }}>
+                <div style={{ marginBottom: 9 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.69rem', marginBottom: 4, color: 'var(--color-text-muted)' }}>
                     <span>Completeness</span>
                     <strong style={{ fontFamily: 'var(--font-mono)', color: isComplete ? '#138808' : '#d97706' }}>{cat.completeness_pct}%</strong>
                   </div>
@@ -508,12 +506,12 @@ export default function DataQuality() {
                 {/* View Details Toggle */}
                 <button
                   onClick={() => toggleCategoryDetails(cat.id)}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 10px', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-subtle)', borderRadius: 4, fontSize: '0.76rem', fontWeight: 600, color: 'var(--color-text-secondary)', cursor: 'pointer', transition: 'background-color 0.15s ease' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 9px', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-subtle)', borderRadius: 3, fontSize: '0.74rem', fontWeight: 600, color: 'var(--color-text-secondary)', cursor: 'pointer', transition: 'background-color 0.1s ease' }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-primary)')}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-elevated)')}
                 >
                   <span>{isExpanded ? 'Hide Technical Details' : `View Details (${cat.technical_fields.length} fields)`}</span>
-                  {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                 </button>
 
                 {/* Collapsible Technical Fields */}
@@ -523,23 +521,23 @@ export default function DataQuality() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.18 }}
+                      transition={{ duration: 0.15 }}
                       style={{ overflow: 'hidden', marginTop: 8 }}
                     >
-                      <div style={{ background: 'var(--color-bg-primary)', borderRadius: 4, padding: '9px 11px', border: '1px solid var(--color-border-subtle)', display: 'flex', flexDirection: 'column', gap: 7 }}>
-                        <div style={{ fontSize: '0.67rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                      <div style={{ background: 'var(--color-bg-primary)', borderRadius: 3, padding: '8px 10px', border: '1px solid var(--color-border-subtle)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div style={{ fontSize: '0.63rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.05em' }}>
                           Technical Schema &amp; Missing Rates
                         </div>
                         {cat.technical_fields.map((f, idx) => (
                           <div
                             key={idx}
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.73rem', paddingBottom: idx < cat.technical_fields.length - 1 ? 6 : 0, borderBottom: idx < cat.technical_fields.length - 1 ? '1px dashed var(--color-border-subtle)' : 'none' }}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', paddingBottom: idx < cat.technical_fields.length - 1 ? 5 : 0, borderBottom: idx < cat.technical_fields.length - 1 ? '1px dashed var(--color-border-subtle)' : 'none' }}
                           >
                             <div>
                               <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{f.label}</div>
-                              <code style={{ fontSize: '0.66rem', color: 'var(--color-text-muted)' }}>{f.field}</code>
+                              <code style={{ fontSize: '0.63rem', color: 'var(--color-text-muted)' }}>{f.field}</code>
                             </div>
-                            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: '0.7rem', color: f.null_rate === 0 ? '#138808' : '#d97706' }}>
+                            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: '0.68rem', color: f.null_rate === 0 ? '#138808' : '#d97706' }}>
                               {(f.null_rate * 100).toFixed(1)}% missing
                             </span>
                           </div>
@@ -556,22 +554,22 @@ export default function DataQuality() {
 
       {/* 4. PRIORITY DATA ISSUES */}
       <section aria-labelledby="data-issues-heading">
-        <div className="card" style={{ padding: '22px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+        <div className="card" style={{ padding: '18px 20px', borderRadius: 4, boxShadow: 'none', backgroundImage: 'none', border: '1px solid var(--color-border-default)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
             <div>
-              <h2 id="data-issues-heading" style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+              <h2 id="data-issues-heading" style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
                 Priority Data Issues &amp; Required Actions
               </h2>
-              <p style={{ margin: '3px 0 0 0', fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+              <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                 Actionable discrepancies that impact delay prediction reliability. Resolved items update automatically upon ingestion sync.
               </p>
             </div>
-            <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-text-muted)', background: 'var(--color-bg-elevated)', padding: '3px 10px', borderRadius: 4 }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-text-muted)', background: 'var(--color-bg-elevated)', padding: '2px 9px', borderRadius: 3, border: '1px solid var(--color-border-subtle)' }}>
               {dataIssues.length} Identified Issues
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
             {dataIssues.map((issue) => (
               <div key={issue.id} className={issueSeverityClass(issue.severity)}>
                 <div className="dq-issue-header">
@@ -580,7 +578,7 @@ export default function DataQuality() {
                 </div>
                 <div className="dq-issue-project">
                   Affected project: <strong style={{ color: 'var(--color-text-primary)' }}>{issue.project_name}</strong>
-                  {' '}<code style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>({issue.project_code})</code>
+                  {' '}<code style={{ fontSize: '0.66rem', color: 'var(--color-text-muted)' }}>({issue.project_code})</code>
                 </div>
                 <p className="dq-issue-desc">{issue.description}</p>
                 <div className="dq-issue-action">
@@ -588,8 +586,8 @@ export default function DataQuality() {
                     <span className="dq-issue-action-label">Action Required:</span>
                     <span className="dq-issue-action-text">{issue.action}</span>
                   </div>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-accent-primary)' }}>
-                    District Nodal Action <ArrowRight size={12} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.71rem', fontWeight: 600, color: 'var(--color-accent-primary)' }}>
+                    District Nodal Action <ArrowRight size={11} />
                   </span>
                 </div>
               </div>
