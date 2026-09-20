@@ -16,8 +16,8 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { predictionsAPI, projectsAPI } from '@/api/client'
-import type { PredictionResult, Project } from '@/types'
-import { EmptyState, RiskBadge, StatusBadge } from '@/components/common'
+import type { PredictionResult, Project, RiskLevel, ProjectStatus } from '@/types'
+import { EmptyState } from '@/components/common'
 import { formatDate, formatINR } from '@/utils'
 import { useAuthStore } from '@/store/authStore'
 
@@ -517,6 +517,40 @@ function getCriticalBottleneckAction(criticalStage: any) {
   }
 }
 
+// ─── Compact Status Indicator (government portal style) ─────────────────────
+function StatusIndicator({ status }: { status: ProjectStatus }) {
+  const norm = (status || '').toLowerCase().replace(/\s/g, '_')
+  const labels: Record<string, string> = {
+    active: 'Active', delayed: 'Delayed', approved: 'Approved',
+    draft: 'Draft', completed: 'Completed', on_hold: 'On Hold',
+    under_review: 'Under Review', cancelled: 'Cancelled',
+  }
+  const label = labels[norm] ?? String(status)
+  const cls = ['active', 'delayed', 'approved', 'draft', 'completed', 'on_hold'].includes(norm) ? norm : 'default'
+  return (
+    <span className={`pl-status pl-status--${cls}`}>
+      <span className="pl-status-dot" />
+      {label}
+    </span>
+  )
+}
+
+// ─── Compact Risk Indicator (government portal style) ────────────────────────
+function RiskIndicator({ level }: { level: string | RiskLevel }) {
+  const norm = (level || '').toLowerCase()
+  const labels: Record<string, string> = {
+    critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low', unknown: 'Unknown',
+  }
+  const label = labels[norm] ?? String(level)
+  const cls = ['critical', 'high', 'medium', 'low'].includes(norm) ? norm : 'unknown'
+  return (
+    <span className={`pl-risk pl-risk--${cls}`}>
+      <span className="pl-risk-bar" />
+      {label}
+    </span>
+  )
+}
+
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -998,12 +1032,10 @@ export default function ProjectDetail() {
               <span
                 style={{
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  color: 'var(--color-accent-primary)',
-                  background: 'var(--color-accent-glow, rgba(244, 119, 33, 0.1))',
-                  padding: '3px 10px',
-                  borderRadius: 6,
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  color: 'var(--color-text-secondary)',
+                  letterSpacing: '0.02em',
                 }}
               >
                 {project.project_code}
@@ -1040,12 +1072,12 @@ export default function ProjectDetail() {
 
             <h1
               style={{
-                margin: '0 0 10px 0',
-                fontSize: '1.65rem',
-                fontWeight: 800,
+                margin: '0 0 8px 0',
+                fontSize: '1.2rem',
+                fontWeight: 700,
                 color: 'var(--color-text-primary)',
-                letterSpacing: '-0.02em',
-                lineHeight: 1.25,
+                letterSpacing: '-0.01em',
+                lineHeight: 1.3,
               }}
             >
               {project.name}
@@ -1084,10 +1116,10 @@ export default function ProjectDetail() {
             </div>
           </div>
 
-          {/* Right: Badges & Quick Status */}
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-            <StatusBadge status={project.status} />
-            <RiskBadge level={riskCategory} />
+          {/* Right: Status & Risk — compact text indicators */}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexShrink: 0 }}>
+            <StatusIndicator status={project.status} />
+            <RiskIndicator level={riskCategory as any} />
           </div>
         </div>
       </div>
@@ -1128,171 +1160,94 @@ export default function ProjectDetail() {
         </div>
       )}
 
-      {/* 4. Executive AI Delay Forecast — 4 Structured Cards (Clean, Not Clumsy) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
-        {/* Card 1: Delay Risk Score */}
-        <div
-          className="card"
-          style={{
-            padding: '18px 20px',
-            borderRadius: 10,
-            background: 'var(--color-bg-card, #ffffff)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            transition: 'all 0.3s ease',
-            opacity: predicting ? 0.7 : 1,
-          }}
-        >
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Overall Risk Score
-              </div>
-              {prediction?.latency_ms != null && (
-                <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                  {Math.round(prediction.latency_ms)}ms inference
-                </span>
-              )}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 6 }}>
-              <span style={{ fontSize: '1.75rem', fontWeight: 800, color: riskColor, fontFamily: 'var(--font-mono)' }}>
-                {prediction ? prediction.risk_score : '—'}
-              </span>
-              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>/ 100</span>
-            </div>
-            <div style={{ fontSize: '0.73rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-              Risk score evaluated via 23 statutory indicators
-            </div>
+      {/* 4. Compact KPI Strip — government portal style */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: 1,
+          border: '1px solid var(--color-border-subtle)',
+          borderRadius: 6,
+          overflow: 'hidden',
+          opacity: predicting ? 0.7 : 1,
+          transition: 'opacity 0.2s',
+        }}
+      >
+        {/* KPI 1: Risk Score */}
+        <div style={{ padding: '14px 18px', background: 'var(--color-bg-card)', borderRight: '1px solid var(--color-border-subtle)' }}>
+          <div style={{ fontSize: '0.67rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+            Risk Score
+            {prediction?.latency_ms != null && (
+              <span style={{ fontWeight: 400, marginLeft: 6 }}>{Math.round(prediction.latency_ms)}ms</span>
+            )}
           </div>
-          <div style={{ marginTop: 12 }}>
-            <div style={{ height: 5, background: 'var(--color-bg-secondary, #e2e8f0)', borderRadius: 4, overflow: 'hidden' }}>
-              <div
-                style={{
-                  height: '100%',
-                  width: `${prediction ? Math.min(100, Math.max(5, prediction.risk_score)) : 0}%`,
-                  background: riskColor,
-                  borderRadius: 4,
-                }}
-              />
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            <span style={{ fontSize: '1.4rem', fontWeight: 800, color: riskColor, fontFamily: 'var(--font-mono)' }}>
+              {prediction ? prediction.risk_score : '—'}
+            </span>
+            <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>/100</span>
+          </div>
+          <div style={{ marginTop: 8, height: 4, background: 'var(--color-border-subtle)', borderRadius: 2, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${prediction ? Math.min(100, Math.max(3, prediction.risk_score)) : 0}%`, background: riskColor, borderRadius: 2 }} />
+          </div>
+          {prediction?.predicted_at && (
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
+              Updated {new Date(prediction.predicted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: 6, fontWeight: 500 }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                {prediction?.predicted_at && (
-                  <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
-                    Recalculated: {new Date(prediction.predicted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                )}
-              </div>
-            </div>
+          )}
+        </div>
+
+        {/* KPI 2: Probability of Delay */}
+        <div style={{ padding: '14px 18px', background: 'var(--color-bg-card)', borderRight: '1px solid var(--color-border-subtle)' }}>
+          <div style={{ fontSize: '0.67rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+            Probability of Delay
+          </div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: delayProb && delayProb >= 60 ? '#dc2626' : '#16a34a', fontFamily: 'var(--font-mono)' }}>
+            {delayProb != null ? `${delayProb}%` : '—'}
+          </div>
+          <div style={{ marginTop: 8, height: 4, background: 'var(--color-border-subtle)', borderRadius: 2, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${delayProb || 0}%`, background: delayProb && delayProb >= 60 ? '#dc2626' : '#16a34a', borderRadius: 2 }} />
           </div>
         </div>
 
-        {/* Card 2: Probability of Delay */}
-        <div
-          className="card"
-          style={{
-            padding: '18px 20px',
-            borderRadius: 10,
-            background: 'var(--color-bg-card, #ffffff)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Probablity of Delay
-            </div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: 6, color: delayProb && delayProb >= 60 ? '#ef4444' : '#10b981', fontFamily: 'var(--font-mono)' }}>
-              {delayProb != null ? `${delayProb}%` : 'Unavailable'}
-            </div>
+        {/* KPI 3: Projected Slippage */}
+        <div style={{ padding: '14px 18px', background: 'var(--color-bg-card)', borderRight: '1px solid var(--color-border-subtle)' }}>
+          <div style={{ fontSize: '0.67rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+            Projected Slippage
           </div>
-          <div style={{ marginTop: 12 }}>
-            <div style={{ height: 5, background: 'var(--color-bg-secondary, #e2e8f0)', borderRadius: 4, overflow: 'hidden' }}>
-              <div
-                style={{
-                  height: '100%',
-                  width: `${delayProb || 0}%`,
-                  background: delayProb && delayProb >= 60 ? '#ef4444' : '#10b981',
-                  borderRadius: 4,
-                }}
-              />
-            </div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: delayDays && Number(delayDays) > 0 ? '#d97706' : 'var(--color-text-primary)', fontFamily: 'var(--font-mono)' }}>
+            {delayDays != null ? `${Math.round(Number(delayDays))} days` : '0 days'}
           </div>
         </div>
 
-        {/* Card 3: Expected Schedule Delay */}
-        <div
-          className="card"
-          style={{
-            padding: '18px 20px',
-            borderRadius: 10,
-            background: 'var(--color-bg-card, #ffffff)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Projected Slippage
-            </div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: 6, color: '#f59e0b', fontFamily: 'var(--font-mono)' }}>
-              {delayDays != null ? `${Math.round(Number(delayDays))} days` : '0 days'}
-            </div>
+        {/* KPI 4: Critical Bottleneck */}
+        <div style={{ padding: '14px 18px', background: 'var(--color-bg-card)' }}>
+          <div style={{ fontSize: '0.67rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+            Critical Bottleneck
           </div>
-        </div>
-
-        {/* Card 4: Critical Bottleneck Stage */}
-        <div
-          className="card"
-          style={{
-            padding: '18px 20px',
-            borderRadius: 10,
-            background: 'var(--color-bg-card, #ffffff)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Critical Bottleneck
-            </div>
-            <div
-              style={{
-                fontSize: '1.05rem',
-                fontWeight: 700,
-                marginTop: 8,
-                color: 'var(--color-text-primary)',
-                lineHeight: 1.35,
-              }}
-            >
-              {typeof prediction?.critical_stage === 'string'
-                ? prediction.critical_stage
-                : prediction?.critical_stage?.stage_name_display ||
-                prediction?.current_stage?.replace(/_/g, ' ') ||
-                'Award & Compensation'}
-            </div>
+          <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--color-text-primary)', lineHeight: 1.4, marginTop: 4 }}>
+            {typeof prediction?.critical_stage === 'string'
+              ? prediction.critical_stage
+              : prediction?.critical_stage?.stage_name_display ||
+              prediction?.current_stage?.replace(/_/g, ' ') ||
+              'Award & Compensation'}
           </div>
         </div>
       </div>
 
-      {/* 5. Clean Structured Tab Navigation */}
+      {/* 5. Tab Navigation — government portal style */}
       <div
         style={{
           display: 'flex',
-          gap: 6,
-          borderBottom: '1px solid var(--color-border-subtle, #e2e8f0)',
-          paddingBottom: 4,
+          gap: 0,
+          borderBottom: '2px solid var(--color-border-subtle)',
           overflowX: 'auto',
         }}
       >
         {[
           { id: 'overview', label: 'Project Overview' },
           { id: 'stages', label: 'Stage-wise Timeline' },
-          { id: 'risk', label: 'Delay Factors Explained' },
+          { id: 'risk', label: 'Delay Factors' },
           { id: 'actions', label: 'Recommended Actions' },
         ].map((item) => {
           const isActive = tab === item.id
@@ -1301,21 +1256,21 @@ export default function ProjectDetail() {
               key={item.id}
               onClick={() => setTab(item.id as Tab)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '9px 18px',
-                borderRadius: 8,
-                fontSize: '0.88rem',
+                padding: '9px 16px',
+                marginBottom: -2,
+                fontSize: '0.82rem',
                 fontWeight: isActive ? 700 : 500,
-                color: isActive ? 'var(--color-accent-primary, #f47721)' : 'var(--color-text-secondary)',
-                background: isActive ? 'var(--color-accent-glow, rgba(244, 119, 33, 0.08))' : 'transparent',
+                color: isActive ? 'var(--color-accent-primary)' : 'var(--color-text-secondary)',
+                background: 'transparent',
                 border: 'none',
+                borderBottom: isActive ? '2px solid var(--color-accent-primary)' : '2px solid transparent',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap',
+                transition: 'color 0.15s, border-color 0.15s',
+                fontFamily: 'var(--font-sans)',
               }}
             >
-              <span>{item.label}</span>
+              {item.label}
             </button>
           )
         })}
@@ -1351,15 +1306,15 @@ export default function ProjectDetail() {
                     <strong style={{ marginLeft: 8, color: '#10b981' }}>({landAcquiredPct}%)</strong>
                   </span>
                 </div>
-                <div style={{ height: 7, background: 'var(--color-bg-secondary, #f1f5f9)', borderRadius: 6, overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      width: `${landAcquiredPct}%`,
-                      background: 'linear-gradient(90deg, #10b981, #059669)',
-                      borderRadius: 6,
-                    }}
-                  />
+                  <div style={{ height: 5, background: 'var(--color-bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        height: '100%',
+                        width: `${landAcquiredPct}%`,
+                        background: '#16a34a',
+                        borderRadius: 3,
+                      }}
+                    />
                 </div>
               </div>
 
@@ -1382,15 +1337,15 @@ export default function ProjectDetail() {
                     )}
                   </span>
                 </div>
-                <div style={{ height: 7, background: 'var(--color-bg-secondary, #f1f5f9)', borderRadius: 6, overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      width: `${compensationPct || 0}%`,
-                      background: 'linear-gradient(90deg, #3b82f6, #2563eb)',
-                      borderRadius: 6,
-                    }}
-                  />
+                  <div style={{ height: 5, background: 'var(--color-bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        height: '100%',
+                        width: `${compensationPct || 0}%`,
+                        background: '#2563eb',
+                        borderRadius: 3,
+                      }}
+                    />
                 </div>
               </div>
             </div>
@@ -1501,30 +1456,29 @@ export default function ProjectDetail() {
                 <div
                   key={stage.stage}
                   style={{
-                    padding: '16px',
-                    border: isCurrent ? '2px solid var(--color-accent-primary)' : '1px solid var(--color-border-subtle, #e2e8f0)',
-                    background: isCurrent ? 'var(--color-accent-glow, rgba(244, 119, 33, 0.05))' : 'var(--color-bg-secondary, #fafafa)',
-                    borderRadius: 8,
+                    padding: '12px 14px',
+                    border: isCurrent
+                      ? '1px solid var(--color-accent-primary)'
+                      : '1px solid var(--color-border-subtle)',
+                    borderLeft: isCurrent ? '3px solid var(--color-accent-primary)' : '3px solid transparent',
+                    background: 'var(--color-bg-card)',
+                    borderRadius: 4,
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    {isCurrent ? (
-                      <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--color-accent-primary)', fontWeight: 700 }}>
-                        ● Active Phase
-                      </span>
-                    ) : <span />}
-                    <RiskBadge level={stage.risk_category} />
-                  </div>
-
-                  <strong style={{ display: 'block', fontSize: '0.88rem', color: 'var(--color-text-primary)', marginBottom: 8 }}>
+                  {isCurrent && (
+                    <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--color-accent-primary)', fontWeight: 700, letterSpacing: '0.07em', display: 'block', marginBottom: 4 }}>
+                      ● Active
+                    </span>
+                  )}
+                  <strong style={{ display: 'block', fontSize: '0.82rem', color: 'var(--color-text-primary)', marginBottom: 6, lineHeight: 1.3 }}>
                     {stage.stage.replace(/_/g, ' ')}
                   </strong>
-
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                    <span style={{ fontSize: '1.35rem', fontWeight: 800, color: sColor, fontFamily: 'var(--font-mono)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: sColor, fontFamily: 'var(--font-mono)' }}>
                       {stage.risk_score}
                     </span>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>/ 100</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>/100</span>
+                    <RiskIndicator level={stage.risk_category as any} />
                   </div>
                 </div>
               )
@@ -1559,7 +1513,7 @@ export default function ProjectDetail() {
                           {est.estimated_duration_days} days
                         </td>
                         <td style={{ padding: '10px 14px' }}>
-                          <RiskBadge level={est.risk_category} />
+                          <RiskIndicator level={est.risk_category} />
                         </td>
                         <td style={{ padding: '10px 14px', fontFamily: 'var(--font-mono)' }}>{est.expected_completion_date}</td>
                       </tr>
@@ -1574,16 +1528,16 @@ export default function ProjectDetail() {
 
       {/* 8. TAB 3: WHY THIS PROJECT IS AT RISK (OFFICER-FRIENDLY EXPLAINABILITY) */}
       {tab === 'risk' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Main Card: Why This Project Is at Risk */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Delay Factors Card */}
           <div
             className="card"
             style={{
-              padding: '24px 28px',
-              borderRadius: 12,
-              background: 'var(--color-bg-card, #ffffff)',
-              border: '1px solid var(--color-border-subtle, #e2e8f0)',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+              padding: '20px 24px',
+              borderRadius: 6,
+              background: 'var(--color-bg-card)',
+              border: '1px solid var(--color-border-subtle)',
+              boxShadow: 'none',
             }}
           >
             {/* Header: Title & Subtitle */}
@@ -1713,11 +1667,11 @@ export default function ProjectDetail() {
         <div
           className="card"
           style={{
-            padding: '24px 28px',
-            borderRadius: 12,
-            background: 'var(--color-bg-card, #ffffff)',
-            border: '1px solid var(--color-border-subtle, #e2e8f0)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+            padding: '20px 24px',
+            borderRadius: 6,
+            background: 'var(--color-bg-card)',
+            border: '1px solid var(--color-border-subtle)',
+            boxShadow: 'none',
           }}
         >
           {/* Header: Title & Subtitle */}
