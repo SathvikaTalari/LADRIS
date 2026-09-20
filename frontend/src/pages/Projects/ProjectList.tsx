@@ -1,6 +1,8 @@
 /**
  * LADRIS — Project List Page
  * Multi-criteria filterable directory by Status, Risk Level, State, District, and Agency.
+ * Visual redesign: Government portal style (pl-* scoped classes).
+ * ALL data, logic, API calls, filtering, and routing are unchanged.
  */
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
@@ -8,7 +10,7 @@ import { motion } from 'framer-motion'
 import { Plus, Search, Filter, FolderKanban, ChevronRight, RotateCcw, MapPin, Building2, Edit3, CheckCircle2, X } from 'lucide-react'
 import { projectsAPI } from '@/api/client'
 import type { ProjectListItem, ProjectStatus, RiskLevel } from '@/types'
-import { RiskBadge, StatusBadge, EmptyState, LoadingState, PageHeader } from '@/components/common'
+import { EmptyState, LoadingState } from '@/components/common'
 import { formatDate, formatHa } from '@/utils'
 import { NewProjectModal } from '@/pages/DataIngestion'
 
@@ -58,78 +60,52 @@ const AGENCY_OPTIONS: { value: string; label: string }[] = [
   { value: 'DMRC', label: 'Metro Rail (DMRC)' },
 ]
 
-// ─── Directory Status & Delay Risk Badges (Rectangular Button Style) ─────────
-const renderDirectoryStatusBadge = (status: ProjectStatus) => {
-  const norm = (status || '').toUpperCase()
-  if (norm === 'ACTIVE') {
-    return (
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: 31,
-          padding: '0 14px',
-          borderRadius: 8,
-          backgroundColor: '#DCFCE7',
-          border: '1px solid #86EFAC',
-          color: '#15803D',
-          fontSize: '0.8125rem',
-          fontWeight: 600,
-          lineHeight: 1,
-          whiteSpace: 'nowrap',
-          verticalAlign: 'middle',
-          boxSizing: 'border-box',
-          boxShadow: 'none',
-        }}
-      >
-        Active
-      </span>
-    )
+// ─── Status Indicator ─────────────────────────────────────────────────────────
+function StatusIndicator({ status }: { status: ProjectStatus }) {
+  const norm = (status || '').toLowerCase().replace(/\s/g, '_')
+  const labels: Record<string, string> = {
+    active: 'Active',
+    delayed: 'Delayed',
+    approved: 'Approved',
+    draft: 'Draft',
+    completed: 'Completed',
+    on_hold: 'On Hold',
+    under_review: 'Under Review',
+    cancelled: 'Cancelled',
   }
-  return <StatusBadge status={status} />
-}
-
-const renderDirectoryRiskBadge = (level: RiskLevel) => {
-  const norm = (level || '').toUpperCase()
-  const riskMap: Record<string, { bg: string; border: string; text: string; label: string }> = {
-    HIGH: { bg: '#FEE2E2', border: '#F87171', text: '#B91C1C', label: 'High' },
-    CRITICAL: { bg: '#FEE2E2', border: '#F87171', text: '#B91C1C', label: 'Critical' },
-    MEDIUM: { bg: '#FEF3C7', border: '#FBBF24', text: '#B45309', label: 'Medium' },
-    LOW: { bg: '#DBEAFE', border: '#60A5FA', text: '#1D4ED8', label: 'Low' },
-  }
-
-  const config = riskMap[norm]
-  if (!config) {
-    return <RiskBadge level={level} />
-  }
-
+  const label = labels[norm] ?? status
+  const cls = ['active', 'delayed', 'approved', 'draft', 'completed', 'on_hold'].includes(norm)
+    ? norm
+    : 'default'
   return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 31,
-        padding: '0 14px',
-        borderRadius: 8,
-        backgroundColor: config.bg,
-        border: `1px solid ${config.border}`,
-        color: config.text,
-        fontSize: '0.8125rem',
-        fontWeight: 600,
-        lineHeight: 1,
-        whiteSpace: 'nowrap',
-        verticalAlign: 'middle',
-        boxSizing: 'border-box',
-        boxShadow: 'none',
-      }}
-    >
-      {config.label}
+    <span className={`pl-status pl-status--${cls}`}>
+      <span className="pl-status-dot" />
+      {label}
     </span>
   )
 }
 
+// ─── Risk Indicator ───────────────────────────────────────────────────────────
+function RiskIndicator({ level }: { level: RiskLevel }) {
+  const norm = (level || '').toLowerCase()
+  const labels: Record<string, string> = {
+    critical: 'Critical',
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low',
+    unknown: 'Unknown',
+  }
+  const label = labels[norm] ?? level
+  const cls = ['critical', 'high', 'medium', 'low'].includes(norm) ? norm : 'unknown'
+  return (
+    <span className={`pl-risk pl-risk--${cls}`}>
+      <span className="pl-risk-bar" />
+      {label}
+    </span>
+  )
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function ProjectList() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -141,7 +117,7 @@ export default function ProjectList() {
   const [isLoading, setIsLoading] = useState(true)
   const [page, setPage] = useState(1)
 
-  // Filters
+  // Filters — unchanged
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [riskFilter, setRiskFilter] = useState<string>('')
@@ -209,56 +185,53 @@ export default function ProjectList() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.25 }}
     >
-      <PageHeader
-        title="Infrastructure Projects Directory"
-        subtitle={total > 0 ? `Showing ${total} active project${total !== 1 ? 's' : ''} across Indian states and sectors` : 'Browse, filter, and monitor delay risks for all infrastructure projects'}
-        actions={
+      {/* ── Page Header ── */}
+      <div className="pl-header">
+        <div>
+          <h1 className="pl-header-title">Infrastructure Projects Directory</h1>
+          <p className="pl-header-subtitle">
+            {total > 0
+              ? `Showing ${total} project${total !== 1 ? 's' : ''} across Indian states and sectors`
+              : 'Browse, filter, and monitor delay risks for all infrastructure projects'}
+          </p>
+        </div>
+        <div className="pl-header-actions">
           <button
-            className="btn btn-primary"
+            className="pl-btn-new"
             onClick={() => setShowNewProjectModal(true)}
           >
-            <Plus size={16} />
+            <Plus size={14} />
             New Project
           </button>
-        }
-      />
+        </div>
+      </div>
 
-      {/* Deleted Project Success Alert */}
+      {/* ── Deleted Project Success Alert ── */}
       {deletedAlert && (
-        <div
-          className="card"
-          style={{
-            background: 'rgba(34, 197, 94, 0.1)',
-            border: '1px solid rgba(34, 197, 94, 0.35)',
-            color: '#22c55e',
-            padding: '12px 18px',
-            marginBottom: 20,
-            borderRadius: 8,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <CheckCircle2 size={18} />
-            <span style={{ fontSize: '0.9rem' }}>
-              Project <strong>{deletedAlert.code}</strong> {deletedAlert.name && deletedAlert.name !== deletedAlert.code ? `(${deletedAlert.name})` : ''} has been successfully deleted from the active directory.
+        <div className="pl-alert-success">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <CheckCircle2 size={15} />
+            <span>
+              Project <strong>{deletedAlert.code}</strong>
+              {deletedAlert.name && deletedAlert.name !== deletedAlert.code
+                ? ` (${deletedAlert.name})`
+                : ''}{' '}
+              has been successfully deleted from the active directory.
             </span>
           </div>
           <button
             type="button"
+            className="pl-alert-close"
             onClick={() => setDeletedAlert(null)}
-            className="btn btn-ghost"
-            style={{ padding: '2px 6px', color: '#22c55e', minHeight: 'auto' }}
           >
-            <X size={16} />
+            <X size={14} />
           </button>
         </div>
       )}
 
-      {/* New Project Modal with all 6 data ingestion methods */}
+      {/* ── New Project Modal ── */}
       <NewProjectModal
         isOpen={showNewProjectModal}
         onClose={() => {
@@ -272,53 +245,37 @@ export default function ProjectList() {
         }}
       />
 
-      {/* Filter Control Bar */}
-      <div className="card" style={{ marginBottom: 20, padding: '16px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <Filter size={15} style={{ color: 'var(--color-accent-primary)' }} />
-          <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
+      {/* ── Filter Toolbar ── */}
+      <div className="pl-filter-bar">
+        <div className="pl-filter-bar-top">
+          <span className="pl-filter-label">
+            <Filter size={11} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />
             Filter Directory
           </span>
           {isFiltered && (
-            <button
-              onClick={clearAllFilters}
-              className="btn btn-secondary"
-              style={{
-                marginLeft: 'auto',
-                padding: '4px 10px',
-                fontSize: '0.78rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-              }}
-            >
-              <RotateCcw size={13} />
+            <button className="pl-filter-reset" onClick={clearAllFilters}>
+              <RotateCcw size={11} />
               Reset Filters
             </button>
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
-          {/* Search Input */}
-          <div style={{ position: 'relative' }}>
-            <Search size={15} style={{
-              position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-              color: 'var(--color-text-muted)',
-            }} />
+        <div className="pl-filter-grid">
+          {/* Search */}
+          <div className="pl-search-wrap">
+            <span className="pl-search-icon"><Search size={13} /></span>
             <input
               type="text"
-              className="input"
-              style={{ paddingLeft: 36, width: '100%', fontSize: '0.85rem' }}
+              className="pl-filter-input"
               placeholder="Search by name or code..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
             />
           </div>
 
-          {/* Status Dropdown */}
+          {/* Status */}
           <select
-            className="input"
-            style={{ width: '100%', fontSize: '0.85rem' }}
+            className="pl-filter-select"
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
           >
@@ -327,10 +284,9 @@ export default function ProjectList() {
             ))}
           </select>
 
-          {/* Risk Level Dropdown */}
+          {/* Risk Level */}
           <select
-            className="input"
-            style={{ width: '100%', fontSize: '0.85rem' }}
+            className="pl-filter-select"
             value={riskFilter}
             onChange={(e) => { setRiskFilter(e.target.value); setPage(1) }}
           >
@@ -339,10 +295,9 @@ export default function ProjectList() {
             ))}
           </select>
 
-          {/* State Dropdown */}
+          {/* State */}
           <select
-            className="input"
-            style={{ width: '100%', fontSize: '0.85rem' }}
+            className="pl-filter-select"
             value={stateFilter}
             onChange={(e) => { setStateFilter(e.target.value); setPage(1) }}
           >
@@ -351,26 +306,21 @@ export default function ProjectList() {
             ))}
           </select>
 
-          {/* District Input */}
-          <div style={{ position: 'relative' }}>
-            <MapPin size={14} style={{
-              position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-              color: 'var(--color-text-muted)',
-            }} />
+          {/* District */}
+          <div className="pl-district-wrap">
+            <span className="pl-district-icon"><MapPin size={12} /></span>
             <input
               type="text"
-              className="input"
-              style={{ paddingLeft: 34, width: '100%', fontSize: '0.85rem' }}
+              className="pl-filter-input"
               placeholder="Filter by District..."
               value={districtFilter}
               onChange={(e) => { setDistrictFilter(e.target.value); setPage(1) }}
             />
           </div>
 
-          {/* Agency Dropdown */}
+          {/* Agency */}
           <select
-            className="input"
-            style={{ width: '100%', fontSize: '0.85rem' }}
+            className="pl-filter-select"
             value={agencyFilter}
             onChange={(e) => { setAgencyFilter(e.target.value); setPage(1) }}
           >
@@ -381,19 +331,21 @@ export default function ProjectList() {
         </div>
       </div>
 
-      {/* Projects Table */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      {/* ── Projects Table ── */}
+      <div className="pl-table-card">
         {isLoading ? (
           <div style={{ padding: 24 }}>
             <LoadingState rows={6} />
           </div>
         ) : projects.length === 0 ? (
           <EmptyState
-            icon={<FolderKanban size={28} />}
+            icon={<FolderKanban size={26} />}
             title="No Projects Found"
-            description={isFiltered
-              ? 'No projects match your selected filters. Try clearing or adjusting search criteria.'
-              : 'No projects currently loaded. You can create a new project or sync data records.'}
+            description={
+              isFiltered
+                ? 'No projects match your selected filters. Try clearing or adjusting search criteria.'
+                : 'No projects currently loaded. You can create a new project or sync data records.'
+            }
             action={
               isFiltered ? (
                 <button className="btn btn-secondary" onClick={clearAllFilters}>
@@ -407,98 +359,110 @@ export default function ProjectList() {
             }
           />
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="data-table">
+          <div className="pl-table-scroll">
+            <table className="pl-table">
               <thead>
                 <tr>
                   <th>Project Code</th>
                   <th>Project Name</th>
-                  <th>Sector & Agency</th>
+                  <th>Sector &amp; Agency</th>
                   <th>Status</th>
                   <th>Delay Risk</th>
-                  <th>State & District</th>
-                  <th>Land Area (ha)</th>
+                  <th>State &amp; District</th>
+                  <th style={{ textAlign: 'right' }}>Land Area (ha)</th>
                   <th>Target Completion</th>
-                  <th style={{ textAlign: 'right', minWidth: 100 }}>Actions</th>
+                  <th style={{ textAlign: 'right', minWidth: 90 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {projects.map((project, i) => {
-                  const districtName = project.district_codes && project.district_codes.length > 0
-                    ? project.district_codes.join(', ')
-                    : 'N/A'
-                  const agencyName = project.executing_agency || project.nodal_agency || 'MoRTH / NHAI'
+                {projects.map((project) => {
+                  const districtName =
+                    project.district_codes && project.district_codes.length > 0
+                      ? project.district_codes.join(', ')
+                      : 'N/A'
+                  const agencyName =
+                    project.executing_agency || project.nodal_agency || 'MoRTH / NHAI'
 
                   return (
-                    <motion.tr
+                    <tr
                       key={project.id}
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.02 }}
-                      style={{ cursor: 'pointer' }}
                       onClick={() => navigate(`/projects/${project.id}`)}
                     >
+                      {/* Project Code */}
                       <td>
-                        <code style={{
-                          fontSize: '0.8rem',
-                          fontFamily: 'var(--font-mono)',
-                          color: 'var(--color-accent-primary)',
-                          background: 'var(--color-accent-glow)',
-                          padding: '2px 8px',
-                          borderRadius: 4,
-                        }}>
-                          {project.project_code}
-                        </code>
+                        <span className="pl-code">{project.project_code}</span>
                       </td>
-                      <td style={{ color: 'var(--color-text-primary)', fontWeight: 500, maxWidth: 280 }}>
-                        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={project.name}>
+
+                      {/* Project Name */}
+                      <td style={{ maxWidth: 280 }}>
+                        <span className="pl-project-name" title={project.name}>
                           {project.name}
-                        </div>
+                        </span>
                       </td>
+
+                      {/* Sector & Agency */}
                       <td>
-                        <div style={{ fontSize: '0.825rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                        <span className="pl-sector">
                           {project.project_type.replace(/_/g, ' ')}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <Building2 size={11} /> {agencyName}
-                        </div>
+                        </span>
+                        <span className="pl-agency">
+                          <Building2 size={10} style={{ display: 'inline', marginRight: 3, verticalAlign: 'middle' }} />
+                          {agencyName}
+                        </span>
                       </td>
-                      <td>{renderDirectoryStatusBadge(project.status)}</td>
-                      <td>{renderDirectoryRiskBadge(project.risk_level)}</td>
+
+                      {/* Status */}
                       <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span className="badge badge-gray" style={{ fontWeight: 600 }}>{project.state_code}</span>
-                          <span style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', textTransform: 'capitalize' }}>
-                            {districtName}
-                          </span>
-                        </div>
+                        <StatusIndicator status={project.status} />
                       </td>
-                      <td>{formatHa(project.total_area_ha)}</td>
-                      <td>{formatDate(project.planned_end_date)}</td>
-                      <td style={{ textAlign: 'right' }} onClick={(e) => e.stopPropagation()}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+
+                      {/* Delay Risk */}
+                      <td>
+                        <RiskIndicator level={project.risk_level} />
+                      </td>
+
+                      {/* State & District */}
+                      <td>
+                        <span className="pl-location">
+                          <span className="pl-location-state">{project.state_code}</span>
+                          <span className="pl-location-sep">·</span>
+                          {districtName}
+                        </span>
+                      </td>
+
+                      {/* Land Area */}
+                      <td style={{ textAlign: 'right' }}>
+                        <span className="pl-area">{formatHa(project.total_area_ha)}</span>
+                      </td>
+
+                      {/* Target Completion */}
+                      <td>
+                        <span className="pl-date">{formatDate(project.planned_end_date)}</span>
+                      </td>
+
+                      {/* Actions */}
+                      <td
+                        style={{ textAlign: 'right' }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="pl-actions">
                           <button
                             type="button"
-                            className="btn btn-ghost"
-                            style={{
-                              padding: '4px 8px',
-                              fontSize: '0.78rem',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              color: 'var(--color-text-secondary)',
-                              borderRadius: 4,
-                            }}
+                            className="pl-btn-edit"
                             title="Edit Project"
                             onClick={() => navigate(`/projects/${project.id}/edit`)}
                           >
-                            <Edit3 size={13} />
+                            <Edit3 size={11} />
                             Edit
                           </button>
-                          <ChevronRight size={16} color="var(--color-text-muted)" onClick={() => navigate(`/projects/${project.id}`)} />
+                          <ChevronRight
+                            size={15}
+                            className="pl-chevron"
+                            onClick={() => navigate(`/projects/${project.id}`)}
+                          />
                         </div>
                       </td>
-                    </motion.tr>
+                    </tr>
                   )
                 })}
               </tbody>
