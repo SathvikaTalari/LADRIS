@@ -17,6 +17,7 @@ import {
   Check,
   X,
   Mail,
+  MessageSquare,
 } from 'lucide-react'
 import { PageHeader } from '@/components/common'
 import { useAuthStore } from '@/store/authStore'
@@ -51,6 +52,7 @@ export default function Admin() {
   // Alert Settings Tab State
   const [alertSettings, setAlertSettings] = useState({
     email_notifications_enabled: true,
+    sms_notifications_enabled: false,
     send_high_critical_only: true,
     reminder_hours: 24,
   })
@@ -79,6 +81,7 @@ export default function Admin() {
       if (data) {
         setAlertSettings({
           email_notifications_enabled: data.email_notifications_enabled ?? true,
+          sms_notifications_enabled: data.sms_notifications_enabled ?? false,
           send_high_critical_only: data.send_high_critical_only ?? true,
           reminder_hours: data.reminder_hours ?? 24,
         })
@@ -623,12 +626,15 @@ export default function Admin() {
                   border: '1px solid var(--color-border-subtle)',
                 }}
               >
-                <div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                    Email Notifications
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                    Send email alerts to responsible officers when delay risks are detected.
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Mail size={18} color="var(--color-accent-primary)" />
+                  <div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                      Email Notifications
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                      Send email alerts to responsible officers when delay risks are detected.
+                    </div>
                   </div>
                 </div>
                 <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: 8 }}>
@@ -649,6 +655,51 @@ export default function Admin() {
                     }}
                   >
                     {alertSettings.email_notifications_enabled ? 'ON' : 'OFF'}
+                  </span>
+                </label>
+              </div>
+
+              {/* 2. SMS Notifications ON/OFF */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px 20px',
+                  borderRadius: 10,
+                  background: 'var(--color-bg-subtle, rgba(255,255,255,0.03))',
+                  border: '1px solid var(--color-border-subtle)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <MessageSquare size={18} color="#10b981" />
+                  <div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                      SMS Notifications
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                      Send SMS to officers' registered phone numbers via Twilio. Requires phone numbers set on user accounts.
+                    </div>
+                  </div>
+                </div>
+                <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: 8 }}>
+                  <input
+                    type="checkbox"
+                    checked={alertSettings.sms_notifications_enabled}
+                    onChange={(e) =>
+                      setAlertSettings({ ...alertSettings, sms_notifications_enabled: e.target.checked })
+                    }
+                    style={{ width: 18, height: 18, accentColor: '#10b981', cursor: 'pointer' }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
+                      color: alertSettings.sms_notifications_enabled ? '#10b981' : 'var(--color-text-muted)',
+                      minWidth: 28,
+                    }}
+                  >
+                    {alertSettings.sms_notifications_enabled ? 'ON' : 'OFF'}
                   </span>
                 </label>
               </div>

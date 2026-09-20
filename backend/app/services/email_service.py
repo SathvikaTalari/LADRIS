@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.models.user import User, UserRole
-from app.models.misc import AlertSeverity, AlertStatus
+from app.models.misc import AlertSeverity, AlertStatus, NotificationLog
 
 logger = logging.getLogger("ladris.email_service")
 settings = get_settings()
@@ -289,6 +289,7 @@ SETTINGS_FILE = Path(__file__).resolve().parents[2] / "data" / "alert_settings.j
 
 DEFAULT_ALERT_SETTINGS = {
     "email_notifications_enabled": True,
+    "sms_notifications_enabled": False,
     "send_high_critical_only": True,
     "reminder_hours": 24,
     "high_risk_alert_score": 75,
@@ -468,4 +469,17 @@ async def trigger_alert_email_if_needed(
         except (ValueError, TypeError):
             pass
     alert.alert_metadata = updated_meta
+
+    # 9. Persist notification log row (committed by caller)
+    try:
+        log_entry = NotificationLog(
+            alert_id=alert.id,
+            channel="email",
+            recipient=to_email,
+            status="SENT",
+        )
+        db.add(log_entry)
+    except Exception as _log_err:
+        logger.debug(f"Could not write email notification log: {_log_err}")
+
     return True

@@ -21,6 +21,7 @@ from app.services.email_service import (
     save_alert_settings,
     trigger_alert_email_if_needed,
 )
+from app.services.sms_service import trigger_alert_sms_if_needed
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
@@ -167,6 +168,7 @@ async def _seed_alerts_from_projects(db: AsyncSession):
         )
         db.add(new_alert)
         await trigger_alert_email_if_needed(db, new_alert, project, current_risk_score=prediction.risk_score)
+        await trigger_alert_sms_if_needed(db, new_alert, project, current_risk_score=prediction.risk_score)
     await db.commit()
 
 
@@ -227,6 +229,10 @@ async def get_alerts(
             sent = await trigger_alert_email_if_needed(db, a, a.project)
             if sent:
                 needs_commit = True
+        if a.status == AlertStatus.ACTIVE and not meta.get("sms_sent"):
+            sms_sent = await trigger_alert_sms_if_needed(db, a, a.project)
+            if sms_sent:
+                needs_commit = True
     if needs_commit:
         await db.commit()
 
@@ -241,6 +247,14 @@ async def get_alerts(
         if sent_at_val:
             try:
                 email_sent_at = datetime.fromisoformat(sent_at_val.replace("Z", "+00:00"))
+            except Exception:
+                pass
+        sms_sent = bool(meta.get("sms_sent", False))
+        sms_sent_at_val = meta.get("sms_sent_at")
+        sms_sent_at = None
+        if sms_sent_at_val:
+            try:
+                sms_sent_at = datetime.fromisoformat(sms_sent_at_val.replace("Z", "+00:00"))
             except Exception:
                 pass
 
@@ -259,6 +273,9 @@ async def get_alerts(
             email_sent=email_sent,
             email_sent_at=email_sent_at,
             email_recipient=meta.get("email_recipient"),
+            sms_sent=sms_sent,
+            sms_sent_at=sms_sent_at,
+            sms_recipient=meta.get("sms_recipient"),
             triggered_at=a.triggered_at,
             acknowledged_by=a.acknowledged_by,
             acknowledged_at=a.acknowledged_at,
@@ -310,6 +327,14 @@ async def update_alert(
             email_sent_at = datetime.fromisoformat(sent_at_val.replace("Z", "+00:00"))
         except Exception:
             pass
+    sms_sent = bool(meta.get("sms_sent", False))
+    sms_sent_at_val = meta.get("sms_sent_at")
+    sms_sent_at = None
+    if sms_sent_at_val:
+        try:
+            sms_sent_at = datetime.fromisoformat(sms_sent_at_val.replace("Z", "+00:00"))
+        except Exception:
+            pass
 
     return AlertResponse(
         id=alert.id,
@@ -326,6 +351,9 @@ async def update_alert(
         email_sent=email_sent,
         email_sent_at=email_sent_at,
         email_recipient=meta.get("email_recipient"),
+        sms_sent=sms_sent,
+        sms_sent_at=sms_sent_at,
+        sms_recipient=meta.get("sms_recipient"),
         triggered_at=alert.triggered_at,
         acknowledged_by=alert.acknowledged_by,
         acknowledged_at=alert.acknowledged_at,

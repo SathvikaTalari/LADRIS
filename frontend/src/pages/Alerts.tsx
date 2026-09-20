@@ -17,6 +17,7 @@ import {
   ShieldAlert,
   Building2,
   Mail,
+  MessageSquare,
 } from 'lucide-react'
 import { alertsAPI, projectsAPI } from '@/api/client'
 import { PageHeader, EmptyState } from '@/components/common'
@@ -498,6 +499,31 @@ export default function Alerts() {
                               }
                             >
                               <Mail size={11} /> Email Sent
+                            </span>
+                          )}
+
+                          {/* SMS Sent Status Badge */}
+                          {(alert.sms_sent || alert.alert_metadata?.sms_sent) && (
+                            <span
+                              className="badge"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                fontSize: '0.72rem',
+                                background: 'rgba(16, 185, 129, 0.12)',
+                                color: '#10b981',
+                                border: '1px solid rgba(16, 185, 129, 0.3)',
+                                padding: '2px 8px',
+                                borderRadius: 6,
+                              }}
+                              title={
+                                alert.sms_recipient || alert.alert_metadata?.sms_recipient
+                                  ? `SMS sent to ${alert.sms_recipient || alert.alert_metadata?.sms_recipient}`
+                                  : 'SMS notification sent to responsible officer'
+                              }
+                            >
+                              <MessageSquare size={11} /> SMS Sent
                             </span>
                           )}
                         </div>

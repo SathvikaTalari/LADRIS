@@ -42,6 +42,7 @@ class User(Base):
     state_code = Column(String(3), nullable=True)
     district_code = Column(String(10), nullable=True)
     agency_name = Column(String(255), nullable=True)
+    phone_number = Column(String(20), nullable=True)   # For SMS alert delivery
     assigned_project_ids = Column(String(1024), nullable=True)  # Comma-separated or JSON string of assigned UUIDs
 
     last_login_at = Column(DateTime(timezone=True), nullable=True)

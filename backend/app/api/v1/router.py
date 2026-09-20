@@ -22,6 +22,7 @@ from app.api.v1.audit import audit_router
 from app.api.v1.chatbot import router as chatbot_router
 from app.api.v1.ingestion import router as ingestion_router
 from app.api.v1.decision_intelligence import router as decision_intelligence_router
+from app.api.v1.notification_logs import router as notification_logs_router
 from app.api.v1.stubs import (
     analytics_router,
     gis_router,
@@ -50,3 +51,4 @@ api_router.include_router(etl_router)
 api_router.include_router(audit_router)
 api_router.include_router(chatbot_router)
 api_router.include_router(decision_intelligence_router)
+api_router.include_router(notification_logs_router)

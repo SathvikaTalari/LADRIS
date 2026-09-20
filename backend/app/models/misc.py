@@ -166,3 +166,25 @@ class DataSource(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+
+# ─── Notification Log ─────────────────────────────────────────────────────────
+
+class NotificationLog(Base):
+    """Records each email/SMS delivery attempt for an alert (Sent/Failed + timestamp)."""
+    __tablename__ = "notification_logs"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    alert_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("alerts.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    channel = Column(String(10), nullable=False)   # "email" | "sms"
+    recipient = Column(String(255), nullable=True)  # email address or phone number
+    status = Column(String(10), nullable=False)     # "SENT" | "FAILED" | "SIMULATED"
+    sent_at = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    error_msg = Column(Text, nullable=True)

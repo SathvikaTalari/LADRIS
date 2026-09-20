@@ -100,6 +100,12 @@ class Settings(BaseSettings):
     APP_FRONTEND_URL: str = "http://localhost:5173"
     DEFAULT_ALERT_EMAIL: str = "officer@ladris.gov.in"
 
+    # ─── SMS Notifications (Twilio) ───────────────────────────────────────────
+    SMS_ENABLED: bool = False
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_FROM_NUMBER: str = ""
+
     # ─── Data.gov.in Integration ──────────────────────────────────────────────
     DATAGOV_API_KEY: str = ""
     # Get free API key at: https://data.gov.in (click Register → My Account → Generate API Key)

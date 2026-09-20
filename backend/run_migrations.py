@@ -178,6 +178,7 @@ async def sync_orm_schema():
         alter_statements = [
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS agency_name VARCHAR(255)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS assigned_project_ids VARCHAR(1024)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20)",
             """
             ALTER TABLE projects 
                 ADD COLUMN IF NOT EXISTS notification_3a_date DATE,

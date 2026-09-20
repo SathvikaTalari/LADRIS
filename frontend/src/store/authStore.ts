@@ -56,9 +56,18 @@ export const useAuthStore = create<AuthState>()(
           const user = await authAPI.me()
           set({ user, isAuthenticated: true, isLoading: false })
         } catch (err: unknown) {
-          const message =
-            (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
-            'Login failed. Please check your credentials.'
+          const axiosErr = err as {
+            response?: { status?: number; data?: { detail?: string } }
+            message?: string
+          }
+          let message = 'Login failed. Please check your credentials.'
+          if (axiosErr?.response?.data?.detail) {
+            message = axiosErr.response.data.detail
+          } else if (axiosErr?.response?.status === 500) {
+            message = 'Backend server error (500). Please check backend logs or database.'
+          } else if (axiosErr?.message?.toLowerCase().includes('network') || !axiosErr?.response) {
+            message = 'Cannot connect to backend server. Please verify the backend is running.'
+          }
           set({ error: message, isLoading: false, isAuthenticated: false })
           throw err
         }

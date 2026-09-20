@@ -216,14 +216,39 @@ export interface Alert {
   title: string
   message: string
   alert_metadata?: Record<string, any>
+  // Email delivery
   email_sent?: boolean
   email_sent_at?: string | null
   email_recipient?: string | null
+  // SMS delivery
+  sms_sent?: boolean
+  sms_sent_at?: string | null
+  sms_recipient?: string | null
   triggered_at: string
   acknowledged_by?: string | null
   acknowledged_at: string | null
   resolved_at: string | null
   created_at?: string
+}
+
+export interface AlertSettings {
+  email_notifications_enabled: boolean
+  sms_notifications_enabled: boolean
+  send_high_critical_only: boolean
+  reminder_hours: number
+  high_risk_alert_score?: number
+  priority_action_score?: number
+  minimum_data_completeness?: number
+}
+
+export interface NotificationLog {
+  id: number
+  alert_id?: string | null
+  channel: 'email' | 'sms' | string
+  recipient?: string | null
+  status: 'SENT' | 'FAILED' | 'SIMULATED' | string
+  sent_at: string
+  error_msg?: string | null
 }
 
 export interface GlobalSearchResult {

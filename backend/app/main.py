@@ -214,6 +214,7 @@ async def lifespan(app: FastAPI):
             await conn.run_sync(Base.metadata.create_all)
             await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS agency_name VARCHAR(255)"))
             await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS assigned_project_ids VARCHAR(1024)"))
+            await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20)"))
             await conn.execute(text("""
                 ALTER TABLE projects 
                     ADD COLUMN IF NOT EXISTS notification_3a_date DATE,

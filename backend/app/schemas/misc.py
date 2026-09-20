@@ -20,6 +20,7 @@ class AlertUpdate(BaseModel):
 
 class AlertSettingsSchema(BaseModel):
     email_notifications_enabled: bool = True
+    sms_notifications_enabled: bool = False
     send_high_critical_only: bool = True
     reminder_hours: int = 24  # 24, 48, or 0 (Off)
     high_risk_alert_score: int = 75
@@ -32,14 +33,29 @@ class AlertResponse(AlertBase):
     project_name: Optional[str] = None
     alert_reason: Optional[str] = None
     explanation: Optional[str] = None
+    # Email delivery status
     email_sent: bool = False
     email_sent_at: Optional[datetime] = None
     email_recipient: Optional[str] = None
+    # SMS delivery status
+    sms_sent: bool = False
+    sms_sent_at: Optional[datetime] = None
+    sms_recipient: Optional[str] = None
     triggered_at: datetime
     acknowledged_by: Optional[UUID] = None
     acknowledged_at: Optional[datetime] = None
     resolved_at: Optional[datetime] = None
     created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+class NotificationLogResponse(BaseModel):
+    id: int
+    alert_id: Optional[UUID] = None
+    channel: str          # "email" | "sms"
+    recipient: Optional[str] = None
+    status: str           # "SENT" | "FAILED" | "SIMULATED"
+    sent_at: datetime
+    error_msg: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
 
 class GlobalSearchResult(BaseModel):

@@ -271,6 +271,11 @@ export const alertsAPI = {
     apiClient.post('/api/v1/alerts/settings', data).then((r) => r.data),
 }
 
+export const notificationLogsAPI = {
+  list: (params?: { alert_id?: string; channel?: string; limit?: number }) =>
+    apiClient.get('/api/v1/notification-logs/', { params }).then((r) => r.data),
+}
+
 export const searchAPI = {
   query: (q: string) =>
     apiClient.get('/api/v1/search/', { params: { q } }).then((r) => r.data),
