@@ -413,23 +413,7 @@ export function SaarthiWidget() {
                 <Sparkles size={17} />
               </div>
               <span>Ask Saarthi</span>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  fontSize: '0.68rem',
-                  fontWeight: 700,
-                  background: 'rgba(16, 185, 129, 0.12)',
-                  color: '#10b981',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
-                  padding: '1px 6px',
-                  borderRadius: 10,
-                }}
-              >
-                <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10b981' }} />
-                AI
-              </span>
+
             </motion.button>
           )}
         </AnimatePresence>
@@ -498,19 +482,6 @@ export function SaarthiWidget() {
                     <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                       Saarthi AI
                     </h3>
-                    <span
-                      style={{
-                        fontSize: '0.62rem',
-                        fontWeight: 700,
-                        background: 'rgba(16, 185, 129, 0.12)',
-                        color: '#10b981',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
-                        padding: '1px 5px',
-                        borderRadius: 8,
-                      }}
-                    >
-                      ONLINE
-                    </span>
                   </div>
                   <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
                     LADRIS Decision Copilot
