@@ -1,311 +1,119 @@
 /**
- * LADRIS — Controlled DOM-based Page Content Collector (V2)
+ * LADRIS — Clear & Easy-Language Page Voice Instructions
  *
- * Extracts meaningful, visible content from the authenticated page container
- * and organizes it into a natural accessibility-style sequence:
+ * Provides clear, friendly, and easy-to-understand voice descriptions
+ * for each main page in LADRIS. Written in simple, non-technical English
+ * so that any official, evaluator, or user can easily understand:
+ *   1. What this page does
+ *   2. What key information is shown
+ *   3. How it helps them take quick, effective action
  *
- * 1. Page introduction
- * 2. Important summary/metric information
- * 3. Current filters or selections
- * 4. Important risks/status information
- * 5. Main available actions
- * 6. Relevant table/list information
- *
- * Dynamically reads live DOM data without hardcoding. Zero fake statistics.
+ * Spoken in a smooth, clear Indian English female voice.
  */
 
-function isElementVisible(el: Element | null): boolean {
-  if (!el || !(el instanceof HTMLElement)) return false
-
-  // Check element geometry
-  if (el.offsetWidth === 0 && el.offsetHeight === 0 && el.getClientRects().length === 0) {
-    return false
-  }
-
-  // Check computed styles
-  const style = window.getComputedStyle(el)
-  if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
-    return false
-  }
-
-  // Exclude elements marked hidden for accessibility
-  if (el.closest('[aria-hidden="true"]')) {
-    return false
-  }
-
-  return true
-}
-
-function cleanText(text: string): string {
-  return text
-    .replace(/\s+/g, ' ')
-    .replace(/[\r\n\t]+/g, ' ')
-    .trim()
-}
-
-const ROUTE_INTRODUCTIONS: Record<string, string> = {
+export const PAGE_VOICE_INSTRUCTIONS: Record<string, string> = {
+  // 1. Dashboard
   '/dashboard':
-    'Welcome to the Command Dashboard, providing a national overview of land acquisition velocity, delay risks, and project portfolios.',
-  '/projects':
-    'You are on the Land Acquisition Projects directory, where you can search, filter, and track infrastructure projects across states and agencies.',
-  '/gis':
-    'This is the GIS Command Map, displaying geospatial project alignments, district risk heatmaps, and spatial delay patterns.',
-  '/analytics':
-    'You are viewing the Analytics dashboard, providing delay risk modeling, compensation outlay analysis, and stage progression metrics.',
-  '/alerts':
-    'This is the Alerts and Early-Warning Command Center, monitoring real-time risk escalations, project delays, and system notifications.',
-  '/intelligence':
-    'Welcome to Decision Intelligence, delivering AI-driven delay root-cause analysis and proactive risk mitigation insights.',
-  '/priority-intelligence':
-    'You are on Priority Intelligence, highlighting high-impact projects that require urgent administrative review and intervention.',
-  '/la-workbench':
-    'This is the Land Acquisition Officer Workbench, designed for milestone tracking, field verification, and district workflow management.',
-  '/agency-portal':
-    'Welcome to the Implementing Agency Portal, allowing executing agencies to monitor assigned land acquisition packages and project progress.',
-  '/data-sources':
-    'You are on the Data Sources registry, managing official dataset integrations, sync schedules, and API connections.',
-  '/data-quality':
-    'This is the Data Quality and AI Reliability monitor, evaluating data completeness, validation health, and model confidence scores.',
-  '/admin':
-    'You are in the Administration panel, managing user accounts, access roles, district assignments, and system configurations.',
-}
+    'Welcome to the LADRIS Dashboard. This page gives you a quick and clear overview of all highway and road projects in India. Here, you can see total active projects, projects with high delay risk, important alerts, and compensation payments to landowners. You can also spot which states and districts have the biggest delays, so officers can take quick action where it is needed most.',
 
-function getRouteIntroduction(): string | null {
-  if (typeof window === 'undefined' || !window.location) return null
-  const pathname = window.location.pathname.replace(/\/+$/, '') || '/'
-  return ROUTE_INTRODUCTIONS[pathname] || null
+  // 2. Projects Directory
+  '/projects':
+    'This is the Projects Directory. Here, you can easily view and search all highway projects across different states and districts. You can filter projects by government agency, current work stage, or risk level. Each project card clearly shows how many days it might be delayed, the land required, and any open court cases. Simply click on any project to see its full details and smart recommendations.',
+
+  // 3. Project Details (Deep-Dive)
+  'project-details':
+    'This is the Project Details page. It shows you the complete status of the selected highway project from start to finish. You can see how much land is acquired, compensation payments made to landowners, and predicted delay days. It also highlights the main reasons for delay, such as court disputes or pending approvals, and gives practical AI suggestions to speed up the work.',
+
+  // 4. Decision Intelligence & What-If Simulator
+  '/decision-intelligence':
+    'Welcome to Decision Intelligence. This tool helps senior officers understand why delays happen and test solutions before making decisions. Using the simple What-If Simulator, you can see what happens if you add more field officers or resolve disputes faster. The system immediately calculates how many months of delay and cost you can save.',
+
+  '/intelligence':
+    'Welcome to Decision Intelligence. This tool helps senior officers understand why delays happen and test solutions before making decisions. Using the simple What-If Simulator, you can see what happens if you add more field officers or resolve disputes faster. The system immediately calculates how many months of delay and cost you can save.',
+
+  // 5. Priority Watchlist
+  '/priority-intelligence':
+    'This is the Priority Watchlist. It automatically highlights the most urgent highway projects that need immediate attention. Projects are ranked by high delay risk, upcoming legal deadlines, and stalled compensation. Officers can quickly check the main issues and assign tasks to resolve them on priority.',
+
+  // 6. Interactive Map (GIS)
+  '/gis':
+    'This is the Interactive Geospatial Map. It shows highway projects across India on an easy-to-read map. Each project is color-coded by risk level: red means critical risk, yellow means moderate risk, and green means on track. You can zoom in to your state or district, click on any route to see its live progress, and quickly find problem areas.',
+
+  // 7. Analytics & Trends
+  '/analytics':
+    'This is the Analytics and Trends page. It helps you see the bigger picture of land acquisition across India. You can easily compare performance between different states, districts, and agencies. The clear charts show average time taken at each stage, common causes of delays, and compensation trends over time.',
+
+  // 8. Alerts & Warnings
+  '/alerts':
+    'This is the Alerts and Early Warnings center. It constantly checks project deadlines to warn officers before delays become serious. Alerts are clearly marked as Critical, High, or Medium for legal disputes, pending payments, or overdue approvals. You can check email notifications sent to officers and take fast action to keep projects on track.',
+
+  // 9. Official Data Sources
+  '/data-sources':
+    'This is the Official Data Sources page. LADRIS securely connects with official government portals, including BhoomiRashi, the national data portal, and court records. Here, you can verify when data was last updated, check connection status, and refresh project information with a single click.',
+
+  // 10. Data Health & Quality
+  '/data-quality':
+    'This is the Data Health and Quality monitor. It automatically checks all project records for missing information or errors. A high health score means the project data is accurate and trustworthy. This ensures that all delay predictions and risk alerts are based on clean and reliable information.',
+
+  // 11. Admin & AI Settings
+  '/admin':
+    'This is the Administration and AI Settings page. System administrators can manage user accounts, assign roles, and set alert rules. You can also configure automated email notifications for high-risk projects and review system activity logs to keep everything running smoothly.',
+
+  // 12. Saarthi AI Copilot
+  'saarthi':
+    'This is Saarthi, your friendly AI assistant for land acquisition. You can ask Saarthi any question in simple words, either by speaking or typing. Saarthi can tell you project status, upcoming legal deadlines, reasons for delay, and helpful solutions based on official highway rules.',
+
+  // 13. LA Officer Workbench
+  '/la-workbench':
+    'This is the Land Acquisition Officer Workbench. Specially designed for district revenue officers and competent authorities, this page makes daily field work simple. Officers can track land notifications, handle landowner objections, verify land titles, and oversee direct bank payments to beneficiaries.',
+
+  // 14. Implementing Agency Portal
+  '/agency-portal':
+    'This is the Implementing Agency Portal for highway authorities and road corporations. It helps engineering teams track site handover, utility shifting, and right-of-way clearance, ensuring civil road construction can start on time without disputes.',
 }
 
 /**
- * Collects visible, meaningful page content from the current authenticated view.
- * If no content is found, returns the fallback string: "LADRIS voice guidance is ready."
+ * Returns a clear, easy-language description of the current page.
  */
-export function collectPageContent(): string {
-  if (typeof document === 'undefined') {
-    return 'LADRIS voice guidance is ready.'
+export function getPageVoiceInstruction(pathname?: string, isSaarthiOpen?: boolean): string {
+  // If Saarthi chatbot window is open, describe Saarthi
+  const saarthiActive =
+    isSaarthiOpen ??
+    (typeof document !== 'undefined' &&
+      Boolean(
+        document.getElementById('saarthi-chat-window') ||
+        document.querySelector('[data-saarthi-open="true"]')
+      ))
+
+  if (saarthiActive) {
+    return PAGE_VOICE_INSTRUCTIONS['saarthi']
   }
 
-  // Target the authenticated page container inside main
-  const root =
-    document.querySelector('main .page-container') ||
-    document.querySelector('main') ||
-    document.querySelector('.page-container')
+  const rawPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/dashboard')
+  const cleanPath = (rawPath || '').replace(/\/+$/, '') || '/dashboard'
 
-  if (!root || !isElementVisible(root)) {
-    return 'LADRIS voice guidance is ready.'
+  // Exact route match
+  if (PAGE_VOICE_INSTRUCTIONS[cleanPath]) {
+    return PAGE_VOICE_INSTRUCTIONS[cleanPath]
   }
 
-  const sections: string[] = []
-  const seenTexts = new Set<string>()
-
-  const addSnippet = (snippet: string) => {
-    const cleaned = cleanText(snippet)
-    if (!cleaned || cleaned.length < 2) return
-
-    const normalized = cleaned.toLowerCase()
-    if (seenTexts.has(normalized)) return
-    seenTexts.add(normalized)
-    sections.push(cleaned)
+  // Project Details match: /projects/:id (excluding /projects/new)
+  if (cleanPath.startsWith('/projects/') && !cleanPath.endsWith('/new')) {
+    return PAGE_VOICE_INSTRUCTIONS['project-details']
   }
 
-  // ─── 1. PAGE INTRODUCTION ───────────────────────────────────────────────────
-  const intro = getRouteIntroduction()
-  const introParts: string[] = []
-
-  if (intro) {
-    introParts.push(intro)
+  // Root fallback to Dashboard
+  if (cleanPath === '' || cleanPath === '/') {
+    return PAGE_VOICE_INSTRUCTIONS['/dashboard']
   }
 
-  const pageTitleEl = root.querySelector('.page-header-title, h1') || document.querySelector('header h1')
-  const titleText = pageTitleEl && isElementVisible(pageTitleEl) ? cleanText(pageTitleEl.textContent || '') : ''
+  // Default friendly fallback
+  return 'Welcome to LADRIS, your intelligent system for monitoring highway land acquisition. Use the top bar and left menu to explore projects, check delay predictions, view the interactive map, and access early warning alerts across India.'
+}
 
-  const pageSubtitleEl = root.querySelector('.page-header-subtitle')
-  const subtitleText = pageSubtitleEl && isElementVisible(pageSubtitleEl) ? cleanText(pageSubtitleEl.textContent || '') : ''
-
-  if (!intro && titleText) {
-    introParts.push(`You are viewing ${titleText}.`)
-  }
-
-  if (subtitleText) {
-    const cleanedSub = subtitleText.endsWith('.') ? subtitleText : `${subtitleText}.`
-    introParts.push(cleanedSub)
-  }
-
-  if (introParts.length > 0) {
-    addSnippet(introParts.join(' '))
-  }
-
-  // ─── 2. IMPORTANT SUMMARY / METRIC INFORMATION ─────────────────────────────
-  const metricSummaries: string[] = []
-  const metricCards = root.querySelectorAll('.metric-card')
-  metricCards.forEach((card) => {
-    if (!isElementVisible(card)) return
-    const labelEl = card.querySelector('.metric-label')
-    const valueEl = card.querySelector('.metric-value')
-    if (labelEl && valueEl) {
-      const label = cleanText(labelEl.textContent || '')
-      const val = cleanText(valueEl.textContent || '')
-      if (label && val && val !== '—') {
-        metricSummaries.push(`${label} at ${val}`)
-      }
-    }
-  })
-
-  // Extract key figures in cards if metric-cards are absent
-  const cardFigures: string[] = []
-  const cards = root.querySelectorAll('.card')
-  cards.forEach((card) => {
-    if (!isElementVisible(card) || card.querySelector('table')) return
-    const strongPairs = card.querySelectorAll('div > span:first-child + strong')
-    strongPairs.forEach((strong) => {
-      const parent = strong.parentElement
-      if (parent && isElementVisible(parent)) {
-        const span = parent.querySelector('span')
-        if (span) {
-          const k = cleanText(span.textContent || '').replace(/:$/, '')
-          const v = cleanText(strong.textContent || '')
-          if (k && v && k.length < 40 && !metricSummaries.some((m) => m.includes(k))) {
-            cardFigures.push(`${k} at ${v}`)
-          }
-        }
-      }
-    })
-  })
-
-  if (metricSummaries.length > 0) {
-    addSnippet(`Key metrics show ${metricSummaries.slice(0, 6).join(', ')}.`)
-  } else if (cardFigures.length > 0) {
-    addSnippet(`Key summary figures include ${cardFigures.slice(0, 3).join(', ')}.`)
-  }
-
-  // ─── 3. CURRENT FILTERS OR SELECTIONS ──────────────────────────────────────
-  const filters: string[] = []
-  const selects = root.querySelectorAll('select')
-  selects.forEach((select) => {
-    if (!isElementVisible(select)) return
-    const selectedOption = cleanText(select.options[select.selectedIndex]?.text || '')
-    const label = cleanText(select.getAttribute('aria-label') || select.name || '')
-    if (selectedOption && !selectedOption.toLowerCase().includes('select')) {
-      filters.push(label ? `${label} set to ${selectedOption}` : selectedOption)
-    }
-  })
-
-  const activeTabs = root.querySelectorAll('[role="tab"][aria-selected="true"], .btn-tab.active, [data-state="active"]')
-  activeTabs.forEach((tab) => {
-    if (!isElementVisible(tab)) return
-    const tabText = cleanText(tab.textContent || '')
-    if (tabText && tabText.length < 30) {
-      filters.push(tabText)
-    }
-  })
-
-  if (filters.length > 0) {
-    addSnippet(`Current filters and selections are ${filters.slice(0, 4).join(', ')}.`)
-  }
-
-  // ─── 4. IMPORTANT RISKS / STATUS INFORMATION ───────────────────────────────
-  const alertElements = root.querySelectorAll('[role="alert"], .badge-red, .badge-yellow, .risk-badge')
-  const riskNotices: string[] = []
-  alertElements.forEach((el) => {
-    if (!isElementVisible(el)) return
-    const parentItem = el.closest('[style*="border"], .card, div')
-    const alertTitle = parentItem?.querySelector('[style*="ellipsis"], [style*="bold"], strong, h4')
-    const badgeText = cleanText(el.textContent || '')
-
-    if (alertTitle && isElementVisible(alertTitle) && parentItem !== el) {
-      const titleStr = cleanText(alertTitle.textContent || '')
-      if (titleStr && titleStr.length < 60 && !riskNotices.some((r) => r.includes(titleStr))) {
-        riskNotices.push(`${badgeText}: ${titleStr}`)
-        return
-      }
-    }
-
-    if (badgeText && !seenTexts.has(badgeText.toLowerCase()) && riskNotices.length < 4) {
-      riskNotices.push(badgeText)
-    }
-  })
-
-  if (riskNotices.length > 0) {
-    addSnippet(`Important risk notices highlight ${riskNotices.slice(0, 4).join(', ')}.`)
-  }
-
-  // ─── 5. MAIN AVAILABLE ACTIONS ─────────────────────────────────────────────
-  const actionButtons: string[] = []
-  const buttons = root.querySelectorAll(
-    '.page-header button, .page-header .btn, button.btn-primary, button.btn-secondary, button:not([aria-hidden="true"])'
-  )
-  buttons.forEach((btn) => {
-    if (!isElementVisible(btn)) return
-    if (btn.closest('header') || btn.closest('.sidebar') || btn.closest('nav')) return
-    const btnText = cleanText(btn.textContent || '')
-    if (
-      btnText &&
-      btnText.length > 2 &&
-      btnText.length < 30 &&
-      !/^[\W_\d]+$/.test(btnText) &&
-      !actionButtons.includes(btnText)
-    ) {
-      actionButtons.push(btnText)
-    }
-  })
-
-  if (actionButtons.length > 0) {
-    addSnippet(`Available actions include ${actionButtons.slice(0, 3).join(', ')}.`)
-  }
-
-  // ─── 6. RELEVANT TABLE / LIST INFORMATION ──────────────────────────────────
-  const tables = root.querySelectorAll('table')
-  tables.forEach((table) => {
-    if (!isElementVisible(table)) return
-
-    const ths = table.querySelectorAll('thead th')
-    const colNames: string[] = []
-    ths.forEach((th) => {
-      if (isElementVisible(th)) {
-        const text = cleanText(th.textContent || '')
-        if (text && text.length < 30) colNames.push(text)
-      }
-    })
-
-    if (colNames.length > 0) {
-      addSnippet(`The table displays columns for ${colNames.slice(0, 5).join(', ')}.`)
-    }
-
-    const rows = table.querySelectorAll('tbody tr')
-    const rowSummaries: string[] = []
-    let rowCount = 0
-    rows.forEach((row) => {
-      if (rowCount >= 2 || !isElementVisible(row)) return
-      const cells = row.querySelectorAll('td')
-      const cellTexts: string[] = []
-      cells.forEach((td) => {
-        if (isElementVisible(td)) {
-          const text = cleanText(td.textContent || '')
-          if (text && text.length < 40) cellTexts.push(text)
-        }
-      })
-      if (cellTexts.length > 0) {
-        rowSummaries.push(cellTexts.slice(0, 4).join(', '))
-        rowCount++
-      }
-    })
-
-    if (rowSummaries.length > 0) {
-      addSnippet(`Top records include: ${rowSummaries.join('; and ')}.`)
-    }
-  })
-
-  // Fallback if no meaningful text collected
-  if (sections.length === 0) {
-    return 'LADRIS voice guidance is ready.'
-  }
-
-  // Limit narration length for very long pages (~200 words max)
-  const fullNarration = sections.join(' ')
-  const words = fullNarration.split(' ')
-  if (words.length > 200) {
-    return words.slice(0, 200).join(' ') + '... and additional details visible on page.'
-  }
-
-  return fullNarration
+/**
+ * Backwards-compatible collector returning the easy-language page description.
+ */
+export function collectPageContent(pathname?: string): string {
+  return getPageVoiceInstruction(pathname)
 }

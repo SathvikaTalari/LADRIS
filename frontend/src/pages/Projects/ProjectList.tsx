@@ -58,6 +58,78 @@ const AGENCY_OPTIONS: { value: string; label: string }[] = [
   { value: 'DMRC', label: 'Metro Rail (DMRC)' },
 ]
 
+// ─── Directory Status & Delay Risk Badges (Rectangular Button Style) ─────────
+const renderDirectoryStatusBadge = (status: ProjectStatus) => {
+  const norm = (status || '').toUpperCase()
+  if (norm === 'ACTIVE') {
+    return (
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 31,
+          padding: '0 14px',
+          borderRadius: 8,
+          backgroundColor: '#DCFCE7',
+          border: '1px solid #86EFAC',
+          color: '#15803D',
+          fontSize: '0.8125rem',
+          fontWeight: 600,
+          lineHeight: 1,
+          whiteSpace: 'nowrap',
+          verticalAlign: 'middle',
+          boxSizing: 'border-box',
+          boxShadow: 'none',
+        }}
+      >
+        Active
+      </span>
+    )
+  }
+  return <StatusBadge status={status} />
+}
+
+const renderDirectoryRiskBadge = (level: RiskLevel) => {
+  const norm = (level || '').toUpperCase()
+  const riskMap: Record<string, { bg: string; border: string; text: string; label: string }> = {
+    HIGH: { bg: '#FEE2E2', border: '#F87171', text: '#B91C1C', label: 'High' },
+    CRITICAL: { bg: '#FEE2E2', border: '#F87171', text: '#B91C1C', label: 'Critical' },
+    MEDIUM: { bg: '#FEF3C7', border: '#FBBF24', text: '#B45309', label: 'Medium' },
+    LOW: { bg: '#DBEAFE', border: '#60A5FA', text: '#1D4ED8', label: 'Low' },
+  }
+
+  const config = riskMap[norm]
+  if (!config) {
+    return <RiskBadge level={level} />
+  }
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 31,
+        padding: '0 14px',
+        borderRadius: 8,
+        backgroundColor: config.bg,
+        border: `1px solid ${config.border}`,
+        color: config.text,
+        fontSize: '0.8125rem',
+        fontWeight: 600,
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
+        verticalAlign: 'middle',
+        boxSizing: 'border-box',
+        boxShadow: 'none',
+      }}
+    >
+      {config.label}
+    </span>
+  )
+}
+
 export default function ProjectList() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -391,8 +463,8 @@ export default function ProjectList() {
                           <Building2 size={11} /> {agencyName}
                         </div>
                       </td>
-                      <td><StatusBadge status={project.status} /></td>
-                      <td><RiskBadge level={project.risk_level} /></td>
+                      <td>{renderDirectoryStatusBadge(project.status)}</td>
+                      <td>{renderDirectoryRiskBadge(project.risk_level)}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <span className="badge badge-gray" style={{ fontWeight: 600 }}>{project.state_code}</span>

@@ -101,7 +101,7 @@ async def sync_prediction_alert(db: AsyncSession, project, result: dict[str, Any
     top_drivers = result.get("top_drivers") or []
     reason = "High Delay Risk"
     predicted_days = result.get("predicted_delay_days", 0)
-    explanation = f"{project.name} has severe ML delay risk ({result['risk_score']:.1f}/100) with predicted {predicted_days:.0f} days timeline slippage."
+    explanation = f"{project.name} has severe delay risk ({result['risk_score']:.1f}/100) with predicted {predicted_days:.0f} days timeline slippage."
 
     # Identify dominant root cause from drivers
     for driver in top_drivers:
@@ -111,31 +111,32 @@ async def sync_prediction_alert(db: AsyncSession, project, result: dict[str, Any
         if direction == "increases_risk":
             if feat == "compensation_disbursement_pct":
                 reason = "Compensation Pending"
-                explanation = rec or f"{project.name}: Compensation disbursement is lagging behind schedule."
+                explanation = rec or f"{project.name}: Compensation payments are behind schedule."
                 break
             elif feat == "legal_dispute_count" or (getattr(project, "legal_case_count", 0) or 0) > 0:
                 reason = "Legal Dispute"
-                explanation = rec or f"{project.name}: Legal disputes pending in court require mediation resolution."
+                explanation = rec or f"{project.name}: Active court disputes require mediation to avoid stay orders."
                 break
             elif feat == "rehabilitation_progress_pct":
                 reason = "R&R Delay"
-                explanation = rec or f"{project.name}: R&R activities are progressing behind statutory milestones."
+                explanation = rec or f"{project.name}: Rehabilitation and resettlement activities are behind schedule."
                 break
 
     if reason == "High Delay Risk":
         if (getattr(project, "legal_case_count", 0) or 0) > 0:
             reason = "Legal Dispute"
-            explanation = f"{project.name} has {project.legal_case_count} active court disputes creating high timeline risk."
+            explanation = f"{project.name} has {project.legal_case_count} active court disputes creating significant delay risk."
         elif getattr(project, "delay_months", 0) and project.delay_months > 0:
             reason = "Stage Overdue"
-            explanation = f"{project.name} is overdue on statutory stage milestones by {project.delay_months} month(s)."
+            dm = project.delay_months
+            explanation = f"{project.name} is overdue on statutory milestones by {dm} {'month' if dm == 1 else 'months'}."
         elif (getattr(project, "rehabilitation_progress_pct", 100) or 100) < 65:
             pct = project.rehabilitation_progress_pct or 0
             reason = "R&R Delay"
-            explanation = f"{project.name} R&R progress ({pct:.0f}%) is behind statutory schedule."
+            explanation = f"{project.name} rehabilitation and resettlement progress ({pct:.0f}%) is behind schedule."
         elif getattr(project, "total_affected_families", 0) and (getattr(project, "families_compensated", 0) or 0) < project.total_affected_families * 0.7:
             reason = "Compensation Pending"
-            explanation = f"{project.name} compensation disbursement pending for affected land parcels."
+            explanation = f"{project.name}: Compensation disbursement is pending for affected land parcels."
 
     if result["risk_category"] == "HIGH":
         metadata = {

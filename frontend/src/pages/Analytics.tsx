@@ -136,7 +136,7 @@ export default function Analytics() {
       { name: 'Low Risk (<35%)', value: low, color: '#10b981' },
       { name: 'Moderate Risk (35-65%)', value: moderate, color: '#f59e0b' },
       { name: 'High Risk (65-85%)', value: high, color: '#f97316' },
-      { name: 'Critical Delay (>85%)', value: critical, color: '#ef4444' },
+      { name: 'Critical Risk (>85%)', value: critical, color: '#ef4444' },
     ]
   }, [projects])
 
@@ -145,7 +145,7 @@ export default function Analytics() {
   if (isLoading) {
     return (
       <div className="card" style={{ padding: 40, textAlign: 'center', color: 'var(--color-text-muted)' }}>
-        Loading predictive analytics engine &amp; multi-dimensional benchmarks…
+        Loading analytics and project trends...
       </div>
     )
   }
@@ -154,20 +154,20 @@ export default function Analytics() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
       <PageHeader
         title="Land Acquisition Trends & Delay Analytics"
-        subtitle="Track project delay patterns, high-risk sectors, regional trends, and key delay causes across India"
+        subtitle="Track project delays, high-risk sectors, regional trends, and main causes across India"
       />
 
       {/* Top High-Level Metrics Banner */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14, marginBottom: 20 }}>
         <div className="card" style={{ padding: 16 }}>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Active Monitored Projects
+            Active Projects
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: 4 }}>
             {overviewSummary?.total_projects || projects.length}
           </div>
           <div style={{ fontSize: '0.72rem', color: '#10b981', marginTop: 2 }}>
-            Verified Indian infrastructure records
+            Verified infrastructure projects
           </div>
         </div>
 
@@ -179,7 +179,7 @@ export default function Analytics() {
             {overviewSummary?.high_risk_projects || 7}
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-            Urgent intervention needed
+            Immediate attention required
           </div>
         </div>
 
@@ -191,7 +191,7 @@ export default function Analytics() {
             {overviewSummary?.average_delay_days ? `${Math.round(overviewSummary.average_delay_days)} days` : '190 d'}
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-            6 months average delay
+            Approximately 6 months
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export default function Analytics() {
             {overviewSummary?.total_area_ha?.toLocaleString() || '9,784.9'} ha
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-            Spanning 10 Indian states &amp; UTs
+            Across 10 states and UTs
           </div>
         </div>
       </div>
@@ -254,7 +254,7 @@ export default function Analytics() {
             {/* State Project Density & High Risk Chart */}
             <div className="card" style={{ padding: 18 }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 12 }}>
-                Project Density &amp; High-Risk Concentrations by State
+                Project Count and High-Risk Projects by State
               </div>
               <ReactECharts
                 style={{ height: 260, width: '100%' }}
@@ -330,7 +330,7 @@ export default function Analytics() {
                         <td>
                           <span className="badge badge-blue" style={{ fontWeight: 700 }}>{d.state_code}</span>
                         </td>
-                        <td>{d.project_count} project(s)</td>
+                        <td>{d.project_count} {d.project_count === 1 ? 'project' : 'projects'}</td>
                         <td style={{ color: d.high_risk_count > 0 ? '#ef4444' : '#10b981', fontWeight: 700 }}>
                           {d.high_risk_count}
                         </td>
@@ -352,7 +352,7 @@ export default function Analytics() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <div>
                   <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                    {selectedStateGroup.state_code} State Projects ({selectedStateGroup.projects.length} Active Infrastructure Initiatives)
+                    {selectedStateGroup.state_code} Projects ({selectedStateGroup.projects.length} Active {selectedStateGroup.projects.length === 1 ? 'Project' : 'Projects'})
                   </h4>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
                     Total Land Area: {selectedStateGroup.total_area} ha • High-Risk Projects: {selectedStateGroup.high_risk_count}
@@ -416,7 +416,7 @@ export default function Analytics() {
             {/* Sector Risk & Count Bar Chart */}
             <div className="card" style={{ padding: 18 }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 12 }}>
-                Comparative Risk Proportions Across Infrastructure Sectors
+                Risk Comparison Across Infrastructure Sectors
               </div>
               <ReactECharts
                 style={{ height: 260, width: '100%' }}
@@ -460,7 +460,7 @@ export default function Analytics() {
             {/* Sector Summary Table */}
             <div className="card" style={{ padding: 18 }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 12 }}>
-                Sector-wise Financial &amp; Land Outlay
+                Land Area and Compensation by Sector
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table className="data-table" style={{ width: '100%', fontSize: '0.8rem' }}>
@@ -500,7 +500,7 @@ export default function Analytics() {
             {/* Stage Progression Funnel / Distribution */}
             <div className="card" style={{ padding: 18 }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 12 }}>
-                Projects Distribution Across Acquisition Lifecycle Stages
+                Project Distribution Across Acquisition Stages
               </div>
               <ReactECharts
                 style={{ height: 260, width: '100%' }}
@@ -544,7 +544,7 @@ export default function Analytics() {
                 Common Delay Bottlenecks
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                According to historical project analysis, infrastructure projects experience the highest risk of slowdown during the <strong>COMPENSATION DISBURSEMENT</strong> and <strong>COURT DISPUTE RESOLUTION</strong> phases.
+                Historical project data shows that the greatest delays occur during <strong>compensation disbursement</strong> and <strong>court dispute resolution</strong>.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ padding: 12, background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: 8 }}>
@@ -552,7 +552,7 @@ export default function Analytics() {
                     Primary Bottleneck: Court Disputes &amp; Title Verification
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
-                    Long unresolved disputes (&gt;200 days) cause significant delays across all infrastructure types.
+                    Unresolved disputes lasting over 200 days cause major delays across all project types.
                   </div>
                 </div>
                 <div style={{ padding: 12, background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: 8 }}>
@@ -560,7 +560,7 @@ export default function Analytics() {
                     Secondary Bottleneck: Rehabilitation &amp; Resettlement Readiness
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
-                    R&amp;R progress below 50% strongly increases the likelihood of delay in airport and irrigation corridors.
+                    R&amp;R progress below 50% significantly increases the risk of delay in airport and irrigation projects.
                   </div>
                 </div>
               </div>
@@ -576,7 +576,7 @@ export default function Analytics() {
             {/* Probability Buckets Donut Chart */}
             <div className="card" style={{ padding: 18 }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 12 }}>
-                Delay Probability Risk Distribution
+                Delay Risk Distribution
               </div>
               <ReactECharts
                 style={{ height: 260, width: '100%' }}
@@ -608,15 +608,15 @@ export default function Analytics() {
             {/* Key Delay Drivers Matrix */}
             <div className="card" style={{ padding: 18 }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 12 }}>
-                Top Factors Causing Delays across Projects
+                Key Factors Causing Project Delays
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[
-                  { driver: 'Rehabilitation & Resettlement Progress %', impact: '+35% delay likelihood when R&R < 40%', weight: 'Very High' },
-                  { driver: 'Compensation Disbursement Lag', impact: 'Delayed sanction-to-disbursement ratio', weight: 'High' },
-                  { driver: 'Pending Legal Disputes Count', impact: 'Court stays & title contestations', weight: 'High' },
-                  { driver: 'Stakeholder Update Recency (>60d gap)', impact: 'Administrative communication bottleneck', weight: 'Medium' },
-                  { driver: 'District Historical Delay Rate', impact: 'Regional procedural complexity', weight: 'Medium' },
+                  { driver: 'Rehabilitation & Resettlement Progress', impact: '+35% delay risk when R&R progress is below 40%', weight: 'Very High' },
+                  { driver: 'Compensation Payment Delays', impact: 'Slow disbursement after compensation is sanctioned', weight: 'High' },
+                  { driver: 'Pending Legal Disputes', impact: 'Court stays and land title challenges', weight: 'High' },
+                  { driver: 'Infrequent Project Updates (>60 days)', impact: 'Delays in progress reporting between agencies', weight: 'Medium' },
+                  { driver: 'District Historical Delay Rate', impact: 'Past acquisition delays and procedural backlogs in the district', weight: 'Medium' },
                 ].map((item, idx) => (
                   <div key={idx} style={{ padding: '10px 12px', background: 'var(--color-bg-secondary)', borderRadius: 6, border: '1px solid var(--color-border-subtle)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
