@@ -1,0 +1,143 @@
+MINISTRY OF ROAD TRANSPORT AND HIGHWAYS
+GOVERNMENT OF INDIA
+
+────────────────────────────────────────────────────────────────────────────────
+GAZETTE NOTIFICATION UNDER SECTION 3A OF THE NATIONAL HIGHWAYS ACT, 1956
+(Central Act No. 48 of 1956)
+────────────────────────────────────────────────────────────────────────────────
+
+Notification No.: NH-11015/22/2024-LA-II
+Gazette Date: 14th March 2024
+Published In: The Gazette of India – Extraordinary, Part II, Section 3, Sub-section (ii)
+
+Subject: Notification of Intention to Acquire Land for the Development and
+         Construction of the Six-Lane Access-Controlled Expressway on NH-130D
+         from Patna to Aurangabad (Gaya Bypass Extension) in the State of Bihar
+         under the National Highways Act, 1956.
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 1: PROJECT IDENTIFICATION
+────────────────────────────────────────────────────────────────────────────────
+
+Project Name    : NH-130D Patna–Aurangabad Six-Lane Expressway (Package-3)
+Project Code    : NHAI-NH130D-PKG3
+Nodal Ministry  : Ministry of Road Transport and Highways (MoRTH)
+Executing Agency: National Highways Authority of India (NHAI)
+State           : Bihar
+Districts       : Patna, Arwal, Aurangabad
+Tehsils Affected: Phulwari Sharif, Masaurhi, Arwal, Madanpur, Aurangabad
+Project Type    : HIGHWAY
+Acquisition Act : NH_ACT_1956
+Total NH Length : 68.4 km (this package: 23.1 km)
+Right-of-Way    : 60 metres
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 2: STATUTORY DATES & TIMELINE
+────────────────────────────────────────────────────────────────────────────────
+
+Section 3A Notification Date   : 14-03-2024
+Objection Period (21 days)     : 14-03-2024 to 04-04-2024
+CALA Hearing of Objections     : 15-04-2024 to 30-04-2024
+Section 3D Declaration (Due)   : On or before 13-03-2025 (1-Year Statutory Deadline)
+Section 3G Award (Estimated)   : Q3 FY 2025-26
+Section 3H Deposit (Estimated) : Q4 FY 2025-26
+Physical Possession Target     : Q1 FY 2026-27
+
+IMPORTANT STATUTORY WARNING:
+If Section 3D Declaration is NOT published on or before 13-03-2025,
+the Section 3A notification shall LAPSE and fresh acquisition proceedings
+must be initiated from the beginning per Section 3A(4) of the NH Act, 1956.
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 3: LAND ACQUISITION DETAILS
+────────────────────────────────────────────────────────────────────────────────
+
+Total Land Area Required       : 1,386.40 Ha
+├── Agricultural Land          : 1,120.80 Ha (80.8%)
+├── Residential/Urban Land     :   148.60 Ha (10.7%)
+├── Government/Common Land     :    82.40 Ha (5.9%)
+└── Forest/Other               :    34.60 Ha (2.5%)
+
+Total Affected Families        : 3,840
+Total Khasra/Survey Numbers    : 2,214
+Number of Villages Affected    : 38
+Number of Districts            : 3
+
+Estimated Total Compensation (INR): ₹ 48,20,00,000 (Forty-Eight Crores Twenty Lakhs)
+Compensation Calculation Basis:
+  - Market Value: Average of top 50% sale deeds registered in 3 years preceding 3A date
+  - Solatium: 100% addition to market value as per RFCTLARR principles applied via NH Act awards
+  - Multiplier Factor: 1.5x (Rural area > 50 km from municipality limits)
+  - Interest @ 12% p.a. from notification to final award
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 4: AFFECTED TEHSIL-WISE LAND SUMMARY
+────────────────────────────────────────────────────────────────────────────────
+
+Tehsil            District      Villages  Families  Area (Ha)  Khasra Count
+─────────────────────────────────────────────────────────────────────────────
+Phulwari Sharif   Patna         6         580       188.40     312
+Masaurhi          Patna         9         840       312.80     486
+Arwal             Arwal         7         720       298.60     398
+Madanpur          Aurangabad    8         880       362.40     528
+Aurangabad        Aurangabad    8         820       224.20     490
+─────────────────────────────────────────────────────────────────────────────
+TOTAL                           38        3,840     1,386.40   2,214
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 5: COMPETENT AUTHORITY FOR LAND ACQUISITION (CALA)
+────────────────────────────────────────────────────────────────────────────────
+
+CALA Officer      : Shri Rajesh Kumar Singh, IAS
+Designation       : Divisional Commissioner, Patna Division
+Office Address    : Divisional Commissioner Office, Bankipur, Patna – 800 001
+Contact           : cala-nh130d-patna@bihar.gov.in | 0612-2505301
+Jurisdiction      : Patna, Arwal, Aurangabad Districts
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 6: OBJECTION PROCEDURE (Section 3B)
+────────────────────────────────────────────────────────────────────────────────
+
+Any person interested in any land mentioned in this notification may, within
+21 days from the date of publication of this notification, object to:
+  (a) the acquisition of the land or any land in the locality;
+  (b) the area and suitability of the land; or
+  (c) the justification offered for the public purpose.
+
+Objections must be filed in writing with the CALA at the address above.
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 7: LEGAL CASE STATUS AT TIME OF NOTIFICATION
+────────────────────────────────────────────────────────────────────────────────
+
+Pre-existing Legal Cases       : 2
+  Case 1: WP(C) 18432/2023 – Patna HC – Masaurhi farmers seeking higher valuation
+  Case 2: CWJ(C) 4211/2023 – Patna HC – Challenge to alignment selection (dismissed)
+
+Current Legal Case Status      : 1 PENDING (WP 18432/2023), 1 DISPOSED
+Impact on Acquisition Timeline : MODERATE – Hearing listed for 28-05-2024
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 8: REHABILITATION & RESETTLEMENT (R&R) COMMITMENTS
+────────────────────────────────────────────────────────────────────────────────
+
+R&R Package Applicable        : YES (families losing > 25% of land holding)
+Families Eligible for R&R     : 1,240
+Resettlement Sites Identified : 3 (Masaurhi Township, Arwal Extension, Aurangabad Periphery)
+House Construction Assistance : ₹3,50,000 per displaced family (BPL) / ₹1,50,000 (APL)
+Livelihood Assistance         : ₹5,00,000 per agricultural family losing primary land
+Employment Preference         : Priority to displaced families in project construction jobs
+
+────────────────────────────────────────────────────────────────────────────────
+
+Issued by order and in the name of the President of India.
+
+                                        (Dr. Anita Sharma)
+                                        Joint Secretary (Land Acquisition)
+                                        Ministry of Road Transport and Highways
+                                        New Delhi – 110 001
+
+Date: 14th March 2024
+
+[This document is a sample for LADRIS system demonstration purposes.
+Document Type: NOTIFICATION | Project Code: NHAI-NH130D-PKG3 | State: BR]

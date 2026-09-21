@@ -1,0 +1,200 @@
+{
+  "type": "FeatureCollection",
+  "name": "NH48_Pune_Bengaluru_Parcels_Package5",
+  "crs": {
+    "type": "name",
+    "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "parcel_id": "NH48-KA-P5-001",
+        "khasra_number": "34/2A",
+        "village": "Hoskote",
+        "tehsil": "Hoskote",
+        "district": "Bengaluru Rural",
+        "state_code": "KA",
+        "area_ha": 18.75,
+        "land_use_type": "Agricultural",
+        "owner_count": 3,
+        "is_notified": true,
+        "is_awarded": true,
+        "is_compensated": true,
+        "is_in_possession": true,
+        "has_legal_dispute": false,
+        "project_name": "NH-48 Bengaluru–Pune Expressway Package-5",
+        "project_code": "NHAI-NH48-PKG5",
+        "project_type": "HIGHWAY",
+        "acquisition_act": "NH_ACT_1956",
+        "notification_3a_date": "2022-03-10",
+        "notification_3d_date": "2022-12-15",
+        "estimated_compensation_inr": 28500000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [77.7980, 13.0650],
+            [77.8060, 13.0650],
+            [77.8060, 13.0720],
+            [77.7980, 13.0720],
+            [77.7980, 13.0650]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "parcel_id": "NH48-KA-P5-002",
+        "khasra_number": "78/1",
+        "village": "Malur",
+        "tehsil": "Malur",
+        "district": "Kolar",
+        "state_code": "KA",
+        "area_ha": 31.20,
+        "land_use_type": "Agricultural",
+        "owner_count": 7,
+        "is_notified": true,
+        "is_awarded": true,
+        "is_compensated": false,
+        "is_in_possession": false,
+        "has_legal_dispute": true,
+        "project_name": "NH-48 Bengaluru–Pune Expressway Package-5",
+        "project_code": "NHAI-NH48-PKG5",
+        "project_type": "HIGHWAY",
+        "acquisition_act": "NH_ACT_1956",
+        "notification_3a_date": "2022-03-10",
+        "notification_3d_date": "2022-12-15",
+        "estimated_compensation_inr": 52800000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [77.9310, 13.0020],
+            [77.9410, 13.0020],
+            [77.9410, 13.0120],
+            [77.9310, 13.0120],
+            [77.9310, 13.0020]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "parcel_id": "NH48-KA-P5-003",
+        "khasra_number": "112/3B",
+        "village": "Bangarpet",
+        "tehsil": "Bangarpet",
+        "district": "Kolar",
+        "state_code": "KA",
+        "area_ha": 24.60,
+        "land_use_type": "Horticultural",
+        "owner_count": 4,
+        "is_notified": true,
+        "is_awarded": false,
+        "is_compensated": false,
+        "is_in_possession": false,
+        "has_legal_dispute": false,
+        "project_name": "NH-48 Bengaluru–Pune Expressway Package-5",
+        "project_code": "NHAI-NH48-PKG5",
+        "project_type": "HIGHWAY",
+        "acquisition_act": "NH_ACT_1956",
+        "notification_3a_date": "2022-03-10",
+        "notification_3d_date": "2022-12-15",
+        "estimated_compensation_inr": 39200000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [78.0120, 12.9880],
+            [78.0200, 12.9880],
+            [78.0200, 12.9960],
+            [78.0120, 12.9960],
+            [78.0120, 12.9880]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "parcel_id": "NH48-KA-P5-004",
+        "khasra_number": "215/A",
+        "village": "Bethamangala",
+        "tehsil": "Sidlaghatta",
+        "district": "Chikkaballapur",
+        "state_code": "KA",
+        "area_ha": 42.80,
+        "land_use_type": "Wasteland",
+        "owner_count": 1,
+        "is_notified": true,
+        "is_awarded": true,
+        "is_compensated": true,
+        "is_in_possession": true,
+        "has_legal_dispute": false,
+        "project_name": "NH-48 Bengaluru–Pune Expressway Package-5",
+        "project_code": "NHAI-NH48-PKG5",
+        "project_type": "HIGHWAY",
+        "acquisition_act": "NH_ACT_1956",
+        "notification_3a_date": "2022-03-10",
+        "notification_3d_date": "2022-12-15",
+        "estimated_compensation_inr": 18900000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [77.8720, 13.1440],
+            [77.8830, 13.1440],
+            [77.8830, 13.1540],
+            [77.8720, 13.1540],
+            [77.8720, 13.1440]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "parcel_id": "NH48-KA-P5-005",
+        "khasra_number": "387/2",
+        "village": "Nandi Hills Road",
+        "tehsil": "Chikkaballapur",
+        "district": "Chikkaballapur",
+        "state_code": "KA",
+        "area_ha": 15.30,
+        "land_use_type": "Agricultural",
+        "owner_count": 9,
+        "is_notified": true,
+        "is_awarded": false,
+        "is_compensated": false,
+        "is_in_possession": false,
+        "has_legal_dispute": true,
+        "project_name": "NH-48 Bengaluru–Pune Expressway Package-5",
+        "project_code": "NHAI-NH48-PKG5",
+        "project_type": "HIGHWAY",
+        "acquisition_act": "NH_ACT_1956",
+        "notification_3a_date": "2022-03-10",
+        "notification_3d_date": "2022-12-15",
+        "estimated_compensation_inr": 31600000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [77.7640, 13.3680],
+            [77.7720, 13.3680],
+            [77.7720, 13.3760],
+            [77.7640, 13.3760],
+            [77.7640, 13.3680]
+          ]
+        ]
+      }
+    }
+  ]
+}

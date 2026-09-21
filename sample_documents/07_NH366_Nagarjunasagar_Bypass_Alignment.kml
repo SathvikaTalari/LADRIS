@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>NH-366 Nagarjunasagar Reservoir Bypass – Highway Alignment</name>
+    <description>
+      Alignment data for the NH-366 Nagarjunasagar Reservoir peripheral bypass.
+      Package NH366-PKG2 covering Macherla to Vinukonda sections.
+      State: Andhra Pradesh | District: Palnadu | Acquisition Act: NH_ACT_1956
+    </description>
+
+    <!-- ═══════════════════════════════════════════════════
+         CORRIDOR ALIGNMENT – Main Highway Centreline
+         Project Code: NHAI-NH366-PKG2
+         Project Type: HIGHWAY
+         ═══════════════════════════════════════════════════ -->
+    <Placemark>
+      <name>NH366 Macherla–Vinukonda Main Alignment</name>
+      <description>
+        Four-lane highway centreline from Macherla bypass junction to Vinukonda interchange.
+        Total alignment length: 42.6 km. ROW width: 60 metres.
+        Sections crossing reservoir periphery require special acquisition clearance.
+      </description>
+      <Style>
+        <LineStyle>
+          <color>ff0000ff</color>
+          <width>3</width>
+        </LineStyle>
+      </Style>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>
+          79.4360,16.4790,0
+          79.4440,16.4710,0
+          79.4550,16.4640,0
+          79.4680,16.4560,0
+          79.4820,16.4450,0
+          79.4990,16.4310,0
+          79.5140,16.4160,0
+          79.5320,16.3990,0
+          79.5520,16.3800,0
+          79.5740,16.3600,0
+          79.5980,16.3410,0
+          79.6240,16.3220,0
+          79.6510,16.3080,0
+          79.6800,16.2980,0
+          79.7120,16.2900,0
+          79.7450,16.2820,0
+          79.7810,16.2740,0
+          79.8160,16.2660,0
+          79.8520,16.2590,0
+          79.8840,16.2540,0
+          79.9130,16.2500,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+
+    <!-- ═══════════════════════════════════════════════════
+         HIGH-RISK ZONE – Reservoir Buffer Area
+         Parcels with disputed tribal classification
+         ═══════════════════════════════════════════════════ -->
+    <Placemark>
+      <name>High-Risk Zone – Reservoir Buffer Strip (Section 3A Lapse Risk)</name>
+      <description>
+        Critical zone: 8.4 km strip along Nagarjunasagar reservoir left bank.
+        Section 3D notification date: 2023-04-12.
+        Proximity to 1-year lapse cliff: BREACHED – escalation required.
+        Legal cases: 11 active petitions in AP High Court.
+        Affected families: 620. Compensated: 140. Possession: 0%.
+      </description>
+      <Style>
+        <PolyStyle>
+          <color>7f0000ff</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+        <LineStyle>
+          <color>ff0000ff</color>
+          <width>2</width>
+        </LineStyle>
+      </Style>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              79.4820,16.4490,0
+              79.4990,16.4350,0
+              79.5140,16.4200,0
+              79.5320,16.4030,0
+              79.5520,16.3840,0
+              79.5740,16.3640,0
+              79.5760,16.3590,0
+              79.5540,16.3760,0
+              79.5340,16.3950,0
+              79.5140,16.4120,0
+              79.4960,16.4270,0
+              79.4800,16.4420,0
+              79.4820,16.4490,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+
+    <!-- ═══════════════════════════════════════════════════
+         STATION POINT – Macherla Bypass Junction
+         ═══════════════════════════════════════════════════ -->
+    <Placemark>
+      <name>Macherla Bypass Junction (Start Point – Chainage 0+000)</name>
+      <description>
+        Project start chainage. Interchange with SH-4.
+        Land acquisition complete for interchange. Area: 14.2 Ha. In possession: YES.
+        Khasra: 88/1, 88/2, 89/A. Village: Macherla. Tehsil: Macherla.
+      </description>
+      <Point>
+        <coordinates>79.4360,16.4790,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- ═══════════════════════════════════════════════════
+         STATION POINT – Vinukonda Interchange (End Point)
+         ═══════════════════════════════════════════════════ -->
+    <Placemark>
+      <name>Vinukonda Interchange (End Point – Chainage 42+600)</name>
+      <description>
+        Project terminus at Vinukonda bypass junction with NH-65.
+        Land acquisition complete. Area: 18.6 Ha. In possession: YES.
+        Khasra: 201/3, 202/1. Village: Vinukonda. Tehsil: Vinukonda.
+      </description>
+      <Point>
+        <coordinates>79.9130,16.2500,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- ═══════════════════════════════════════════════════
+         BLOCKED PARCEL – Court Injunction Zone
+         ═══════════════════════════════════════════════════ -->
+    <Placemark>
+      <name>Court Injunction Zone – Palnadu District (BLOCKED)</name>
+      <description>
+        BLOCKED – High Court interim stay order WP No. 12847/2024.
+        Area: 22.4 Ha. Owner: Palnadu Farmers Collective (11 members).
+        Khasra numbers: 134/1, 134/2, 135/A, 136/B. Village: Gurazala.
+        Circle rate disputed: ₹8.2L/acre vs demanded ₹18L/acre.
+        Next hearing: 2026-10-15. Solatium: Not determined.
+      </description>
+      <Style>
+        <PolyStyle>
+          <color>7fff0000</color>
+          <fill>1</fill>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              79.6800,16.3020,0
+              79.6920,16.3020,0
+              79.6920,16.3120,0
+              79.6800,16.3120,0
+              79.6800,16.3020,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+
+  </Document>
+</kml>
