@@ -1,6 +1,7 @@
 """
 LADRIS — FastAPI Application Entry Point
 """
+import asyncio
 import sys
 import time
 from contextlib import asynccontextmanager
@@ -275,8 +276,55 @@ async def lifespan(app: FastAPI):
             print(f"   ✅ Project CSV synchronized: {len(imported_ids)} project(s)")
         except Exception as exc:
             print(f"   ⚠️  Project CSV synchronization failed: {exc}")
+
+    # ─── Live Datasource Sync Background Poller ────────────────────────────────
+    _live_sync_task = None
+    if settings.LIVE_SYNC_ENABLED and db_ok:
+        async def _live_sync_poller():
+            """Background loop: poll all due LiveSyncJobs every LIVE_SYNC_POLL_INTERVAL_SECS seconds."""
+            from app.services.live_sync_service import run_all_due_sync_jobs
+            print(
+                f"   ✅ Live Sync Poller started "
+                f"(interval={settings.LIVE_SYNC_POLL_INTERVAL_SECS}s, "
+                f"max_failures={settings.LIVE_SYNC_MAX_FAILURES})"
+            )
+            while True:
+                try:
+                    await asyncio.sleep(settings.LIVE_SYNC_POLL_INTERVAL_SECS)
+                    async with AsyncSessionLocal() as session:
+                        results = await run_all_due_sync_jobs(session)
+                    if results:
+                        triggered = sum(1 for r in results if r.ml_triggered)
+                        changed = sum(r.changes_applied for r in results)
+                        failures = sum(1 for r in results if not r.success)
+                        print(
+                            f"   🔄 Live Sync: {len(results)} job(s) polled | "
+                            f"{changed} field(s) changed | "
+                            f"{triggered} ML refresh(es) | "
+                            f"{failures} failure(s)"
+                        )
+                except asyncio.CancelledError:
+                    print("   🛑 Live Sync Poller stopping gracefully...")
+                    break
+                except Exception as exc:
+                    import logging
+                    logging.getLogger("live_sync_poller").error(
+                        "Live Sync Poller error (will retry next interval): %s", exc
+                    )
+
+        _live_sync_task = asyncio.create_task(_live_sync_poller())
+
     yield
+
+    # ─── Shutdown ──────────────────────────────────────────────────────────────
+    if _live_sync_task is not None and not _live_sync_task.done():
+        _live_sync_task.cancel()
+        try:
+            await _live_sync_task
+        except asyncio.CancelledError:
+            pass
     print(f"🛑 {settings.APP_NAME} shutting down...")
+
 
 
 # ─── Application Factory ──────────────────────────────────────────────────────

@@ -23,4 +23,5 @@ from app.models.ingestion import (  # noqa: F401
     DocumentReviewStatus,
 )
 from app.models.decision_intelligence import ProjectIntervention  # noqa: F401
+from app.models.live_sync import LiveSyncJob, ProjectChangeLog, SyncSourceType, ChangeSource  # noqa: F401
 

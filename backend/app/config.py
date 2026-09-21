@@ -123,6 +123,16 @@ class Settings(BaseSettings):
     INGESTION_API_KEY: str = "ladris-secure-api-key-default"
     EXTERNAL_DB_URL: str = ""
 
+    # ─── Live Datasource Sync Engine ─────────────────────────────────────────
+    LIVE_SYNC_ENABLED: bool = True
+    LIVE_SYNC_POLL_INTERVAL_SECS: int = 60     # how often the background poller wakes up
+    LIVE_SYNC_MAX_FAILURES: int = 5            # disable job after this many consecutive errors
+    LIVE_SYNC_REQUEST_TIMEOUT_SECS: float = 20.0  # HTTP request timeout for REST_API syncs
+    # Fernet symmetric key for encrypting stored credentials (connection URLs, API keys).
+    # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    # If empty, a deterministic fallback is used (NOT for production).
+    FERNET_ENCRYPTION_KEY: str = ""
+
     # Existing trained LightGBM module (never retrained by request handlers)
     @staticmethod
     def _get_ml_root() -> Path:
