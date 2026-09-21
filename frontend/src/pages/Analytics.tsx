@@ -140,6 +140,11 @@ export default function Analytics() {
     ]
   }, [projects])
 
+  // ── Derived high-risk count from actual project list (HIGH + CRITICAL) ─────
+  const computedHighRiskCount = useMemo(() => {
+    return projects.filter((p) => p.risk_level === 'HIGH' || p.risk_level === 'CRITICAL').length
+  }, [projects])
+
   const selectedStateGroup = stateData.find((d) => d.state_code === selectedState)
 
   if (isLoading) {
@@ -176,7 +181,7 @@ export default function Analytics() {
             High-Risk Projects
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ef4444', marginTop: 4 }}>
-            {overviewSummary?.high_risk_projects || 7}
+            {projects.length > 0 ? computedHighRiskCount : (overviewSummary?.high_risk_projects ?? '—')}
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
             Immediate attention required
@@ -268,15 +273,21 @@ export default function Analytics() {
                 option={{
                   backgroundColor: 'transparent',
                   tooltip: { trigger: 'axis', confine: true },
-                  legend: { data: ['Total Projects', 'High Risk'], textStyle: { color: '#8b95a8', fontSize: 11 } },
-                  grid: { top: 30, bottom: 30, left: 30, right: 10, containLabel: true },
+                  legend: {
+                    data: ['Total Projects', 'High Risk'],
+                    textStyle: { color: '#8b95a8', fontSize: 11 },
+                    bottom: 0,
+                  },
+                  grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
                   xAxis: {
                     type: 'category',
                     data: stateData.map((d) => d.state_code),
                     axisLabel: { color: '#8b95a8', fontSize: 11 },
+                    axisTick: { show: false },
                   },
                   yAxis: {
                     type: 'value',
+                    minInterval: 1,
                     axisLabel: { color: '#8b95a8', fontSize: 11 },
                     splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } },
                   },
@@ -286,14 +297,15 @@ export default function Analytics() {
                       type: 'bar',
                       data: stateData.map((d) => d.project_count),
                       itemStyle: { color: '#3d7ef5', borderRadius: [4, 4, 0, 0] },
-                      barWidth: '35%',
+                      barMaxWidth: 28,
+                      barGap: '10%',
                     },
                     {
                       name: 'High Risk',
                       type: 'bar',
                       data: stateData.map((d) => d.high_risk_count),
                       itemStyle: { color: '#ef4444', borderRadius: [4, 4, 0, 0] },
-                      barWidth: '35%',
+                      barMaxWidth: 28,
                     },
                   ],
                 }}
@@ -313,7 +325,6 @@ export default function Analytics() {
                       <th>Projects</th>
                       <th>High Risk</th>
                       <th>Land Area</th>
-                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -335,9 +346,6 @@ export default function Analytics() {
                           {d.high_risk_count}
                         </td>
                         <td>{d.total_area} ha</td>
-                        <td>
-                          <span style={{ fontSize: '0.72rem', color: 'var(--color-accent-primary)' }}>Select →</span>
-                        </td>
                       </tr>
                     ))}
                   </tbody>

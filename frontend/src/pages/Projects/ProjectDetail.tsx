@@ -1218,6 +1218,18 @@ export default function ProjectDetail() {
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: delayDays && Number(delayDays) > 0 ? '#d97706' : 'var(--color-text-primary)', fontFamily: 'var(--font-mono)' }}>
             {delayDays != null ? `${Math.round(Number(delayDays))} days` : '0 days'}
           </div>
+          {(() => {
+            const days = delayDays != null ? Math.round(Number(delayDays)) : 0
+            const baseDate = project?.planned_end_date ? new Date(project.planned_end_date) : null
+            if (!baseDate || isNaN(baseDate.getTime())) return null
+            const estimatedDate = new Date(baseDate)
+            estimatedDate.setDate(estimatedDate.getDate() + days)
+            return (
+              <div style={{ fontSize: '0.7rem', color: days > 0 ? '#d97706' : 'var(--color-text-muted)', marginTop: 5, fontWeight: 500 }}>
+                Est. completion: {estimatedDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </div>
+            )
+          })()}
         </div>
 
         {/* KPI 4: Critical Bottleneck */}

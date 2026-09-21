@@ -422,11 +422,17 @@ def _portfolio(projects, prediction_rows):
     by_project = {row.project_id: row for row in prediction_rows}
     counts = {"LOW": 0, "MEDIUM": 0, "HIGH": 0, "CRITICAL": 0}
     for row in prediction_rows:
-        cat = row.risk_category
-        # Segregate CRITICAL from HIGH for extreme risk scores (score >= 90) or explicit CRITICAL category
-        if cat == "CRITICAL" or (cat == "HIGH" and (row.risk_score or 0) >= 90.0):
-            cat = "CRITICAL"
-        counts[cat] = counts.get(cat, 0) + 1
+        # Use the ML model's risk_category directly — do NOT override it
+        cat = (row.risk_category or "MEDIUM").upper()
+        if cat in counts:
+            counts[cat] += 1
+    # Also include projects without predictions using their stored risk_level
+    predicted_ids = set(row.project_id for row in prediction_rows)
+    for project in projects:
+        if project.id not in predicted_ids:
+            stored = (getattr(project.risk_level, 'value', None) or str(project.risk_level or 'MEDIUM')).upper()
+            if stored in counts:
+                counts[stored] += 1
     completeness = [sum(value is not None for value in (row.feature_snapshot or {}).values()) / 23 * 100 for row in prediction_rows]
     queue, stage_values = [], defaultdict(list)
     states, districts = defaultdict(list), defaultdict(list)
@@ -436,9 +442,8 @@ def _portfolio(projects, prediction_rows):
         district = (project.district_codes or [project.state_code])[0]
         peak = max(row.stage_predictions or [], key=lambda item: item.get("risk_score", 0), default={})
         driver = next((item for item in row.top_drivers or [] if item.get("contribution", 0) > 0), None)
-        item_risk_level = row.risk_category
-        if item_risk_level == "CRITICAL" or (item_risk_level == "HIGH" and (row.risk_score or 0) >= 90.0):
-            item_risk_level = "CRITICAL"
+        # Use the ML model's risk_category directly
+        item_risk_level = (row.risk_category or "MEDIUM").upper()
         queue.append({
             "id": str(project.id), "name": project.name, "project_code": project.project_code,
             "state_code": project.state_code, "district": district, "location": f"{project.state_code} / {district}",
@@ -464,14 +469,16 @@ def _portfolio(projects, prediction_rows):
     return counts, queue[:10], stages, highest, top_states, top_districts, average
 
 
+
 @analytics_router.get("/overview")
 async def analytics_overview(db: AsyncSession = Depends(get_db), _: User = Depends(get_current_user)):
     projects = (await db.execute(select(Project).where(Project.deleted_at.is_(None)))).scalars().all()
     predictions = await latest_predictions(db)
     counts, *_ = _portfolio(projects, predictions)
     delay_values = [row.predicted_delay_days for row in predictions if row.predicted_delay_days is not None]
+    high_risk_total = counts["HIGH"] + counts["CRITICAL"]
     return {"status": "success" if projects else "no_data", "data_loaded": bool(projects), "summary": {
-        "total_projects": len(projects), "high_risk_projects": counts["HIGH"], "projects_requiring_attention": counts["HIGH"],
+        "total_projects": len(projects), "high_risk_projects": high_risk_total, "projects_requiring_attention": high_risk_total,
         "average_delay_days": round(sum(delay_values) / len(delay_values), 1) if delay_values else None,
         "total_area_ha": round(sum(float(project.total_area_ha or 0) for project in projects), 1),
         "total_affected_families": sum(project.total_affected_families or 0 for project in projects),
@@ -485,11 +492,23 @@ async def analytics_executive(db: AsyncSession = Depends(get_db), _: User = Depe
     active_alerts = (await db.execute(select(func.count(Alert.id)).where(Alert.status == AlertStatus.ACTIVE))).scalar_one()
     counts, queue, stages, highest, states, districts, completeness = _portfolio(projects, predictions)
     total = len(projects)
+    from datetime import date as _date
+    today = _date.today()
+    def _is_delayed(p) -> bool:
+        status_val = str(getattr(p.status, "value", p.status)).upper()
+        if status_val == "DELAYED":
+            return True
+        if p.delay_months and int(p.delay_months) > 0:
+            return True
+        if p.planned_end_date and p.planned_end_date < today and status_val not in ("COMPLETED", "CANCELLED"):
+            return True
+        return False
+    projects_delayed_count = sum(1 for p in projects if _is_delayed(p))
     return {
         "status": "success" if total else "no_data", "data_loaded": bool(total),
         "executive_kpis": {"total_active_projects": total, "total_land_required_ha": round(sum(float(p.total_area_ha or 0) for p in projects), 1),
             "financial_outlay_cr": round(sum(float(p.estimated_compensation_inr or 0) for p in projects) / 1e7, 1),
-            "high_critical_projects": counts["HIGH"] + counts["CRITICAL"], "projects_delayed": sum(str(getattr(p.status, "value", p.status)) == "DELAYED" for p in projects),
+            "high_critical_projects": counts["HIGH"] + counts["CRITICAL"], "projects_delayed": projects_delayed_count,
             "active_alerts": active_alerts, "projects_requiring_intervention": counts["HIGH"] + counts["CRITICAL"],
             "avg_data_completeness": completeness, "data_trust_score": round(completeness)},
         "ai_reliability_distinction": {"prediction_status": {"available": len(predictions), "unavailable_deferred": total - len(predictions), "low_reliability": sum(not (row.validation or {}).get("is_valid", True) for row in predictions)}},
