@@ -88,7 +88,26 @@ async def list_projects(
     if project_type:
         query = query.where(Project.project_type == project_type)
     if status:
-        query = query.where(Project.status == status)
+        if status == ProjectStatus.DELAYED:
+            # A project is "delayed" if any of these are true:
+            # 1. Status is explicitly DELAYED
+            # 2. delay_months > 0 (explicitly recorded delay)
+            # 3. planned_end_date has passed and project is not completed/cancelled
+            from datetime import date as _date
+            from sqlalchemy import or_, and_
+            today = _date.today()
+            query = query.where(
+                or_(
+                    Project.status == ProjectStatus.DELAYED,
+                    Project.delay_months > 0,
+                    and_(
+                        Project.planned_end_date < today,
+                        Project.status.not_in([ProjectStatus.COMPLETED, ProjectStatus.CANCELLED]),
+                    ),
+                )
+            )
+        else:
+            query = query.where(Project.status == status)
     if risk_level:
         query = query.where(Project.risk_level == risk_level)
     if search:
@@ -114,6 +133,8 @@ async def list_projects(
     prediction_by_project = {
         row.project_id: row for row in await latest_predictions(db)
     }
+    from datetime import date as _today_date
+    today_date = _today_date.today()
     items = []
     for project in projects:
         item = ProjectListResponse.model_validate(project)
@@ -126,6 +147,15 @@ async def list_projects(
                 item.top_bottleneck = raw_driver.replace("_", " ").title()
         elif item.top_bottleneck is None and item.delay_reason:
             item.top_bottleneck = item.delay_reason
+        # Derive effective display status — if project is delayed but status not updated, show DELAYED
+        current_status = str(getattr(project.status, "value", project.status)).upper()
+        if current_status not in ("COMPLETED", "CANCELLED", "DELAYED"):
+            is_delayed = (
+                (project.delay_months and int(project.delay_months) > 0) or
+                (project.planned_end_date and project.planned_end_date < today_date)
+            )
+            if is_delayed:
+                item.status = ProjectStatus.DELAYED
         items.append(item)
 
     return PaginatedResponse(

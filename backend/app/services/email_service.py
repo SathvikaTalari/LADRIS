@@ -177,11 +177,12 @@ def send_alert_email_sync(
 
     # If no SMTP credentials configured, operate in graceful developer simulation mode
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        logger.info(
-            f"[EMAIL NOTIFICATION DISPATCHED - Developer Mode] To: {to_email} | Subject: {subject}"
+        logger.warning(
+            f"[EMAIL SKIPPED - No SMTP credentials] To: {to_email} | Subject: {subject} "
+            f"| Set SMTP_USER and SMTP_PASSWORD in .env to enable real delivery."
         )
         return {
-            "sent": True,
+            "sent": False,
             "mode": "SIMULATED",
             "to": to_email,
             "timestamp": timestamp,
@@ -447,22 +448,26 @@ async def trigger_alert_email_if_needed(
         project_id=alert.project_id,
     )
 
-    # 7. Dispatch in background (non-blocking)
-    asyncio.create_task(
-        send_alert_email_async(
-            to_email=to_email,
-            subject=email_data["subject"],
-            body_text=email_data["text"],
-            body_html=email_data["html"],
-        )
+    # 7. Dispatch — await actual result so we can record real status
+    result = await send_alert_email_async(
+        to_email=to_email,
+        subject=email_data["subject"],
+        body_text=email_data["text"],
+        body_html=email_data["html"],
     )
 
-    # 8. Update delivery status on alert metadata
+    actually_sent = result.get("sent", False)
+    mode = result.get("mode", "UNKNOWN")
+    error_detail = result.get("error", "")
+
+    # 8. Update delivery status on alert metadata (only mark sent=True for real SMTP delivery)
     updated_meta = dict(meta)
-    updated_meta["email_sent"] = True
+    updated_meta["email_sent"] = actually_sent
     updated_meta["email_sent_at"] = datetime.now(timezone.utc).isoformat()
     updated_meta["email_recipient"] = to_email
-    updated_meta["email_status"] = "SENT"
+    updated_meta["email_status"] = mode  # SMTP | SIMULATED | ERROR | DISABLED
+    if error_detail:
+        updated_meta["email_error"] = error_detail
     if score is not None:
         try:
             updated_meta["last_sent_risk_score"] = float(score)
@@ -471,15 +476,22 @@ async def trigger_alert_email_if_needed(
     alert.alert_metadata = updated_meta
 
     # 9. Persist notification log row (committed by caller)
+    log_status = "SENT" if actually_sent else f"FAILED ({mode})"
     try:
         log_entry = NotificationLog(
             alert_id=alert.id,
             channel="email",
             recipient=to_email,
-            status="SENT",
+            status=log_status,
         )
         db.add(log_entry)
     except Exception as _log_err:
         logger.debug(f"Could not write email notification log: {_log_err}")
 
-    return True
+    if not actually_sent:
+        logger.warning(
+            f"⚠️ Email NOT delivered [{mode}] to {to_email}. "
+            + (f"Error: {error_detail}" if error_detail else "Check SMTP_USER / SMTP_PASSWORD in .env")
+        )
+
+    return actually_sent
