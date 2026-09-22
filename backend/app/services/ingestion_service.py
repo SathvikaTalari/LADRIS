@@ -230,7 +230,15 @@ class IngestionService:
         # 4. District Codes
         raw_dist = raw.get("district_codes") or raw.get("District") or []
         if isinstance(raw_dist, str):
-            districts = [d.strip() for d in re.split(r"[,;/]+", raw_dist) if d.strip()]
+            # Handle Python list-string notation: "['Bengaluru Urban']" or "['A','B']"
+            stripped = raw_dist.strip()
+            if stripped.startswith("[") and stripped.endswith("]"):
+                inner = stripped[1:-1]
+                # Extract quoted values or plain comma-separated values
+                quoted = re.findall(r"['\"]([^'\"]+)['\"]", inner)
+                districts = quoted if quoted else [d.strip() for d in inner.split(",") if d.strip()]
+            else:
+                districts = [d.strip() for d in re.split(r"[,;/]+", stripped) if d.strip()]
         elif isinstance(raw_dist, list):
             districts = [str(d).strip() for d in raw_dist if str(d).strip()]
         else:
@@ -363,6 +371,47 @@ class IngestionService:
                 errors.append(f"Invalid longitude: {lng}. Must be between -180 and 180.")
             normalized["longitude"] = lng
 
+        # 14. Risk Level
+        raw_risk = str(raw.get("risk_level") or "").strip().upper()
+        try:
+            normalized["risk_level"] = RiskLevel(raw_risk) if raw_risk else RiskLevel.UNKNOWN
+        except ValueError:
+            normalized["risk_level"] = RiskLevel.UNKNOWN
+
+        # 15. Status
+        raw_status = str(raw.get("status") or "ACTIVE").strip().upper()
+        try:
+            normalized["status"] = ProjectStatus(raw_status)
+        except ValueError:
+            normalized["status"] = ProjectStatus.ACTIVE
+
+        # 16. Delay info & Tehsil names
+        delay_months = parse_int_safe(raw.get("delay_months"))
+        if delay_months is not None:
+            normalized["delay_months"] = delay_months
+        delay_reason = str(raw.get("delay_reason") or "").strip() or None
+        if delay_reason:
+            normalized["delay_reason"] = delay_reason
+        raw_tehsil = raw.get("tehsil_names") or []
+        if isinstance(raw_tehsil, str):
+            tehsil_stripped = raw_tehsil.strip()
+            if tehsil_stripped.startswith("[") and tehsil_stripped.endswith("]"):
+                inner = tehsil_stripped[1:-1]
+                quoted = re.findall(r"['\"]([^'\"]+)['\"]", inner)
+                tehsils = quoted if quoted else [t.strip() for t in inner.split(",") if t.strip()]
+            else:
+                tehsils = [t.strip() for t in re.split(r"[,;/]+", tehsil_stripped) if t.strip()]
+        elif isinstance(raw_tehsil, list):
+            tehsils = [str(t).strip() for t in raw_tehsil if str(t).strip()]
+        else:
+            tehsils = []
+        normalized["tehsil_names"] = tehsils
+
+        # 17. Nodal Agency
+        raw_nodal = str(raw.get("nodal_agency") or "").strip() or None
+        if raw_nodal:
+            normalized["nodal_agency"] = raw_nodal
+
         return normalized, errors
 
     # ─── 2. CSV / Excel Auto-Mapping & Preview ────────────────────────────────
@@ -454,6 +503,7 @@ class IngestionService:
         source_name: Optional[str] = None,
         reporting_period: Optional[str] = None,
         user_id: Optional[uuid.UUID] = None,
+        upsert: bool = True,
     ) -> Dict[str, Any]:
         """Execute CSV/Excel bulk import with row validation, duplicate checks, and PostGIS/ML refresh."""
         ext = os.path.splitext(filename)[1].lower()
@@ -467,7 +517,7 @@ class IngestionService:
         else:
             raise ValueError(f"Unsupported format: {ext}")
 
-        # Create IngestionJob record
+        # 1. Create IngestionJob record and flush to generate ID
         job = IngestionJob(
             job_type="CSV_EXCEL",
             source_name=source_name or f"Upload: {filename}",
@@ -483,19 +533,21 @@ class IngestionService:
         )
         self.db.add(job)
         await self.db.flush()
+        job_id = job.id
 
-        # Cache existing project codes for fast duplicate detection
-        existing_codes_res = await self.db.execute(select(Project.project_code).where(Project.deleted_at.is_(None)))
+        # 2. Snapshot ALL existing project codes (including soft-deleted) for duplicate / upsert handling
+        existing_codes_res = await self.db.execute(select(Project.project_code))
         existing_codes = set(existing_codes_res.scalars().all())
 
         imported_count = 0
+        updated_count = 0
         duplicate_count = 0
         invalid_count = 0
         rejected_errors: List[Dict[str, Any]] = []
         imported_project_ids: List[uuid.UUID] = []
-        seen_batch_codes = set()
+        seen_batch_codes: set = set()
 
-        # Invert mapping: {source_col: target_field}
+        # 3. Process each row
         for index, row in df.iterrows():
             row_dict = row.where(pd.notnull(row), None).to_dict()
             mapped_payload: Dict[str, Any] = {}
@@ -506,37 +558,129 @@ class IngestionService:
             row_index = index + 1
             code = str(mapped_payload.get("project_code") or "").strip()
 
-            # Duplicate Check
-            if code in existing_codes or code in seen_batch_codes:
+            # Case A: Duplicate within this upload file
+            if code in seen_batch_codes:
                 duplicate_count += 1
                 raw_rec = RawIngestionRecord(
-                    job_id=job.id,
+                    job_id=job_id,
                     row_index=row_index,
                     source_record_id=code,
                     raw_payload=to_jsonable(row_dict),
                     normalized_payload=to_jsonable(mapped_payload),
                     validation_status=ValidationStatus.DUPLICATE.value,
-                    validation_errors=["Duplicate project_code detected"],
+                    validation_errors=["Duplicate project_code within batch"],
                     target_entity=target_entity,
                 )
                 self.db.add(raw_rec)
                 rejected_errors.append({
                     "row_index": row_index,
                     "project_code": code,
-                    "reason": f"Duplicate project code '{code}' already exists in LADRIS or file.",
+                    "reason": f"project_code '{code}' appears more than once in this file.",
                 })
                 continue
 
-            # Strong Validation
+            # Case B: Project code already exists in DB
+            if code in existing_codes:
+                if not upsert:
+                    duplicate_count += 1
+                    raw_rec = RawIngestionRecord(
+                        job_id=job_id,
+                        row_index=row_index,
+                        source_record_id=code,
+                        raw_payload=to_jsonable(row_dict),
+                        normalized_payload=to_jsonable(mapped_payload),
+                        validation_status=ValidationStatus.DUPLICATE.value,
+                        validation_errors=[f"Project code '{code}' already exists."],
+                        target_entity=target_entity,
+                    )
+                    self.db.add(raw_rec)
+                    rejected_errors.append({
+                        "row_index": row_index,
+                        "project_code": code,
+                        "reason": f"Duplicate project code '{code}' already exists in LADRIS.",
+                    })
+                    continue
+
+                # Upsert: validate mapped fields
+                normalized, errors = self.normalize_project_payload(mapped_payload)
+                if errors:
+                    invalid_count += 1
+                    raw_rec = RawIngestionRecord(
+                        job_id=job_id,
+                        row_index=row_index,
+                        source_record_id=code,
+                        raw_payload=to_jsonable(row_dict),
+                        normalized_payload=to_jsonable(mapped_payload),
+                        validation_status=ValidationStatus.INVALID.value,
+                        validation_errors=errors,
+                        target_entity=target_entity,
+                    )
+                    self.db.add(raw_rec)
+                    rejected_errors.append({
+                        "row_index": row_index,
+                        "project_code": code,
+                        "reason": "Upsert validation failed: " + "; ".join(errors),
+                    })
+                    continue
+
+                try:
+                    res = await self.db.execute(
+                        select(Project).where(Project.project_code == code)
+                    )
+                    existing_project = res.scalar_one_or_none()
+                    if existing_project:
+                        # Restore soft-deleted project if needed
+                        existing_project.deleted_at = None
+                        _skip = {"id", "project_code", "created_at"}
+                        for k, v in normalized.items():
+                            if k not in _skip and v is not None:
+                                setattr(existing_project, k, v)
+                        existing_project.updated_by = user_id
+
+                        raw_rec = RawIngestionRecord(
+                            job_id=job_id,
+                            row_index=row_index,
+                            source_record_id=code,
+                            raw_payload=to_jsonable(row_dict),
+                            normalized_payload=to_jsonable(normalized),
+                            validation_status=ValidationStatus.IMPORTED.value,
+                            validation_errors=[],
+                            target_entity=target_entity,
+                            target_id=existing_project.id,
+                        )
+                        self.db.add(raw_rec)
+                        await self.db.flush()
+
+                        seen_batch_codes.add(code)
+                        imported_project_ids.append(existing_project.id)
+                        updated_count += 1
+                    else:
+                        invalid_count += 1
+                        rejected_errors.append({
+                            "row_index": row_index,
+                            "project_code": code,
+                            "reason": f"Project '{code}' not found for update.",
+                        })
+                except Exception as upsert_exc:
+                    logger.error(f"Upsert failed for row {row_index} ('{code}'): {upsert_exc}")
+                    invalid_count += 1
+                    rejected_errors.append({
+                        "row_index": row_index,
+                        "project_code": code,
+                        "reason": f"Upsert error: {str(upsert_exc)[:200]}",
+                    })
+                continue
+
+            # Case C: Brand-new project
             normalized, errors = self.normalize_project_payload(mapped_payload)
             if errors:
                 invalid_count += 1
                 raw_rec = RawIngestionRecord(
-                    job_id=job.id,
+                    job_id=job_id,
                     row_index=row_index,
-                    source_record_id=code,
+                    source_record_id=code or f"Row-{row_index}",
                     raw_payload=to_jsonable(row_dict),
-                    normalized_payload=to_jsonable(normalized),
+                    normalized_payload=to_jsonable(mapped_payload),
                     validation_status=ValidationStatus.INVALID.value,
                     validation_errors=errors,
                     target_entity=target_entity,
@@ -549,18 +693,16 @@ class IngestionService:
                 })
                 continue
 
-            # Save valid Project
             try:
                 project = Project(
                     **normalized,
                     created_by=user_id,
                     updated_by=user_id,
-                    status=ProjectStatus.ACTIVE,
                 )
                 self.db.add(project)
                 await self.db.flush()
 
-                # Add standard stages
+                # Add stages
                 for s_idx, (_, stage_name) in enumerate(STAGES):
                     s_status = StageStatus.IN_PROGRESS if s_idx == 0 else StageStatus.PENDING
                     stage = ProjectStage(
@@ -571,9 +713,8 @@ class IngestionService:
                     )
                     self.db.add(stage)
 
-                # Record raw ingestion entry
                 raw_rec = RawIngestionRecord(
-                    job_id=job.id,
+                    job_id=job_id,
                     row_index=row_index,
                     source_record_id=project.project_code,
                     raw_payload=to_jsonable(row_dict),
@@ -584,32 +725,45 @@ class IngestionService:
                     target_id=project.id,
                 )
                 self.db.add(raw_rec)
+                await self.db.flush()
 
                 seen_batch_codes.add(code)
                 existing_codes.add(code)
                 imported_project_ids.append(project.id)
                 imported_count += 1
             except Exception as e:
-                logger.error(f"Error persisting row {row_index}: {e}")
-                invalid_count += 1
+                logger.error(f"Row {row_index} ('{code}') insert failed: {e}")
+                duplicate_count += 1
                 rejected_errors.append({
                     "row_index": row_index,
                     "project_code": code,
-                    "reason": f"Database insertion error: {str(e)}",
+                    "reason": f"DB constraint or insertion error: {str(e)[:200]}",
                 })
 
-        # Update Job Metrics
-        job.valid_records = imported_count
-        job.invalid_records = invalid_count
-        job.duplicate_records = duplicate_count
-        job.imported_records = imported_count
-        job.error_summary = rejected_errors
-        job.status = IngestionJobStatus.IMPORTED.value if imported_count > 0 else IngestionJobStatus.FAILED.value
-        job.completed_at = datetime.now(timezone.utc)
+        # 4. Update Job Metrics
+        total_success = imported_count + updated_count
+        final_status = (
+            IngestionJobStatus.IMPORTED.value if total_success > 0
+            else (IngestionJobStatus.PARTIAL.value if (total_success > 0 and (invalid_count > 0 or duplicate_count > 0))
+                  else IngestionJobStatus.FAILED.value)
+        )
+        try:
+            res = await self.db.execute(select(IngestionJob).where(IngestionJob.id == job_id))
+            job_obj = res.scalar_one_or_none()
+            if job_obj:
+                job_obj.valid_records = total_success
+                job_obj.invalid_records = invalid_count
+                job_obj.duplicate_records = duplicate_count
+                job_obj.imported_records = total_success
+                job_obj.error_summary = rejected_errors
+                job_obj.status = final_status
+                job_obj.completed_at = datetime.now(timezone.utc)
+            await self.db.commit()
+        except Exception as job_exc:
+            logger.error(f"Failed to update job {job_id} metrics: {job_exc}")
+            await self.db.rollback()
 
-        await self.db.commit()
-
-        # Trigger ML pipeline prediction refresh for newly imported projects
+        # 5. ML prediction refresh for imported / updated projects
         ml_refreshed_count = 0
         for pid in imported_project_ids:
             try:
@@ -620,17 +774,19 @@ class IngestionService:
                 await self.db.rollback()
                 logger.warning(f"ML prediction refresh skipped for project {pid}: {ml_exc}")
 
+        error_url = f"/api/v1/ingestion/jobs/{job_id}/errors.csv" if rejected_errors else None
         return {
-            "job_id": str(job.id),
+            "job_id": str(job_id),
             "total_rows": len(df),
             "imported_rows": imported_count,
+            "updated_rows": updated_count,
             "duplicate_rows": duplicate_count,
             "invalid_rows": invalid_count,
             "rejected_rows": invalid_count + duplicate_count,
-            "error_report_url": f"/api/v1/ingestion/jobs/{job.id}/errors.csv" if rejected_errors else None,
+            "error_report_url": error_url,
             "sample_errors": rejected_errors[:10],
             "ml_refreshed_count": ml_refreshed_count,
-            "status": job.status,
+            "status": final_status,
         }
 
     # ─── 4. REST API External JSON Ingestion ──────────────────────────────────
@@ -688,7 +844,6 @@ class IngestionService:
                         **normalized,
                         created_by=user_id,
                         updated_by=user_id,
-                        status=ProjectStatus.ACTIVE,
                     )
                     self.db.add(proj)
                     await self.db.flush()
@@ -1154,7 +1309,6 @@ class IngestionService:
                     **normalized,
                     created_by=user_id,
                     updated_by=user_id,
-                    status=ProjectStatus.ACTIVE,
                 )
                 self.db.add(proj)
                 await self.db.flush()
@@ -1689,7 +1843,6 @@ class IngestionService:
                     **normalized,
                     created_by=user_id,
                     updated_by=user_id,
-                    status=ProjectStatus.ACTIVE,
                 )
                 self.db.add(proj)
                 await self.db.flush()
@@ -1786,7 +1939,6 @@ class IngestionService:
                 **normalized,
                 created_by=user_id,
                 updated_by=user_id,
-                status=ProjectStatus.ACTIVE,
             )
             self.db.add(proj)
             await self.db.flush()
@@ -2153,7 +2305,6 @@ class IngestionService:
                     **normalized,
                     created_by=user_id,
                     updated_by=user_id,
-                    status=ProjectStatus.ACTIVE,
                 )
                 self.db.add(proj)
                 await self.db.flush()

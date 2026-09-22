@@ -20,6 +20,9 @@ from app.services.email_service import (
     get_alert_settings,
     save_alert_settings,
     trigger_alert_email_if_needed,
+    format_alert_email,
+    send_alert_email_async,
+    resolve_officer_email,
 )
 from app.services.sms_service import trigger_alert_sms_if_needed
 
@@ -198,6 +201,37 @@ async def update_settings(
     return saved
 
 
+@router.post("/test-email")
+async def send_test_email(
+    target_email: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Dispatch an immediate test email alert to verify SMTP delivery."""
+    recipient = target_email or await resolve_officer_email(db)
+    email_data = format_alert_email(
+        project_name="[TEST] LADRIS System Connectivity Test",
+        risk_level="HIGH",
+        predicted_delay="60 days",
+        main_issue="Immediate Alert Notification Pipeline Test",
+        current_stage="Joint Measurement Survey",
+        project_id=None,
+    )
+    result = await send_alert_email_async(
+        to_email=recipient,
+        subject=email_data["subject"],
+        body_text=email_data["text"],
+        body_html=email_data["html"],
+    )
+    return {
+        "success": result.get("sent", False),
+        "mode": result.get("mode"),
+        "recipient": recipient,
+        "error": result.get("error"),
+        "timestamp": result.get("timestamp"),
+    }
+
+
 @router.get("/", response_model=List[AlertResponse])
 async def get_alerts(
     project_id: Optional[uuid.UUID] = None,
@@ -205,7 +239,15 @@ async def get_alerts(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    query = select(Alert).options(joinedload(Alert.project)).order_by(desc(Alert.triggered_at))
+    query = (
+        select(Alert)
+        .outerjoin(Project, Alert.project_id == Project.id)
+        .where(
+            (Alert.project_id.is_(None)) | ((Project.id.isnot(None)) & (Project.deleted_at.is_(None)))
+        )
+        .options(joinedload(Alert.project))
+        .order_by(desc(Alert.triggered_at))
+    )
     
     if project_id:
         query = query.where(Alert.project_id == project_id)

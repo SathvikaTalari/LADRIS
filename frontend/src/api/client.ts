@@ -375,6 +375,7 @@ export interface CSVImportSummaryData {
   job_id: string
   total_rows: number
   imported_rows: number
+  updated_rows: number
   duplicate_rows: number
   invalid_rows: number
   rejected_rows: number

@@ -1311,9 +1311,10 @@ TSIIC-AIR-TG-505,Warangal Greenfield Airport Expansion,AIRPORT,TG,325.0,110.0,65
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 24 }}>
             <StatBox label="Total Rows" value={summary.total_rows} />
-            <StatBox label="Imported" value={summary.imported_rows} color="#10b981" />
+            <StatBox label="Imported (New)" value={summary.imported_rows} color="#10b981" />
+            <StatBox label="Updated" value={summary.updated_rows ?? 0} color="#38bdf8" />
             <StatBox label="Duplicates" value={summary.duplicate_rows} color="#f59e0b" />
             <StatBox label="Rejected" value={summary.rejected_rows} color="#ef4444" />
           </div>
@@ -1343,7 +1344,13 @@ TSIIC-AIR-TG-505,Warangal Greenfield Airport Expansion,AIRPORT,TG,325.0,110.0,65
           )}
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button className="btn btn-primary" onClick={() => onSuccess(`Imported ${summary.imported_rows} projects from ${preview?.file_name}`)}>
+            <button className="btn btn-primary" onClick={() => onSuccess(
+              summary.imported_rows > 0 && summary.updated_rows === 0
+                ? `Imported ${summary.imported_rows} new project(s) from ${preview?.file_name}`
+                : summary.updated_rows > 0 && summary.imported_rows === 0
+                  ? `Updated ${summary.updated_rows} existing project(s) from ${preview?.file_name}`
+                  : `Imported ${summary.imported_rows} new + updated ${summary.updated_rows ?? 0} existing project(s)`
+            )}>
               Done
             </button>
           </div>

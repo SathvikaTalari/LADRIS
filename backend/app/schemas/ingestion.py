@@ -59,6 +59,7 @@ class CSVImportSummary(BaseModel):
     job_id: str
     total_rows: int
     imported_rows: int
+    updated_rows: int = 0
     duplicate_rows: int
     invalid_rows: int
     rejected_rows: int

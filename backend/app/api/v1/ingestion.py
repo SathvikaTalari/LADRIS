@@ -204,6 +204,7 @@ async def import_csv_excel(
     target_entity: str = Form("PROJECT"),
     source_name: Optional[str] = Form(None),
     reporting_period: Optional[str] = Form(None),
+    upsert: bool = Form(True, description="If True, update existing records with the same project_code instead of rejecting them"),
     file: Optional[UploadFile] = File(None),
     request: Request = None,
     db: AsyncSession = Depends(get_db),
@@ -242,6 +243,7 @@ async def import_csv_excel(
             source_name=source_name,
             reporting_period=reporting_period,
             user_id=current_user.id,
+            upsert=upsert,
         )
 
         await record_audit_log(

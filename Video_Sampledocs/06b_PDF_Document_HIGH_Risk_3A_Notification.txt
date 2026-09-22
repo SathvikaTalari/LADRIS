@@ -1,0 +1,107 @@
+﻿MINISTRY OF ROAD TRANSPORT AND HIGHWAYS
+GOVERNMENT OF INDIA
+
+────────────────────────────────────────────────────────────────────────────────
+GAZETTE NOTIFICATION UNDER SECTION 3A OF THE NATIONAL HIGHWAYS ACT, 1956
+(Central Act No. 48 of 1956)
+────────────────────────────────────────────────────────────────────────────────
+
+Notification No.: NH-11015/44/2021-LA-I
+Gazette Date: 20th September 2021
+Published In: The Gazette of India – Extraordinary, Part II, Section 3
+
+Subject: Notification of Intention to Acquire Land for NH-44 Nagpur–Jabalpur
+         Corridor (Seoni Tribal Belt Section) in the State of Madhya Pradesh
+         under the National Highways Act, 1956.
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 1: PROJECT IDENTIFICATION
+────────────────────────────────────────────────────────────────────────────────
+
+Project Name    : NH-44 Nagpur–Jabalpur Corridor Package-2 (Seoni Section)
+Project Code    : NHAI-NH44-HIGH-PDF
+Nodal Ministry  : Ministry of Road Transport and Highways (MoRTH)
+Executing Agency: National Highways Authority of India (NHAI)
+State           : Madhya Pradesh
+Districts       : Seoni, Balaghat
+Tehsils Affected: Seoni, Keolari, Barghat
+Project Type    : HIGHWAY
+Acquisition Act : NH_ACT_1956
+Risk Level      : HIGH
+Total Length    : 18.6 km | Right-of-Way: 60 metres
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 2: STATUTORY DATES & TIMELINE
+────────────────────────────────────────────────────────────────────────────────
+
+Section 3A Notification Date   : 20-09-2021
+Objection Period (21 days)     : 20-09-2021 to 11-10-2021
+CALA Hearing of Objections     : 25-10-2021 to 15-11-2021
+Section 3D Declaration (Due)   : On or before 19-09-2022 *** LAPSED – FRESH 3A REQUIRED ***
+Section 3D Actual Status       : LAPSED. Fresh 3A filed 12-01-2023 (pending 3D again by 11-01-2024)
+Delay from Lapse               : 28 months cumulative delay as of reporting date
+
+CRITICAL WARNING:
+Section 3D was NOT published within the 1-year statutory period.
+The original Section 3A notification LAPSED on 19-09-2022.
+Fresh proceedings initiated under new notification dated 12-01-2023.
+The project remains at HIGH RISK of second lapse if 3D not issued by 11-01-2024.
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 3: LAND ACQUISITION DETAILS
+────────────────────────────────────────────────────────────────────────────────
+
+Total Land Area Required       : 1,640.80 Ha
+├── Agricultural Land          :   820.40 Ha (50.0%)
+├── Scheduled Tribe Land (FRA) :   640.00 Ha (39.0%) *** CONTESTED ***
+├── Residential/Urban Land     :    98.40 Ha (6.0%)
+└── Forest/Other               :    82.00 Ha (5.0%)
+
+Total Affected Families        : 4,120
+Total Khasra/Survey Numbers    : 2,840
+Number of Villages Affected    : 22
+
+Estimated Total Compensation (INR): Rs 31,00,00,000 (Thirty-One Crores)
+Disbursed So Far               : Rs 7,20,00,000 (23.2% of estimate)
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 4: LEGAL CASE STATUS
+────────────────────────────────────────────────────────────────────────────────
+
+Active Legal Cases             : 18
+  Case 1: WP(C) 8821/2022 – MP High Court – Tribal land FRA claim; HC stay on 480 Ha
+           Status: STAY ACTIVE – next hearing 15-10-2026
+  Case 2: WP(C) 9104/2022 – MP High Court – Challenge to SIA methodology; notice issued to NHAI
+           Status: PENDING – counter-affidavit due
+  Cases 3-18: Compensation award disputes filed by individual landowners before CALA Seoni
+
+Current Legal Case Status      : ACTIVE (18 cases; 1 major HC stay blocking 480 Ha)
+Impact on Acquisition Timeline : SEVERE – 480 Ha blocked by court order; possession impossible
+GRAM SABHA STATUS              : Consent denied in 3 villages (Keolari, Bamhni, Khursia)
+                                 under Forest Rights Act 2006 / PESA provisions
+RISK ASSESSMENT                : HIGH – Acquisition stalled; alignment revision under study
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 5: R&R COMMITMENTS & STATUS
+────────────────────────────────────────────────────────────────────────────────
+
+R&R Package Applicable        : YES
+Families Eligible for R&R     : 1,840
+Families Rehabilitated So Far : 480 (26.1%)
+Resettlement Sites Identified : 4 (Seoni, Keolari, Barghat, Lamta)
+Issues                        : R&R package rejected by tribal community – compensation
+                                 rates below FRA entitlements; Social Audit demanded
+
+────────────────────────────────────────────────────────────────────────────────
+
+Issued by order and in the name of the President of India.
+
+                                        (Shri Dinesh Kumar Tiwari)
+                                        Joint Secretary (Land Acquisition)
+                                        Ministry of Road Transport and Highways
+                                        New Delhi – 110 001
+
+Date: 12th January 2023 (Re-notification)
+
+[HIGH RISK SAMPLE – Document Type: NOTIFICATION | Project Code: NHAI-NH44-HIGH-PDF | State: MP]
+[LADRIS AI Extraction Note: Risk Score = HIGH | Delay = 28 months | Legal Cases = 18 | HC Stay Active]

@@ -233,6 +233,16 @@ async def send_alert_email_async(
     )
 
 
+def is_deliverable_email(email: Optional[str]) -> bool:
+    """Check if an email address belongs to a real domain rather than a local mock domain."""
+    if not email:
+        return False
+    e = email.strip().lower()
+    if any(e.endswith(d) for d in ("@ladris.gov.in", "@example.com", "@test.com", "@domain.com")):
+        return False
+    return "@" in e and "." in e.split("@")[-1]
+
+
 async def resolve_officer_email(
     db: AsyncSession,
     project_id: Optional[UUID] = None,
@@ -241,10 +251,15 @@ async def resolve_officer_email(
     """
     Resolves the most appropriate officer email for a project.
     Hierarchy:
-      1. User explicitly assigned to this project_id
-      2. Land Acquisition Officer / Project Officer in the project's state
-      3. Global default officer email (from settings)
+      1. User explicitly assigned to this project_id (if real/deliverable email)
+      2. Land Acquisition Officer / Project Officer in the project's state (if real/deliverable email)
+      3. Global DEFAULT_ALERT_EMAIL configured in settings (e.g. Gmail address)
+      4. Fallback to first officer email in DB or officer@ladris.gov.in
     """
+    default_email = getattr(settings, "DEFAULT_ALERT_EMAIL", "") or "officer@ladris.gov.in"
+    default_is_real = is_deliverable_email(default_email)
+
+    candidate_email: Optional[str] = None
     try:
         if project_id:
             pid_str = str(project_id)
@@ -255,10 +270,13 @@ async def resolve_officer_email(
                 )
             )
             for user in res.scalars():
-                if user.assigned_project_ids and pid_str in user.assigned_project_ids:
-                    return user.email
+                if user.assigned_project_ids and pid_str in user.assigned_project_ids and user.email:
+                    if is_deliverable_email(user.email):
+                        return user.email
+                    candidate_email = user.email
+                    break
 
-        if state_code:
+        if not candidate_email and state_code:
             res = await db.execute(
                 select(User).where(
                     User.is_active.is_(True),
@@ -268,9 +286,16 @@ async def resolve_officer_email(
             )
             matched_user = res.scalar_one_or_none()
             if matched_user and matched_user.email:
-                return matched_user.email
+                if is_deliverable_email(matched_user.email):
+                    return matched_user.email
+                candidate_email = matched_user.email
 
-        # Generic officer fallback
+        # If a real alert email is configured in DEFAULT_ALERT_EMAIL (e.g., in .env),
+        # prioritize it over dummy placeholder emails (like @ladris.gov.in)
+        if default_is_real:
+            return default_email
+
+        # Generic officer fallback from DB
         res = await db.execute(
             select(User).where(
                 User.is_active.is_(True),
@@ -283,7 +308,8 @@ async def resolve_officer_email(
     except Exception as e:
         logger.debug(f"Could not resolve officer from database: {e}")
 
-    return getattr(settings, "DEFAULT_ALERT_EMAIL", "officer@ladris.gov.in")
+    return default_email
+
 
 
 SETTINGS_FILE = Path(__file__).resolve().parents[2] / "data" / "alert_settings.json"
@@ -476,13 +502,14 @@ async def trigger_alert_email_if_needed(
     alert.alert_metadata = updated_meta
 
     # 9. Persist notification log row (committed by caller)
-    log_status = "SENT" if actually_sent else f"FAILED ({mode})"
+    log_status = "SENT" if actually_sent else (mode if mode in ("SIMULATED", "FAILED", "ERROR", "DISABLED") else "FAILED")[:50]
     try:
         log_entry = NotificationLog(
             alert_id=alert.id,
             channel="email",
             recipient=to_email,
             status=log_status,
+            error_msg=error_detail or None,
         )
         db.add(log_entry)
     except Exception as _log_err:

@@ -1,0 +1,66 @@
+﻿{
+  "type": "FeatureCollection",
+  "name": "Video_Demo_GIS_Parcels",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "parcel_id": "GIS-LOW-001",
+        "khasra_number": "88/A",
+        "village": "Kompally",
+        "tehsil": "Medchal",
+        "district": "Medchal-Malkajgiri",
+        "state_code": "TS",
+        "area_ha": 16.80,
+        "risk_level": "LOW",
+        "acquisition_status": "ACQUIRED",
+        "compensation_status": "PAID",
+        "legal_case_count": 0,
+        "project_name": "NH-161 Hyderabad Outer Ring Road – Kompally Section",
+        "project_code": "NHAI-NH161-LOW-GIS",
+        "project_type": "HIGHWAY",
+        "remarks": "Full possession taken. No disputes. Land handed to contractor."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [78.4820, 17.5620],
+          [78.4890, 17.5620],
+          [78.4890, 17.5680],
+          [78.4820, 17.5680],
+          [78.4820, 17.5620]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "parcel_id": "GIS-HIGH-001",
+        "khasra_number": "312/B",
+        "village": "Keolari",
+        "tehsil": "Keolari",
+        "district": "Seoni",
+        "state_code": "MP",
+        "area_ha": 48.50,
+        "risk_level": "HIGH",
+        "acquisition_status": "STAYED",
+        "compensation_status": "DISPUTED",
+        "legal_case_count": 7,
+        "project_name": "NH-44 Nagpur–Jabalpur Corridor – Seoni Tribal Section",
+        "project_code": "NHAI-NH44-HIGH-GIS",
+        "project_type": "HIGHWAY",
+        "remarks": "HC interim stay active. Tribal FRA claim pending. Gram sabha consent not obtained. Acquisition blocked."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [79.9140, 22.0920],
+          [79.9230, 22.0920],
+          [79.9230, 22.1010],
+          [79.9140, 22.1010],
+          [79.9140, 22.0920]
+        ]]
+      }
+    }
+  ]
+}

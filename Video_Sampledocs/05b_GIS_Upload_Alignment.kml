@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Video Demo GIS – KML Alignment Routes</name>
+    <description>Two road alignment routes: LOW risk (on schedule) and HIGH risk (disputed) for LADRIS video demo</description>
+
+    <Style id="lowRiskLine">
+      <LineStyle><color>ff00cc00</color><width>4</width></LineStyle>
+    </Style>
+    <Style id="highRiskLine">
+      <LineStyle><color>ff0000ff</color><width>4</width></LineStyle>
+    </Style>
+
+    <!-- LOW RISK: NH-161 Hyderabad ORR – Medchal to Kompally -->
+    <Placemark>
+      <name>NH-161 ORR Medchal–Kompally [LOW RISK]</name>
+      <description>
+        Project Code: NHAI-NH161-LOW-KML
+        Risk Level: LOW
+        Status: ACTIVE – Land 99% acquired, possession complete
+        Length: 12.4 km | Acquisition: 420 Ha | Families: 1,080
+        Delay: 0 months | Legal Cases: 0
+        Remark: Fully on schedule. Contractor mobilised.
+      </description>
+      <styleUrl>#lowRiskLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>
+          78.4820,17.5280,0
+          78.4900,17.5380,0
+          78.4980,17.5480,0
+          78.5060,17.5580,0
+          78.5140,17.5680,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+
+    <!-- HIGH RISK: NH-44 Seoni Tribal Segment – Blocked by HC Stay -->
+    <Placemark>
+      <name>NH-44 Seoni Tribal Section [HIGH RISK]</name>
+      <description>
+        Project Code: NHAI-NH44-HIGH-KML
+        Risk Level: HIGH
+        Status: DELAYED – HC stay on 480 Ha; FRA consent denied
+        Length: 18.6 km | Acquisition: 1,640 Ha | Families: 4,120
+        Delay: 28 months | Legal Cases: 18
+        Remark: Section 3D at lapse risk. Alignment revision under study.
+      </description>
+      <styleUrl>#highRiskLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>
+          79.9050,22.0640,0
+          79.9140,22.0760,0
+          79.9230,22.0880,0
+          79.9320,22.1000,0
+          79.9410,22.1120,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+
+  </Document>
+</kml>

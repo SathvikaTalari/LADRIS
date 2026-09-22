@@ -183,7 +183,7 @@ class NotificationLog(Base):
     )
     channel = Column(String(10), nullable=False)   # "email" | "sms"
     recipient = Column(String(255), nullable=True)  # email address or phone number
-    status = Column(String(10), nullable=False)     # "SENT" | "FAILED" | "SIMULATED"
+    status = Column(String(50), nullable=False)     # "SENT" | "FAILED" | "SIMULATED"
     sent_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
