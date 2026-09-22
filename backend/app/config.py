@@ -57,8 +57,21 @@ class Settings(BaseSettings):
                     pass
         return self.POSTGRES_PORT
 
+    POSTGRES_SSL: bool = False
+
     @property
     def DATABASE_URL(self) -> str:
+        import os
+        raw = os.getenv("DATABASE_URL")
+        if raw:
+            clean = raw
+            if clean.startswith("postgres://"):
+                clean = clean.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif clean.startswith("postgresql://") and not clean.startswith("postgresql+asyncpg://"):
+                clean = clean.replace("postgresql://", "postgresql+asyncpg://", 1)
+            if "?" in clean:
+                clean = clean.split("?")[0]
+            return clean
         return (
             f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
             f"@{self.effective_host}:{self.effective_port}/{self.POSTGRES_DB}"
@@ -66,6 +79,17 @@ class Settings(BaseSettings):
 
     @property
     def SYNC_DATABASE_URL(self) -> str:
+        import os
+        raw = os.getenv("SYNC_DATABASE_URL") or os.getenv("DATABASE_URL")
+        if raw:
+            clean = raw
+            if clean.startswith("postgres://"):
+                clean = clean.replace("postgres://", "postgresql://", 1)
+            elif clean.startswith("postgresql+asyncpg://"):
+                clean = clean.replace("postgresql+asyncpg://", "postgresql://", 1)
+            if "?" in clean:
+                clean = clean.split("?")[0]
+            return clean
         return (
             f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
             f"@{self.effective_host}:{self.effective_port}/{self.POSTGRES_DB}"

@@ -17,6 +17,16 @@ from app.config import get_settings
 settings = get_settings()
 
 
+_connect_args = {
+    "timeout": 10,    # asyncpg connect timeout (seconds)
+    "command_timeout": 30,
+}
+if getattr(settings, "POSTGRES_SSL", False) or any(
+    host_indicator in settings.DATABASE_URL
+    for host_indicator in ["supabase.co", "neon.tech", "render.com", "pooler.supabase.com", "amazonaws.com", "aivencloud.com"]
+):
+    _connect_args["ssl"] = "require"
+
 # Create async engine with connection retry / resilience settings
 engine = create_async_engine(
     settings.DATABASE_URL,
@@ -26,10 +36,7 @@ engine = create_async_engine(
     max_overflow=10,
     pool_recycle=300,     # recycle connections every 5 minutes
     pool_timeout=10,      # wait up to 10s for a connection slot
-    connect_args={
-        "timeout": 10,    # asyncpg connect timeout (seconds)
-        "command_timeout": 30,
-    },
+    connect_args=_connect_args,
 )
 
 # Session factory
