@@ -85,7 +85,10 @@ export default function Alerts() {
     setIsLoading(true)
     try {
       const [alertsData, projectsData] = await Promise.all([
-        alertsAPI.list(),
+        alertsAPI.list().catch((e) => {
+          console.error('alertsAPI.list failed:', e)
+          return []
+        }),
         projectsAPI.list({ page_size: 100 }).catch(() => ({ items: [] })),
       ])
 

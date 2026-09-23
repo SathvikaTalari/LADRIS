@@ -232,6 +232,7 @@ async def send_test_email(
     }
 
 
+@router.get("", response_model=List[AlertResponse])
 @router.get("/", response_model=List[AlertResponse])
 async def get_alerts(
     project_id: Optional[uuid.UUID] = None,
@@ -257,26 +258,12 @@ async def get_alerts(
     result = await db.execute(query)
     alerts = result.scalars().all()
     
-    # Synchronize production-model alerts without fabricating velocity history.
-    if not project_id and not status:
+    # If no alerts exist yet, seed them once from ML predictions
+    if not alerts and not project_id and not status:
         await _seed_alerts_from_projects(db)
         result = await db.execute(query)
         alerts = result.scalars().all()
 
-    # Dispatch email notification for any existing active critical/high alerts not yet emailed
-    needs_commit = False
-    for a in alerts:
-        meta = a.alert_metadata or {}
-        if a.status == AlertStatus.ACTIVE and not meta.get("email_sent"):
-            sent = await trigger_alert_email_if_needed(db, a, a.project)
-            if sent:
-                needs_commit = True
-        if a.status == AlertStatus.ACTIVE and not meta.get("sms_sent"):
-            sms_sent = await trigger_alert_sms_if_needed(db, a, a.project)
-            if sms_sent:
-                needs_commit = True
-    if needs_commit:
-        await db.commit()
 
     response_items = []
     for a in alerts:
