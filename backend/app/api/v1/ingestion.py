@@ -134,12 +134,16 @@ async def ingest_manual(
     current_user: User = Depends(get_current_user),
 ) -> ManualIngestionResponse:
     """Manually add or update project, compensation, legal, R&R, stakeholder, or GIS records."""
+    user_id = current_user.id if current_user else None
+    user_email = current_user.email if current_user else None
+    user_role = current_user.role if current_user else None
+
     service = IngestionService(db)
     try:
         result = await service.ingest_manual_record(
             entity_type=payload.entity_type,
             data=payload.data,
-            user_id=current_user.id,
+            user_id=user_id,
             source_name=payload.source_name or "Manual Form Entry",
             reporting_period=payload.reporting_period,
         )
@@ -147,9 +151,9 @@ async def ingest_manual(
         await record_audit_log(
             db=db,
             action=f"INGEST_MANUAL_{payload.entity_type.upper()}",
-            user_id=current_user.id,
-            user_email=current_user.email,
-            user_role=current_user.role,
+            user_id=user_id,
+            user_email=user_email,
+            user_role=user_role,
             resource_type="ingestion",
             resource_id=uuid.UUID(result["record_id"]) if result.get("record_id") else None,
             ip_address=request.client.host if request.client else None,
@@ -233,6 +237,10 @@ async def import_csv_excel(
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Either 'file' or 'file_id' must be provided.")
 
+    user_id = current_user.id if current_user else None
+    user_email = current_user.email if current_user else None
+    user_role = current_user.role if current_user else None
+
     service = IngestionService(db)
     try:
         summary = await service.import_csv_excel(
@@ -242,16 +250,16 @@ async def import_csv_excel(
             target_entity=target_entity,
             source_name=source_name,
             reporting_period=reporting_period,
-            user_id=current_user.id,
+            user_id=user_id,
             upsert=upsert,
         )
 
         await record_audit_log(
             db=db,
             action="INGEST_CSV_EXCEL",
-            user_id=current_user.id,
-            user_email=current_user.email,
-            user_role=current_user.role,
+            user_id=user_id,
+            user_email=user_email,
+            user_role=user_role,
             resource_type="ingestion",
             resource_id=uuid.UUID(summary["job_id"]),
             ip_address=request.client.host if request and request.client else None,
@@ -261,6 +269,8 @@ async def import_csv_excel(
         )
 
         return CSVImportSummary(**summary)
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Import failed: {str(exc)}")
 

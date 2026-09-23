@@ -767,11 +767,11 @@ class IngestionService:
         ml_refreshed_count = 0
         for pid in imported_project_ids:
             try:
-                await ensure_current_prediction(self.db, pid)
+                async with self.db.begin_nested():
+                    await ensure_current_prediction(self.db, pid)
                 await self.db.commit()
                 ml_refreshed_count += 1
             except Exception as ml_exc:
-                await self.db.rollback()
                 logger.warning(f"ML prediction refresh skipped for project {pid}: {ml_exc}")
 
         error_url = f"/api/v1/ingestion/jobs/{job_id}/errors.csv" if rejected_errors else None

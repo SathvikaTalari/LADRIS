@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from email.message import EmailMessage
 import json
 import logging
+import os
 from pathlib import Path
 import smtplib
 from typing import Any, Dict, Optional

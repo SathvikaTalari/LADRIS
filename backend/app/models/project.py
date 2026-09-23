@@ -156,8 +156,8 @@ class Project(Base):
     deleted_at = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
-    stages = relationship("ProjectStage", back_populates="project", lazy="select")
-    alerts = relationship("Alert", back_populates="project", lazy="select")
+    stages = relationship("ProjectStage", back_populates="project", lazy="selectin")
+    alerts = relationship("Alert", back_populates="project", lazy="selectin")
 
     def __repr__(self) -> str:
         return f"<Project {self.project_code}: {self.name}>"
