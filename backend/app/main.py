@@ -232,6 +232,8 @@ async def lifespan(app: FastAPI):
             """))
             await conn.execute(text("ALTER TABLE projects ALTER COLUMN district_codes TYPE TEXT[] USING district_codes::text[]"))
             await conn.execute(text("ALTER TABLE projects ALTER COLUMN milestone_data_status SET DEFAULT 'USER_ENTERED'"))
+            await conn.execute(text("ALTER TABLE projects ADD COLUMN IF NOT EXISTS alignment_geom geometry(LineString, 4326)"))
+            await conn.execute(text("ALTER TABLE projects ADD COLUMN IF NOT EXISTS geom geometry(Geometry, 4326)"))
             await conn.execute(text("ALTER TABLE rr_records ADD COLUMN IF NOT EXISTS resettlement_site_ready BOOLEAN"))
         print("   ✅ Database tables & PostGIS schema verified")
     except Exception as e:
@@ -276,6 +278,24 @@ async def lifespan(app: FastAPI):
             print(f"   ✅ Project CSV synchronized: {len(imported_ids)} project(s)")
         except Exception as exc:
             print(f"   ⚠️  Project CSV synchronization failed: {exc}")
+
+    # Check and populate detailed PostGIS parcel data if land_parcels is empty
+    if db_ok:
+        try:
+            async with AsyncSessionLocal() as session:
+                parcels_count = (await session.execute(text("SELECT count(*) FROM land_parcels"))).scalar() or 0
+                if parcels_count == 0:
+                    import sys
+                    from pathlib import Path
+                    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+                    from setup_nh65_parcels import setup as setup_nh65
+                    from populate_all_project_parcels import run_population
+                    await setup_nh65()
+                    await run_population()
+                    print("   ✅ Detailed PostGIS parcel boundaries & alignments populated")
+        except Exception as parcel_exc:
+            print(f"   ⚠️  Detailed parcel population note: {parcel_exc}")
+
 
     # ─── Live Datasource Sync Background Poller ────────────────────────────────
     _live_sync_task = None
