@@ -12,6 +12,7 @@ import {
   Globe, Accessibility, HelpCircle, LayoutGrid,
 } from 'lucide-react'
 import { useThemeStore } from '@/store/themeStore'
+import { useAuthStore } from '@/store/authStore'
 import KeyComponentsSection from './sections/KeyComponentsSection'
 import FeaturesRippleSection from './sections/FeaturesRippleSection'
 import RolesConnectedSection from './sections/RolesConnectedSection'
@@ -110,6 +111,7 @@ const HERO_SLIDES = [
 export default function Landing() {
   const navigate = useNavigate()
   const { theme, toggleTheme } = useThemeStore()
+  const { isAuthenticated } = useAuthStore()
   const isDark = theme === 'dark'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -161,7 +163,13 @@ export default function Landing() {
   const prevSlide = () => setActiveSlide(prev => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
   const nextSlide = () => setActiveSlide(prev => (prev + 1) % HERO_SLIDES.length)
 
-  const handleAccessDashboard = () => navigate('/login')
+  const handleAccessDashboard = () => {
+    if (isAuthenticated && localStorage.getItem('access_token')) {
+      navigate('/dashboard')
+    } else {
+      navigate('/login')
+    }
+  }
 
   // Accessibility effects — applied globally via <html> attributes
   useEffect(() => {

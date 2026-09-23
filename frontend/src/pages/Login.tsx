@@ -41,7 +41,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated && localStorage.getItem('access_token')) {
-      navigate('/dashboard')
+      navigate('/dashboard', { replace: true })
     }
   }, [isAuthenticated, navigate])
 
@@ -125,7 +125,7 @@ export default function Login() {
     clearError()
     try {
       await login(email.trim(), password.trim())
-      navigate('/dashboard')
+      navigate('/dashboard', { replace: true })
     } catch {
       // Error handled in store
     }
