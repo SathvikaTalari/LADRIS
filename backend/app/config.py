@@ -145,6 +145,9 @@ class Settings(BaseSettings):
     SMTP_USE_TLS: bool = True
     APP_FRONTEND_URL: str = "http://localhost:5173"
     DEFAULT_ALERT_EMAIL: str = "officer@ladris.gov.in"
+    RESEND_API_KEY: str = ""
+    RESEND_FROM_EMAIL: str = ""
+    BREVO_API_KEY: str = ""
 
     # ─── SMS Notifications (Twilio) ───────────────────────────────────────────
     SMS_ENABLED: bool = False

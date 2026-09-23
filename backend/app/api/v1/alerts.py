@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 import uuid
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_current_user_optional
 from app.models.user import User, UserRole
 from app.models.misc import Alert, AlertStatus, AlertType, AlertSeverity
 from app.models.project import Project
@@ -204,10 +204,10 @@ async def update_settings(
 @router.post("/test-email")
 async def send_test_email(
     target_email: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ):
-    """Dispatch an immediate test email alert to verify SMTP delivery."""
+    """Dispatch an immediate test email alert to verify SMTP / Resend delivery."""
     recipient = target_email or await resolve_officer_email(db)
     email_data = format_alert_email(
         project_name="[TEST] LADRIS System Connectivity Test",
@@ -229,6 +229,100 @@ async def send_test_email(
         "recipient": recipient,
         "error": result.get("error"),
         "timestamp": result.get("timestamp"),
+    }
+
+
+@router.post("/{alert_id}/send-email")
+async def send_single_alert_email(
+    alert_id: uuid.UUID,
+    target_email: Optional[str] = None,
+    current_user: Optional[User] = Depends(get_current_user_optional),
+    db: AsyncSession = Depends(get_db),
+):
+    """Dispatch or retry sending an email for a specific alert."""
+    query = select(Alert).options(joinedload(Alert.project)).where(Alert.id == alert_id)
+    result = await db.execute(query)
+    alert = result.scalar_one_or_none()
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+
+    meta = alert.alert_metadata or {}
+    pname = alert.project.name if alert.project else meta.get("project_name", "Land Acquisition Project")
+    reason, explanation = classify_alert_reason(alert, alert.project)
+
+    score = meta.get("risk_score")
+    severity = alert.severity
+    risk_level = (
+        "CRITICAL"
+        if severity == AlertSeverity.CRITICAL or (score and float(score) >= 90)
+        else ("HIGH" if severity == AlertSeverity.HIGH or (score and float(score) >= 70) else "MEDIUM")
+    )
+
+    if meta.get("predicted_delay_days"):
+        pred_delay = f"{float(meta['predicted_delay_days']):.0f} days"
+    elif alert.project and getattr(alert.project, "delay_months", None):
+        pred_delay = f"{alert.project.delay_months} months"
+    else:
+        pred_delay = "3 - 6 months (estimated)"
+
+    current_stage = (
+        meta.get("critical_stage")
+        or getattr(alert.project, "milestone_data_status", None)
+        or "Section 19 (Declaration)"
+    )
+
+    recipient = target_email or await resolve_officer_email(
+        db, project_id=alert.project_id, state_code=alert.project.state_code if alert.project else None
+    )
+
+    email_data = format_alert_email(
+        project_name=pname,
+        risk_level=risk_level,
+        predicted_delay=pred_delay,
+        main_issue=reason,
+        current_stage=current_stage,
+        project_id=alert.project_id,
+    )
+
+    res = await send_alert_email_async(
+        to_email=recipient,
+        subject=email_data["subject"],
+        body_text=email_data["text"],
+        body_html=email_data["html"],
+    )
+
+    actually_sent = res.get("sent", False)
+    mode = res.get("mode", "UNKNOWN")
+    error_detail = res.get("error", "")
+
+    updated_meta = dict(meta)
+    updated_meta["email_sent"] = actually_sent
+    updated_meta["email_sent_at"] = datetime.now(timezone.utc).isoformat()
+    updated_meta["email_recipient"] = recipient
+    updated_meta["email_status"] = mode
+    if error_detail:
+        updated_meta["email_error"] = error_detail
+    alert.alert_metadata = updated_meta
+
+    from app.models.misc import NotificationLog
+    log_status = "SENT" if actually_sent else (mode if mode in ("SIMULATED", "FAILED", "ERROR", "DISABLED") else "FAILED")[:50]
+    log_entry = NotificationLog(
+        alert_id=alert.id,
+        channel="email",
+        recipient=recipient,
+        status=log_status,
+        error_msg=error_detail or None,
+    )
+    db.add(log_entry)
+    await db.commit()
+    await db.refresh(alert)
+
+    return {
+        "success": actually_sent,
+        "mode": mode,
+        "recipient": recipient,
+        "error": error_detail,
+        "alert_id": str(alert.id),
     }
 
 

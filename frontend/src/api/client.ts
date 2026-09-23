@@ -272,6 +272,12 @@ export const alertsAPI = {
 
   updateSettings: (data: any) =>
     apiClient.post('/api/v1/alerts/settings', data).then((r) => r.data),
+
+  sendEmail: (id: string, target_email?: string) =>
+    apiClient.post(`/api/v1/alerts/${id}/send-email`, null, { params: target_email ? { target_email } : {} }).then((r) => r.data),
+
+  testEmail: (target_email?: string) =>
+    apiClient.post('/api/v1/alerts/test-email', null, { params: target_email ? { target_email } : {} }).then((r) => r.data),
 }
 
 export const notificationLogsAPI = {

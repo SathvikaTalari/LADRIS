@@ -81,6 +81,10 @@ export default function Alerts() {
   const [severityFilter, setSeverityFilter] = useState('ALL')
   const [reasonFilter, setReasonFilter] = useState('ALL')
 
+  // Email action state
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null)
+  const [emailNotification, setEmailNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
   const fetchAlertsAndProjects = async () => {
     setIsLoading(true)
     try {
@@ -120,6 +124,59 @@ export default function Alerts() {
       fetchAlertsAndProjects()
     } catch (e) {
       console.error('Failed to update alert:', e)
+    }
+  }
+
+  const handleSendEmail = async (alertId: string) => {
+    setSendingEmailId(alertId)
+    setEmailNotification(null)
+    try {
+      const res = await alertsAPI.sendEmail(alertId)
+      if (res.success) {
+        setEmailNotification({
+          type: 'success',
+          message: `Email alert successfully delivered to ${res.recipient} (Mode: ${res.mode || 'SENT'})!`,
+        })
+      } else {
+        setEmailNotification({
+          type: 'error',
+          message: `Email delivery not completed: ${res.error || 'Check RESEND_API_KEY in Render dashboard.'}`,
+        })
+      }
+      fetchAlertsAndProjects()
+    } catch (e: any) {
+      setEmailNotification({
+        type: 'error',
+        message: `Failed to trigger email: ${e.response?.data?.detail || e.message || 'Error'}`,
+      })
+    } finally {
+      setSendingEmailId(null)
+    }
+  }
+
+  const handleTestEmail = async () => {
+    setSendingEmailId('test')
+    setEmailNotification(null)
+    try {
+      const res = await alertsAPI.testEmail()
+      if (res.success) {
+        setEmailNotification({
+          type: 'success',
+          message: `Test email successfully sent to ${res.recipient} (Mode: ${res.mode})!`,
+        })
+      } else {
+        setEmailNotification({
+          type: 'error',
+          message: `Test email delivery failed: ${res.error || 'Check RESEND_API_KEY in Render dashboard.'}`,
+        })
+      }
+    } catch (e: any) {
+      setEmailNotification({
+        type: 'error',
+        message: `Test email error: ${e.response?.data?.detail || e.message}`,
+      })
+    } finally {
+      setSendingEmailId(null)
     }
   }
 
@@ -213,7 +270,50 @@ export default function Alerts() {
       <PageHeader
         title="Project Alerts & Notifications"
         subtitle="Real-time alerts for project delay risks, pending compensation, court disputes, and milestone delays"
+        actions={
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button
+              onClick={handleTestEmail}
+              disabled={sendingEmailId === 'test'}
+              className="btn btn-secondary btn-sm"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.8rem' }}
+              title="Send a live test alert email to officer / configured email"
+            >
+              <Mail size={14} /> {sendingEmailId === 'test' ? 'Sending Test...' : 'Send Test Alert Email'}
+            </button>
+          </div>
+        }
       />
+
+      {/* Email Status Alert Banner */}
+      {emailNotification && (
+        <div
+          style={{
+            marginBottom: 20,
+            padding: '12px 16px',
+            borderRadius: 8,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            background: emailNotification.type === 'success' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+            border: `1px solid ${emailNotification.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+            color: emailNotification.type === 'success' ? '#10b981' : '#f87171',
+            fontSize: '0.85rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {emailNotification.type === 'success' ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
+            <span>{emailNotification.message}</span>
+          </div>
+          <button
+            onClick={() => setEmailNotification(null)}
+            style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 4 }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid-kpi" style={{ marginBottom: 20 }}>
@@ -480,8 +580,8 @@ export default function Alerts() {
                             )}
                           </span>
 
-                          {/* Email Sent Status Badge */}
-                          {(alert.email_sent || alert.alert_metadata?.email_sent) && (
+                          {/* Email Sent / Failed Status Badge */}
+                          {(alert.email_sent || alert.alert_metadata?.email_sent) ? (
                             <span
                               className="badge"
                               style={{
@@ -497,13 +597,33 @@ export default function Alerts() {
                               }}
                               title={
                                 alert.email_recipient || alert.alert_metadata?.email_recipient
-                                  ? `Email sent to ${alert.email_recipient || alert.alert_metadata?.email_recipient}`
+                                  ? `Email delivered to ${alert.email_recipient || alert.alert_metadata?.email_recipient}`
                                   : 'Email notification sent to responsible officer'
                               }
                             >
                               <Mail size={11} /> Email Sent
                             </span>
-                          )}
+                          ) : (alert.alert_metadata?.email_status === 'ERROR' || alert.alert_metadata?.email_error) ? (
+                            <span
+                              className="badge"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                fontSize: '0.72rem',
+                                background: 'rgba(239, 68, 68, 0.12)',
+                                color: '#f87171',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                padding: '2px 8px',
+                                borderRadius: 6,
+                                cursor: 'pointer',
+                              }}
+                              title={alert.alert_metadata?.email_error || 'Email dispatch blocked or failed'}
+                              onClick={() => handleSendEmail(alert.id)}
+                            >
+                              <Mail size={11} /> Email Failed (Retry)
+                            </span>
+                          ) : null}
 
                           {/* SMS Sent Status Badge */}
                           {(alert.sms_sent || alert.alert_metadata?.sms_sent) && (
@@ -572,6 +692,27 @@ export default function Alerts() {
                           <Check size={13} /> Resolve
                         </button>
                       )}
+
+                      <button
+                        onClick={() => handleSendEmail(alert.id)}
+                        disabled={sendingEmailId === alert.id}
+                        className="btn btn-secondary btn-sm"
+                        style={{
+                          fontSize: '0.75rem',
+                          color: (alert.email_sent || alert.alert_metadata?.email_sent) ? 'var(--color-text-secondary)' : '#60a5fa',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                        title={(alert.email_sent || alert.alert_metadata?.email_sent) ? "Resend email alert to officer" : "Send email alert notification"}
+                      >
+                        <Mail size={13} />
+                        {sendingEmailId === alert.id
+                          ? 'Sending...'
+                          : (alert.email_sent || alert.alert_metadata?.email_sent)
+                          ? 'Resend Email'
+                          : 'Send Email'}
+                      </button>
 
                       {isResolved && (
                         <span

@@ -175,11 +175,117 @@ def send_alert_email_sync(
         logger.info("Email notifications disabled via SMTP_ENABLED=False")
         return {"sent": False, "mode": "DISABLED", "to": to_email, "timestamp": timestamp}
 
-    # If no SMTP credentials configured, operate in graceful developer simulation mode
+    # 1. Resend HTTP API (Recommended for cloud hosting like Render Free Tier where SMTP ports are blocked)
+    resend_key = os.getenv("RESEND_API_KEY") or getattr(settings, "RESEND_API_KEY", "")
+    if resend_key and resend_key.strip():
+        try:
+            import requests
+            from_sender = (
+                getattr(settings, "RESEND_FROM_EMAIL", "")
+                or f"{settings.SMTP_FROM_NAME} <onboarding@resend.dev>"
+            )
+            r = requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {resend_key.strip()}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "from": from_sender,
+                    "to": [to_email],
+                    "subject": subject,
+                    "text": body_text,
+                    "html": body_html,
+                },
+                timeout=12,
+            )
+            if r.status_code in (200, 201):
+                logger.info(f"✅ Email delivered via Resend API to {to_email}")
+                return {
+                    "sent": True,
+                    "mode": "RESEND",
+                    "to": to_email,
+                    "id": r.json().get("id"),
+                    "timestamp": timestamp,
+                }
+            else:
+                err_text = r.text
+                logger.warning(f"⚠️ Resend API returned status {r.status_code}: {err_text}")
+                return {
+                    "sent": False,
+                    "mode": "ERROR",
+                    "error": f"Resend {r.status_code}: {err_text}",
+                    "to": to_email,
+                    "timestamp": timestamp,
+                }
+        except Exception as e:
+            logger.warning(f"⚠️ Resend API dispatch error: {e}")
+            return {
+                "sent": False,
+                "mode": "ERROR",
+                "error": str(e),
+                "to": to_email,
+                "timestamp": timestamp,
+            }
+
+    # 2. Brevo HTTP API
+    brevo_key = os.getenv("BREVO_API_KEY") or getattr(settings, "BREVO_API_KEY", "")
+    if brevo_key and brevo_key.strip():
+        try:
+            import requests
+            sender_email = (
+                settings.SMTP_FROM_EMAIL
+                if "@" in settings.SMTP_FROM_EMAIL and not settings.SMTP_FROM_EMAIL.endswith("@ladris.gov.in")
+                else (settings.SMTP_USER or "alerts@resend.dev")
+            )
+            r = requests.post(
+                "https://api.brevo.com/v3/smtp/email",
+                headers={
+                    "api-key": brevo_key.strip(),
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "sender": {"name": settings.SMTP_FROM_NAME, "email": sender_email},
+                    "to": [{"email": to_email}],
+                    "subject": subject,
+                    "htmlContent": body_html,
+                    "textContent": body_text,
+                },
+                timeout=12,
+            )
+            if r.status_code in (200, 201):
+                logger.info(f"✅ Email delivered via Brevo API to {to_email}")
+                return {
+                    "sent": True,
+                    "mode": "BREVO",
+                    "to": to_email,
+                    "timestamp": timestamp,
+                }
+            else:
+                err_text = r.text
+                logger.warning(f"⚠️ Brevo API returned status {r.status_code}: {err_text}")
+                return {
+                    "sent": False,
+                    "mode": "ERROR",
+                    "error": f"Brevo {r.status_code}: {err_text}",
+                    "to": to_email,
+                    "timestamp": timestamp,
+                }
+        except Exception as e:
+            logger.warning(f"⚠️ Brevo API dispatch error: {e}")
+            return {
+                "sent": False,
+                "mode": "ERROR",
+                "error": str(e),
+                "to": to_email,
+                "timestamp": timestamp,
+            }
+
+    # 3. If no SMTP credentials configured, operate in graceful developer simulation mode
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
         logger.warning(
-            f"[EMAIL SKIPPED - No SMTP credentials] To: {to_email} | Subject: {subject} "
-            f"| Set SMTP_USER and SMTP_PASSWORD in .env to enable real delivery."
+            f"[EMAIL SKIPPED - No credentials] To: {to_email} | Subject: {subject} "
+            f"| Set RESEND_API_KEY or SMTP_USER/SMTP_PASSWORD in .env"
         )
         return {
             "sent": False,
@@ -188,7 +294,7 @@ def send_alert_email_sync(
             "timestamp": timestamp,
         }
 
-    # Live SMTP Dispatch
+    # 4. Live SMTP Dispatch
     try:
         msg = EmailMessage()
         msg["Subject"] = subject
@@ -211,11 +317,14 @@ def send_alert_email_sync(
             "timestamp": timestamp,
         }
     except Exception as e:
-        logger.warning(f"⚠️ Failed to deliver SMTP email to {to_email}: {e}")
+        err_str = str(e)
+        if "101" in err_str or "unreachable" in err_str.lower():
+            err_str = f"{err_str} (Render Free Tier blocks outbound SMTP ports 25/465/587. Set RESEND_API_KEY to send emails via HTTP API for free)."
+        logger.warning(f"⚠️ Failed to deliver SMTP email to {to_email}: {err_str}")
         return {
             "sent": False,
             "mode": "ERROR",
-            "error": str(e),
+            "error": err_str,
             "to": to_email,
             "timestamp": timestamp,
         }
