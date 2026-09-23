@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Shield,
@@ -28,6 +29,21 @@ import type { UserRole } from '@/types'
 export default function Admin() {
   const { user } = useAuthStore()
   const isSystemAdmin = user?.role === 'SUPER_ADMIN'
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // Guard: Always ensure /dashboard is the initial landing page.
+  // If arrived directly from login, bookmark, or old redirect without clicking Admin in nav, route to /dashboard.
+  useEffect(() => {
+    const cameFromNav = Boolean(location.state && (location.state as any).fromNav)
+    const visitedExplicitly = sessionStorage.getItem('visited_admin_explicitly') === 'true'
+
+    if (!cameFromNav && !visitedExplicitly) {
+      navigate('/dashboard', { replace: true })
+    } else {
+      sessionStorage.setItem('visited_admin_explicitly', 'true')
+    }
+  }, [location, navigate])
 
   // Tab State
   const [activeTab, setActiveTab] = useState<'users' | 'alerts' | 'models' | 'audit'>('users')

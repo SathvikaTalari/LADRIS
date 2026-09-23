@@ -91,6 +91,7 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
   const currentTitle = pageTitle ?? PAGE_LABELS[location.pathname] ?? 'LADRIS'
 
   const handleLogout = () => {
+    sessionStorage.removeItem('visited_admin_explicitly')
     logout()
     navigate('/login')
   }
@@ -307,7 +308,15 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
 
                   <DropdownItem icon={User}   label="My Profile"  onClick={() => setDropdownOpen(false)} />
                   {(user?.role === 'SUPER_ADMIN' || user?.role === 'STATE_ADMIN') && (
-                    <DropdownItem icon={Shield} label="Admin Panel" onClick={() => { navigate('/admin'); setDropdownOpen(false) }} />
+                    <DropdownItem
+                      icon={Shield}
+                      label="Admin Panel"
+                      onClick={() => {
+                        sessionStorage.setItem('visited_admin_explicitly', 'true')
+                        navigate('/admin', { state: { fromNav: true } })
+                        setDropdownOpen(false)
+                      }}
+                    />
                   )}
                   <div style={{ height: 1, background: 'var(--color-border-subtle)', margin: '4px' }} />
                   <DropdownItem icon={LogOut} label="Sign Out"    onClick={handleLogout} danger />

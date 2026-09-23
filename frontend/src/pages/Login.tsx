@@ -41,6 +41,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated && localStorage.getItem('access_token')) {
+      sessionStorage.removeItem('visited_admin_explicitly')
       navigate('/dashboard', { replace: true })
     }
   }, [isAuthenticated, navigate])
@@ -123,9 +124,11 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     clearError()
+    sessionStorage.removeItem('visited_admin_explicitly')
     try {
       await login(email.trim(), password.trim())
-      navigate('/dashboard', { replace: true })
+      sessionStorage.removeItem('visited_admin_explicitly')
+      window.location.replace('/dashboard')
     } catch {
       // Error handled in store
     }

@@ -236,7 +236,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               </div>
             )}
             {adminItems.map(({ to, icon: Icon, label }) => (
-              <NavLink key={to} to={to} style={{ textDecoration: 'none' }}>
+              <NavLink
+                key={to}
+                to={to}
+                state={{ fromNav: true }}
+                onClick={() => sessionStorage.setItem('visited_admin_explicitly', 'true')}
+                style={{ textDecoration: 'none' }}
+              >
 
                 {({ isActive }) => (
                   <motion.div

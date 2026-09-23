@@ -165,6 +165,7 @@ export default function Landing() {
 
   const handleAccessDashboard = () => {
     if (isAuthenticated && localStorage.getItem('access_token')) {
+      sessionStorage.removeItem('visited_admin_explicitly')
       navigate('/dashboard')
     } else {
       navigate('/login')
