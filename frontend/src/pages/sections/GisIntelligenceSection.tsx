@@ -25,6 +25,28 @@ const INDIA_BOUNDS: [[number,number],[number,number]] = [
 ]
 const INDIA_CENTER: [number,number] = [20.5937, 78.9629]
 
+// Tile layers — 100% free, reliable, no API key or watermark required
+const TILE_LAYERS = {
+  osm: {
+    name: 'Street',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 18,
+  },
+  satellite: {
+    name: 'Satellite',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri',
+    maxZoom: 18,
+  },
+  topo: {
+    name: 'Terrain',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri',
+    maxZoom: 18,
+  },
+}
+
 interface Project {
   id: number; name: string; state: string; risk: RiskLevel
   riskScore: number; delayProb: string; mainRisk: string; stage: string
@@ -188,6 +210,7 @@ export default function GisIntelligenceSection({ isDark, language }: { isDark: b
   const [visibleMarkers, setVisibleMarkers] = useState<number[]>([])
   const [activeId,       setActiveId]       = useState<number|null>(null)
   const [tagVisible,     setTagVisible]     = useState(false)
+  const [tileType,       setTileType]       = useState<'osm' | 'satellite' | 'topo'>('osm')
 
   const selectProject = useCallback((id: number) => setActiveId(id), [])
 
@@ -283,12 +306,81 @@ export default function GisIntelligenceSection({ isDark, language }: { isDark: b
                 zoomControl={true}
                 scrollWheelZoom={false}
               >
-                {/* Colorful Carto Voyager tile — vibrant political map of India */}
+                {/* Clean, watermark-free map tiles with optional satellite and terrain view */}
                 <TileLayer
-                  url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                  attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-                  maxZoom={14}
+                  key={tileType}
+                  url={TILE_LAYERS[tileType].url}
+                  attribution={TILE_LAYERS[tileType].attribution}
+                  maxZoom={TILE_LAYERS[tileType].maxZoom}
                 />
+
+                {/* Interactive Map Layer Switcher (Street, Satellite, Terrain) */}
+                <div style={{
+                  position: "absolute",
+                  top: 14,
+                  right: 14,
+                  zIndex: 800,
+                  display: "flex",
+                  background: isDark ? "rgba(10,22,44,0.92)" : "rgba(255,255,255,0.95)",
+                  padding: 3,
+                  borderRadius: 8,
+                  boxShadow: "0 4px 14px rgba(0,0,0,0.18)",
+                  border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)"}`,
+                  gap: 3,
+                  backdropFilter: "blur(8px)",
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => setTileType('osm')}
+                    style={{
+                      padding: "5px 11px",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      background: tileType === 'osm' ? "#003366" : "transparent",
+                      color: tileType === 'osm' ? "#ffffff" : (isDark ? "#cbd5e1" : "#334155"),
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {hi ? 'सड़क (Street)' : 'Street'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTileType('satellite')}
+                    style={{
+                      padding: "5px 11px",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      background: tileType === 'satellite' ? "#003366" : "transparent",
+                      color: tileType === 'satellite' ? "#ffffff" : (isDark ? "#cbd5e1" : "#334155"),
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {hi ? 'उपग्रह (Satellite)' : 'Satellite'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTileType('topo')}
+                    style={{
+                      padding: "5px 11px",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      background: tileType === 'topo' ? "#003366" : "transparent",
+                      color: tileType === 'topo' ? "#ffffff" : (isDark ? "#cbd5e1" : "#334155"),
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {hi ? 'स्थलाकृति (Terrain)' : 'Terrain'}
+                  </button>
+                </div>
 
                 <MapController activeId={activeId} />
 
