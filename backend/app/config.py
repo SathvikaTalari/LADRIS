@@ -32,6 +32,17 @@ class Settings(BaseSettings):
 
     @property
     def effective_host(self) -> str:
+        import os
+        from urllib.parse import urlparse
+        raw = os.getenv("DATABASE_URL")
+        if raw:
+            try:
+                p = raw.split("://", 1)[-1]
+                parsed = urlparse(f"http://{p}")
+                if parsed.hostname:
+                    return parsed.hostname
+            except Exception:
+                pass
         host = self.POSTGRES_HOST
         if host == "db":
             try:
@@ -43,6 +54,17 @@ class Settings(BaseSettings):
 
     @property
     def effective_port(self) -> int:
+        import os
+        from urllib.parse import urlparse
+        raw = os.getenv("DATABASE_URL")
+        if raw:
+            try:
+                p = raw.split("://", 1)[-1]
+                parsed = urlparse(f"http://{p}")
+                if parsed.port:
+                    return parsed.port
+            except Exception:
+                pass
         if self.effective_host in ("localhost", "127.0.0.1"):
             import socket
             try:

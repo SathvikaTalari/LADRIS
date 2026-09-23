@@ -20,6 +20,8 @@ settings = get_settings()
 _connect_args = {
     "timeout": 10,    # asyncpg connect timeout (seconds)
     "command_timeout": 30,
+    "statement_cache_size": 0,           # Required for PgBouncer / Supabase transaction poolers
+    "prepared_statement_cache_size": 0,  # Prevent DuplicatePreparedStatementError in asyncpg
 }
 if getattr(settings, "POSTGRES_SSL", False) or any(
     host_indicator in settings.DATABASE_URL
