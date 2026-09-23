@@ -18,25 +18,8 @@ interface AuthState {
   clearError: () => void
 }
 
-export function getRoleDefaultPath(role?: string): string {
-  switch (role) {
-    case 'SUPER_ADMIN':
-      return '/admin'
-    case 'LA_OFFICER':
-    case 'PROJECT_OFFICER':
-      return '/la-workbench'
-    case 'PROJECT_AGENCY':
-      return '/agency-portal'
-    case 'POLICY_ANALYST':
-    case 'ANALYST':
-      return '/intelligence'
-    case 'CENTRAL_ADMIN':
-    case 'STATE_ADMIN':
-    case 'DISTRICT_OFFICER':
-    case 'VIEWER':
-    default:
-      return '/dashboard'
-  }
+export function getRoleDefaultPath(_role?: string): string {
+  return '/dashboard'
 }
 
 export const useAuthStore = create<AuthState>()(

@@ -5,16 +5,16 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, EyeOff, AlertCircle, Lock, Mail, Zap, Sun, Moon, UserCheck } from 'lucide-react'
-import { useAuthStore, getRoleDefaultPath } from '@/store/authStore'
+import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 
 const ROLE_OPTIONS = [
-  { key: 'SUPER_ADMIN', label: 'System Admin', email: 'admin@ladris.gov.in', pass: 'Password123!', scope: 'System-wide', target: 'Admin Panel' },
-  { key: 'LA_OFFICER', label: 'Land Acquisition Officer', email: 'la.officer@ladris.gov.in', pass: 'Password123!', scope: 'Land Acquisition', target: 'Acquisition Dashboard' },
-  { key: 'DISTRICT_ADMIN', label: 'District Admin', email: 'district.admin@ladris.gov.in', pass: 'Password123!', scope: 'District', target: 'District Dashboard' },
-  { key: 'STATE_ADMIN', label: 'State Authority', email: 'state.authority@ladris.gov.in', pass: 'Password123!', scope: 'State-wide', target: 'State Dashboard' },
-  { key: 'PROJECT_AGENCY', label: 'Project Agency User', email: 'agency.user@ladris.gov.in', pass: 'Password123!', scope: 'Project', target: 'Project Dashboard' },
-  { key: 'VIEWER', label: 'Viewer / Decision Maker', email: 'viewer@ladris.gov.in', pass: 'Password123!', scope: 'Read-only / Audit', target: 'Executive Dashboard' },
+  { key: 'SUPER_ADMIN', label: 'System Admin', email: 'admin@ladris.gov.in', pass: 'Password123!', scope: 'System-wide', target: 'Dashboard' },
+  { key: 'LA_OFFICER', label: 'Land Acquisition Officer', email: 'la.officer@ladris.gov.in', pass: 'Password123!', scope: 'Land Acquisition', target: 'Dashboard' },
+  { key: 'DISTRICT_ADMIN', label: 'District Admin', email: 'district.admin@ladris.gov.in', pass: 'Password123!', scope: 'District', target: 'Dashboard' },
+  { key: 'STATE_ADMIN', label: 'State Authority', email: 'state.authority@ladris.gov.in', pass: 'Password123!', scope: 'State-wide', target: 'Dashboard' },
+  { key: 'PROJECT_AGENCY', label: 'Project Agency User', email: 'agency.user@ladris.gov.in', pass: 'Password123!', scope: 'Project', target: 'Dashboard' },
+  { key: 'VIEWER', label: 'Viewer / Decision Maker', email: 'viewer@ladris.gov.in', pass: 'Password123!', scope: 'Read-only / Audit', target: 'Dashboard' },
 ]
 
 export default function Login() {
@@ -125,9 +125,7 @@ export default function Login() {
     clearError()
     try {
       await login(email.trim(), password.trim())
-      const currentUser = useAuthStore.getState().user
-      const dest = getRoleDefaultPath(currentUser?.role)
-      navigate(dest)
+      navigate('/dashboard')
     } catch {
       // Error handled in store
     }
