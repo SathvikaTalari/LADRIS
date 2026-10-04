@@ -10,7 +10,11 @@ const getBaseUrl = () => {
     return import.meta.env.VITE_API_BASE_URL
   }
   if (typeof window !== 'undefined') {
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    const host = window.location.hostname
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      if (host.startsWith('192.168.') || host.startsWith('10.') || host.endsWith('.local')) {
+        return `http://${host}:8000`
+      }
       return 'https://ladris-backend.onrender.com'
     }
   }

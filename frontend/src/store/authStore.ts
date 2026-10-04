@@ -49,7 +49,7 @@ export const useAuthStore = create<AuthState>()(
           } else if (axiosErr?.response?.status === 500) {
             message = 'Backend server error (500). Please check backend logs or database.'
           } else if (axiosErr?.message?.toLowerCase().includes('network') || !axiosErr?.response) {
-            message = 'Cannot connect to backend server. Please verify the backend is running.'
+            message = 'Server is taking longer to respond (cold start / waking up). Please wait 10-15 seconds and try again.'
           }
           set({ error: message, isLoading: false, isAuthenticated: false })
           throw err
