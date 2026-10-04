@@ -19,6 +19,7 @@ import RolesConnectedSection from './sections/RolesConnectedSection'
 import SystemArchitectureSection from './sections/SystemArchitectureSection'
 import GisIntelligenceSection from './sections/GisIntelligenceSection'
 import SmartAnalyticsSection from './sections/SmartAnalyticsSection'
+import TrustedLeadersSection from './sections/TrustedLeadersSection'
 
 /* ─── Feature cards data ────────────────────────────────────────────────── */
 const FEATURES = [
@@ -366,7 +367,7 @@ export default function Landing() {
     footerIntelligence: hi ? 'बुद्धिमत्ता प्लेटफ़ॉर्म' : 'Intelligence Platform',
     footerTagline: hi ? 'भूमि अधिग्रहण विलंब जोखिम बुद्धिमत्ता प्रणाली' : 'Land Acquisition Delay Risk Intelligence System',
     footerBuiltFor: hi ? 'ग्रामीण विकास मंत्रालय, भारत सरकार के लिए निर्मित।' : 'Built for Ministry of Rural Development, Government of India.',
-    footerLocation: hi ? 'नई दिल्ली, भारत' : 'New Delhi, India',
+    footerLocation: hi ? 'हैदराबाद, भारत' : 'Hyderabad, India',
     footerPlatformTitle: hi ? 'प्लेटफ़ॉर्म' : 'Platform',
     footerPlatformLinks: hi
       ? ['विशेषताएं', 'आर्किटेक्चर', 'विश्लेषण', 'GIS इंटेलिजेंस', 'दस्तावेज़ीकरण', 'सहायता और प्रतिक्रिया',]
@@ -435,10 +436,10 @@ export default function Landing() {
         }}>
 
           {/* Left: Flag + हिंदी/English govt label */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 200 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 230 }}>
 
-            {/* Indian Tricolor Flag — inline SVG, no background padding */}
-            <svg width="30" height="48" viewBox="0 0 44 30" style={{ flexShrink: 0, borderRadius: 2, display: 'block' }} xmlns="http://www.w3.org/2000/svg">
+            {/* Indian Tricolor Flag — inline SVG, properly proportioned 44x30 */}
+            <svg width="44" height="30" viewBox="0 0 44 30" style={{ flexShrink: 0, borderRadius: 3, display: 'block', boxShadow: '0 1px 4px rgba(0,0,0,0.18)', border: '1px solid rgba(0,0,0,0.08)' }} xmlns="http://www.w3.org/2000/svg">
               {/* Saffron */}
               <rect x="0" y="0" width="44" height="10" fill="#FF9933" />
               {/* White */}
@@ -464,10 +465,10 @@ export default function Landing() {
               })}
             </svg>
             <div>
-              <div style={{ fontSize: '0.74rem', fontWeight: 700, color: isDark ? '#c9d8f0' : '#1a2e4a', lineHeight: 1.25 }}>
+              <div style={{ fontSize: '0.96rem', fontWeight: 800, color: isDark ? '#c9d8f0' : '#1a2e4a', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
                 {T.govIndia}
               </div>
-              <div style={{ fontSize: '0.65rem', fontWeight: 500, color: isDark ? '#5a7194' : '#5a7194' }}>
+              <div style={{ fontSize: '0.80rem', fontWeight: 600, color: isDark ? '#7daaff' : '#475569', marginTop: 2 }}>
                 {T.govIndiaEn}
               </div>
             </div>
@@ -475,10 +476,10 @@ export default function Landing() {
 
           {/* Center: Ministry name (Hindi + English) */}
           <div style={{ textAlign: 'center', flex: 1 }}>
-            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: isDark ? '#c9d8f0' : '#1a2e4a', lineHeight: 1.3 }}>
+            <div style={{ fontSize: '1.08rem', fontWeight: 800, color: isDark ? '#e2ecfc' : '#0a1d37', lineHeight: 1.25, letterSpacing: '0.01em' }}>
               {T.ministry}
             </div>
-            <div style={{ fontSize: '0.68rem', fontWeight: 500, color: isDark ? '#5a7194' : '#5a7194' }}>
+            <div style={{ fontSize: '0.84rem', fontWeight: 600, color: isDark ? '#8da2c0' : '#475569', marginTop: 2, letterSpacing: '0.015em' }}>
               {T.ministryEn}
             </div>
           </div>
@@ -711,29 +712,30 @@ export default function Landing() {
         }}>
           <div style={{
             maxWidth: 1320, margin: '0 auto',
-            padding: '0 32px', height: 85,
+            padding: '0 32px', height: 90,
             display: 'flex', alignItems: 'center',
             justifyContent: 'space-between', gap: 16,
           }}>
 
             {/* Left: Emblem + Gap + Logo + Brand */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexShrink: 0 }}>
               {/* MoRTH Ashoka Emblem — pre-cropped: emblem + Hindi only, no English text */}
               <img
                 src="/logo_morth_clean.png"
                 alt="MoRTH Emblem"
-                style={{ height: 46, width: 'auto', display: 'block', flexShrink: 0 }}
+                style={{ height: 60, width: 'auto', display: 'block', flexShrink: 0 }}
               />
+              <div style={{ height: 44, width: 1, background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)' }} />
               {/* logo.png + Brand text */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <img src="/logo.png" alt="LADRIS" style={{ width: 42, height: 42, objectFit: 'contain', flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <img src="/logo.png" alt="LADRIS" style={{ width: 52, height: 52, objectFit: 'contain', flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+                  <div style={{ fontSize: '1.38rem', fontWeight: 900, color: isDark ? '#f0f6fc' : '#0a1d37', letterSpacing: '-0.025em', lineHeight: 1.1 }}>
                     LADRIS<span style={{ color: '#4080ff' }}></span>
                   </div>
-                  <div style={{ fontSize: '0.45rem', fontWeight: 600, color: isDark ? '#4a6280' : '#64748b', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 1 }}>
-                    {T.brandSub1}<br />
-                    {T.brandSub2}
+                  <div style={{ fontSize: '0.58rem', fontWeight: 700, color: isDark ? '#7daaff' : '#475569', letterSpacing: '0.04em', textTransform: 'uppercase', marginTop: 2, lineHeight: 1.3 }}>
+                    <div>{T.brandSub1}</div>
+                    <div>{T.brandSub2}</div>
                   </div>
                 </div>
               </div>
@@ -1641,6 +1643,9 @@ export default function Landing() {
         <SystemArchitectureSection isDark={isDark} language={language} />
       </div>
 
+      {/* ════ TRUSTED BY INDUSTRY LEADERS SECTION ════ */}
+      <TrustedLeadersSection isDark={isDark} language={language} />
+
       {/* ════ [REMOVED OLD INLINE ARCHITECTURE] ════ */}
       <section style={{ display: 'none' }}>
         {/* Background decorative grid */}
@@ -1955,9 +1960,14 @@ export default function Landing() {
                   <rect x="2" y="4" width="20" height="16" rx="2" />
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                 </svg>
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
-                  support@ladris.gov.in
-                </span>
+                <a
+                  href="mailto:teamdatamindsyndicate@gmail.com"
+                  style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.15s' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.65)')}
+                >
+                  teamdatamindsyndicate@gmail.com
+                </a>
               </div>
               {/* Location */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1965,17 +1975,8 @@ export default function Landing() {
                   <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                   <circle cx="12" cy="10" r="3" />
                 </svg>
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
+                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)' }}>
                   {T.footerLocation}
-                </span>
-              </div>
-              {/* Phone */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.61 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-                </svg>
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
-                  +91-11-2338-XXXX (Ministry Helpline)
                 </span>
               </div>
             </div>

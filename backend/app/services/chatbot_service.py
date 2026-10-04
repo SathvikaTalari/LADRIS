@@ -286,26 +286,16 @@ class SaarthiService:
         if is_greeting and (len(words_set) <= 3 or "saarthi" in q or "who are you" in q):
             return {
                 "reply": (
-                    "🙏 **Namaste! I am Saarthi**, your dedicated AI Assistant and Decision Companion for **LADRIS**.\n\n"
-                    "I am connected directly to our real-time database of national infrastructure corridors, statutory regulations (**NH Act 1956**, **RFCTLARR 2013**), and platform analytics.\n\n"
-                    "**You can ask me questions like:**\n"
-                    "- *\"Which projects have high delay risk?\"*\n"
-                    "- *\"Tell me about Bhadrak-Balasore NH-16 or Nellore Industrial Corridor\"*\n"
-                    "- *\"What projects need data or have quality issues?\"*\n"
-                    "- *\"What is the Section 3D 1-year statutory rule?\"*\n"
-                    "- *\"Which projects have active court cases?\"*\n"
-                    "- *\"How does the Priority Score work?\"*"
+                    "🙏 **Namaste! How can I assist you today?**\n\n"
+                    "Ask me about project delays, Section 3D statutory deadlines, or corridor risk alerts."
                 ),
                 "actions": [
-                    {"label": "🚨 High Delay Risk Projects", "path": "/priority-intelligence"},
-                    {"label": "📊 Command Dashboard", "path": "/dashboard"},
+                    {"label": "🚨 High Delay Corridors", "path": "/priority-intelligence"},
                     {"label": "🗺️ GIS Risk Map", "path": "/gis"},
-                    {"label": "📈 Data Quality & Health", "path": "/data-quality"},
                 ],
                 "suggestions": [
                     "Which projects have high delay risk?",
-                    "What projects need data?",
-                    "What is the Section 3D 1-year statutory rule?",
+                    "What is the Section 3D statutory rule?",
                     "Show projects with active court cases",
                 ]
             }

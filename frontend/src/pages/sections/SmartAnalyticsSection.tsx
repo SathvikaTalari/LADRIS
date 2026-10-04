@@ -1,666 +1,707 @@
-/**
- * SmartAnalyticsSection — LADRIS Landing Page
- * Animation: LIVE ANALYTICS DRAW
- * Sequence: DATA → PATTERN → INSIGHT
- * Uses Framer Motion (already installed). Zero new deps.
- */
-import { useEffect, useRef, useState } from 'react'
-import { motion, useInView, useReducedMotion } from 'framer-motion'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { TrendingUp, AlertTriangle, ShieldCheck, Clock, FileText, Scale, CheckCircle2 } from 'lucide-react'
 
-/* ─── Tokens ─────────────────────────────────────────────────────────────── */
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
-const ACCENT   = '#003d6b'
-const ACCENT_D = '#4a7fd4'
-
-interface AreaData {
-  num: string
-  title: string
-  desc: string
-  icon: React.ReactNode
+interface SmartAnalyticsSectionProps {
+  isDark?: boolean
+  language?: string
 }
 
-/* ─── Chart data: delay trend (prototype values) ─────────────────────────── */
-// SVG viewBox "0 0 280 200" — taller chart fills container, ascending delay trend
-const PTS: [number, number][] = [
-  [18, 172], [58, 148], [98, 158], [148, 118], [188, 130], [235, 90], [268, 68]
+interface CorridorData {
+  id: string
+  nameEn: string
+  nameHi: string
+  avgDelay: string
+  riskProjects: number
+  accuracy: string
+  pts: { stageEn: string; stageHi: string; days: number; risk: 'LOW' | 'MEDIUM' | 'HIGH'; milestone: string }[]
+}
+
+const CORRIDOR_DATASETS: CorridorData[] = [
+  {
+    id: 'all',
+    nameEn: 'All Infrastructure Packages',
+    nameHi: 'सभी बुनियादी ढांचा पैकेज',
+    avgDelay: '26 Days Avg Delay',
+    riskProjects: 5,
+    accuracy: '94.2%',
+    pts: [
+      { stageEn: 'Sec 3A Gazette', stageHi: 'धारा 3A राजपत्र', days: 12, risk: 'LOW', milestone: 'Preliminary Notification' },
+      { stageEn: 'Joint Survey (JMS)', stageHi: 'संयुक्त सर्वेक्षण (JMS)', days: 28, risk: 'LOW', milestone: 'Boundary Verification' },
+      { stageEn: 'Sec 3D Declaration', stageHi: 'धारा 3D घोषणा', days: 74, risk: 'HIGH', milestone: 'Vesting Declaration' },
+      { stageEn: 'Asset Valuation', stageHi: 'संपत्ति मूल्यांकन', days: 48, risk: 'MEDIUM', milestone: 'Tree/Structure Survey' },
+      { stageEn: 'Award Determination', stageHi: 'मुआवजा निर्णय (CALA)', days: 22, risk: 'LOW', milestone: 'Section 3G Award' },
+      { stageEn: 'Possession Handover', stageHi: 'भौतिक कब्जा एवं हैंडओवर', days: 14, risk: 'LOW', milestone: 'Civil Work Clearance' },
+    ],
+  },
+  {
+    id: 'highways',
+    nameEn: 'National Highways (NHAI)',
+    nameHi: 'राष्ट्रीय राजमार्ग (NHAI)',
+    avgDelay: '34 Days Avg Delay',
+    riskProjects: 3,
+    accuracy: '95.6%',
+    pts: [
+      { stageEn: 'Sec 3A Gazette', stageHi: 'धारा 3A राजपत्र', days: 10, risk: 'LOW', milestone: 'Route Alignment' },
+      { stageEn: 'Joint Survey (JMS)', stageHi: 'संयुक्त सर्वेक्षण (JMS)', days: 32, risk: 'MEDIUM', milestone: 'Field Cadastral Ties' },
+      { stageEn: 'Sec 3D Declaration', stageHi: 'धारा 3D घोषणा', days: 86, risk: 'HIGH', milestone: 'Statutory 1-Yr Deadline' },
+      { stageEn: 'Asset Valuation', stageHi: 'संपत्ति मूल्यांकन', days: 54, risk: 'HIGH', milestone: 'Revenue & Forest Review' },
+      { stageEn: 'Award Determination', stageHi: 'मुआवजा निर्णय (CALA)', days: 26, risk: 'MEDIUM', milestone: 'Treasury Deposit' },
+      { stageEn: 'Possession Handover', stageHi: 'भौतिक कब्जा एवं हैंडओवर', days: 16, risk: 'LOW', milestone: 'RoW Handover' },
+    ],
+  },
+  {
+    id: 'rail',
+    nameEn: 'Freight & Metro Rail (DFCCIL/BMRCL)',
+    nameHi: 'माल एवं मेट्रो रेल',
+    avgDelay: '22 Days Avg Delay',
+    riskProjects: 2,
+    accuracy: '93.8%',
+    pts: [
+      { stageEn: 'Sec 3A Gazette', stageHi: 'धारा 3A राजपत्र', days: 14, risk: 'LOW', milestone: 'Station / Yard Boundary' },
+      { stageEn: 'Joint Survey (JMS)', stageHi: 'संयुक्त सर्वेक्षण (JMS)', days: 24, risk: 'LOW', milestone: 'Urban Parcel Demarcation' },
+      { stageEn: 'Sec 3D Declaration', stageHi: 'धारा 3D घोषणा', days: 62, risk: 'MEDIUM', milestone: 'Special Railway Act' },
+      { stageEn: 'Asset Valuation', stageHi: 'संपत्ति मूल्यांकन', days: 38, risk: 'MEDIUM', milestone: 'Commercial Land Valuation' },
+      { stageEn: 'Award Determination', stageHi: 'मुआवजा निर्णय (CALA)', days: 18, risk: 'LOW', milestone: 'Direct Transfer' },
+      { stageEn: 'Possession Handover', stageHi: 'भौतिक कब्जा एवं हैंडओवर', days: 10, risk: 'LOW', milestone: 'Track Access' },
+    ],
+  },
 ]
 
+export default function SmartAnalyticsSection({ isDark = false, language = 'en' }: SmartAnalyticsSectionProps) {
+  const isHindi = language === 'hi'
+  const [selectedCorridor, setSelectedCorridor] = useState<string>('all')
+  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null)
 
-/** Build smooth cubic-bezier SVG path from control points */
-function buildSmoothPath(pts: [number, number][]): string {
-  if (pts.length < 2) return ''
-  let d = `M ${pts[0][0]},${pts[0][1]}`
-  for (let i = 1; i < pts.length; i++) {
-    const [px, py] = pts[i - 1]
-    const [cx, cy] = pts[i]
-    const cpx = (px + cx) / 2
-    d += ` C ${cpx},${py} ${cpx},${cy} ${cx},${cy}`
-  }
-  return d
-}
+  const activeDataset = CORRIDOR_DATASETS.find((d) => d.id === selectedCorridor) || CORRIDOR_DATASETS[0]
+  const pts = activeDataset.pts
 
-const SMOOTH_PATH = buildSmoothPath(PTS)
+  // SVG Chart Dimensions
+  const chartW = 540
+  const chartH = 220
+  const padLeft = 46
+  const padRight = 36
+  const padTop = 32
+  const padBottom = 42
 
-/* ─── Approx path length for dasharray trick ─────────────────────────────── */
-// Calculated manually for this path (~340px). We use Framer's pathLength instead.
+  const maxDays = 100
+  const plotW = chartW - padLeft - padRight
+  const plotH = chartH - padTop - padBottom
 
-/* ─── Analytics area cards ─────────────────────────────────────────────── */
-/* ─── Hoverable area card ─────────────────────────────────────────────────── */
-function AreaCard({ area, visible, delay, isDark }: {
-  area: AreaData; visible: boolean; delay: number; isDark: boolean
-}) {
-  const [hovered, setHovered] = useState(false)
-  const accent = isDark ? ACCENT_D : ACCENT
+  // Coordinates calculation
+  const coords = pts.map((p, i) => {
+    const x = padLeft + (i / (pts.length - 1)) * plotW
+    const y = padTop + plotH - (p.days / maxDays) * plotH
+    return { ...p, x, y }
+  })
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={visible ? { opacity: 1, y: hovered ? -3 : 0 } : { opacity: 0, y: 12 }}
-      transition={{ duration: 0.55, delay, ease: EASE }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: isDark ? 'rgba(14,26,52,0.96)' : '#ffffff',
-        border: `1px solid ${hovered
-          ? (isDark ? 'rgba(74,127,212,0.4)' : 'rgba(0,61,107,0.28)')
-          : (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,51,102,0.1)')}`,
-        borderRadius: 14,
-        padding: '18px 20px',
-        cursor: 'default',
-        boxShadow: hovered
-          ? isDark ? '0 8px 28px rgba(0,0,0,0.4)' : '0 6px 22px rgba(0,61,107,0.12)'
-          : isDark ? '0 2px 8px rgba(0,0,0,0.25)' : '0 1px 5px rgba(0,51,102,0.06)',
-        transition: 'border-color 0.25s ease, box-shadow 0.25s ease',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Top accent on hover */}
-      {hovered && (
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 2,
-          background: `linear-gradient(90deg, ${accent}, transparent)`,
-        }}/>
-      )}
+  // Build smooth curve path
+  const curvePath = coords.reduce((acc, curr, idx, arr) => {
+    if (idx === 0) return `M ${curr.x} ${curr.y}`
+    const prev = arr[idx - 1]
+    const cx1 = prev.x + (curr.x - prev.x) / 2
+    const cy1 = prev.y
+    const cx2 = prev.x + (curr.x - prev.x) / 2
+    const cy2 = curr.y
+    return `${acc} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${curr.x} ${curr.y}`
+  }, '')
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-        {/* Icon */}
-        <motion.div
-          animate={{ scale: hovered ? 1.08 : 1 }}
-          transition={{ duration: 0.2 }}
-          style={{
-            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-            background: isDark ? 'rgba(74,127,212,0.1)' : 'rgba(0,61,107,0.06)',
-            border: `1px solid ${isDark ? 'rgba(74,127,212,0.18)' : 'rgba(0,61,107,0.1)'}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: accent,
-            transition: 'background 0.2s ease',
-          }}>
-          {area.icon}
-        </motion.div>
-
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Number */}
-          <div style={{
-            fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.14em',
-            color: isDark ? 'rgba(74,127,212,0.6)' : 'rgba(0,61,107,0.4)',
-            marginBottom: 3,
-          }}>{area.num}</div>
-
-          {/* Title */}
-          <div style={{
-            fontSize: '0.8rem', fontWeight: 800,
-            color: isDark ? '#f0f6fc' : '#0a1d37',
-            marginBottom: 5, lineHeight: 1.2,
-          }}>{area.title}</div>
-
-          {/* Desc */}
-          <div style={{
-            fontSize: '0.71rem', lineHeight: 1.5,
-            color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,51,102,0.55)',
-          }}>{area.desc}</div>
-        </div>
-      </div>
-    </motion.div>
-  )
-}
-
-/* ─── Main Section ───────────────────────────────────────────────────────── */
-export default function SmartAnalyticsSection({ isDark, language }: { isDark: boolean; language: 'en' | 'hi' }) {
-  const hi = language === 'hi'
-
-  const AREAS = [
-    {
-      num: '01', title: hi ? 'जोखिम प्रवृत्तियां' : 'Risk Trends',
-      desc: hi ? 'उच्च, मध्यम और निम्न जोखिम वाले प्रोजेक्ट देखें।' : 'See High, Medium and Low risk projects.',
-      icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>),
-    },
-    {
-      num: '02', title: hi ? 'विलंब प्रवृत्तियां' : 'Delay Trends',
-      desc: hi ? 'प्रोजेक्टों में विलंब किस तरह बदलता है यह देखें।' : 'Track how delays change across projects.',
-      icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>),
-    },
-    {
-      num: '03', title: hi ? 'प्रोजेक्ट प्रदर्शन' : 'Project Performance',
-      desc: hi ? 'समयसीमा और प्रोजेक्ट प्रगति की तुलना करें।' : 'Compare timelines and project progress.',
-      icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>),
-    },
-    {
-      num: '04', title: hi ? 'जिला और राज्य दृश्य' : 'District & State View',
-      desc: hi ? 'क्षेत्रों में विलंब पैटर्न देखें।' : 'Spot delay patterns across regions.',
-      icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>),
-    },
-  ]
-
-  const sectionRef = useRef<HTMLElement>(null)
-  const isInView   = useInView(sectionRef, { once: true, margin: '-8% 0px' })
-  const reduced    = useReducedMotion() ?? false
-
-  // Animation phase flags
-  const [panelVisible,   setPanelVisible]   = useState(false)
-  const [gridVisible,    setGridVisible]    = useState(false)
-  const [axesVisible,    setAxesVisible]    = useState(false)
-  const [lineProgress,   setLineProgress]   = useState(0)    // 0 → 1
-  const [dotsVisible,    setDotsVisible]    = useState<boolean[]>(PTS.map(() => false))
-  const [riskVisible,    setRiskVisible]    = useState([false, false, false])
-  const [perfFill,       setPerfFill]       = useState(0)    // 0 → 72 (%)
-  const [regionVisible,  setRegionVisible]  = useState([false, false])
-  const [headingVisible, setHeadingVisible] = useState(false)
-  const [taglineVisible, setTaglineVisible] = useState(false)
-  const [areasVisible,   setAreasVisible]   = useState(false)
-
-  const accent = isDark ? ACCENT_D : ACCENT
-
-  useEffect(() => {
-    if (!isInView) return
-    const ts: ReturnType<typeof setTimeout>[] = []
-    const t = (fn: () => void, ms: number) => { const id = setTimeout(fn, ms); ts.push(id) }
-
-    if (reduced) {
-      // Reduced motion: instant fade-in of everything
-      t(() => { setPanelVisible(true); setGridVisible(true); setAxesVisible(true) }, 100)
-      t(() => { setLineProgress(1) }, 200)
-      t(() => setDotsVisible(PTS.map(() => true)), 250)
-      t(() => setRiskVisible([true, true, true]), 300)
-      t(() => setPerfFill(72), 350)
-      t(() => setRegionVisible([true, true]), 400)
-      t(() => { setHeadingVisible(true); setTaglineVisible(true); setAreasVisible(true) }, 450)
-    } else {
-      // STEP 1: Panel fades in
-      t(() => setPanelVisible(true), 200)
-      // STEP 2: Grid appears
-      t(() => setGridVisible(true), 520)
-      // STEP 3: Axes draw
-      t(() => setAxesVisible(true), 780)
-      // STEP 4: Line draws (controlled via lineProgress animated separately)
-      t(() => setLineProgress(1), 1050)
-      // STEP 5: Dots appear one by one
-      PTS.forEach((_, i) => {
-        t(() => setDotsVisible(prev => { const n = [...prev]; n[i] = true; return n }), 1900 + i * 130)
-      })
-      // STEP 6: Risk labels HIGH → MEDIUM → LOW
-      t(() => setRiskVisible(prev => [true, prev[1], prev[2]]), 2800)
-      t(() => setRiskVisible(prev => [prev[0], true, prev[2]]), 3100)
-      t(() => setRiskVisible(prev => [prev[0], prev[1], true]), 3400)
-      // STEP 7: Performance fills
-      t(() => setPerfFill(72), 3700)
-      // STEP 8: Region labels
-      t(() => setRegionVisible(prev => [true, prev[1]]), 4100)
-      t(() => setRegionVisible(prev => [prev[0], true]), 4350)
-      // STEP 9: Heading
-      t(() => setHeadingVisible(true), 4650)
-      // STEP 10: Tagline + area cards
-      t(() => setTaglineVisible(true), 5000)
-      t(() => setAreasVisible(true), 5200)
-    }
-
-    return () => ts.forEach(clearTimeout)
-  }, [isInView, reduced])
-
-  /* ── Inline styles helpers ── */
-  const sectionBg = isDark
-    ? 'linear-gradient(160deg, #060f1e 0%, #0a1a30 55%, #07111f 100%)'
-    : 'linear-gradient(160deg, #f0f4fb 0%, #f7f9fd 55%, #eaeff8 100%)'
-
-  const cardBg    = isDark ? 'rgba(12,22,46,0.97)' : '#ffffff'
-  const cardBorder = isDark ? 'rgba(74,127,212,0.14)' : 'rgba(0,51,102,0.1)'
-  const textPrimary = isDark ? '#f0f6fc' : '#0a1d37'
-  const textSec    = isDark ? '#7da0cc' : '#4a6280'
-  const gridStroke = isDark ? 'rgba(74,127,212,0.07)' : 'rgba(0,51,102,0.06)'
-  const axisStroke = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,51,102,0.22)'
+  const areaPath = `${curvePath} L ${coords[coords.length - 1].x} ${padTop + plotH} L ${coords[0].x} ${padTop + plotH} Z`
 
   return (
     <section
-      ref={sectionRef}
-      id="smart-analytics"
-      aria-label="Smart Analytics"
+      id="analytics"
       style={{
-        background: sectionBg,
-        padding: '92px 40px 84px',
+        padding: '88px 32px 80px',
+        background: isDark
+          ? 'linear-gradient(180deg, #060e1d 0%, #081326 50%, #060e1d 100%)'
+          : 'linear-gradient(180deg, #f7f9fc 0%, #f0f4f9 50%, #f7f9fc 100%)',
         position: 'relative',
         overflow: 'hidden',
+        borderTop: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,51,102,0.06)',
       }}
     >
-      {/* Dot-grid bg */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: isDark
-          ? 'radial-gradient(rgba(74,127,212,0.1) 1px, transparent 1px)'
-          : 'radial-gradient(rgba(0,51,102,0.08) 1px, transparent 1px)',
-        backgroundSize: '28px 28px', opacity: 0.6,
-      }}/>
-
-      <div style={{ maxWidth: 1160, margin: '0 auto', position: 'relative' }}>
-
-        {/* ── Section header (animates in at step 9) ─────────────────── */}
-        <div style={{ textAlign: 'center', marginBottom: 52 }}>
-          <motion.div
-            initial={{ opacity: 0, y: reduced ? 0 : 14 }}
-            animate={headingVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, ease: EASE }}
+      <div style={{ maxWidth: 1160, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        {/* ── Section Header ── */}
+        <div style={{ textAlign: 'center', marginBottom: 44 }}>
+          <motion.h2
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            style={{
+              fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              color: isDark ? '#f0f6fc' : '#0a1d37',
+              margin: '0 0 12px',
+              lineHeight: 1.2,
+            }}
           >
-            <h2 style={{
-              fontSize: 'clamp(1.7rem, 3vw, 2.35rem)',
-              fontWeight: 900, letterSpacing: '-0.035em',
-              color: textPrimary, margin: '0 0 12px', lineHeight: 1.15,
-            }}>
-              {hi ? 'स्मार्ट विश्लेषण' : 'Smart Analytics'}
-            </h2>
-            <p style={{
-              fontSize: '0.97rem', fontWeight: 500,
-              color: textSec, margin: 0,
-            }}>
-              {hi ? 'प्रोजेक्ट डेटा को स्पष्ट जानकारी में बदलें।' : 'Turn project data into clear insights.'}
-            </p>
-          </motion.div>
+            {isHindi ? 'स्मार्ट विश्लेषण एवं पूर्वानुमान' : 'Smart Analytics & Delay Intelligence'}
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            style={{
+              fontSize: '1rem',
+              fontWeight: 500,
+              color: isDark ? '#94a9c9' : '#4a6280',
+              maxWidth: 640,
+              margin: '0 auto',
+              lineHeight: 1.65,
+            }}
+          >
+            {isHindi
+              ? 'भूमि अधिग्रहण डेटा को स्पष्ट, पूर्वानुमानात्मक अंतर्दृष्टि में बदलें ताकि समय रहते सही कदम उठाए जा सकें।'
+              : 'Transform raw revenue and gazette milestones into predictive delay trajectories before statutory deadlines lapse.'}
+          </motion.p>
         </div>
 
-        {/* ── Main analytics panel ─────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, scale: reduced ? 1 : 0.985 }}
-          animate={panelVisible ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.7, ease: EASE }}
+        {/* ── Executive Metric KPI Badges ── */}
+        <div
           style={{
-            background: cardBg,
-            border: `1px solid ${cardBorder}`,
-            borderRadius: 22,
-            padding: '32px 32px 28px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: 16,
+            marginBottom: 32,
+          }}
+        >
+          {[
+            {
+              label: isHindi ? 'पूर्वानुमान सटीकता' : 'ML Forecast Accuracy',
+              val: '94.2%',
+              desc: isHindi ? 'ग्रेडिएंट बूस्टेड रिग्रेशन मॉडल' : 'Gradient Boosted Delay Model',
+              icon: <TrendingUp size={20} color="#38bdf8" />,
+            },
+            {
+              label: isHindi ? 'शुरुआती चेतावनी विंडो' : 'Early Warning Horizon',
+              val: '45 Days',
+              desc: isHindi ? 'धारा 3D समाप्ति से पहले अलर्ट' : 'Advance Alert Before Sec 3D Lapse',
+              icon: <Clock size={20} color="#f47721" />,
+            },
+            {
+              label: isHindi ? 'लागत जोखिम निवारण' : 'Cost Escalation Averted',
+              val: '₹320+ Cr',
+              desc: isHindi ? 'निष्क्रियता दावों की रोकथाम' : 'EPC Contractor Idling Avoidance',
+              icon: <ShieldCheck size={20} color="#10b981" />,
+            },
+            {
+              label: isHindi ? 'सक्रिय ट्रैक किए गए पैकेज' : 'Active Projects Tracked',
+              val: '12 Packages',
+              desc: isHindi ? '100% पोस्ट-जीआईएस लिंक्ड' : 'PostGIS Cadastral Linked',
+              icon: <FileText size={20} color="#818cf8" />,
+            },
+          ].map((item, i) => (
+            <motion.div
+              key={item.label}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
+              style={{
+                background: isDark ? '#0c1a30' : '#ffffff',
+                border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e8eef5',
+                borderRadius: 14,
+                padding: '16px 20px',
+                boxShadow: isDark ? '0 4px 18px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,51,102,0.04)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+              }}
+            >
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 10,
+                  background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,51,102,0.04)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {item.icon}
+              </div>
+              <div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: isDark ? '#f0f6fc' : '#0a1d37', lineHeight: 1.1 }}>
+                  {item.val}
+                </div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: isDark ? '#8da2c0' : '#475569', marginTop: 2 }}>
+                  {item.label}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: isDark ? '#64748b' : '#94a3b8', marginTop: 1 }}>
+                  {item.desc}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* ── Main Analytics Interactive Dashboard Card ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.55 }}
+          style={{
+            background: isDark ? '#0b1628' : '#ffffff',
+            border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e8eef5',
+            borderRadius: 20,
             boxShadow: isDark
-              ? '0 12px 48px rgba(0,0,0,0.45)'
-              : '0 8px 40px rgba(0,51,102,0.1)',
+              ? '0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)'
+              : '0 16px 45px rgba(0, 51, 102, 0.07), 0 2px 6px rgba(0,0,0,0.03)',
+            padding: '28px 32px 30px',
             marginBottom: 28,
           }}
         >
-
-          {/* ── Dashboard grid ── */}
-          <div className="sas-dash-grid" style={{ alignItems: 'stretch' }}>
-
-            {/* LEFT: Delay Trend chart — stretches to match right column height */}
-            <div style={{
-              background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,51,102,0.025)',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,51,102,0.08)'}`,
-              borderRadius: 14, padding: '16px 18px 12px',
-              display: 'flex', flexDirection: 'column',
-              alignSelf: 'stretch',
-            }}>
-              <div style={{
-                fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em',
-                color: textSec, marginBottom: 14, textTransform: 'uppercase',
-                flexShrink: 0,
-              }}>
-                {hi ? 'विलंब प्रवृत्ति' : 'Delay Trend'}
+          {/* Top Control Bar: Corridor Selector Tabs */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 14,
+              borderBottom: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid #eef2f6',
+              paddingBottom: 18,
+              marginBottom: 24,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '0.98rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37' }}>
+                {isHindi ? 'चरण-वार विलंब एवं जोखिम प्रक्षेपवक्र' : 'Stage-wise Delay Duration & Risk Trajectory'}
               </div>
-
-              {/* SVG Chart — flex:1 so it fills the remaining height */}
-              <svg
-                viewBox="0 0 280 200"
-                preserveAspectRatio="xMidYMid meet"
-                style={{ width: '100%', flex: 1, display: 'block', overflow: 'visible', minHeight: 160 }}
-                aria-label="Delay trend chart"
-              >
-                {/* Subtle grid lines */}
-                {[40, 80, 120, 160, 195].map(y => (
-                  <motion.line key={y}
-                    x1="18" y1={y} x2="272" y2={y}
-                    stroke={gridStroke} strokeWidth="0.8"
-                    initial={{ opacity: 0 }}
-                    animate={gridVisible ? { opacity: 1 } : {}}
-                    transition={{ duration: 0.4, delay: 0.06 * (y / 40) }}
-                  />
-                ))}
-
-                {/* Y axis */}
-                <motion.line
-                  x1="18" y1="10" x2="18" y2="193"
-                  stroke={axisStroke} strokeWidth="1.2"
-                  initial={{ pathLength: 0 }}
-                  animate={axesVisible ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.38, ease: EASE }}
-                />
-                {/* X axis */}
-                <motion.line
-                  x1="18" y1="193" x2="275" y2="193"
-                  stroke={axisStroke} strokeWidth="1.2"
-                  initial={{ pathLength: 0 }}
-                  animate={axesVisible ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.38, delay: 0.12, ease: EASE }}
-                />
-
-                {/* Quarter labels */}
-                {axesVisible && (
-                  <>
-                    {['Q1','Q2','Q3','Q4','Q5','Q6','Q7'].map((q, i) => (
-                      <motion.text key={q}
-                        x={PTS[i][0]} y={202}
-                        textAnchor="middle"
-                        fontSize="9" fill={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,51,102,0.35)'}
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                        transition={{ duration: 0.25, delay: 0.06 * i }}
-                      >{q}</motion.text>
-                    ))}
-                  </>
-                )}
-
-                {/* Gradient area fill */}
-                <defs>
-                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.18 : 0.1}/>
-                    <stop offset="100%" stopColor={accent} stopOpacity={0}/>
-                  </linearGradient>
-                  <clipPath id="lineClip">
-                    <motion.rect
-                      x="0" y="0" height="210"
-                      initial={{ width: 0 }}
-                      animate={lineProgress === 1 ? { width: 290 } : {}}
-                      transition={{ duration: 0.85, ease: EASE }}
-                    />
-                  </clipPath>
-                </defs>
-
-                {/* Area fill */}
-                <motion.path
-                  d={`${SMOOTH_PATH} L 268,193 L 18,193 Z`}
-                  fill="url(#areaGrad)"
-                  clipPath="url(#lineClip)"
-                  initial={{ opacity: 0 }}
-                  animate={lineProgress === 1 ? { opacity: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                />
-
-                {/* Trend line */}
-                <motion.path
-                  d={SMOOTH_PATH}
-                  fill="none"
-                  stroke={accent}
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={lineProgress === 1 ? { pathLength: 1, opacity: 1 } : {}}
-                  transition={{ duration: 0.85, ease: EASE }}
-                />
-
-                {/* Data points */}
-                {PTS.map(([x, y], i) => (
-                  <motion.circle key={i}
-                    cx={x} cy={y} r={5}
-                    fill={isDark ? '#0a1a30' : '#ffffff'}
-                    stroke={accent} strokeWidth="2.2"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={dotsVisible[i] ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ duration: 0.28, ease: EASE }}
-                    style={{ transformOrigin: `${x}px ${y}px` }}
-                  />
-                ))}
-              </svg>
+              <div style={{ fontSize: '0.78rem', color: isDark ? '#8da2c0' : '#64748b', marginTop: 2 }}>
+                {isHindi
+                  ? 'अधिग्रहण चरणों के दौरान औसत विलंब अवधि और संभावित रुकावटें'
+                  : 'Average pending days per statutory milestone based on cross-agency analysis'}
+              </div>
             </div>
 
-            {/* RIGHT column: Risk + Performance + Region */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-              {/* RISK DISTRIBUTION (step 6) */}
-              <div style={{
-                background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,51,102,0.025)',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,51,102,0.08)'}`,
-                borderRadius: 14, padding: '14px 18px',
-              }}>
-                <div style={{
-                  fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em',
-                  color: textSec, marginBottom: 12, textTransform: 'uppercase',
-                }}>
-                  {hi ? 'जोखिम वितरण' : 'Risk Distribution'}
-                </div>
-
-                {([
-                  { label: hi ? 'उच्च' : 'HIGH',   pct: 28, opacity: 1,    idx: 0 },
-                  { label: hi ? 'मध्यम' : 'MEDIUM', pct: 45, opacity: 0.65, idx: 1 },
-                  { label: hi ? 'निम्न' : 'LOW',    pct: 27, opacity: 0.38, idx: 2 },
-                ] as const).map(({ label, pct, opacity, idx }) => (
-                  <motion.div
-                    key={label}
-                    initial={{ opacity: 0, scale: 0.92 }}
-                    animate={riskVisible[idx] ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ duration: 0.38, ease: EASE }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}
+            {/* Filter Pills */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {CORRIDOR_DATASETS.map((d) => {
+                const isActive = selectedCorridor === d.id
+                return (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCorridor(d.id)
+                      setHoveredPoint(null)
+                    }}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: 8,
+                      fontSize: '0.78rem',
+                      fontWeight: isActive ? 700 : 500,
+                      cursor: 'pointer',
+                      border: isActive
+                        ? '1px solid #f47721'
+                        : isDark
+                        ? '1px solid rgba(255,255,255,0.09)'
+                        : '1px solid #e2e8f0',
+                      background: isActive
+                        ? isDark
+                          ? 'rgba(244,119,33,0.18)'
+                          : 'rgba(244,119,33,0.1)'
+                        : isDark
+                        ? 'rgba(255,255,255,0.03)'
+                        : 'transparent',
+                      color: isActive ? '#f47721' : isDark ? '#94a9c9' : '#475569',
+                      transition: 'all 0.18s ease',
+                    }}
                   >
-                    <div style={{
-                      fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.09em',
-                      color: accent, width: 52, flexShrink: 0, opacity,
-                    }}>{label}</div>
-                    <div style={{
-                      flex: 1, height: 5, borderRadius: 6,
-                      background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,51,102,0.08)',
-                      overflow: 'hidden',
-                    }}>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={riskVisible[idx] ? { width: `${pct}%` } : {}}
-                        transition={{ duration: 0.55, delay: 0.12, ease: EASE }}
-                        style={{ height: '100%', background: accent, borderRadius: 6, opacity }}
-                      />
-                    </div>
-                    <div style={{
-                      fontSize: '0.62rem', fontWeight: 700,
-                      color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,51,102,0.5)',
-                      width: 28, textAlign: 'right', flexShrink: 0,
-                    }}>{pct}%</div>
-                  </motion.div>
-                ))}
+                    {isHindi ? d.nameHi : d.nameEn}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Grid Layout: Left Chart, Right Risk Diagnostics */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1.45fr 1fr',
+              gap: 28,
+              alignItems: 'start',
+            }}
+            className="sa-dashboard-grid"
+          >
+            {/* ── LEFT: High Fidelity Curve Chart ── */}
+            <div
+              style={{
+                background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,51,102,0.015)',
+                border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #eef2f8',
+                borderRadius: 14,
+                padding: '20px 18px 14px',
+                position: 'relative',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <span style={{ fontSize: '0.76rem', fontWeight: 800, color: isDark ? '#c8daf4' : '#0a1d37', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  {isHindi ? 'विलंब का रुझान (दिनों में)' : 'Timeline Bottleneck Curve'}
+                </span>
+                <span
+                  style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: 6,
+                    background: isDark ? 'rgba(244,119,33,0.15)' : '#fff3eb',
+                    color: '#f47721',
+                    border: '1px solid rgba(244,119,33,0.25)',
+                  }}
+                >
+                  {activeDataset.avgDelay}
+                </span>
               </div>
 
-              {/* PROJECT PERFORMANCE (step 7) */}
-              <div style={{
-                background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,51,102,0.025)',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,51,102,0.08)'}`,
-                borderRadius: 14, padding: '14px 18px',
-              }}>
-                <div style={{
-                  fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em',
-                  color: textSec, marginBottom: 12, textTransform: 'uppercase',
-                }}>
-                  {hi ? 'प्रोजेक्ट प्रदर्शन' : 'Project Performance'}
+              {/* SVG Area & Curve */}
+              <div style={{ position: 'relative', width: '100%', height: 'auto' }}>
+                <svg
+                  viewBox={`0 0 ${chartW} ${chartH}`}
+                  style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}
+                >
+                  <defs>
+                    <linearGradient id="saGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f47721" stopOpacity={isDark ? 0.35 : 0.22} />
+                      <stop offset="60%" stopColor="#003366" stopOpacity={isDark ? 0.15 : 0.08} />
+                      <stop offset="100%" stopColor="#003366" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Horizontal grid guide lines */}
+                  {[0, 25, 50, 75, 100].map((val) => {
+                    const y = padTop + plotH - (val / maxDays) * plotH
+                    return (
+                      <g key={val}>
+                        <line
+                          x1={padLeft}
+                          y1={y}
+                          x2={chartW - padRight}
+                          y2={y}
+                          stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,51,102,0.07)'}
+                          strokeDasharray="4 4"
+                          strokeWidth="1"
+                        />
+                        <text
+                          x={padLeft - 8}
+                          y={y + 3.5}
+                          textAnchor="end"
+                          fontSize="9.5"
+                          fontWeight="600"
+                          fill={isDark ? '#64748b' : '#94a3b8'}
+                        >
+                          {val}d
+                        </text>
+                      </g>
+                    )
+                  })}
+
+                  {/* Area fill */}
+                  <path d={areaPath} fill="url(#saGrad)" />
+
+                  {/* Solid smooth line */}
+                  <path
+                    d={curvePath}
+                    fill="none"
+                    stroke="#003366"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d={curvePath}
+                    fill="none"
+                    stroke="#f47721"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray="6 3"
+                  />
+
+                  {/* Interactive Points on curve */}
+                  {coords.map((pt, i) => {
+                    const isHovered = hoveredPoint === i
+                    const isRiskHigh = pt.risk === 'HIGH'
+                    return (
+                      <g
+                        key={pt.stageEn}
+                        onMouseEnter={() => setHoveredPoint(i)}
+                        onMouseLeave={() => setHoveredPoint(null)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {/* Glow halo */}
+                        <circle
+                          cx={pt.x}
+                          cy={pt.y}
+                          r={isHovered ? 11 : isRiskHigh ? 8 : 6}
+                          fill={isRiskHigh ? 'rgba(239, 68, 68, 0.2)' : 'rgba(0, 51, 102, 0.15)'}
+                        />
+                        {/* Center core */}
+                        <circle
+                          cx={pt.x}
+                          cy={pt.y}
+                          r={isHovered ? 5.5 : 4}
+                          fill={isRiskHigh ? '#ef4444' : pt.risk === 'MEDIUM' ? '#f59e0b' : '#10b981'}
+                          stroke={isDark ? '#0b1628' : '#ffffff'}
+                          strokeWidth="2"
+                        />
+
+                        {/* X-axis milestone label */}
+                        <text
+                          x={pt.x}
+                          y={padTop + plotH + 18}
+                          textAnchor="middle"
+                          fontSize="8.5"
+                          fontWeight={isHovered ? '800' : '600'}
+                          fill={isHovered ? '#f47721' : isDark ? '#94a9c9' : '#64748b'}
+                        >
+                          {isHindi ? pt.stageHi.split(' ')[0] : pt.stageEn.split(' ')[0]}
+                        </text>
+                      </g>
+                    )
+                  })}
+                </svg>
+              </div>
+
+              {/* Hover Tooltip / Stage Insight Box */}
+              <div
+                style={{
+                  marginTop: 10,
+                  padding: '10px 14px',
+                  background: isDark ? '#081120' : '#f0f5fc',
+                  borderRadius: 8,
+                  border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #dbeafe',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  minHeight: 40,
+                }}
+              >
+                {hoveredPoint !== null ? (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          background:
+                            coords[hoveredPoint].risk === 'HIGH'
+                              ? '#ef4444'
+                              : coords[hoveredPoint].risk === 'MEDIUM'
+                              ? '#f59e0b'
+                              : '#10b981',
+                        }}
+                      />
+                      <span style={{ fontSize: '0.82rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37' }}>
+                        {isHindi ? coords[hoveredPoint].stageHi : coords[hoveredPoint].stageEn}
+                      </span>
+                      <span style={{ fontSize: '0.74rem', color: isDark ? '#8da2c0' : '#64748b' }}>
+                        ({coords[hoveredPoint].milestone})
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f47721' }}>
+                      {coords[hoveredPoint].days} {isHindi ? 'दिन विलंब' : 'days avg delay'}
+                    </span>
+                  </>
+                ) : (
+                  <div style={{ fontSize: '0.76rem', color: isDark ? '#64748b' : '#64748b', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Clock size={14} />
+                    <span>{isHindi ? 'चरण विवरण देखने के लिए किसी भी बिंदु पर होवर करें।' : 'Hover over any data point to inspect stage bottlenecks.'}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── RIGHT: Root Cause Diagnostics & Breakdown ── */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Risk Distribution Breakdown */}
+              <div
+                style={{
+                  background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,51,102,0.015)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #eef2f8',
+                  borderRadius: 14,
+                  padding: '16px 18px',
+                }}
+              >
+                <div style={{ fontSize: '0.74rem', fontWeight: 800, color: isDark ? '#c8daf4' : '#0a1d37', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 12 }}>
+                  {isHindi ? 'सक्रिय परियोजना जोखिम वर्गीकरण' : 'Project Risk Distribution'}
                 </div>
 
-                {([
-                  { label: hi ? 'निर्धारित समय पर' : 'On Schedule', pct: 72, opacity: 1    },
-                  { label: hi ? 'जोखिम में'     : 'At Risk',     pct: 19, opacity: 0.62 },
-                  { label: hi ? 'विलंबित'     : 'Delayed',     pct: 9,  opacity: 0.38 },
-                ] as const).map(({ label, pct, opacity }, i) => (
-                  <div key={label} style={{ marginBottom: 8 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontSize: '0.65rem', color: textSec, fontWeight: 500 }}>{label}</span>
-                      <motion.span
-                        initial={{ opacity: 0 }}
-                        animate={perfFill > 0 ? { opacity: 1 } : {}}
-                        transition={{ duration: 0.3, delay: 0.3 + i * 0.1 }}
-                        style={{ fontSize: '0.65rem', fontWeight: 700, color: isDark ? '#c0d4f0' : '#0a1d37' }}
-                      >
-                        {pct}%
-                      </motion.span>
+                {[
+                  { label: isHindi ? 'निम्न जोखिम (समय पर)' : 'Low Risk (On Track)', pct: 58, count: '7 Pkgs', color: '#10b981' },
+                  { label: isHindi ? 'मध्यम जोखिम (ध्यान दें)' : 'Medium Risk (Approvals)', pct: 25, count: '3 Pkgs', color: '#f59e0b' },
+                  { label: isHindi ? 'उच्च जोखिम (कार्रवाई आवश्यक)' : 'Critical (Court Stay/Dispute)', pct: 17, count: '2 Pkgs', color: '#ef4444' },
+                ].map((item) => (
+                  <div key={item.label} style={{ marginBottom: 10 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginBottom: 4 }}>
+                      <span style={{ fontWeight: 600, color: isDark ? '#c0d4f0' : '#334155' }}>{item.label}</span>
+                      <span style={{ fontWeight: 800, color: item.color }}>{item.count} ({item.pct}%)</span>
                     </div>
-                    <div style={{
-                      height: 5, borderRadius: 6,
-                      background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,51,102,0.08)',
-                      overflow: 'hidden',
-                    }}>
+                    <div style={{ height: 6, borderRadius: 6, background: isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0', overflow: 'hidden' }}>
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={perfFill > 0 ? { width: `${pct}%` } : {}}
-                        transition={{ duration: 0.65, delay: 0.15 * i, ease: EASE }}
-                        style={{ height: '100%', background: accent, borderRadius: 6, opacity }}
+                        whileInView={{ width: `${item.pct}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                        style={{ height: '100%', borderRadius: 6, background: item.color }}
                       />
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* DISTRICT & STATE VIEW (step 8) */}
-              <div style={{
-                background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,51,102,0.025)',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,51,102,0.08)'}`,
-                borderRadius: 14, padding: '14px 18px',
-              }}>
-                <div style={{
-                  fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em',
-                  color: textSec, marginBottom: 12, textTransform: 'uppercase',
-                }}>
-                  {hi ? 'जिला और राज्य दृश्य' : 'District & State View'}
+              {/* Primary Delay Drivers */}
+              <div
+                style={{
+                  background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,51,102,0.015)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #eef2f8',
+                  borderRadius: 14,
+                  padding: '16px 18px',
+                }}
+              >
+                <div style={{ fontSize: '0.74rem', fontWeight: 800, color: isDark ? '#c8daf4' : '#0a1d37', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>
+                  {isHindi ? 'शीर्ष मूल कारण विश्लेषण' : 'Top Root Causes of Corridor Delays'}
                 </div>
 
-                {([
-                  { label: hi ? 'जिले का औसत विलंब' : 'DISTRICT avg delay', val: hi ? '14 दिन' : '14 days', pct: 58, idx: 0 },
-                  { label: hi ? 'राज्य का औसत विलंब' : 'STATE avg delay',    val: hi ? '21 दिन' : '21 days', pct: 84, idx: 1 },
-                ] as const).map(({ label, val, pct, idx }) => (
-                  <motion.div
-                    key={label}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={regionVisible[idx] ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.4, ease: EASE }}
-                    style={{ marginBottom: 9 }}
-                  >
-                    <div style={{
-                      display: 'flex', justifyContent: 'space-between',
-                      marginBottom: 4,
-                    }}>
-                      <span style={{
-                        fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.07em',
-                        color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,51,102,0.5)',
-                      }}>{label}</span>
-                      <span style={{
-                        fontSize: '0.62rem', fontWeight: 700,
-                        color: isDark ? '#c0d4f0' : '#0a1d37',
-                      }}>{val}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[
+                    { reason: isHindi ? 'अदालती स्थगन व स्वामित्व विवाद' : 'Court Injunctions & Title Claims', share: '42%' },
+                    { reason: isHindi ? 'वृक्ष/संरचना परिसंपत्ति मूल्यांकन' : 'Asset & Orchard Valuation Disputes', share: '28%' },
+                    { reason: isHindi ? 'धारा 3D राजपत्र अधिसूचना अंतराल' : 'Section 3D Gazette Publishing Lag', share: '19%' },
+                    { reason: isHindi ? 'वन एवं पर्यावरण एनओसी मंजूरी' : 'Forest & Wildlife NOC Clearance', share: '11%' },
+                  ].map((rc) => (
+                    <div
+                      key={rc.reason}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: '0.75rem',
+                        color: isDark ? '#8da2c0' : '#475569',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#f47721' }} />
+                        <span>{rc.reason}</span>
+                      </div>
+                      <span style={{ fontWeight: 700, color: isDark ? '#f0f6fc' : '#0a1d37' }}>{rc.share}</span>
                     </div>
-                    <div style={{
-                      height: 5, borderRadius: 6,
-                      background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,51,102,0.08)',
-                      overflow: 'hidden',
-                    }}>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={regionVisible[idx] ? { width: `${pct}%` } : {}}
-                        transition={{ duration: 0.6, delay: 0.1, ease: EASE }}
-                        style={{
-                          height: '100%', borderRadius: 6,
-                          background: accent,
-                          opacity: idx === 0 ? 0.75 : 1,
-                        }}
-                      />
-                    </div>
-                  </motion.div>
-                ))}
+                  ))}
+                </div>
               </div>
 
-            </div>{/* end right col */}
-          </div>{/* end dashboard grid */}
-
-          {/* Prototype disclaimer */}
-          <div style={{
-            marginTop: 18,
-            fontSize: '0.58rem', fontWeight: 500, letterSpacing: '0.06em',
-            color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,51,102,0.28)',
-            textAlign: 'right',
-          }}>
-            {hi ? 'मूल्य केवल प्रदर्शन के लिए प्रोटोटाइप संकेतक हैं।' : 'Values shown are prototype indicators for demonstration.'}
+              {/* Actionable AI Recommendation Card */}
+              <div
+                style={{
+                  background: isDark ? 'rgba(244,119,33,0.08)' : '#fff8f3',
+                  border: '1px solid rgba(244,119,33,0.3)',
+                  borderRadius: 12,
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 10,
+                }}
+              >
+                <AlertTriangle size={18} color="#f47721" style={{ flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f47721' }}>
+                    {isHindi ? 'AI प्रारंभिक चेतावनी अंतर्दृष्टि' : 'Actionable Intelligence Recommendation'}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: isDark ? '#cbd5e1' : '#475569', marginTop: 2, lineHeight: 1.4 }}>
+                    {isHindi
+                      ? 'मोहनलालगंज में 2 लंबित अदालती मामलों के शीघ्र समाधान से परियोजना के 65 दिनों के ठहराव को बचाया जा सकता है।'
+                      : 'Resolving 2 title succession disputes early in Mohanlalganj prevents 65 compounding days of linear corridor idling.'}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </motion.div>
 
-        {/* ── 4 analytics area cards ─────────────────────────────────────── */}
-        <div className="sas-areas-grid" style={{ marginBottom: 44 }}>
-          {AREAS.map((area, i) => (
-            <AreaCard
-              key={area.num}
-              area={area}
-              visible={areasVisible}
-              delay={i * 0.1}
-              isDark={isDark}
-            />
+        {/* ── 3 Simple Core Pillars Below (Clean & Intuitive) ── */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 20,
+          }}
+        >
+          {[
+            {
+              title: isHindi ? 'भविष्यवाणी जोखिम स्कोरिंग' : 'Predictive Risk Scoring',
+              desc: isHindi
+                ? 'परियोजना के वैधानिक या वित्तीय मील के पत्थर चूकने से पहले विलंब की संभावना का सटीक अनुमान लगाएं।'
+                : 'Forecast delay probabilities months ahead using historical milestone durations and local dispute patterns.',
+              icon: <Scale size={20} color="#003366" />,
+            },
+            {
+              title: isHindi ? 'कैडस्ट्रल हीटमैप दृश्य' : 'Cadastral GIS Mapping',
+              desc: isHindi
+                ? 'राजस्व ग्राम खसरा मानचित्रों पर उच्च जोखिम वाले मुकदमों और अनसुलझी भूमि के समूहों को सीधे देखें।'
+                : 'Identify localized litigation hotspots directly overlaid on revenue village survey numbers and corridor paths.',
+              icon: <FileText size={20} color="#f47721" />,
+            },
+            {
+              title: isHindi ? 'स्वचालित निवारक सिफारिशें' : 'Preventive Action Playbooks',
+              desc: isHindi
+                ? 'सीएएलए और परियोजना निदेशकों को समय पर कानूनी और वित्तीय हस्तक्षेप के लिए स्वचालित सुझाव।'
+                : 'Empower CALA officers and Project Directors with automated statutory playbooks to avert idling claims.',
+              icon: <CheckCircle2 size={20} color="#10b981" />,
+            },
+          ].map((pillar, idx) => (
+            <motion.div
+              key={pillar.title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: idx * 0.1 }}
+              style={{
+                background: isDark ? '#0c1a30' : '#ffffff',
+                border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid #eef2f8',
+                borderRadius: 14,
+                padding: '22px 24px',
+                boxShadow: isDark ? '0 4px 18px rgba(0,0,0,0.25)' : '0 2px 10px rgba(0,51,102,0.03)',
+              }}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: isDark ? 'rgba(255,255,255,0.05)' : '#eef4fb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 14,
+                }}
+              >
+                {pillar.icon}
+              </div>
+              <h3 style={{ fontSize: '0.96rem', fontWeight: 800, color: isDark ? '#f0f6fc' : '#0a1d37', margin: '0 0 6px' }}>
+                {pillar.title}
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: isDark ? '#8da2c0' : '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {pillar.desc}
+              </p>
+            </motion.div>
           ))}
         </div>
-
-        {/* ── Final tagline (step 10) ─────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={taglineVisible ? { opacity: 1 } : {}}
-          transition={{ duration: 0.55, ease: EASE }}
-          style={{ textAlign: 'center' }}
-        >
-          <div style={{ width: 1, height: 28, background: isDark
-            ? 'linear-gradient(to bottom, rgba(74,127,212,0.38), transparent)'
-            : 'linear-gradient(to bottom, rgba(0,61,107,0.3), transparent)',
-            margin: '0 auto 14px' }}/>
-          <span style={{
-            fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: isDark ? ACCENT_D : ACCENT,
-          }}>
-            {hi ? 'प्रवृत्ति देखें। जोखिम पहचानें। कार्रवाई करें।' : 'See the trend. Spot the risk. Make the move.'}
-          </span>
-        </motion.div>
-
       </div>
 
-      {/* ── Scoped responsive CSS ──────────────────────────────────────────── */}
       <style>{`
-        @media (prefers-reduced-motion: reduce) {
-          #smart-analytics * {
-            animation-duration: 0.001ms !important;
-            transition-duration: 0.001ms !important;
-          }
-        }
-
-        /* Desktop — chart left, right panels right */
-        .sas-dash-grid {
-          display: grid;
-          grid-template-columns: 1.6fr 1fr;
-          gap: 18px;
-          align-items: start;
-        }
-
-        /* 4 analytics area cards — 2×2 grid on desktop */
-        .sas-areas-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
-        }
-
-        /* Tablet */
         @media (max-width: 900px) {
-          #smart-analytics { padding: 72px 24px 64px; }
-          .sas-dash-grid {
-            grid-template-columns: 1fr;
-          }
-          .sas-areas-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        /* Mobile */
-        @media (max-width: 540px) {
-          #smart-analytics { padding: 56px 18px 52px; }
-          .sas-areas-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
+          .sa-dashboard-grid {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>

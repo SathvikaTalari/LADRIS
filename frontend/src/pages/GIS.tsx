@@ -38,7 +38,6 @@ import {
   TileLayer,
   Marker,
   Popup,
-  CircleMarker,
   useMap,
   GeoJSON,
 } from 'react-leaflet'
@@ -94,24 +93,131 @@ const PARCEL_RISK_COLORS: Record<string, { fill: string; stroke: string; fillOpa
   CRITICAL: { fill: '#dc2626', stroke: '#991b1b', fillOpacity: 0.55 },
   HIGH: { fill: '#f97316', stroke: '#c2410c', fillOpacity: 0.5 },
   MEDIUM: { fill: '#eab308', stroke: '#a16207', fillOpacity: 0.45 },
-  LOW: { fill: '#16a34a', stroke: '#15803d', fillOpacity: 0.4 },
+  LOW: { fill: '#10b981', stroke: '#059669', fillOpacity: 0.4 },
 }
 
-function createRiskMarkerIcon(riskLevel: string) {
-  let color = '#16a34a'
-  let glowColor = 'rgba(22,163,74,0.4)'
-  if (riskLevel === 'CRITICAL') { color = '#dc2626'; glowColor = 'rgba(220,38,38,0.5)' }
-  else if (riskLevel === 'HIGH') { color = '#f97316'; glowColor = 'rgba(249,115,22,0.45)' }
-  else if (riskLevel === 'MEDIUM') { color = '#eab308'; glowColor = 'rgba(234,179,8,0.45)' }
-  const html = `<div style="position:relative;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><div style="position:absolute;width:30px;height:30px;border-radius:50%;background:${color};opacity:0.3;animation:ping 2.2s cubic-bezier(0,0,0.2,1) infinite;"></div><div style="width:16px;height:16px;border-radius:50%;background:${color};border:2.5px solid #ffffff;box-shadow:0 2px 8px ${glowColor},0 0 0 3px ${glowColor};"></div></div>`
-  return L.divIcon({ html, className: 'custom-risk-marker', iconSize: [30, 30], iconAnchor: [15, 15] })
+function createRiskMarkerIcon(riskLevel: string, showHalo: boolean = true) {
+  const norm = (riskLevel || 'LOW').toUpperCase()
+
+  // Coloured markers: low - green, medium - yellow, high - orange, critical - red
+  let pinColor = '#10b981'       // low - green
+  let borderDashed = '#047857'
+  let haloBg = 'rgba(16, 185, 129, 0.18)'
+  let glowColor = 'rgba(16, 185, 129, 0.4)'
+  let haloSize = 54
+  let pulseSpeed = '3s'
+
+  if (norm === 'CRITICAL') {
+    pinColor = '#dc2626'        // critical - red
+    borderDashed = '#991b1b'
+    haloBg = 'rgba(220, 38, 38, 0.22)'
+    glowColor = 'rgba(220, 38, 38, 0.55)'
+    haloSize = 72
+    pulseSpeed = '1.8s'
+  } else if (norm === 'HIGH') {
+    pinColor = '#f97316'        // high - orange
+    borderDashed = '#c2410c'
+    haloBg = 'rgba(249, 115, 22, 0.20)'
+    glowColor = 'rgba(249, 115, 22, 0.45)'
+    haloSize = 64
+    pulseSpeed = '2.2s'
+  } else if (norm === 'MEDIUM') {
+    pinColor = '#eab308'        // medium - yellow
+    borderDashed = '#a16207'
+    haloBg = 'rgba(234, 179, 8, 0.18)'
+    glowColor = 'rgba(234, 179, 8, 0.4)'
+    haloSize = 58
+    pulseSpeed = '2.6s'
+  }
+
+  const haloHtml = showHalo ? `
+    <div class="hotspot-halo-zone" style="
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: ${haloSize}px;
+      height: ${haloSize}px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 2px dashed ${borderDashed};
+      background: ${haloBg};
+      box-shadow: 0 0 10px ${glowColor};
+      animation: hotspotPulse ${pulseSpeed} ease-in-out infinite;
+      pointer-events: none;
+    "></div>
+    <div style="
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: ${Math.round(haloSize * 0.55)}px;
+      height: ${Math.round(haloSize * 0.55)}px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid ${borderDashed};
+      opacity: 0.35;
+      pointer-events: none;
+    "></div>
+  ` : ''
+
+  const pinHtml = `
+    <div class="hotspot-pin-anchor" style="
+      position: absolute;
+      left: 38px;
+      bottom: 38px;
+      transform: translateX(-50%);
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.55));
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      z-index: 10;
+    ">
+      <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <path d="M12 0C5.37258 0 0 5.37258 0 12C0 20.2 12 32 12 32C12 32 24 20.2 24 12C24 5.37258 18.6274 0 12 0Z" fill="${pinColor}"/>
+        <path d="M12 0.75C5.78679 0.75 0.75 5.78679 0.75 12C0.75 19.5 11.4 30.5 12 31.1C12.6 30.5 23.25 19.5 23.25 12C23.25 5.78679 18.2132 0.75 12 0.75Z" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+        <circle cx="12" cy="11.5" r="4.2" fill="#ffffff"/>
+      </svg>
+    </div>
+    <div style="
+      position: absolute;
+      left: 38px;
+      top: 38px;
+      transform: translate(-50%, -50%);
+      width: 6px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      z-index: 5;
+    "></div>
+  `
+
+  const html = `
+    <div class="hotspot-marker-container" style="
+      position: relative;
+      width: 76px;
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+      ${haloHtml}
+      ${pinHtml}
+    </div>
+  `
+
+  return L.divIcon({
+    html,
+    className: 'custom-hotspot-risk-marker',
+    iconSize: [76, 76],
+    iconAnchor: [38, 38],
+    popupAnchor: [0, -36],
+  })
 }
 
 function getRiskLevelColor(level: string): string {
-  if (level === 'CRITICAL') return '#dc2626'
-  if (level === 'HIGH') return '#f97316'
-  if (level === 'MEDIUM') return '#eab308'
-  return '#16a34a'
+  const norm = (level || '').toUpperCase()
+  if (norm === 'CRITICAL') return '#dc2626'
+  if (norm === 'HIGH') return '#f97316'
+  if (norm === 'MEDIUM') return '#eab308'
+  return '#10b981'
 }
 
 function MapViewController({ center, zoom }: { center: [number, number]; zoom: number }) {
@@ -244,6 +350,16 @@ function DetailedMapModal({ project, onClose }: DetailedMapProps) {
               </div>
               <MapContainer center={mapCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
                 <TileLayer key={detailTile} attribution={MAP_TILES[detailTile].attribution} url={MAP_TILES[detailTile].url} />
+                {detailTile === 'SATELLITE' && (
+                  <TileLayer
+                    key="modal-boundaries"
+                    url="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                    attribution="&copy; Esri &mdash; Boundaries and Places"
+                    zIndex={400}
+                    opacity={0.92}
+                    maxZoom={19}
+                  />
+                )}
                 {project.lat && project.lng && (
                   <Marker position={[project.lat, project.lng]} icon={createRiskMarkerIcon(project.risk_level)}>
                     <Popup><strong>{project.name}</strong><br /><span style={{ fontSize: '0.75rem', color: '#64748b' }}>Project Centroid</span></Popup>
@@ -391,8 +507,6 @@ export default function GIS() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterPanelOpen, setFilterPanelOpen] = useState(true)
   const [detailedMapProject, setDetailedMapProject] = useState<any | null>(null)
-  const [interactiveSearchQuery, setInteractiveSearchQuery] = useState('')
-  const [interactiveRisk, setInteractiveRisk] = useState('ALL')
 
   useEffect(() => {
     let isMounted = true
@@ -433,17 +547,6 @@ export default function GIS() {
       return true
     })
   }, [projects, selectedState, selectedRisk, selectedStatus, selectedDistrict, selectedAgency, searchQuery])
-
-  const interactiveProjects = useMemo(() => {
-    return projects.filter(p => {
-      if (interactiveRisk !== 'ALL' && p.risk_level !== interactiveRisk) return false
-      if (interactiveSearchQuery.trim()) {
-        const q = interactiveSearchQuery.toLowerCase()
-        if (!p.name.toLowerCase().includes(q) && !p.project_code.toLowerCase().includes(q)) return false
-      }
-      return true
-    })
-  }, [projects, interactiveRisk, interactiveSearchQuery])
 
   const stats = useMemo(() => {
     const critical = visibleProjects.filter(p => p.risk_level === 'CRITICAL').length
@@ -562,17 +665,31 @@ export default function GIS() {
             </div>
           </div>
 
-          <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
+          <MapContainer center={mapCenter} zoom={mapZoom} className="gis-satellite-enhanced" style={{ height: '100%', width: '100%' }}>
             <MapViewController center={mapCenter} zoom={mapZoom} />
-            <TileLayer key={tileKey} attribution={currentTile.attribution} url={currentTile.url} />
-            {showHalos && visibleProjects.map(p => {
-              const colorMap: Record<string, string> = { CRITICAL: '#dc2626', HIGH: '#f97316', MEDIUM: '#eab308', LOW: '#16a34a' }
-              const radMap: Record<string, number> = { CRITICAL: 24, HIGH: 18, MEDIUM: 13, LOW: 9 }
-              const color = colorMap[p.risk_level] || '#16a34a'
-              return <CircleMarker key={`halo-${p.id}`} center={[p.lat, p.lng]} radius={radMap[p.risk_level] || 9} pathOptions={{ color, fillColor: color, fillOpacity: 0.13, weight: 1, opacity: 0.4 }} />
-            })}
+            <TileLayer key={tileKey} attribution={currentTile.attribution} url={currentTile.url} maxZoom={19} />
+            {tileKey === 'SATELLITE' && (
+              <>
+                <TileLayer
+                  key="gis-boundaries"
+                  url="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution="&copy; Esri &mdash; Boundaries and Places"
+                  zIndex={400}
+                  opacity={0.92}
+                  maxZoom={19}
+                />
+                <TileLayer
+                  key="gis-transportation"
+                  url="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}"
+                  attribution="&copy; Esri &mdash; Transportation"
+                  zIndex={401}
+                  opacity={0.78}
+                  maxZoom={19}
+                />
+              </>
+            )}
             {showMarkers && visibleProjects.map(p => (
-              <Marker key={`marker-${p.id}`} position={[p.lat, p.lng]} icon={createRiskMarkerIcon(p.risk_level)}>
+              <Marker key={`marker-${p.id}-${showHalos}`} position={[p.lat, p.lng]} icon={createRiskMarkerIcon(p.risk_level, showHalos)}>
                 <Popup className="custom-leaflet-popup" maxWidth={300}>
                   <div style={{ padding: '4px 2px', color: '#0f172a', minWidth: 260 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -628,19 +745,30 @@ export default function GIS() {
                     <div style={{ marginBottom: 14 }}><label className="input-label" style={{ fontSize: '0.72rem' }}>Risk Level</label><select id="gis-filter-risk" value={selectedRisk} onChange={e => setSelectedRisk(e.target.value)} className="input" style={{ height: 36, fontSize: '0.78rem' }}><option value="ALL">All Risk Levels</option><option value="CRITICAL">Critical</option><option value="HIGH">High</option><option value="MEDIUM">Medium</option><option value="LOW">Low</option></select></div>
                     <div style={{ borderTop: '1px solid var(--color-border-subtle)', paddingTop: 12 }}>
                       <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><Layers size={11} /> Layer Controls</div>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.78rem', color: 'var(--color-text-primary)', cursor: 'pointer', marginBottom: 6 }}><input type="checkbox" checked={showMarkers} onChange={e => setShowMarkers(e.target.checked)} /> Project Markers</label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.78rem', color: 'var(--color-text-primary)', cursor: 'pointer' }}><input type="checkbox" checked={showHalos} onChange={e => setShowHalos(e.target.checked)} /> Risk Signal Halos</label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.78rem', color: 'var(--color-text-primary)', cursor: 'pointer', marginBottom: 6 }}>
+                        <input type="checkbox" checked={showMarkers} onChange={e => setShowMarkers(e.target.checked)} /> Hotspot Project Pins
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.78rem', color: 'var(--color-text-primary)', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={showHalos} onChange={e => setShowHalos(e.target.checked)} /> Dashed Hotspot Zones
+                      </label>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
             <div className="card" style={{ border: '1px solid rgba(64,128,255,0.15)', background: 'rgba(64,128,255,0.03)' }}>
-              <h4 style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4080ff', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Target size={13} /> Project Delay Risk Legend</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.75rem' }}>
-                {[{ color: '#dc2626', label: 'Critical Risk', sub: 'Score > 80' }, { color: '#f97316', label: 'High Risk', sub: 'Score 65-80' }, { color: '#eab308', label: 'Medium Risk', sub: 'Score 45-65' }, { color: '#16a34a', label: 'Low Risk', sub: 'Score < 45' }].map(l => (
-                  <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: l.color, boxShadow: `0 0 6px ${l.color}60`, flexShrink: 0 }} />
+              <h4 style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4080ff', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Target size={13} /> Hotspot Delay Risk Legend</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 9, fontSize: '0.75rem' }}>
+                {[
+                  { color: '#dc2626', border: '#991b1b', bg: 'rgba(220,38,38,0.22)', label: 'Critical Risk', sub: 'Score > 80 (Urgent Bottlenecks)' },
+                  { color: '#f97316', border: '#c2410c', bg: 'rgba(249,115,22,0.20)', label: 'High Risk', sub: 'Score 65-80 (Elevated Delay Hazard)' },
+                  { color: '#eab308', border: '#a16207', bg: 'rgba(234,179,8,0.18)', label: 'Medium Risk', sub: 'Score 45-65 (Moderate Attention)' },
+                  { color: '#10b981', border: '#047857', bg: 'rgba(16,185,129,0.18)', label: 'Low Risk', sub: 'Score < 45 (On Track / Stable)' },
+                ].map(l => (
+                  <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: '50%', border: `1.8px dashed ${l.border}`, background: l.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: l.color, boxShadow: `0 0 5px ${l.color}` }} />
+                    </div>
                     <div><div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{l.label}</div><div style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>{l.sub}</div></div>
                   </div>
                 ))}
@@ -648,74 +776,6 @@ export default function GIS() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* ── Interactive Map Section ──────────────────────────────────────────── */}
-      <div style={{ marginTop: 32 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, paddingBottom: 14, borderBottom: '2px solid var(--color-border-subtle)' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 9, background: 'linear-gradient(135deg,#1e40af,#3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Map size={16} color="#fff" />
-              </div>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>Interactive Map — Land Acquisition Risk View</h2>
-            </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 0, maxWidth: 640 }}>
-              Select any project to open a detailed Land Acquisition Risk Map with parcel-level status, ownership disputes, compensation tracking, and risk colour coding.
-            </p>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: 'var(--color-bg-card)', border: '1px solid var(--color-border-subtle)', borderRadius: 10, padding: '7px 14px' }}>
-            <Search size={14} color="var(--color-text-muted)" />
-            <input id="interactive-map-search" type="text" placeholder="Search project to open detailed map..." value={interactiveSearchQuery} onChange={e => setInteractiveSearchQuery(e.target.value)} style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '0.82rem', color: 'var(--color-text-primary)', width: '100%' }} />
-          </div>
-          <select id="interactive-map-risk-filter" value={interactiveRisk} onChange={e => setInteractiveRisk(e.target.value)} className="input" style={{ width: 160, height: 40, fontSize: '0.78rem' }}>
-            <option value="ALL">All Risk Levels</option>
-            <option value="CRITICAL">Critical</option>
-            <option value="HIGH">High</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="LOW">Low</option>
-          </select>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: 12 }}>
-          {interactiveProjects.length === 0 ? (
-            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>No projects match your search.</div>
-          ) : (
-            interactiveProjects.map(p => {
-              const rc = getRiskLevelColor(p.risk_level)
-              return (
-                <motion.div key={p.id} whileHover={{ y: -2, boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }} transition={{ duration: 0.15 }} className="card" style={{ padding: '14px 16px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${rc},${rc}80)` }} />
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <code style={{ fontSize: '0.65rem', color: '#1d4ed8', fontWeight: 800, background: '#eff6ff', padding: '2px 6px', borderRadius: 4, border: '1px solid #bfdbfe' }}>{p.project_code}</code>
-                    <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 8px', borderRadius: 10, background: rc + '18', color: rc, border: `1px solid ${rc}35` }}>{p.risk_level}</span>
-                  </div>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 6, lineHeight: 1.3 }}>{p.name}</div>
-                  <div style={{ display: 'flex', gap: 10, fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: 10 }}>
-                    <span>{STATE_COORDINATES[p.state_code]?.name || p.state_code || 'N/A'}</span>
-                    <span>• {p.status}</span>
-                  </div>
-                  {p.priorityScore != null && (
-                    <div style={{ marginBottom: 10 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', color: 'var(--color-text-muted)', marginBottom: 3 }}>
-                        <span>Risk Score</span><strong style={{ color: rc }}>{p.priorityScore.toFixed(0)}/100</strong>
-                      </div>
-                      <div style={{ height: 4, background: 'var(--color-border-subtle)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${p.priorityScore}%`, background: rc, borderRadius: 2 }} />
-                      </div>
-                    </div>
-                  )}
-                  <button id={`interactive-open-map-${p.id}`} onClick={() => setDetailedMapProject(p)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px 12px', background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff', fontSize: '0.74rem', fontWeight: 700, borderRadius: 8, border: 'none', cursor: 'pointer', boxShadow: '0 2px 10px rgba(37,99,235,0.25)' }}>
-                    Open Detailed Map
-                  </button>
-                </motion.div>
-              )
-            })
-          )}
-        </div>
       </div>
 
       <AnimatePresence>
@@ -728,7 +788,20 @@ export default function GIS() {
         <DetailedMapView initialProjectId={detailedMapProject?.id} />
       )}
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes hotspotPulse {
+          0% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.82; }
+          50% { transform: translate(-50%, -50%) scale(1.04); opacity: 1; }
+          100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.82; }
+        }
+        .hotspot-pin-anchor:hover {
+          transform: translateX(-50%) translateY(-3px) scale(1.1) !important;
+        }
+        .gis-satellite-enhanced .leaflet-tile-pane {
+          filter: contrast(1.06) saturate(1.15) brightness(1.02);
+        }
+      `}</style>
     </motion.div>
   )
 }

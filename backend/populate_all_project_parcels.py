@@ -17,7 +17,6 @@ from app.database import AsyncSessionLocal
 PROJECT_DATA = {
     "TG-NHAI-SRD-001": {
         "name": "NH65 Sangareddy Highway Four-Laning",
-        # Already has 4 parcels in land_parcels, let's add alignment and boundary
         "alignment_coords": [
             [78.570, 17.325],
             [78.588, 17.322],
@@ -27,7 +26,108 @@ PROJECT_DATA = {
             [78.730, 17.255],
             [78.750, 17.240]
         ],
-        "skip_parcels": True  # Already has 4 detailed parcels
+        "district": "Sangareddy",
+        "tehsil": "Hayathnagar",
+        "state_code": "TG",
+        "project_type": "HIGHWAY",
+        "parcels": [
+            {
+                "kn": "142/A",
+                "village": "Hayathnagar",
+                "tehsil": "Hayathnagar",
+                "district": "Rangareddy",
+                "area_ha": 14.5,
+                "owners": 1,
+                "status_color": "RED",
+                "is_hotspot": True,
+                "issue_type": "LEGAL",
+                "has_legal": True,
+                "is_notif": True,
+                "is_award": False,
+                "is_comp": False,
+                "is_poss": False,
+                "days_pending": 320,
+                "ownership_status": "Title Disputed (Inheritance Litigation)",
+                "compensation_status": "Stayed by High Court Order",
+                "legal_status": "High Court Injunction (WP-4182/2023)",
+                "geom": {
+                    "type": "Polygon",
+                    "coordinates": [[[78.585, 17.32], [78.591, 17.32], [78.591, 17.326], [78.585, 17.326], [78.585, 17.32]]]
+                }
+            },
+            {
+                "kn": "148/2",
+                "village": "Pedda Amberpet",
+                "tehsil": "Abdullapurmet",
+                "district": "Rangareddy",
+                "area_ha": 22.8,
+                "owners": 5,
+                "status_color": "ORANGE",
+                "is_hotspot": True,
+                "issue_type": "OWNERSHIP",
+                "has_legal": False,
+                "is_notif": True,
+                "is_award": False,
+                "is_comp": False,
+                "is_poss": False,
+                "days_pending": 165,
+                "ownership_status": "Joint Ownership (5 Co-sharers)",
+                "compensation_status": "Section 23 Award Pending Inquiry",
+                "legal_status": "No Litigation (Title Inquiry Ongoing)",
+                "geom": {
+                    "type": "Polygon",
+                    "coordinates": [[[78.602, 17.318], [78.61, 17.318], [78.61, 17.324], [78.602, 17.324], [78.602, 17.318]]]
+                }
+            },
+            {
+                "kn": "205/B",
+                "village": "Koheda",
+                "tehsil": "Abdullapurmet",
+                "district": "Rangareddy",
+                "area_ha": 18.25,
+                "owners": 1,
+                "status_color": "ORANGE",
+                "is_hotspot": False,
+                "issue_type": "COMPENSATION",
+                "has_legal": False,
+                "is_notif": True,
+                "is_award": True,
+                "is_comp": False,
+                "is_poss": False,
+                "days_pending": 85,
+                "ownership_status": "Single Title Holder (Verified)",
+                "compensation_status": "Award Passed — Treasury Release Pending",
+                "legal_status": "Clear / No Dispute",
+                "geom": {
+                    "type": "Polygon",
+                    "coordinates": [[[78.615, 17.315], [78.622, 17.315], [78.622, 17.321], [78.615, 17.321], [78.615, 17.315]]]
+                }
+            },
+            {
+                "kn": "310/1",
+                "village": "Choutuppal",
+                "tehsil": "Choutuppal",
+                "district": "Yadadri Bhuvanagiri",
+                "area_ha": 31.45,
+                "owners": 1,
+                "status_color": "GREEN",
+                "is_hotspot": False,
+                "issue_type": "NONE",
+                "has_legal": False,
+                "is_notif": True,
+                "is_award": True,
+                "is_comp": True,
+                "is_poss": True,
+                "days_pending": 0,
+                "ownership_status": "Government / CALA Acquired",
+                "compensation_status": "100% Disbursed (Direct Benefit Transfer)",
+                "legal_status": "Clear Title Registered",
+                "geom": {
+                    "type": "Polygon",
+                    "coordinates": [[[78.72, 17.25], [78.73, 17.25], [78.73, 17.26], [78.72, 17.26], [78.72, 17.25]]]
+                }
+            }
+        ]
     },
     "TG-IRR-KHM-008": {
         "name": "Khammam Lift Irrigation Expansion Package",
@@ -1397,11 +1497,6 @@ async def run_population():
             """), {"geom": align_json, "pid": pid})
             print(f"  -> Updated alignment_geom route LineString.")
 
-            # 2. Skip parcels if already defined (e.g. TG-NHAI-SRD-001)
-            if conf.get("skip_parcels"):
-                print(f"  -> Skipping parcel insert (already has existing parcels).")
-                continue
-
             # Delete any existing parcels for this project to ensure clean idempotency
             await session.execute(text("DELETE FROM land_parcels WHERE project_id = :pid"), {"pid": pid})
 
@@ -1409,13 +1504,16 @@ async def run_population():
             bearing = conf.get("bearing_deg", 45)
 
             for idx, p_cfg in enumerate(parcels_list):
-                geom = generate_parcel_geometry(lat, lng, idx, len(parcels_list), bearing)
+                if "geom" in p_cfg:
+                    geom = p_cfg["geom"]
+                else:
+                    geom = generate_parcel_geometry(lat, lng, idx, len(parcels_list), bearing)
                 geom_str = json.dumps(geom)
 
                 kn = p_cfg["kn"]
                 vil = p_cfg["village"]
                 teh = p_cfg["tehsil"]
-                dist = conf["district"]
+                dist = p_cfg.get("district") or conf["district"]
                 area = p_cfg["area_ha"]
 
                 merged_props = {

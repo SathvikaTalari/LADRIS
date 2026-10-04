@@ -91,23 +91,23 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         height: 'var(--topnav-height)',
         display: 'flex',
         alignItems: 'center',
-        padding: '0 14px',
-        gap: 11,
+        padding: collapsed ? '0 11px' : '0 14px',
+        gap: 12,
         flexShrink: 0,
         borderBottom: '1px solid rgba(64,128,255,0.08)',
       }}>
         {/* Logo mark */}
         <div style={{
-          width: 38, height: 38,
-          borderRadius: 8,
+          width: 46, height: 46,
+          borderRadius: 10,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
           overflow: 'hidden',
           background: 'rgba(14,22,40,0.85)',
-          border: '1px solid rgba(64,128,255,0.25)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          border: '1.5px solid rgba(64,128,255,0.35)',
+          boxShadow: '0 3px 10px rgba(0,0,0,0.25)',
           padding: 2,
         }}>
           <img
@@ -123,21 +123,22 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -6 }}
               transition={{ duration: 0.15 }}
+              style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
             >
               <div style={{
-                fontSize: '0.9375rem',
-                fontWeight: 800,
+                fontSize: '1.22rem',
+                fontWeight: 900,
                 color: 'var(--color-text-primary)',
-                lineHeight: 1.15,
+                lineHeight: 1.12,
                 letterSpacing: '-0.02em',
               }}>
                 LADRIS
               </div>
               <div style={{
-                fontSize: '0.5rem',
+                fontSize: '0.56rem',
                 color: 'var(--color-accent-primary)',
                 fontWeight: 700,
-                letterSpacing: '0.04em',
+                letterSpacing: '0.035em',
                 textTransform: 'uppercase',
                 lineHeight: 1.25,
                 marginTop: 2,

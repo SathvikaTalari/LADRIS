@@ -18,45 +18,56 @@ import { MetricCard, DataNotice } from '@/components/common'
 import { Link, useNavigate } from 'react-router-dom'
 
 function createRiskMarkerIcon(riskLevel: string) {
-  let color = '#138808' // Green
-  if (riskLevel === 'CRITICAL') color = '#ff4757'
-  else if (riskLevel === 'HIGH') color = '#f47721'
-  else if (riskLevel === 'MEDIUM') color = '#d97706'
+  const norm = (riskLevel || 'LOW').toUpperCase()
+  let pinColor = '#10b981'
+  let borderDashed = '#047857'
+  let haloBg = 'rgba(16, 185, 129, 0.18)'
+  let glowColor = 'rgba(16, 185, 129, 0.4)'
+  let haloSize = 42
+
+  if (norm === 'CRITICAL') {
+    pinColor = '#dc2626'
+    borderDashed = '#991b1b'
+    haloBg = 'rgba(220, 38, 38, 0.22)'
+    glowColor = 'rgba(220, 38, 38, 0.55)'
+    haloSize = 52
+  } else if (norm === 'HIGH') {
+    pinColor = '#f97316'
+    borderDashed = '#c2410c'
+    haloBg = 'rgba(249, 115, 22, 0.20)'
+    glowColor = 'rgba(249, 115, 22, 0.45)'
+    haloSize = 48
+  } else if (norm === 'MEDIUM') {
+    pinColor = '#eab308'
+    borderDashed = '#a16207'
+    haloBg = 'rgba(234, 179, 8, 0.18)'
+    glowColor = 'rgba(234, 179, 8, 0.4)'
+    haloSize = 44
+  }
 
   const html = `
-    <div style="
-      position: relative;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    ">
+    <div style="position:relative;width:56px;height:56px;display:flex;align-items:center;justify-content:center;">
       <div style="
-        position: absolute;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background-color: ${color};
-        opacity: 0.35;
-        animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        position:absolute;top:50%;left:50%;width:${haloSize}px;height:${haloSize}px;
+        transform:translate(-50%,-50%);border-radius:50%;border:1.8px dashed ${borderDashed};
+        background:${haloBg};box-shadow:0 0 8px ${glowColor};pointer-events:none;
       "></div>
-      <div style="
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background-color: ${color};
-        border: 2px solid #060f1e;
-        box-shadow: 0 0 10px ${color}, 0 0 4px rgba(0,0,0,0.8);
-      "></div>
+      <div style="position:absolute;left:28px;bottom:28px;transform:translateX(-50%);filter:drop-shadow(0 3px 5px rgba(0,0,0,0.5));cursor:pointer;">
+        <svg width="20" height="26" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+          <path d="M12 0C5.37258 0 0 5.37258 0 12C0 20.2 12 32 12 32C12 32 24 20.2 24 12C24 5.37258 18.6274 0 12 0Z" fill="${pinColor}"/>
+          <path d="M12 0.75C5.78679 0.75 0.75 5.78679 0.75 12C0.75 19.5 11.4 30.5 12 31.1C12.6 30.5 23.25 19.5 23.25 12C23.25 5.78679 18.2132 0.75 12 0.75Z" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+          <circle cx="12" cy="11.5" r="4.2" fill="#ffffff"/>
+        </svg>
+      </div>
     </div>
   `
 
   return L.divIcon({
-    html: html,
-    className: 'custom-risk-marker',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
+    html,
+    className: 'custom-dashboard-risk-marker',
+    iconSize: [56, 56],
+    iconAnchor: [28, 28],
+    popupAnchor: [0, -30],
   })
 }
 

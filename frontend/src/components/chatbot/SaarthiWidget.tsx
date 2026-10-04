@@ -17,8 +17,6 @@ import {
   Maximize2,
   Minimize2,
   Trash2,
-  ChevronRight,
-  Shield,
   ArrowRight,
   Bot
 } from 'lucide-react'
@@ -37,10 +35,8 @@ interface Message {
 
 const DEFAULT_SUGGESTIONS = [
   'Which projects have high delay risk?',
-  'What projects need data?',
-  'What is the Section 3D 1-year statutory rule?',
+  'What is the Section 3D statutory rule?',
   'Show projects with active court cases',
-  'Tell me about Nellore Industrial Corridor',
 ]
 
 // Simple Markdown Formatter Helper
@@ -202,9 +198,8 @@ export function SaarthiWidget() {
       id: 'welcome-1',
       sender: 'saarthi',
       text:
-        '🙏 **Namaste! I am Saarthi**, your AI assistant for **LADRIS**.\n\n' +
-        'I have real-time access to live infrastructure corridors, statutory regulations (**NH Act 1956**, **RFCTLARR 2013**), and platform analytics.\n\n' +
-        'Ask me anything about **project delays**, **Section 3D statutory deadlines**, **data quality**, or **active court cases**!',
+        '🙏 **Namaste! How can I assist you today?**\n' +
+        'Ask me about project delays, Section 3D statutory deadlines, or corridor risk alerts.',
       suggestions: DEFAULT_SUGGESTIONS,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
@@ -350,7 +345,7 @@ export function SaarthiWidget() {
       {
         id: 'welcome-cleared',
         sender: 'saarthi',
-        text: '🧹 Conversation reset. How may I assist your land acquisition analysis?',
+        text: '🙏 Conversation reset. How can I assist you today?',
         suggestions: DEFAULT_SUGGESTIONS,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
@@ -376,7 +371,11 @@ export function SaarthiWidget() {
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
-              whileHover={{ scale: 1.04, y: -2 }}
+              whileHover={{
+                scale: 1.05,
+                y: -2,
+                boxShadow: '0 12px 28px rgba(0, 51, 102, 0.45), 0 0 18px rgba(56, 189, 248, 0.35)',
+              }}
               whileTap={{ scale: 0.96 }}
               onClick={() => setIsOpen(true)}
               title="Open Saarthi AI Copilot"
@@ -384,22 +383,20 @@ export function SaarthiWidget() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 9,
-                padding: '10px 18px',
+                padding: '10px 20px',
                 borderRadius: 9999,
-                background: isDark
-                  ? 'var(--color-bg-secondary)'
-                  : 'var(--color-bg-card)',
-                color: 'var(--color-text-primary)',
-                border: '1px solid var(--color-border-default)',
-                boxShadow: isDark
-                  ? '0 10px 25px rgba(0,0,0,0.5), 0 0 15px var(--color-accent-glow)'
-                  : '0 8px 24px rgba(0,51,102,0.15)',
+                background: 'linear-gradient(135deg, #001f3f 0%, #003366 50%, #0b3d75 100%)',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.22)',
+                boxShadow:
+                  '0 8px 24px rgba(0, 51, 102, 0.35), 0 2px 6px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
                 cursor: 'pointer',
                 fontFamily: 'var(--font-sans)',
                 fontWeight: 600,
-                fontSize: '0.85rem',
+                fontSize: '0.875rem',
+                letterSpacing: '0.01em',
                 backdropFilter: 'blur(12px)',
-                transition: 'border-color 0.2s, box-shadow 0.2s',
+                transition: 'all 0.2s ease',
               }}
             >
               <div
@@ -407,13 +404,15 @@ export function SaarthiWidget() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--color-accent-primary)',
+                  color: '#38bdf8',
+                  filter: 'drop-shadow(0 0 5px rgba(56, 189, 248, 0.6))',
                 }}
               >
                 <Sparkles size={17} />
               </div>
-              <span>Ask Saarthi</span>
-
+              <span style={{ color: '#ffffff', textShadow: '0 1px 2px rgba(0, 0, 0, 0.35)' }}>
+                Ask Saarthi
+              </span>
             </motion.button>
           )}
         </AnimatePresence>
@@ -433,11 +432,11 @@ export function SaarthiWidget() {
               position: 'fixed',
               bottom: 24,
               right: 24,
-              width: isExpanded ? 'min(760px, calc(100vw - 48px))' : 'min(440px, calc(100vw - 48px))',
-              height: isExpanded ? 'min(720px, calc(100vh - 48px))' : 'min(580px, calc(100vh - 48px))',
+              width: isExpanded ? 'min(760px, calc(100vw - 48px))' : 'min(420px, calc(100vw - 32px))',
+              height: isExpanded ? 'min(720px, calc(100vh - 48px))' : 'min(550px, calc(100vh - 48px))',
               borderRadius: 16,
               background: isDark ? 'var(--color-bg-secondary)' : '#ffffff',
-              border: '1px solid var(--color-border-subtle)',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 51, 102, 0.12)',
               boxShadow: isDark
                 ? '0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(0,0,0,0.4)'
                 : '0 16px 40px rgba(0,51,102,0.18)',
@@ -452,7 +451,7 @@ export function SaarthiWidget() {
             {/* Header */}
             <div
               style={{
-                padding: '14px 18px',
+                padding: '12px 16px',
                 background: 'var(--color-bg-card)',
                 color: 'var(--color-text-primary)',
                 display: 'flex',
@@ -466,36 +465,56 @@ export function SaarthiWidget() {
                   style={{
                     width: 34,
                     height: 34,
-                    borderRadius: 8,
-                    background: 'var(--color-bg-elevated)',
+                    borderRadius: 9,
+                    background: isDark
+                      ? 'linear-gradient(135deg, #0b2545 0%, #134074 100%)'
+                      : 'linear-gradient(135deg, #003366 0%, #004c99 100%)',
                     border: '1px solid var(--color-border-subtle)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'var(--color-accent-primary)',
+                    color: '#38bdf8',
+                    boxShadow: '0 2px 6px rgba(0, 51, 102, 0.25)',
                   }}
                 >
                   <Bot size={18} />
                 </div>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    <h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                       Saarthi AI
                     </h3>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        padding: '1px 7px',
+                        borderRadius: 12,
+                        fontSize: '0.62rem',
+                        fontWeight: 600,
+                        background: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.1)',
+                        color: isDark ? '#34d399' : '#059669',
+                        border: `1px solid ${isDark ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.22)'}`,
+                      }}
+                    >
+                      <span style={{ width: 5, height: 5, borderRadius: '50%', background: isDark ? '#34d399' : '#059669' }} />
+                      Grounded
+                    </span>
                   </div>
-                  <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-                    LADRIS Decision Copilot
+                  <p style={{ margin: '1px 0 0', fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
+                    Statutory & Delay Decision Copilot
                   </p>
                 </div>
               </div>
 
               {/* Header Actions */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 {/* TTS narration toggle */}
                 <button
                   type="button"
                   onClick={() => setTtsEnabled(!ttsEnabled)}
-                  title={ttsEnabled ? 'Mute Voice Narration' : 'Enable Voice Narration'}
+                  title={ttsEnabled ? 'Mute Voice' : 'Enable Voice'}
                   style={{
                     background: ttsEnabled ? 'var(--color-bg-elevated)' : 'transparent',
                     border: 'none',
@@ -509,7 +528,7 @@ export function SaarthiWidget() {
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {ttsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                  {ttsEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
                 </button>
 
                 {/* Clear Chat */}
@@ -530,7 +549,7 @@ export function SaarthiWidget() {
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={15} />
                 </button>
 
                 {/* Expand / Minimize Window Size */}
@@ -551,7 +570,7 @@ export function SaarthiWidget() {
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                  {isExpanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
                 </button>
 
                 {/* Close Button */}
@@ -581,43 +600,20 @@ export function SaarthiWidget() {
               </div>
             </div>
 
-            {/* Quick Context Pill bar */}
-            <div
-              style={{
-                padding: '6px 16px',
-                background: 'var(--color-bg-surface)',
-                borderBottom: '1px solid var(--color-border-subtle)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                fontSize: '0.7rem',
-                color: 'var(--color-text-muted)',
-                overflowX: 'auto',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              <Shield size={12} color="var(--color-accent-primary)" />
-              <span>Grounded:</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>NH Act 1956</strong>
-              <span>•</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>RFCTLARR 2013</strong>
-              <span>•</span>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Live Corridors Registry</strong>
-            </div>
-
             {/* Messages Scroll Area */}
             <div
               style={{
                 flex: 1,
                 overflowY: 'auto',
-                padding: '16px 16px 8px',
+                padding: '14px 16px 8px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 16,
+                gap: 12,
               }}
             >
-              {messages.map((msg) => {
+              {messages.map((msg, idx) => {
                 const isUser = msg.sender === 'user'
+                const isLastAssistant = !isUser && idx === messages.length - 1
 
                 return (
                   <div
@@ -631,23 +627,27 @@ export function SaarthiWidget() {
                   >
                     <div
                       style={{
-                        maxWidth: '90%',
-                        padding: isUser ? '10px 14px' : '14px 16px',
+                        maxWidth: '88%',
+                        padding: isUser ? '9px 13px' : '11px 14px',
                         borderRadius: isUser ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
                         background: isUser
                           ? isDark
-                            ? 'var(--color-bg-elevated)'
+                            ? '#0a4275'
                             : '#003366'
-                          : 'var(--color-bg-surface)',
+                          : isDark
+                            ? 'var(--color-bg-surface)'
+                            : '#f8fafc',
                         color: isUser ? '#ffffff' : 'var(--color-text-primary)',
-                        border: isUser ? 'none' : '1px solid var(--color-border-subtle)',
+                        border: isUser
+                          ? '1px solid rgba(255, 255, 255, 0.12)'
+                          : '1px solid var(--color-border-subtle)',
                         boxShadow: isUser
-                          ? '0 2px 8px rgba(0,0,0,0.15)'
-                          : '0 1px 4px rgba(0,0,0,0.04)',
+                          ? '0 2px 6px rgba(0,0,0,0.12)'
+                          : '0 1px 3px rgba(0,0,0,0.03)',
                       }}
                     >
                       {isUser ? (
-                        <div style={{ fontSize: '0.85rem', fontWeight: 500, lineHeight: 1.45 }}>
+                        <div style={{ fontSize: '0.825rem', fontWeight: 500, lineHeight: 1.45 }}>
                           {msg.text}
                         </div>
                       ) : (
@@ -658,8 +658,8 @@ export function SaarthiWidget() {
                       {!isUser && msg.actions && msg.actions.length > 0 && (
                         <div
                           style={{
-                            marginTop: 12,
-                            paddingTop: 10,
+                            marginTop: 10,
+                            paddingTop: 8,
                             borderTop: '1px solid var(--color-border-subtle)',
                             display: 'flex',
                             flexWrap: 'wrap',
@@ -676,13 +676,13 @@ export function SaarthiWidget() {
                               style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: 6,
-                                padding: '5px 11px',
+                                gap: 5,
+                                padding: '4px 10px',
                                 borderRadius: 6,
                                 background: 'var(--color-bg-elevated)',
                                 border: '1px solid var(--color-border-subtle)',
                                 color: 'var(--color-text-primary)',
-                                fontSize: '0.74rem',
+                                fontSize: '0.72rem',
                                 fontWeight: 600,
                                 cursor: 'pointer',
                                 transition: 'all 0.15s ease',
@@ -697,7 +697,7 @@ export function SaarthiWidget() {
                               }}
                             >
                               <span>{act.label}</span>
-                              <ArrowRight size={12} />
+                              <ArrowRight size={11} />
                             </button>
                           ))}
                         </div>
@@ -706,9 +706,9 @@ export function SaarthiWidget() {
 
                     <span
                       style={{
-                        fontSize: '0.65rem',
+                        fontSize: '0.64rem',
                         color: 'var(--color-text-muted)',
-                        marginTop: 4,
+                        marginTop: 3,
                         marginLeft: 6,
                         marginRight: 6,
                       }}
@@ -716,48 +716,49 @@ export function SaarthiWidget() {
                       {msg.timestamp}
                     </span>
 
-                    {/* Contextual Suggestion Pills beneath Assistant Reply */}
-                    {!isUser && msg.suggestions && msg.suggestions.length > 0 && (
+                    {/* Contextual Suggestion Pills only on latest Assistant message */}
+                    {isLastAssistant && msg.suggestions && msg.suggestions.length > 0 && (
                       <div
                         style={{
                           marginTop: 8,
                           display: 'flex',
                           flexWrap: 'wrap',
                           gap: 6,
-                          maxWidth: '96%',
+                          maxWidth: '100%',
                         }}
                       >
-                        {msg.suggestions.map((sug, sIdx) => (
+                        {msg.suggestions.slice(0, 3).map((sug, sIdx) => (
                           <button
                             key={sIdx}
                             onClick={() => handleSendMessage(sug)}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: 4,
-                              padding: '4px 10px',
-                              borderRadius: 12,
-                              background: 'var(--color-bg-surface)',
-                              border: '1px solid var(--color-border-subtle)',
-                              color: 'var(--color-text-secondary)',
+                              gap: 5,
+                              padding: '5px 11px',
+                              borderRadius: 16,
+                              background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 51, 102, 0.04)',
+                              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 51, 102, 0.12)',
+                              color: isDark ? 'var(--color-text-secondary)' : '#003366',
                               fontSize: '0.72rem',
                               fontWeight: 500,
                               cursor: 'pointer',
                               textAlign: 'left',
+                              lineHeight: 1.3,
                               transition: 'all 0.15s ease',
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.borderColor = 'var(--color-accent-primary)'
-                              e.currentTarget.style.color = 'var(--color-text-primary)'
-                              e.currentTarget.style.background = 'var(--color-bg-elevated)'
+                              e.currentTarget.style.color = 'var(--color-accent-primary)'
+                              e.currentTarget.style.background = isDark ? 'rgba(56, 189, 248, 0.08)' : 'rgba(0, 51, 102, 0.08)'
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.borderColor = 'var(--color-border-subtle)'
-                              e.currentTarget.style.color = 'var(--color-text-secondary)'
-                              e.currentTarget.style.background = 'var(--color-bg-surface)'
+                              e.currentTarget.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 51, 102, 0.12)'
+                              e.currentTarget.style.color = isDark ? 'var(--color-text-secondary)' : '#003366'
+                              e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 51, 102, 0.04)'
                             }}
                           >
-                            <ChevronRight size={11} strokeWidth={2.5} />
+                            <Sparkles size={11} color="var(--color-accent-primary)" />
                             <span>{sug}</span>
                           </button>
                         ))}
@@ -772,8 +773,8 @@ export function SaarthiWidget() {
                 <div
                   style={{
                     alignSelf: 'flex-start',
-                    padding: '10px 14px',
-                    borderRadius: '14px 14px 14px 2px',
+                    padding: '8px 12px',
+                    borderRadius: '12px 12px 12px 2px',
                     background: 'var(--color-bg-surface)',
                     border: '1px solid var(--color-border-subtle)',
                     display: 'flex',
@@ -781,9 +782,9 @@ export function SaarthiWidget() {
                     gap: 8,
                   }}
                 >
-                  <Sparkles size={14} color="var(--color-accent-primary)" className="animate-spin" />
-                  <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
-                    Consulting LADRIS Intelligence Engine...
+                  <Sparkles size={13} color="var(--color-accent-primary)" className="animate-spin" />
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                    Analyzing corridor records...
                   </span>
                 </div>
               )}
@@ -794,7 +795,7 @@ export function SaarthiWidget() {
             {/* Input Footer */}
             <div
               style={{
-                padding: '12px 16px',
+                padding: '10px 14px',
                 background: 'var(--color-bg-card)',
                 borderTop: '1px solid var(--color-border-subtle)',
               }}
@@ -815,10 +816,10 @@ export function SaarthiWidget() {
                   <button
                     type="button"
                     onClick={toggleVoiceInput}
-                    title={isListening ? 'Stop listening' : 'Voice Input (Speak to Saarthi)'}
+                    title={isListening ? 'Stop listening' : 'Voice Input'}
                     style={{
-                      width: 38,
-                      height: 38,
+                      width: 36,
+                      height: 36,
                       borderRadius: 8,
                       display: 'flex',
                       alignItems: 'center',
@@ -828,12 +829,13 @@ export function SaarthiWidget() {
                       background: isListening ? 'rgba(239, 68, 68, 0.12)' : 'var(--color-bg-surface)',
                       color: isListening ? '#ef4444' : 'var(--color-text-muted)',
                       transition: 'all 0.15s ease',
+                      flexShrink: 0,
                     }}
                   >
                     {isListening ? (
-                      <MicOff size={16} className="animate-pulse" />
+                      <MicOff size={15} className="animate-pulse" />
                     ) : (
-                      <Mic size={16} />
+                      <Mic size={15} />
                     )}
                   </button>
                 )}
@@ -846,17 +848,17 @@ export function SaarthiWidget() {
                   placeholder={
                     isListening
                       ? '🎙️ Listening... Speak now'
-                      : 'Ask about high-risk corridors, 3A/3D rules, data quality...'
+                      : 'Ask Saarthi anything...'
                   }
                   style={{
                     flex: 1,
-                    height: 38,
+                    height: 36,
                     padding: '0 12px',
                     borderRadius: 8,
                     border: '1px solid var(--color-border-subtle)',
                     background: 'var(--color-bg-surface)',
                     color: 'var(--color-text-primary)',
-                    fontSize: '0.825rem',
+                    fontSize: '0.82rem',
                     outline: 'none',
                     transition: 'border-color 0.15s ease',
                   }}
@@ -870,8 +872,8 @@ export function SaarthiWidget() {
                   disabled={isLoading || !inputText.trim()}
                   title="Send message"
                   style={{
-                    width: 38,
-                    height: 38,
+                    width: 36,
+                    height: 36,
                     borderRadius: 8,
                     display: 'flex',
                     alignItems: 'center',
@@ -885,6 +887,7 @@ export function SaarthiWidget() {
                     border: 'none',
                     opacity: isLoading || !inputText.trim() ? 0.6 : 1,
                     transition: 'all 0.15s ease',
+                    flexShrink: 0,
                   }}
                 >
                   <Send size={15} />
@@ -897,11 +900,12 @@ export function SaarthiWidget() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  fontSize: '0.66rem',
+                  fontSize: '0.64rem',
                   color: 'var(--color-text-muted)',
+                  padding: '0 2px',
                 }}
               >
-                <span>AI Decision Support • Grounded in Real Registry Records</span>
+                <span>NH Act 1956 & RFCTLARR 2013 grounded</span>
                 {speechSupported && isListening && (
                   <span style={{ color: '#ef4444', fontWeight: 600 }}>● Live Audio</span>
                 )}
