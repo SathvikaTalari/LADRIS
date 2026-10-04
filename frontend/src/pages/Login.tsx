@@ -128,6 +128,8 @@ export default function Login() {
     try {
       await login(email.trim(), password.trim())
       sessionStorage.removeItem('visited_admin_explicitly')
+      sessionStorage.removeItem('ladris_session_tour_seen')
+      sessionStorage.setItem('ladris_fresh_login_tour', 'true')
       window.location.replace('/dashboard')
     } catch {
       // Error handled in store

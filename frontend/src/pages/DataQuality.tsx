@@ -270,7 +270,7 @@ export default function DataQuality() {
         <h2 id="overall-quality-heading" style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-text-muted)', margin: '0 0 10px', paddingBottom: 6, borderBottom: '1px solid var(--color-border-subtle)' }}>
           Overall Data Quality
         </h2>
-        <div className="dq-kpi-grid">
+        <div id="tour-dataquality-kpis" className="dq-kpi-grid">
 
           {/* Overall Data Quality */}
           <div className="dq-kpi-card">

@@ -194,7 +194,7 @@ export default function PriorityIntelligence() {
       />
 
       {/* Filter Control Bar */}
-      <div className="card" style={{ marginBottom: 24, background: 'var(--color-bg-card)', padding: 18, width: '100%' }}>
+      <div id="tour-priority-filters" className="card" style={{ marginBottom: 24, background: 'var(--color-bg-card)', padding: 18, width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <Filter size={14} color="var(--color-accent-primary)" />
           Filter & Sort Projects

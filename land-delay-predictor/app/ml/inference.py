@@ -72,6 +72,7 @@ def get_bundle() -> dict[str, Any]:
 
 def warm_model() -> dict[str, Any]:
     bundle = get_bundle()
+    _get_explainer(bundle)
     return {"model_version": bundle["version"], "feature_columns": bundle["feature_columns"]}
 
 
@@ -94,8 +95,14 @@ def _underlying_classifier(classifier: Any) -> Any:
     return classifier
 
 
-def _drivers(classifier: Any, frame: pd.DataFrame, raw: dict[str, Any], limit: int = 5) -> list[dict[str, Any]]:
-    explainer = shap.TreeExplainer(_underlying_classifier(classifier))
+def _get_explainer(bundle: dict[str, Any]) -> shap.TreeExplainer:
+    if "explainer" not in bundle:
+        bundle["explainer"] = shap.TreeExplainer(_underlying_classifier(bundle["classifier"]))
+    return bundle["explainer"]
+
+
+def _drivers(bundle: dict[str, Any], frame: pd.DataFrame, raw: dict[str, Any], limit: int = 5) -> list[dict[str, Any]]:
+    explainer = _get_explainer(bundle)
     values = explainer.shap_values(frame)
     if isinstance(values, list):
         values = values[1]
@@ -116,7 +123,7 @@ def _drivers(classifier: Any, frame: pd.DataFrame, raw: dict[str, Any], limit: i
     return result
 
 
-def predict_features(features: dict[str, Any]) -> dict[str, Any]:
+def predict_features(features: dict[str, Any], explain: bool = True) -> dict[str, Any]:
     """Validate and score one point-in-time, 23-feature snapshot."""
     started = time.perf_counter()
     features_copy = dict(features)
@@ -140,7 +147,7 @@ def predict_features(features: dict[str, Any]) -> dict[str, Any]:
     p10 = float(bundle["regressor_p10"].predict(frame)[0]) if bundle.get("regressor_p10") else None
     p90 = float(bundle["regressor_p90"].predict(frame)[0]) if bundle.get("regressor_p90") else None
     clamp = lambda value: None if value is None else round(float(np.clip(value, 0, 2000)), 2)
-    drivers = _drivers(bundle["classifier"], frame, cleaned)
+    drivers = _drivers(bundle, frame, cleaned) if explain else []
 
     lower_days = clamp(p10)
     upper_days = clamp(p90)
@@ -166,22 +173,40 @@ def predict_features(features: dict[str, Any]) -> dict[str, Any]:
 
 
 def predict_stages(features: dict[str, Any]) -> list[dict[str, Any]]:
-    """Counterfactually score every lifecycle category with the production model.
-
-    The active artifact does not contain standalone per-stage model files, so
-    this method never claims that it does.
-    """
+    """Counterfactually score every lifecycle category with the production model in a single vectorized batch."""
     stages = ["notification", "survey", "approval", "compensation", "legal_resolution", "rehabilitation", "possession", "completed"]
-    results = []
+    bundle = get_bundle()
+    columns = bundle["feature_columns"]
+    cat_cols = bundle["categorical_columns"]
+    low = float(bundle["risk_threshold_low"])
+    high = float(bundle["risk_threshold_high"])
+
+    rows = []
     for stage in stages:
         row = dict(features)
         row["current_stage"] = stage
-        prediction = predict_features(row)
+        cleaned, _ = validate_single_row(row, strict=False)
+        rows.append({name: cleaned.get(name) for name in columns})
+
+    frame = pd.DataFrame(rows, columns=columns)
+    for col in columns:
+        if col in cat_cols:
+            frame[col] = frame[col].astype("category")
+        else:
+            frame[col] = pd.to_numeric(frame[col], errors="coerce")
+
+    probs = bundle["classifier"].predict_proba(frame)[:, 1]
+
+    results = []
+    for idx, stage in enumerate(stages):
+        prob = float(probs[idx])
+        score = round(prob * 100.0, 2)
+        category = "HIGH" if score >= high else "MEDIUM" if score >= low else "LOW"
         results.append({
             "stage": stage,
-            "delay_probability": prediction["delay_probability"],
-            "risk_score": prediction["risk_score"],
-            "risk_category": prediction["risk_category"],
+            "delay_probability": round(prob, 6),
+            "risk_score": score,
+            "risk_category": category,
             "prediction_method": "overall_model_stage_counterfactual",
         })
     return results

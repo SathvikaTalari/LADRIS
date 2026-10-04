@@ -11,6 +11,7 @@ Handles calculation and business logic for:
 import asyncio
 from datetime import date, datetime, timezone
 import logging
+import time
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
@@ -426,7 +427,7 @@ async def simulate_what_if(project_id: UUID, req: WhatIfSimulationRequest, db: A
             sanctioned = test1.get("compensation_sanctioned")
             if sanctioned and float(sanctioned) > 0:
                 test1["compensation_disbursed"] = 0.85 * float(sanctioned)
-            p1 = runtime.predict_features(test1)
+            p1 = runtime.predict_features(test1, explain=False)
             if p1["risk_category"] in ("MEDIUM", "LOW"):
                 min_changes.append(f"Disburse compensation to at least 85% (Reduces risk to {p1['risk_score']:.0f})")
         except Exception as e:
@@ -438,7 +439,7 @@ async def simulate_what_if(project_id: UUID, req: WhatIfSimulationRequest, db: A
             test2["legal_dispute_count"] = max(int(test2.get("legal_dispute_count") or 0), test2["open_legal_dispute_count"])
             if test2["open_legal_dispute_count"] == 0:
                 test2["max_dispute_pendency_days"] = 0
-            p2 = runtime.predict_features(test2)
+            p2 = runtime.predict_features(test2, explain=False)
             if p2["risk_category"] in ("MEDIUM", "LOW"):
                 min_changes.append(f"Resolve at least 2 open court disputes via Lok Adalat (Reduces risk to {p2['risk_score']:.0f})")
         except Exception as e:
@@ -457,7 +458,7 @@ async def simulate_what_if(project_id: UUID, req: WhatIfSimulationRequest, db: A
                 test1["compensation_disbursed"] = 0.95 * float(sanctioned)
             test1["open_legal_dispute_count"] = 0
             test1["max_dispute_pendency_days"] = 0
-            p1 = runtime.predict_features(test1)
+            p1 = runtime.predict_features(test1, explain=False)
             if p1["risk_category"] == "LOW":
                 min_changes.append(f"Reach 95% compensation disbursement and resolve all active disputes (Brings risk down to {p1['risk_score']:.0f} Low)")
             else:
@@ -801,6 +802,7 @@ async def record_intervention(project_id: UUID, req: ProjectInterventionCreate, 
     db.add(intervention_row)
     await db.commit()
     await db.refresh(intervention_row)
+    invalidate_overview_cache(project.id)
 
     return ProjectInterventionResponse(
         id=str(intervention_row.id),
@@ -875,28 +877,38 @@ async def delete_intervention(project_id: UUID, intervention_id: UUID, db: Async
         raise LookupError(f"Intervention {intervention_id} not found for project {project_id}")
     await db.delete(row)
     await db.commit()
-
-
+    invalidate_overview_cache(project_id)
 
 
 # ─── 7. Combined Overview ─────────────────────────────────────────────────────
 
+_OVERVIEW_CACHE: Dict[str, tuple[float, DecisionIntelligenceOverview]] = {}
+OVERVIEW_CACHE_TTL = 30.0  # 30-second TTL cache for blazing-fast roundtrips
+
+
+def invalidate_overview_cache(project_id: UUID | str) -> None:
+    """Evict cached overview when project state or actions change."""
+    _OVERVIEW_CACHE.pop(str(project_id), None)
+
+
 async def get_full_overview(project_id: UUID, db: AsyncSession) -> DecisionIntelligenceOverview:
-    """Fetch complete Decision Intelligence bundle for single fast roundtrip."""
-    summary_task = get_summary_header(project_id, db)
-    blockers_task = get_land_blockers(project_id, db)
-    gap_task = get_payment_possession_gap(project_id, db)
-    bottlenecks_task = get_process_bottlenecks(project_id, db)
-    interventions_task = get_interventions(project_id, db)
+    """Fetch complete Decision Intelligence bundle for single fast roundtrip with caching."""
+    pid_str = str(project_id)
+    now_ts = time.time()
+    if pid_str in _OVERVIEW_CACHE:
+        cached_ts, cached_overview = _OVERVIEW_CACHE[pid_str]
+        if now_ts - cached_ts < OVERVIEW_CACHE_TTL:
+            return cached_overview
 
-    summary, blockers, gap, bottlenecks, interventions = await asyncio.gather(
-        summary_task, blockers_task, gap_task, bottlenecks_task, interventions_task
-    )
-
-    # Initial what-if baseline
+    # Sequential execution on single AsyncSession to prevent concurrency locks
+    summary = await get_summary_header(project_id, db)
+    blockers = await get_land_blockers(project_id, db)
+    gap = await get_payment_possession_gap(project_id, db)
+    bottlenecks = await get_process_bottlenecks(project_id, db)
+    interventions = await get_interventions(project_id, db)
     what_if = await simulate_what_if(project_id, WhatIfSimulationRequest(), db)
 
-    return DecisionIntelligenceOverview(
+    overview = DecisionIntelligenceOverview(
         summary=summary,
         land_blockers=blockers,
         what_if_baseline=what_if,
@@ -904,3 +916,5 @@ async def get_full_overview(project_id: UUID, db: AsyncSession) -> DecisionIntel
         process_bottlenecks=bottlenecks,
         recent_interventions=interventions,
     )
+    _OVERVIEW_CACHE[pid_str] = (now_ts, overview)
+    return overview

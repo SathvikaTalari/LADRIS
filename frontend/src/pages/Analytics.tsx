@@ -214,14 +214,17 @@ export default function Analytics() {
       </div>
 
       {/* Navigation Tabs */}
-      <div style={{
-        display: 'flex',
-        gap: 10,
-        marginBottom: 20,
-        borderBottom: '1px solid var(--color-border-subtle)',
-        paddingBottom: 12,
-        flexWrap: 'wrap',
-      }}>
+      <div
+        id="tour-analytics-tabs"
+        style={{
+          display: 'flex',
+          gap: 10,
+          marginBottom: 20,
+          borderBottom: '1px solid var(--color-border-subtle)',
+          paddingBottom: 12,
+          flexWrap: 'wrap',
+        }}
+      >
         <button
           className={`btn ${activeTab === 'states' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('states')}

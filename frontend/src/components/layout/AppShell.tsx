@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { TopNav } from './TopNav'
 import { SaarthiWidget } from '@/components/chatbot/SaarthiWidget'
+import { GuidedInteractiveTour } from '@/components/onboarding/GuidedInteractiveTour'
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Land Acquisition Overview',
@@ -58,6 +59,8 @@ export function AppShell() {
         </div>
       </motion.main>
       <SaarthiWidget />
+      {/* Interactive Box-Highlight Guided Feature Tour */}
+      <GuidedInteractiveTour />
     </div>
   )
 }

@@ -578,7 +578,7 @@ export default function GIS() {
       <PageHeader title="Interactive Geographic Risk Map" subtitle="Visualize project locations, state-by-state delay hotspots, and district risk intensity across India" />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <div style={{ display: 'flex', background: 'var(--color-bg-card)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-lg)', padding: 4, gap: 4 }}>
+        <div id="tour-gis-tabs" style={{ display: 'flex', background: 'var(--color-bg-card)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-lg)', padding: 4, gap: 4 }}>
           <button
             id="gis-view-risk-map"
             onClick={() => setActiveTab('PROJECT_MAP')}

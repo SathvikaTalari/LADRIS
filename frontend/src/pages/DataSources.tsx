@@ -126,7 +126,7 @@ export default function DataSources() {
       />
 
       {/* ─── 1. Simple Data Source Overview (6 Cards) ─── */}
-      <div style={{ marginBottom: 28 }}>
+      <div id="tour-datasources-overview" style={{ marginBottom: 28 }}>
         <div style={{ marginBottom: 14 }}>
           <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
             Data Source Overview
