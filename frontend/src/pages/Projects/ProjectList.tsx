@@ -199,6 +199,7 @@ export default function ProjectList() {
         </div>
         <div className="pl-header-actions">
           <button
+            id="tour-new-project-btn"
             className="pl-btn-new"
             onClick={() => setShowNewProjectModal(true)}
           >

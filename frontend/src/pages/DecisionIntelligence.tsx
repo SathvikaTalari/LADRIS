@@ -48,6 +48,9 @@ import type {
 
 type TabKey = 'overview' | 'blockers' | 'gap' | 'bottlenecks' | 'simulator' | 'impact'
 
+// Module-level cache for zero-latency instant tab switching
+const OVERVIEW_CLIENT_CACHE = new Map<string, { data: any; timestamp: number }>()
+
 export default function DecisionIntelligence() {
   const [projects, setProjects] = useState<any[]>([])
   const [selectedProjectId, setSelectedProjectId] = useState<string>('')
@@ -85,8 +88,75 @@ export default function DecisionIntelligence() {
   const [savingAction, setSavingAction] = useState(false)
   const [actionSuccessMsg, setActionSuccessMsg] = useState('')
   const [deletingActionId, setDeletingActionId] = useState<string | null>(null)
+  const lastLoadedIdRef = useRef<string>('')
 
-  // 1. Initial Load of Projects
+  // Fast client-side cache for instant zero-latency tab switching
+  const applyOverview = useCallback((overview: any) => {
+    setSummary(overview.summary)
+    setBlockers(overview.land_blockers)
+    setWhatIf(overview.what_if_baseline)
+    setGap(overview.payment_possession_gap)
+    setBottlenecks(overview.process_bottlenecks)
+    setInterventions(overview.recent_interventions || [])
+
+    // Initialize simulator sliders from baseline
+    if (overview.what_if_baseline?.current_inputs) {
+      const inp = overview.what_if_baseline.current_inputs
+      setSimDisbursement(
+        inp.compensation_disbursement_pct !== undefined && inp.compensation_disbursement_pct !== null
+          ? Math.round(inp.compensation_disbursement_pct)
+          : 50
+      )
+      setSimDisputes(
+        inp.open_legal_dispute_count !== undefined && inp.open_legal_dispute_count !== null
+          ? inp.open_legal_dispute_count
+          : 0
+      )
+      setSimRehab(
+        inp.rehabilitation_progress_pct !== undefined && inp.rehabilitation_progress_pct !== null
+          ? Math.round(inp.rehabilitation_progress_pct)
+          : 50
+      )
+      setSimResettlement(Boolean(inp.resettlement_site_ready))
+      setSimUpdates(
+        inp.stakeholder_update_count_90d !== undefined && inp.stakeholder_update_count_90d !== null
+          ? inp.stakeholder_update_count_90d
+          : 2
+      )
+      setActivePreset(null)
+      skipDebounceRef.current = true
+    }
+  }, [])
+
+  // 1. Load Project Decision Intelligence Bundle with cache check
+  const loadProjectData = useCallback(async (projectId: string, forceFresh = false) => {
+    if (!projectId) return
+
+    // Check in-memory module cache for instant display
+    const cached = OVERVIEW_CLIENT_CACHE.get(projectId)
+    if (cached && !forceFresh) {
+      applyOverview(cached.data)
+      setLoading(false)
+      // If cached less than 45s ago, don't even refetch
+      if (Date.now() - cached.timestamp < 45000) {
+        return
+      }
+    } else {
+      setLoading(true)
+    }
+
+    try {
+      const overview = await decisionIntelligenceAPI.getOverview(projectId)
+      OVERVIEW_CLIENT_CACHE.set(projectId, { data: overview, timestamp: Date.now() })
+      applyOverview(overview)
+    } catch (err) {
+      console.error('Failed to load Decision Intelligence bundle:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [applyOverview])
+
+  // 2. Initial Load of Projects
   useEffect(() => {
     async function loadProjects() {
       try {
@@ -94,67 +164,24 @@ export default function DecisionIntelligence() {
         const items = res.items || []
         setProjects(items)
         if (items.length > 0) {
-          setSelectedProjectId(items[0].id)
+          const initialId = items[0].id
+          setSelectedProjectId(initialId)
+          lastLoadedIdRef.current = initialId
+          loadProjectData(initialId)
         }
       } catch (err) {
         console.error('Failed to load projects:', err)
       }
     }
     loadProjects()
-  }, [])
-
-  // 2. Load Project Decision Intelligence Bundle
-  const loadProjectData = async (projectId: string) => {
-    if (!projectId) return
-    setLoading(true)
-    try {
-      const overview = await decisionIntelligenceAPI.getOverview(projectId)
-      setSummary(overview.summary)
-      setBlockers(overview.land_blockers)
-      setWhatIf(overview.what_if_baseline)
-      setGap(overview.payment_possession_gap)
-      setBottlenecks(overview.process_bottlenecks)
-      setInterventions(overview.recent_interventions || [])
-
-      // Initialize simulator sliders from baseline
-      if (overview.what_if_baseline?.current_inputs) {
-        const inp = overview.what_if_baseline.current_inputs
-        setSimDisbursement(
-          inp.compensation_disbursement_pct !== undefined && inp.compensation_disbursement_pct !== null
-            ? Math.round(inp.compensation_disbursement_pct)
-            : 50
-        )
-        setSimDisputes(
-          inp.open_legal_dispute_count !== undefined && inp.open_legal_dispute_count !== null
-            ? inp.open_legal_dispute_count
-            : 0
-        )
-        setSimRehab(
-          inp.rehabilitation_progress_pct !== undefined && inp.rehabilitation_progress_pct !== null
-            ? Math.round(inp.rehabilitation_progress_pct)
-            : 50
-        )
-        setSimResettlement(Boolean(inp.resettlement_site_ready))
-        setSimUpdates(
-          inp.stakeholder_update_count_90d !== undefined && inp.stakeholder_update_count_90d !== null
-            ? inp.stakeholder_update_count_90d
-            : 2
-        )
-        setActivePreset(null)
-        skipDebounceRef.current = true
-      }
-    } catch (err) {
-      console.error('Failed to load Decision Intelligence bundle:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [loadProjectData])
 
   useEffect(() => {
-    if (selectedProjectId) {
+    if (selectedProjectId && selectedProjectId !== lastLoadedIdRef.current) {
+      lastLoadedIdRef.current = selectedProjectId
       loadProjectData(selectedProjectId)
     }
-  }, [selectedProjectId])
+  }, [selectedProjectId, loadProjectData])
 
   // 3. Handle What-If Simulation
   const runSimulation = useCallback(
@@ -276,7 +303,8 @@ export default function DecisionIntelligence() {
       setTimeout(() => setActionSuccessMsg(''), 6000)
 
       // Refresh overview
-      loadProjectData(selectedProjectId)
+      OVERVIEW_CLIENT_CACHE.delete(selectedProjectId)
+      loadProjectData(selectedProjectId, true)
     } catch (err) {
       console.error('Failed to record intervention:', err)
     } finally {
@@ -291,6 +319,7 @@ export default function DecisionIntelligence() {
     setDeletingActionId(interventionId)
     try {
       await decisionIntelligenceAPI.deleteIntervention(selectedProjectId, interventionId)
+      OVERVIEW_CLIENT_CACHE.delete(selectedProjectId)
       setInterventions((prev) => prev.filter((i) => i.id !== interventionId))
     } catch (err) {
       console.error('Failed to delete intervention:', err)
@@ -563,6 +592,7 @@ export default function DecisionIntelligence() {
 
       {/* ─── Structured Navigation Tabs ─── */}
       <div
+        id="tour-decision-tabs"
         style={{
           display: 'flex',
           gap: 4,

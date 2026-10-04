@@ -351,7 +351,7 @@ export default function Alerts() {
       </div>
 
       {/* Filter Control Bar */}
-      <div className="card" style={{ marginBottom: 20, padding: 16 }}>
+      <div id="tour-alerts-filter" className="card" style={{ marginBottom: 20, padding: 16 }}>
         <div
           style={{
             display: 'flex',

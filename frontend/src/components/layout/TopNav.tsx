@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Square } from 'lucide-react'
+import { Bell, LogOut, User, ChevronDown, Shield, Sun, Moon, Volume2, Square, Compass } from 'lucide-react'
 import { voiceEngine } from '@/components/voice/voiceEngine'
 import { getPageVoiceInstruction } from '@/components/voice/pageContentCollector'
 import { useAuthStore } from '@/store/authStore'
@@ -141,28 +141,41 @@ export function TopNav({ sidebarCollapsed, pageTitle }: TopNavProps) {
       {/* Right: Controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
 
+        {/* Guided Feature Tour Button */}
+        <NavIconButton
+          id="tour-guide-btn"
+          icon={<Compass size={19} strokeWidth={1.8} style={{ color: '#ef4444' }} />}
+          onClick={() => {
+            window.dispatchEvent(new CustomEvent('ladris-start-tour'))
+          }}
+          title="Interactive Feature Tour (Box Highlights)"
+          ariaLabel="Interactive Feature Tour"
+        />
+
         {/* Speaker / Voice Play & Stop Control */}
-        {!voiceState.isSpeaking ? (
-          <NavIconButton
-            icon={<Volume2 size={19} strokeWidth={1.8} />}
-            onClick={handleToggleVoice}
-            title="Listen to page instructions (Play)"
-            ariaLabel="Play voice instructions"
-            ariaPressed={false}
-          />
-        ) : (
-          <NavIconButton
-            icon={<Square size={13} strokeWidth={2} fill="currentColor" style={{ color: 'var(--color-risk-critical, #ef4444)' }} />}
-            onClick={handleToggleVoice}
-            title="Stop voice instructions"
-            ariaLabel="Stop voice instructions"
-            ariaPressed={true}
-            style={{
-              border: '1px solid rgba(239, 68, 68, 0.45)',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            }}
-          />
-        )}
+        <div id="tour-voice-btn" style={{ display: 'inline-flex' }}>
+          {!voiceState.isSpeaking ? (
+            <NavIconButton
+              icon={<Volume2 size={19} strokeWidth={1.8} />}
+              onClick={handleToggleVoice}
+              title="Listen to page instructions (Play)"
+              ariaLabel="Play voice instructions"
+              ariaPressed={false}
+            />
+          ) : (
+            <NavIconButton
+              icon={<Square size={13} strokeWidth={2} fill="currentColor" style={{ color: 'var(--color-risk-critical, #ef4444)' }} />}
+              onClick={handleToggleVoice}
+              title="Stop voice instructions"
+              ariaLabel="Stop voice instructions"
+              ariaPressed={true}
+              style={{
+                border: '1px solid rgba(239, 68, 68, 0.45)',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              }}
+            />
+          )}
+        </div>
 
         {/* Alerts / Notifications Button */}
         <NavIconButton
@@ -339,6 +352,7 @@ function NavIconButton({
   ariaLabel,
   ariaPressed,
   style,
+  id,
 }: {
   icon: React.ReactNode
   onClick: () => void
@@ -347,9 +361,11 @@ function NavIconButton({
   ariaLabel?: string
   ariaPressed?: boolean
   style?: React.CSSProperties
+  id?: string
 }) {
   return (
     <button
+      id={id}
       onClick={onClick}
       title={title}
       aria-label={ariaLabel ?? title}

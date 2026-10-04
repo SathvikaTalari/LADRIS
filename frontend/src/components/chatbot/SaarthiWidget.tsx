@@ -368,6 +368,7 @@ export function SaarthiWidget() {
         <AnimatePresence>
           {!isOpen && (
             <motion.button
+              id="tour-saarthi-btn"
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
