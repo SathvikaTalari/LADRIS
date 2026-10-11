@@ -152,7 +152,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: 'tour-finish',
     page: '/dashboard',
-    selector: '#tour-voice-btn',
+    selector: '#tour-guide-btn',
     title: 'Ready to Explore!',
     badge: 'All Done',
     description: 'You are all set! Replay this tour anytime using the red 🧭 compass button in the top bar.',
