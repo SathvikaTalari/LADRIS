@@ -2119,51 +2119,115 @@ class IngestionService:
         mapping: Dict[str, str] = {}
         for col in columns:
             c = col.lower().strip()
-            if c in ("project_code", "code", "pkg_code", "pkg_no", "project_id"):
+            if c in ("project_code", "code", "pkg_code", "pkg_no", "project_id", "ext_project_id"):
                 mapping[col] = "project_code"
             elif c in ("project_name", "name", "project_title", "title", "scheme_name"):
                 mapping[col] = "name"
-            elif c in ("project_type", "type", "sector", "category"):
+            elif c in ("project_description", "description", "details"):
+                mapping[col] = "description"
+            elif c in ("project_type", "type", "sector", "category", "project_category"):
                 mapping[col] = "project_type"
-            elif c in ("state_code", "state", "state_name"):
+            elif c in ("acquisition_act", "la_act", "act"):
+                mapping[col] = "acquisition_act"
+            elif c in ("status", "current_status", "project_status"):
+                mapping[col] = "status"
+            elif c in ("risk_level", "priority_flag", "priority"):
+                mapping[col] = "risk_level"
+            elif c in ("nodal_agency", "ministry_name", "ministry", "agency"):
+                mapping[col] = "nodal_agency"
+            elif c in ("executing_agency", "impl_agency", "implementing_agency"):
+                mapping[col] = "executing_agency"
+            elif c in ("state_code", "state", "state_name", "state_abbrev"):
                 mapping[col] = "state_code"
-            elif c in ("district", "dist", "district_name", "district_codes"):
+            elif c in ("district", "dist", "district_name", "district_codes", "district_list"):
                 mapping[col] = "district"
-            elif c in ("total_area_ha", "total_land_area_ha", "land_required_ha", "total_area", "area_ha"):
+            elif c in ("total_area_ha", "total_land_area_ha", "land_required_ha", "total_area", "area_ha", "total_land_ha"):
                 mapping[col] = "total_area_ha"
-            elif c in ("area_acquired_ha", "acquired_land_area_ha", "land_acquired_ha", "acquired_area"):
+            elif c in ("area_acquired_ha", "acquired_land_area_ha", "land_acquired_ha", "acquired_area", "acquired_land_ha"):
                 mapping[col] = "area_acquired_ha"
-            elif c in ("area_in_possession_ha", "possessed_land_area_ha", "possession_ha", "possessed_area"):
+            elif c in ("area_in_possession_ha", "possessed_land_area_ha", "possession_ha", "possessed_area", "possession_land_ha"):
                 mapping[col] = "area_in_possession_ha"
-            elif c in ("estimated_compensation_inr", "sanctioned_compensation_inr", "total_compensation_inr", "compensation_sanctioned", "sanctioned_amount"):
+            elif c in ("estimated_compensation_inr", "sanctioned_compensation_inr", "total_compensation_inr", "compensation_sanctioned", "sanctioned_amount", "estimated_comp"):
                 mapping[col] = "estimated_compensation_inr"
-            elif c in ("disbursed_compensation_inr", "compensation_disbursed", "amount_disbursed", "disbursed_amount"):
+            elif c in ("disbursed_compensation_inr", "compensation_disbursed", "amount_disbursed", "disbursed_amount", "disbursed_comp"):
                 mapping[col] = "disbursed_compensation_inr"
-            elif c in ("total_affected_families", "affected_families_count", "pafs", "total_pafs", "displaced_families"):
+            elif c in ("total_affected_families", "affected_families_count", "pafs", "total_pafs", "displaced_families", "total_families"):
                 mapping[col] = "total_affected_families"
-            elif c in ("families_compensated", "compensated_families_count", "compensated_pafs"):
+            elif c in ("families_compensated", "compensated_families_count", "compensated_pafs", "compensated_families"):
                 mapping[col] = "families_compensated"
-            elif c in ("families_rehabilitated", "rehabilitated_families_count", "resettled_families"):
+            elif c in ("families_rehabilitated", "rehabilitated_families_count", "resettled_families", "rehabilitated_families"):
                 mapping[col] = "families_rehabilitated"
-            elif c in ("rehabilitation_progress_pct", "rr_progress", "rehab_pct", "rr_pct"):
+            elif c in ("rehabilitation_progress_pct", "rr_progress", "rehab_pct", "rr_pct", "rr_pct_complete"):
                 mapping[col] = "rehabilitation_progress_pct"
-            elif c in ("legal_case_count", "court_cases_count", "litigation_count", "disputes_count", "legal_cases"):
+            elif c in ("legal_case_count", "court_cases_count", "litigation_count", "disputes_count", "legal_cases", "court_case_count"):
                 mapping[col] = "legal_case_count"
             elif c in ("legal_case_status", "case_status", "court_case_status"):
                 mapping[col] = "legal_case_status"
+            elif c in ("delay_months", "delay_months_count"):
+                mapping[col] = "delay_months"
+            elif c in ("delay_reason", "delay_notes"):
+                mapping[col] = "delay_reason"
             elif c in ("notification_3a_date", "gazette_notification_date", "sec3a_date", "notification_date"):
                 mapping[col] = "notification_3a_date"
             elif c in ("notification_3d_date", "declaration_date", "sec3d_date"):
                 mapping[col] = "notification_3d_date"
-            elif c in ("planned_start_date", "start_date", "commencement_date"):
+            elif c in ("planned_start_date", "start_date", "commencement_date", "plan_start"):
                 mapping[col] = "planned_start_date"
-            elif c in ("planned_end_date", "target_completion_date", "end_date", "target_date"):
+            elif c in ("planned_end_date", "target_completion_date", "end_date", "target_date", "plan_end"):
                 mapping[col] = "planned_end_date"
+            elif c in ("actual_start_date", "actual_start"):
+                mapping[col] = "actual_start_date"
             elif c in ("latitude", "lat"):
                 mapping[col] = "latitude"
             elif c in ("longitude", "lng", "lon"):
                 mapping[col] = "longitude"
         return mapping
+
+    async def upload_and_preview_database_sql(
+        self,
+        sql_content: str,
+        filename: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Execute an uploaded .sql database dump/script (e.g., PostgreSQL DDL and INSERTs)
+        into the database, detect the table name, and preview sample rows with suggested mappings.
+        """
+        clean_sql = (sql_content or "").lstrip("\ufeff\xef\xbb\xbf \t\r\n").strip()
+        if not clean_sql:
+            raise ValueError("The uploaded SQL script is empty.")
+
+        # Detect table name from DDL/DML statements
+        table_name = "external_la_projects"
+        m_create = re.search(r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([a-zA-Z0-9_.]+)", clean_sql, re.IGNORECASE)
+        if m_create:
+            table_name = m_create.group(1).split(".")[-1].strip("\"'`")
+        else:
+            m_insert = re.search(r"INSERT\s+INTO\s+([a-zA-Z0-9_.]+)", clean_sql, re.IGNORECASE)
+            if m_insert:
+                table_name = m_insert.group(1).split(".")[-1].strip("\"'`")
+
+        clean_table = re.sub(r"[^a-zA-Z0-9_.]", "", table_name.strip())
+        if not clean_table:
+            clean_table = "external_la_projects"
+
+        # Execute script via asyncpg connection
+        conn = await self.db.connection()
+        raw_conn = await conn.get_raw_connection()
+        try:
+            await raw_conn._connection.execute(clean_sql)
+            await self.db.commit()
+        except Exception as e:
+            await self.db.rollback()
+            raise ValueError(f"Failed to execute SQL script: {str(e)}")
+
+        # Preview table
+        preview = await self.test_and_preview_database(
+            connection_url=None,
+            table_name=clean_table,
+            limit=5,
+        )
+        preview["message"] = f"Successfully loaded SQL script into table '{clean_table}' ({preview.get('total_rows_approx', 0)} records)."
+        return preview
 
     async def test_and_preview_database(
         self,
@@ -2299,6 +2363,8 @@ class IngestionService:
                     if v is not None and k != "id":
                         setattr(proj, k, v)
                 proj.updated_by = user_id
+                self.db.add(proj)
+                await self.db.flush()
                 duplicates_count += 1
             else:
                 proj = Project(
@@ -2357,7 +2423,6 @@ class IngestionService:
                     })
             except Exception as ml_err:
                 logger.warning(f"ML prediction failed for DB project {pid}: {ml_err}")
-                await self.db.rollback()
 
         job.status = IngestionJobStatus.IMPORTED.value
         job.valid_records = imported_count + duplicates_count

@@ -72,6 +72,7 @@ settings = get_settings()
 ALLOWED_SPREADSHEET_EXTS = {".csv", ".xls", ".xlsx"}
 ALLOWED_GIS_EXTS = {".geojson", ".json", ".kml", ".zip", ".csv"}
 ALLOWED_DOC_EXTS = {".pdf"}
+ALLOWED_DATABASE_EXTS = {".sql", ".dump", ".txt"}
 MAX_FILE_BYTES = settings.INGESTION_MAX_FILE_SIZE_MB * 1024 * 1024
 
 
@@ -314,6 +315,82 @@ async def ingest_external(
 
 
 # ─── 4. Database Controlled Import ───────────────────────────────────────────
+
+@router.post("/database/upload-sql", response_model=DatabaseTestResponse)
+async def upload_database_sql_file(
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> DatabaseTestResponse:
+    """Upload and execute a .sql database script or dump file to extract table schema and preview records."""
+    content = await file.read()
+    validate_file_safety(file.filename or "script.sql", len(content), ALLOWED_DATABASE_EXTS)
+    try:
+        sql_text = content.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        try:
+            sql_text = content.decode("utf-8")
+        except UnicodeDecodeError:
+            sql_text = content.decode("latin-1", errors="replace")
+    sql_text = sql_text.lstrip("\ufeff\xef\xbb\xbf \t\r\n").strip()
+
+    service = IngestionService(db)
+    try:
+        res = await service.upload_and_preview_database_sql(
+            sql_content=sql_text,
+            filename=file.filename,
+        )
+        return DatabaseTestResponse(**res)
+    except Exception as e:
+        return DatabaseTestResponse(
+            success=False,
+            columns=[],
+            sample_rows=[],
+            error=str(e),
+        )
+
+
+@router.post("/database/load-sample", response_model=DatabaseTestResponse)
+async def load_sample_database_file(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> DatabaseTestResponse:
+    """Load the built-in sample database script (09_External_DB_Schema_And_Data.sql)."""
+    candidates = [
+        Path("c:/LandAcquisition/LADRIS/sample_documents/09_External_DB_Schema_And_Data.sql"),
+        Path("sample_documents/09_External_DB_Schema_And_Data.sql"),
+        Path("../sample_documents/09_External_DB_Schema_And_Data.sql"),
+        Path("04_Database_Import.sql"),
+        Path("../04_Database_Import.sql"),
+    ]
+    sample_path = None
+    for p in candidates:
+        if p.exists():
+            sample_path = p
+            break
+
+    if not sample_path:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sample database SQL script could not be found.",
+        )
+
+    sql_text = sample_path.read_text(encoding="utf-8")
+    service = IngestionService(db)
+    try:
+        res = await service.upload_and_preview_database_sql(
+            sql_content=sql_text,
+            filename=sample_path.name,
+        )
+        return DatabaseTestResponse(**res)
+    except Exception as e:
+        return DatabaseTestResponse(
+            success=False,
+            columns=[],
+            sample_rows=[],
+            error=str(e),
+        )
+
 
 @router.post("/database/test", response_model=DatabaseTestResponse)
 async def test_database_connection(

@@ -27,6 +27,13 @@ import {
   Layers,
   Trash2,
   ExternalLink,
+  Copy,
+  Check,
+  Code,
+  Terminal,
+  Info,
+  HelpCircle,
+  FileCode,
 } from 'lucide-react'
 import { ingestionAPI, projectsAPI } from '@/api/client'
 import type {
@@ -1153,10 +1160,9 @@ function CSVImportModal({
   const [mapping, setMapping] = useState<Record<string, string>>({})
   const [showManualMapping, setShowManualMapping] = useState(false)
   const [summary, setSummary] = useState<CSVImportSummaryData | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return
-    const selected = e.target.files[0]
+  const processFile = async (selected: File) => {
     setError(null)
     setLoading(true)
     try {
@@ -1169,6 +1175,11 @@ function CSVImportModal({
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return
+    processFile(e.target.files[0])
   }
 
   const handleImport = async () => {
@@ -1206,22 +1217,73 @@ function CSVImportModal({
 
       {/* Step 1: Upload */}
       {step === 'UPLOAD' && (
-        <div style={{ textAlign: 'center', padding: '30px 20px' }}>
+        <div style={{ padding: '24px 16px' }}>
           <div
+            id="csv-dropzone"
             style={{
-              border: '2px dashed rgba(255,255,255,0.15)',
-              borderRadius: 12,
-              padding: '40px 20px',
-              cursor: 'pointer',
-              background: 'rgba(255,255,255,0.02)',
+              border: isDragging
+                ? '2px dashed var(--color-accent-primary, #38bdf8)'
+                : '2px dashed rgba(56, 189, 248, 0.45)',
+              borderRadius: 14,
+              padding: '48px 24px',
+              cursor: loading ? 'wait' : 'pointer',
+              background: isDragging
+                ? 'rgba(56, 189, 248, 0.12)'
+                : 'rgba(56, 189, 248, 0.03)',
+              textAlign: 'center',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onClick={() => document.getElementById('csv-upload-input')?.click()}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setIsDragging(true)
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault()
+              setIsDragging(false)
+            }}
+            onDrop={(e) => {
+              e.preventDefault()
+              setIsDragging(false)
+              if (e.dataTransfer.files?.[0]) {
+                processFile(e.dataTransfer.files[0])
+              }
+            }}
+            onMouseEnter={(e) => {
+              if (!isDragging) {
+                e.currentTarget.style.borderColor = 'var(--color-accent-primary, #38bdf8)'
+                e.currentTarget.style.background = 'rgba(56, 189, 248, 0.08)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isDragging) {
+                e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.45)'
+                e.currentTarget.style.background = 'rgba(56, 189, 248, 0.03)'
+              }
+            }}
           >
-            <Upload size={36} style={{ color: 'var(--color-accent-primary, #38bdf8)', margin: '0 auto 12px' }} />
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
+            <div
+              style={{
+                width: 58,
+                height: 58,
+                borderRadius: '50%',
+                background: 'rgba(56, 189, 248, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 14,
+              }}
+            >
+              <Upload size={30} style={{ color: 'var(--color-accent-primary, #38bdf8)' }} />
+            </div>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
               Click or drag .csv, .xls, or .xlsx file to upload
             </h3>
-            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+            <p style={{ fontSize: '0.84rem', color: 'var(--color-text-muted)', margin: '8px 0 0' }}>
               Files up to 50MB supported with automatic column detection.
             </p>
             <input
@@ -1231,31 +1293,6 @@ function CSVImportModal({
               style={{ display: 'none' }}
               onChange={handleFileSelect}
             />
-          </div>
-
-          <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center' }}>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => {
-                const sampleCsv = `Project Code,Project Name,Project Type,State,Total Area (ha),Area Acquired (ha),Area in Possession,Affected Families,Families Compensated,Families Rehabilitated,R&R Progress %,Compensation Sanctioned,Compensation Disbursed,Planned Start Date,Expected Completion,Notification Date,Open Disputes,Latitude,Longitude
-NHAI-EXP-PB-101,Delhi-Amritsar-Katra Expressway Section 3,HIGHWAY,PB,145.5,140.0,138.0,320,315,310,96.0,180000000,174000000,2023-01-15,2025-12-31,2022-04-10,0,31.6340,74.8723
-MRIDC-RAIL-MH-202,Pune-Nashik Semi High-Speed Rail Corridor,RAILWAY,MH,260.0,195.0,150.0,850,680,450,58.0,360000000,285000000,2022-09-01,2026-06-30,2021-11-15,2,18.5204,73.8567
-UPSIDA-IND-UP-303,Lucknow-Kanpur Industrial Corridor Node A,INDUSTRIAL_CORRIDOR,UP,410.0,160.0,95.0,1450,720,210,22.0,580000000,310000000,2022-03-10,2025-08-31,2021-05-20,7,26.8467,80.9462
-BMRCL-METRO-KA-404,Bengaluru Metro Phase 3 Outer Ring Road,METRO_RAIL,KA,54.2,48.5,45.0,290,275,260,88.0,220000000,205000000,2023-05-01,2026-12-31,2022-08-14,1,12.9716,77.5946
-TSIIC-AIR-TG-505,Warangal Greenfield Airport Expansion,AIRPORT,TG,325.0,110.0,65.0,980,420,150,18.0,440000000,190000000,2022-01-10,2025-06-30,2020-09-12,5,17.9689,79.5941`
-                const blob = new Blob([sampleCsv], { type: 'text/csv' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = 'ladris_5_sample_projects.csv'
-                a.click()
-              }}
-              style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 6 }}
-            >
-              <Download size={14} />
-              Download Sample CSV Template
-            </button>
           </div>
         </div>
       )}
@@ -1455,14 +1492,132 @@ function StatBox({ label, value, color }: { label: string; value: number; color?
 
 // ─── 3. Connect API Modal ────────────────────────────────────────────────────
 
+const SAMPLE_05_PAYLOAD = {
+  source_name: 'BhoomiRashi National Data Gateway',
+  reporting_period: 'Q2-2026',
+  records: [
+    {
+      project_code: 'NHAI-NH16-PKG7',
+      name: 'NH-16 Vijayawada–Rajam Six-Lane Expressway Package-7',
+      description: 'Six-laning of NH16 from Anakapalli to Vizianagaram under Bharatmala Pariyojana Phase-I',
+      project_type: 'HIGHWAY',
+      acquisition_act: 'NH_ACT_1956',
+      status: 'DELAYED',
+      risk_level: 'CRITICAL',
+      nodal_agency: 'MoRTH',
+      executing_agency: 'NHAI',
+      state_code: 'AP',
+      district_codes: ['Visakhapatnam', 'Vizianagaram'],
+      tehsil_names: ['Anakapalli', 'Bheemunipatnam', 'Vizianagaram'],
+      total_area_ha: 2180.6,
+      area_acquired_ha: 1050.0,
+      area_in_possession_ha: 620.0,
+      total_affected_families: 6200,
+      families_compensated: 2800,
+      families_rehabilitated: 1900,
+      rehabilitation_progress_pct: 30.65,
+      planned_start_date: '2020-11-01',
+      planned_end_date: '2023-10-31',
+      actual_start_date: '2021-04-15',
+      baseline_duration_days: 1095,
+      estimated_compensation_inr: 650000000.0,
+      disbursed_compensation_inr: 195000000.0,
+      notification_3a_date: '2021-04-15',
+      notification_3d_date: '2022-03-10',
+      delay_months: 34,
+      delay_reason: 'High Court Interim Stay on 680 Ha in Vizianagaram district; tribal R&R package under revision',
+      legal_case_count: 28,
+      legal_case_status: 'ACTIVE',
+      latitude: 17.7384,
+      longitude: 83.2184,
+    },
+    {
+      project_code: 'NHAI-NH27-PKG2',
+      name: 'NH-27 Varanasi–Kolkata Expressway Package-2',
+      description: 'Greenfield 6-lane access-controlled expressway; Dehri-on-Sone to Sasaram section',
+      project_type: 'HIGHWAY',
+      acquisition_act: 'RFCTLARR_2013',
+      status: 'ACTIVE',
+      risk_level: 'MEDIUM',
+      nodal_agency: 'MoRTH',
+      executing_agency: 'NHAI',
+      state_code: 'BR',
+      district_codes: ['Rohtas', 'Aurangabad'],
+      tehsil_names: ['Dehri', 'Sasaram', 'Obra'],
+      total_area_ha: 1640.0,
+      area_acquired_ha: 1490.0,
+      area_in_possession_ha: 1340.0,
+      total_affected_families: 4100,
+      families_compensated: 3900,
+      families_rehabilitated: 3600,
+      rehabilitation_progress_pct: 87.8,
+      planned_start_date: '2022-06-01',
+      planned_end_date: '2025-05-31',
+      actual_start_date: '2022-08-20',
+      baseline_duration_days: 1095,
+      estimated_compensation_inr: 420000000.0,
+      disbursed_compensation_inr: 395000000.0,
+      notification_3a_date: '2022-08-20',
+      notification_3d_date: '2023-07-18',
+      delay_months: 4,
+      delay_reason: 'Minor compensation revision for 60 families near Sasaram urban boundary',
+      legal_case_count: 3,
+      legal_case_status: 'SETTLED',
+      latitude: 24.9268,
+      longitude: 84.035,
+    },
+    {
+      project_code: 'NHAI-RRTS-DELHI-MRT',
+      name: 'Delhi–Meerut Regional Rapid Transit System Package-4',
+      description: 'RRTS corridor viaduct and station construction from Sahibabad to Ghaziabad Urban Centre',
+      project_type: 'METRO_RAIL',
+      acquisition_act: 'RFCTLARR_2013',
+      status: 'COMPLETED',
+      risk_level: 'LOW',
+      nodal_agency: 'MoHUA',
+      executing_agency: 'NCRTC',
+      state_code: 'UP',
+      district_codes: ['Ghaziabad'],
+      tehsil_names: ['Sahibabad', 'Ghaziabad'],
+      total_area_ha: 64.8,
+      area_acquired_ha: 64.8,
+      area_in_possession_ha: 64.8,
+      total_affected_families: 820,
+      families_compensated: 820,
+      families_rehabilitated: 820,
+      rehabilitation_progress_pct: 100.0,
+      planned_start_date: '2019-03-01',
+      planned_end_date: '2022-02-28',
+      actual_start_date: '2019-05-01',
+      actual_end_date: '2023-01-15',
+      baseline_duration_days: 1095,
+      estimated_compensation_inr: 245000000.0,
+      disbursed_compensation_inr: 245000000.0,
+      notification_3a_date: '2019-05-01',
+      notification_3d_date: '2020-03-25',
+      delay_months: 10,
+      delay_reason: 'COVID-19 lockdown halted SIA and compensation disbursement for 8 months',
+      legal_case_count: 0,
+      legal_case_status: 'NONE',
+      latitude: 28.6667,
+      longitude: 77.4314,
+    },
+  ],
+}
+
 const API_PRESETS = [
   {
+    id: 'SAMPLE_DOC_05',
+    name: '05_API_Batch_Payload.json',
+    badge: '3 Projects',
+    data: SAMPLE_05_PAYLOAD,
+  },
+  {
     id: 'PM_GATISHAKTI',
-    name: 'PM-GatiShakti Multi-Corridor Stream',
-    badge: 'National Master Plan (NMP)',
-    description: 'Surat-Chennai Corridor Package 4 & Varanasi-Kolkata Greenfield Expressway',
+    name: 'PM-GatiShakti Stream',
+    badge: '2 Projects',
     data: {
-      source_name: 'PM_GATI_SHAKTI_INTEGRATION',
+      source_name: 'PM_GATI_SHAKTI',
       reporting_period: '2026-Q1',
       projects: [
         {
@@ -1512,11 +1667,10 @@ const API_PRESETS = [
   },
   {
     id: 'BHOOMIRASHI',
-    name: 'MoRTH BhoomiRashi Highway Package',
-    badge: 'Ministry of Road Transport',
-    description: 'NH-44 Hyderabad-Bengaluru Section Four-Laning',
+    name: 'MoRTH BhoomiRashi',
+    badge: '1 Project',
     data: {
-      source_name: 'BHOOMIRASHI_MORTH_PORTAL',
+      source_name: 'BHOOMIRASHI_PORTAL',
       reporting_period: '2026-Q1',
       projects: [
         {
@@ -1545,11 +1699,10 @@ const API_PRESETS = [
   },
   {
     id: 'BULLET_TRAIN',
-    name: 'High-Speed Rail Corridor (NHSRCL)',
-    badge: 'Ministry of Railways',
-    description: 'Mumbai-Ahmedabad High Speed Rail Section C3',
+    name: 'High-Speed Rail Corridor',
+    badge: '1 Project',
     data: {
-      source_name: 'NHSRCL_PORTAL_INTEGRATION',
+      source_name: 'NHSRCL_PORTAL',
       reporting_period: '2026-Q1',
       projects: [
         {
@@ -1586,13 +1739,18 @@ function ConnectAPIModal({
   onSuccess: (msg: string) => void
 }) {
   const [apiKey] = useState('ladris-secure-api-key-default')
-  const [activePreset, setActivePreset] = useState('PM_GATISHAKTI')
-  const [viewTab, setViewTab] = useState<'PREVIEW' | 'JSON'>('PREVIEW')
-  const [jsonPayload, setJsonPayload] = useState(JSON.stringify(API_PRESETS[0].data, null, 2))
-  const [parsedData, setParsedData] = useState<any>(API_PRESETS[0].data)
+  const [activeTab, setActiveTab] = useState<'PRESETS' | 'CUSTOM' | 'DEV_INTEGRATION'>('PRESETS')
+  const [activePreset, setActivePreset] = useState('SAMPLE_DOC_05')
+  const [jsonPayload, setJsonPayload] = useState(JSON.stringify(SAMPLE_05_PAYLOAD, null, 2))
+  const [parsedData, setParsedData] = useState<any>(SAMPLE_05_PAYLOAD)
+  const [jsonError, setJsonError] = useState<string | null>(null)
+  const [copiedType, setCopiedType] = useState<'curl' | null>(null)
   const [response, setResponse] = useState<ExternalIngestionResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isDraggingJson, setIsDraggingJson] = useState(false)
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const [codeLang, setCodeLang] = useState<'curl' | 'python' | 'javascript'>('curl')
 
   const handleSelectPreset = (presetId: string) => {
     setActivePreset(presetId)
@@ -1600,6 +1758,7 @@ function ConnectAPIModal({
     if (preset) {
       setJsonPayload(JSON.stringify(preset.data, null, 2))
       setParsedData(preset.data)
+      setJsonError(null)
       setError(null)
     }
   }
@@ -1609,10 +1768,38 @@ function ConnectAPIModal({
     try {
       const parsed = JSON.parse(val)
       setParsedData(parsed)
-      setError(null)
-    } catch {
-      // JSON is being typed, keep existing parsed
+      setJsonError(null)
+    } catch (err: any) {
+      setJsonError(err.message)
     }
+  }
+
+  const processJsonFile = (file: File) => {
+    setUploadedFileName(file.name)
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const content = event.target?.result as string
+      try {
+        const parsed = JSON.parse(content)
+        setJsonPayload(JSON.stringify(parsed, null, 2))
+        setParsedData(parsed)
+        setJsonError(null)
+      } catch (err: any) {
+        setJsonError(`Invalid JSON: ${err.message}`)
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) processJsonFile(file)
+  }
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text)
+    setCopiedType('curl')
+    setTimeout(() => setCopiedType(null), 2000)
   }
 
   const handleSend = async () => {
@@ -1628,44 +1815,85 @@ function ConnectAPIModal({
 
       const res = await ingestionAPI.externalBatch(payloadToSubmit, apiKey)
       setResponse(res)
-      onSuccess(res.message || `API batch ingested: ${res.imported} new, ${res.duplicates} updated.`)
+      onSuccess(res.message || `Ingested ${res.imported} new, ${res.duplicates} updated.`)
     } catch (e: any) {
-      setError(e?.response?.data?.detail || e.message || 'API ingestion failed.')
+      setError(e?.response?.data?.detail || e.message || 'Ingestion failed.')
     } finally {
       setLoading(false)
     }
   }
 
   const projectsToPreview: any[] = parsedData?.projects || parsedData?.records || []
+  const endpointUrl = `${window.location.origin.replace(/:[0-9]+$/, ':8000')}/api/v1/ingestion/external`
+
+  const getCodeSnippet = (lang: 'curl' | 'python' | 'javascript') => {
+    const payloadStr = JSON.stringify(parsedData || SAMPLE_05_PAYLOAD, null, 2)
+    if (lang === 'curl') {
+      return `curl -X POST "${endpointUrl}" \\
+  -H "Content-Type: application/json" \\
+  -H "X-API-Key: ${apiKey}" \\
+  -d '${payloadStr}'`
+    }
+    if (lang === 'python') {
+      return `import requests
+
+url = "${endpointUrl}"
+headers = {
+    "Content-Type": "application/json",
+    "X-API-Key": "${apiKey}"
+}
+payload = ${payloadStr}
+
+response = requests.post(url, headers=headers, json=payload)
+print(response.status_code, response.json())`
+    }
+    return `const response = await fetch("${endpointUrl}", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-API-Key": "${apiKey}"
+  },
+  body: JSON.stringify(${payloadStr})
+});
+
+const result = await response.json();
+console.log(result);`
+  }
 
   return (
     <ModalShell
-      title="REST API Push & Connection Ingestion"
-      subtitle="Ingest automated government and partner data pipelines (PM-GatiShakti, BhoomiRashi, RoR) with instant Machine Learning delay risk predictions."
+      title="Connect API"
+      subtitle="Select a preset stream or upload a JSON payload to run AI delay predictions."
       onClose={onClose}
       maxWidth={880}
     >
-      {/* State 2: ML Prediction Results View */}
       {response && response.projects && response.projects.length > 0 ? (
         <div>
-          <div style={{ textAlign: 'center', padding: '12px 0 16px' }}>
-            <div style={{
-              width: 54, height: 54, borderRadius: '50%',
-              background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px auto'
-            }}>
-              <CheckCircle2 size={28} color="#10b981" />
+          <div style={{ textAlign: 'center', padding: '10px 0 16px' }}>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: '50%',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid #10b981',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 8px auto',
+              }}
+            >
+              <CheckCircle2 size={24} color="#10b981" />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
-              API Data Ingested & Scored via Machine Learning!
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+              Ingested & Scored Successfully
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
-              Processed <strong>{response.total}</strong> project(s) ({response.imported} new, {response.duplicates} updated) and synchronized with the ML Delay Prediction Engine.
+            <p style={{ fontSize: '0.84rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+              Processed <strong>{response.total}</strong> project(s) ({response.imported} new, {response.duplicates} updated).
             </p>
           </div>
 
-          {/* List of Scored Projects */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
             {response.projects.map((p) => {
               const isHigh = p.risk_category === 'HIGH' || p.risk_category === 'CRITICAL'
               const isMed = p.risk_category === 'MEDIUM'
@@ -1676,27 +1904,20 @@ function ConnectAPIModal({
                 <div
                   key={p.project_id}
                   style={{
-                    background: 'linear-gradient(180deg, var(--color-bg-secondary) 0%, rgba(20,28,45,0.85) 100%)',
+                    background: 'var(--color-bg-secondary)',
                     border: '1px solid var(--color-border-subtle)',
-                    borderRadius: 12,
-                    padding: '16px 20px',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+                    borderRadius: 10,
+                    padding: '14px 18px',
                   }}
                 >
-                  {/* Top Bar */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 10 }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                          {p.project_name}
-                        </span>
-                        <code style={{ fontSize: '0.75rem', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '2px 6px', borderRadius: 4 }}>
-                          {p.project_code}
-                        </code>
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: 3 }}>
-                        {p.project_type || 'INFRASTRUCTURE'} • {p.district ? `${p.district}, ` : ''}{p.state_code} • {p.total_area_ha ? `${p.total_area_ha} ha` : ''}
-                      </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                        {p.project_name}
+                      </span>
+                      <code style={{ fontSize: '0.72rem', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '1px 6px', borderRadius: 4 }}>
+                        {p.project_code}
+                      </code>
                     </div>
                     <span style={{
                       fontSize: '0.72rem', fontWeight: 800, padding: '3px 8px', borderRadius: 6,
@@ -1706,67 +1927,33 @@ function ConnectAPIModal({
                     </span>
                   </div>
 
-                  {/* Prediction Metrics Grid */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 12 }}>
-                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 12px', borderRadius: 8 }}>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Delay Risk Score</div>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: badgeColor, marginTop: 2 }}>
-                        {p.risk_score} <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>/ 100</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 10 }}>
+                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '8px 10px', borderRadius: 6 }}>
+                      <div style={{ fontSize: '0.66rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Risk Score</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: badgeColor }}>{p.risk_score} / 100</div>
+                    </div>
+                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '8px 10px', borderRadius: 6 }}>
+                      <div style={{ fontSize: '0.66rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Delay Probability</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
+                        {p.delay_probability !== undefined ? `${Math.round(p.delay_probability * 100)}%` : 'N/A'}
                       </div>
                     </div>
-
-                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 12px', borderRadius: 8 }}>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Delay Probability</div>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: 2 }}>
-                        {p.delay_probability ? `${(p.delay_probability * 100).toFixed(0)}%` : '—'}
-                      </div>
-                    </div>
-
-                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 12px', borderRadius: 8 }}>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Expected Delay</div>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#f59e0b', marginTop: 2 }}>
-                        +{p.predicted_delay_days ? Math.round(p.predicted_delay_days) : 0} <span style={{ fontSize: '0.75rem' }}>days</span>
-                      </div>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
-                        ~{p.predicted_delay_days ? Math.round(p.predicted_delay_days / 30) : 0} mos past deadline
-                      </div>
-                    </div>
-
-                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 12px', borderRadius: 8 }}>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Model Confidence</div>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#2dd4bf', marginTop: 2 }}>
-                        {p.confidence_score ? `${(p.confidence_score * 100).toFixed(0)}%` : '88%'}
+                    <div style={{ background: 'var(--color-bg-tertiary)', padding: '8px 10px', borderRadius: 6 }}>
+                      <div style={{ fontSize: '0.66rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Predicted Delay</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
+                        {p.predicted_delay_days !== undefined ? `${Math.round(p.predicted_delay_days)} d` : 'N/A'}
                       </div>
                     </div>
                   </div>
 
-                  {/* SHAP Drivers & Direct Link */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                    {p.top_delay_drivers && p.top_delay_drivers.length > 0 ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Drivers:</span>
-                        {p.top_delay_drivers.map((drv, dIdx) => (
-                          <span
-                            key={dIdx}
-                            style={{
-                              fontSize: '0.7rem', padding: '2px 7px', borderRadius: 4,
-                              background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)',
-                              color: '#ef4444', fontWeight: 600
-                            }}
-                          >
-                            {drv.feature?.replace(/_/g, ' ')}
-                          </span>
-                        ))}
-                      </div>
-                    ) : <div />}
-
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <a
                       href={`/projects/${p.project_id}`}
-                      className="btn btn-secondary"
-                      style={{ fontSize: '0.75rem', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: 5, textDecoration: 'none' }}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 5, textDecoration: 'none' }}
                     >
                       <span>View ML Analytics</span>
-                      <ExternalLink size={13} />
+                      <ExternalLink size={12} />
                     </a>
                   </div>
                 </div>
@@ -1774,45 +1961,97 @@ function ConnectAPIModal({
             })}
           </div>
 
-          {/* Action Buttons */}
           <div style={{ display: 'flex', gap: 10, justifyContent: 'space-between' }}>
-            <button
-              className="btn btn-secondary"
-              onClick={() => {
-                setResponse(null)
-              }}
-            >
-              Send Another API Batch
+            <button className="btn btn-secondary" onClick={() => setResponse(null)}>
+              Send Another Batch
             </button>
             <button className="btn btn-primary" onClick={onClose}>
-              Done & View Projects Directory
+              Done
             </button>
           </div>
         </div>
       ) : (
-        /* State 1: Presets, Builder & Configuration Form */
         <div>
-          {/* Security & Endpoint Info Banner */}
-          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '12px 16px', borderRadius: 8, marginBottom: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: '0.78rem' }}>
-              <div>
-                <span style={{ color: 'var(--color-text-muted)' }}>Target Endpoint:</span>{' '}
-                <code style={{ color: '#38bdf8', fontWeight: 600 }}>POST /api/v1/ingestion/external</code>
-              </div>
-              <div>
-                <span style={{ color: 'var(--color-text-muted)' }}>Authentication:</span>{' '}
-                <code style={{ color: '#38bdf8' }}>X-API-Key: {apiKey}</code>
-              </div>
-            </div>
+          {/* Clean 3 Tabs */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              marginBottom: 16,
+              borderBottom: '1px solid var(--color-border-subtle, rgba(255,255,255,0.08))',
+              paddingBottom: 8,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setActiveTab('PRESETS')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                borderRadius: 8,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === 'PRESETS' ? 'var(--color-accent-primary, #38bdf8)' : 'transparent',
+                color: activeTab === 'PRESETS' ? '#fff' : 'var(--color-text-secondary)',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Sparkles size={14} />
+              <span>Presets</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('CUSTOM')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                borderRadius: 8,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === 'CUSTOM' ? 'var(--color-accent-primary, #38bdf8)' : 'transparent',
+                color: activeTab === 'CUSTOM' ? '#fff' : 'var(--color-text-secondary)',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Code size={14} />
+              <span>Upload / Custom JSON</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('DEV_INTEGRATION')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                borderRadius: 8,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === 'DEV_INTEGRATION' ? 'var(--color-accent-primary, #38bdf8)' : 'transparent',
+                color: activeTab === 'DEV_INTEGRATION' ? '#fff' : 'var(--color-text-secondary)',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Terminal size={14} />
+              <span>cURL & Developer API</span>
+            </button>
           </div>
 
-          {/* 1-Click Government Presets Selector */}
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Sparkles size={15} color="var(--color-accent-primary)" />
-              <span>Select Official Data Stream Preset (Ready to Ingest):</span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10 }}>
+          {/* TAB 1: PRESETS */}
+          {activeTab === 'PRESETS' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10, marginBottom: 16 }}>
               {API_PRESETS.map((p) => {
                 const isSelected = activePreset === p.id
                 return (
@@ -1820,133 +2059,402 @@ function ConnectAPIModal({
                     key={p.id}
                     onClick={() => handleSelectPreset(p.id)}
                     style={{
-                      border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: 8,
-                      padding: '10px 12px',
-                      background: isSelected ? 'rgba(56, 189, 248, 0.08)' : 'rgba(255,255,255,0.02)',
+                      border: isSelected ? '2px solid var(--color-accent-primary, #38bdf8)' : '1px solid var(--color-border-subtle, rgba(255,255,255,0.1))',
+                      borderRadius: 10,
+                      padding: '12px 14px',
+                      background: isSelected ? 'rgba(56, 189, 248, 0.08)' : 'var(--color-bg-secondary, rgba(255,255,255,0.02))',
                       cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
                       transition: 'all 0.15s ease',
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                      <span style={{ fontSize: '0.84rem', fontWeight: 700, color: isSelected ? '#38bdf8' : 'var(--color-text-primary)' }}>
-                        {p.name}
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: isSelected ? 'var(--color-accent-primary, #38bdf8)' : 'var(--color-text-primary)', marginBottom: 6 }}>
+                      {p.name}
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>
+                        {p.badge}
                       </span>
-                    </div>
-                    <div style={{ fontSize: '0.7rem', color: '#2dd4bf', fontWeight: 600, marginBottom: 4 }}>
-                      {p.badge}
-                    </div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-                      {p.description}
                     </div>
                   </div>
                 )
               })}
             </div>
-          </div>
+          )}
 
-          {/* Mode Switch: Stream Cards vs Raw JSON */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button
-                type="button"
-                className={`btn ${viewTab === 'PREVIEW' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
-                onClick={() => setViewTab('PREVIEW')}
-              >
-                Project Stream Preview ({projectsToPreview.length})
-              </button>
-              <button
-                type="button"
-                className={`btn ${viewTab === 'JSON' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
-                onClick={() => setViewTab('JSON')}
-              >
-                JSON Payload Code
-              </button>
-            </div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-              Source: <strong>{parsedData?.source_name || 'EXTERNAL_API'}</strong>
-            </span>
-          </div>
-
-          {/* Tab Content */}
-          {viewTab === 'PREVIEW' ? (
-            <div style={{ maxHeight: 250, overflowY: 'auto', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {projectsToPreview.map((item: any, idx: number) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: 'var(--color-bg-secondary)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    borderRadius: 8,
-                    padding: '10px 14px',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                      {item.name || item.project_name || `Project ${idx + 1}`}
-                    </span>
-                    <code style={{ fontSize: '0.72rem', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '1px 5px', borderRadius: 4 }}>
-                      {item.project_code}
-                    </code>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, fontSize: '0.74rem', color: 'var(--color-text-secondary)', marginTop: 6 }}>
-                    <div>Type: <strong>{item.project_type || 'HIGHWAY'}</strong></div>
-                    <div>State: <strong>{item.state_code}</strong></div>
-                    <div>Land Area: <strong>{item.total_area_ha} ha</strong></div>
-                    <div>Compensation: <strong>₹{(item.estimated_compensation_inr / 10000000).toFixed(1)} Cr</strong></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
+          {/* TAB 2: CUSTOM JSON */}
+          {activeTab === 'CUSTOM' && (
             <div style={{ marginBottom: 16 }}>
+              {/* Dotted Rectangle Box Dropzone for JSON file */}
+              <div
+                id="json-dropzone"
+                style={{
+                  border: isDraggingJson
+                    ? '2px dashed var(--color-accent-primary, #38bdf8)'
+                    : uploadedFileName
+                    ? '2px solid rgba(16, 185, 129, 0.6)'
+                    : '2px dashed rgba(56, 189, 248, 0.45)',
+                  borderRadius: 10,
+                  padding: uploadedFileName ? '14px 18px' : '24px 18px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  background: isDraggingJson
+                    ? 'rgba(56, 189, 248, 0.12)'
+                    : uploadedFileName
+                    ? 'rgba(16, 185, 129, 0.04)'
+                    : 'rgba(56, 189, 248, 0.03)',
+                  marginBottom: 14,
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={() => document.getElementById('api-json-file-input')?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setIsDraggingJson(true)
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault()
+                  setIsDraggingJson(false)
+                }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  setIsDraggingJson(false)
+                  if (e.dataTransfer.files?.[0]) {
+                    processJsonFile(e.dataTransfer.files[0])
+                  }
+                }}
+                onMouseEnter={(e) => {
+                  if (!isDraggingJson && !uploadedFileName) {
+                    e.currentTarget.style.borderColor = 'var(--color-accent-primary, #38bdf8)'
+                    e.currentTarget.style.background = 'rgba(56, 189, 248, 0.07)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isDraggingJson && !uploadedFileName) {
+                    e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.45)'
+                    e.currentTarget.style.background = 'rgba(56, 189, 248, 0.03)'
+                  }
+                }}
+              >
+                {uploadedFileName ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: '50%',
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                        <CheckCircle2 size={18} color="#10b981" />
+                      </div>
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                          {uploadedFileName}
+                        </div>
+                        <div style={{ fontSize: '0.74rem', color: '#10b981' }}>
+                          Loaded into code preview • {projectsToPreview.length} project(s) parsed
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setUploadedFileName(null)
+                        setJsonPayload('{\n  "source_name": "Custom Integration",\n  "records": []\n}')
+                        setParsedData({ records: [] })
+                      }}
+                      style={{
+                        background: 'none',
+                        border: '1px solid var(--color-border-subtle)',
+                        borderRadius: 6,
+                        padding: '4px 10px',
+                        color: 'var(--color-text-muted)',
+                        fontSize: '0.74rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Clear File
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{
+                      width: 42,
+                      height: 42,
+                      borderRadius: '50%',
+                      background: 'rgba(56, 189, 248, 0.12)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 8px auto',
+                    }}>
+                      <Upload size={20} style={{ color: 'var(--color-accent-primary, #38bdf8)' }} />
+                    </div>
+                    <h4 style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
+                      Click or drag .json file to upload
+                    </h4>
+                    <p style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                      Automatically parses payload and populates the JSON code preview
+                    </p>
+                  </>
+                )}
+                <input
+                  id="api-json-file-input"
+                  type="file"
+                  accept=".json"
+                  style={{ display: 'none' }}
+                  onChange={handleFileUpload}
+                />
+              </div>
+
+              {/* JSON Code Preview Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                  <Code size={14} />
+                  <span>JSON Code Preview</span>
+                </div>
+                <div style={{ fontSize: '0.74rem', color: jsonError ? '#ef4444' : '#10b981', fontWeight: 600 }}>
+                  {jsonError ? `⚠️ Invalid JSON` : `✅ ${projectsToPreview.length} project(s) ready`}
+                </div>
+              </div>
+
+              {/* JSON Code Preview Area */}
               <textarea
-                rows={9}
+                rows={11}
                 className="input"
-                style={{ fontFamily: 'monospace', fontSize: '0.78rem', width: '100%', lineHeight: 1.4 }}
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: '0.78rem',
+                  width: '100%',
+                  lineHeight: 1.45,
+                  background: 'var(--color-bg-primary)',
+                  borderRadius: 8,
+                  border: jsonError ? '1px solid #ef4444' : '1px solid var(--color-border-subtle)',
+                  padding: '10px 12px',
+                }}
                 value={jsonPayload}
                 onChange={(e) => handleJsonChange(e.target.value)}
+                placeholder="Paste JSON here..."
               />
             </div>
           )}
 
+          {/* TAB 3: DEVELOPER / CURL INTEGRATION */}
+          {activeTab === 'DEV_INTEGRATION' && (
+            <div style={{ marginBottom: 16 }}>
+              {/* Explainer Banner */}
+              <div
+                style={{
+                  background: 'rgba(56, 189, 248, 0.05)',
+                  border: '1px solid rgba(56, 189, 248, 0.18)',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  marginBottom: 12,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-accent-primary, #38bdf8)', fontWeight: 700, fontSize: '0.84rem', marginBottom: 4 }}>
+                  <Terminal size={15} />
+                  <span>Automated System-to-System REST API</span>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', lineHeight: 1.45 }}>
+                  Use this endpoint to stream land acquisition records directly from external government portals (e.g. NHAI BhoomiRashi, PM GatiShakti, MoRTH, State Portals) or automated server cron jobs without needing manual web upload.
+                </div>
+              </div>
+
+              {/* Endpoint Specs Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: 8,
+                  marginBottom: 12,
+                }}
+              >
+                <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-subtle)', borderRadius: 8, padding: '8px 12px' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Endpoint URL</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '0.74rem', color: '#38bdf8', marginTop: 2, wordBreak: 'break-all' }}>
+                    POST /api/v1/ingestion/external
+                  </div>
+                </div>
+
+                <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-subtle)', borderRadius: 8, padding: '8px 12px' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Authentication Header</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '0.74rem', color: 'var(--color-text-primary)', marginTop: 2 }}>
+                    X-API-Key: {apiKey}
+                  </div>
+                </div>
+
+                <div style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border-subtle)', borderRadius: 8, padding: '8px 12px' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Payload Format</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '0.74rem', color: '#10b981', marginTop: 2 }}>
+                    application/json (Batch Records)
+                  </div>
+                </div>
+              </div>
+
+              {/* Language Switcher & Copy */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {(['curl', 'python', 'javascript'] as const).map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => setCodeLang(lang)}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: 6,
+                        fontSize: '0.74rem',
+                        fontWeight: 600,
+                        border: 'none',
+                        cursor: 'pointer',
+                        background: codeLang === lang ? 'var(--color-accent-primary, #38bdf8)' : 'var(--color-bg-secondary)',
+                        color: codeLang === lang ? '#fff' : 'var(--color-text-secondary)',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {lang === 'curl' ? 'cURL' : lang === 'python' ? 'Python (requests)' : 'Node.js / JS (fetch)'}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: '0.72rem', padding: '3px 10px', display: 'flex', alignItems: 'center', gap: 4 }}
+                  onClick={() => handleCopy(getCodeSnippet(codeLang))}
+                >
+                  {copiedType === 'curl' ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+                  <span>{copiedType === 'curl' ? 'Copied!' : 'Copy Code'}</span>
+                </button>
+              </div>
+
+              {/* Code Block */}
+              <pre
+                style={{
+                  background: 'var(--color-bg-primary)',
+                  padding: '12px 14px',
+                  borderRadius: 8,
+                  fontSize: '0.74rem',
+                  lineHeight: 1.45,
+                  overflowX: 'auto',
+                  maxHeight: 160,
+                  border: '1px solid var(--color-border-subtle)',
+                  color: '#94a9c9',
+                  fontFamily: 'monospace',
+                  margin: 0,
+                }}
+              >
+                {getCodeSnippet(codeLang)}
+              </pre>
+            </div>
+          )}
+
+          {/* STREAM PREVIEW (Projects to be ingested - only for Presets tab) */}
+          {activeTab === 'PRESETS' && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 8 }}>
+                Projects to Ingest ({projectsToPreview.length})
+              </div>
+
+              {projectsToPreview.length === 0 ? (
+                <div style={{ padding: '16px', textAlign: 'center', background: 'var(--color-bg-secondary)', borderRadius: 8, color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
+                  No projects found in payload.
+                </div>
+              ) : (
+                <div style={{ maxHeight: 180, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {projectsToPreview.map((item: any, idx: number) => (
+                    <div
+                      key={idx}
+                      style={{
+                        background: 'var(--color-bg-secondary)',
+                        border: '1px solid var(--color-border-subtle, rgba(255,255,255,0.06))',
+                        borderRadius: 8,
+                        padding: '8px 12px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                          {item.name || item.project_name || `Project ${idx + 1}`}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                          {item.project_type || 'HIGHWAY'} • {item.state_code || 'IN'} • {item.total_area_ha ? `${item.total_area_ha} ha` : ''} {item.estimated_compensation_inr ? `• ₹${(item.estimated_compensation_inr / 10000000).toFixed(1)} Cr` : ''}
+                        </div>
+                      </div>
+                      <code style={{ fontSize: '0.72rem', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '2px 6px', borderRadius: 4 }}>
+                        {item.project_code || 'AUTOGEN'}
+                      </code>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {error && (
-            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem', marginBottom: 16 }}>
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.8rem', marginBottom: 14 }}>
               {error}
             </div>
           )}
 
           {/* Action Footer */}
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 14 }}>
             <button className="btn btn-secondary" onClick={onClose} disabled={loading}>
               Cancel
             </button>
-            <button
-              className="btn btn-primary"
-              onClick={handleSend}
-              disabled={loading || projectsToPreview.length === 0}
-              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-            >
-              {loading ? (
-                <>
-                  <span className="spinner" />
-                  <span>Processing API Batch & Scoring ML…</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles size={16} />
-                  <span>Import via API & Run ML Delay Prediction</span>
-                </>
-              )}
-            </button>
+            {activeTab === 'DEV_INTEGRATION' ? (
+              <button
+                className="btn btn-primary"
+                onClick={handleSend}
+                disabled={loading}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner" />
+                    <span>Testing Endpoint…</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={15} />
+                    <span>Send Test API Request</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                className="btn btn-primary"
+                onClick={handleSend}
+                disabled={loading || projectsToPreview.length === 0 || !!jsonError}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner" />
+                    <span>Processing…</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={15} />
+                    <span>Import {projectsToPreview.length > 0 ? `${projectsToPreview.length} Projects` : ''} & Predict Delays</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       )}
     </ModalShell>
   )
 }
+
 
 // ─── 4. Database Import Modal ────────────────────────────────────────────────
 
@@ -1957,7 +2465,11 @@ function DatabaseImportModal({
   onClose: () => void
   onSuccess: (msg: string) => void
 }) {
-  const [tableName, setTableName] = useState('bhoomirashi_projects')
+  const [importMode, setImportMode] = useState<'sql_file' | 'live_connection'>('sql_file')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [loadingSample, setLoadingSample] = useState(false)
+  const [tableName, setTableName] = useState('external_la_projects')
   const [connectionUrl, setConnectionUrl] = useState('')
   const [showAdvUrl, setShowAdvUrl] = useState(false)
   const [testing, setTesting] = useState(false)
@@ -1967,7 +2479,59 @@ function DatabaseImportModal({
   const [importResult, setImportResult] = useState<DatabaseImportResult | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const handleTest = async () => {
+  const handleFileSelect = (file: File) => {
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
+    if (!['.sql', '.dump', '.txt'].includes(ext)) {
+      setError(`Invalid file format '${ext}'. Please upload a .sql database script or dump file.`)
+      return
+    }
+    setSelectedFile(file)
+    setError(null)
+  }
+
+  const handleUploadSQL = async () => {
+    if (!selectedFile) {
+      setError('Please select or drop a .sql database script file.')
+      return
+    }
+    setTesting(true)
+    setError(null)
+    try {
+      const res = await ingestionAPI.uploadDatabaseSQL(selectedFile)
+      if (!res.success) {
+        setError(res.error || 'Failed to parse database SQL script.')
+      } else {
+        setPreview(res)
+        if (res.table_name) setTableName(res.table_name)
+        setColumnMapping(res.suggested_mapping || {})
+      }
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || e.message || 'SQL upload and execution failed.')
+    } finally {
+      setTesting(false)
+    }
+  }
+
+  const handleLoadSample = async () => {
+    setLoadingSample(true)
+    setError(null)
+    try {
+      const res = await ingestionAPI.loadSampleDatabaseSQL()
+      if (!res.success) {
+        setError(res.error || 'Failed to load sample database script.')
+      } else {
+        setPreview(res)
+        if (res.table_name) setTableName(res.table_name)
+        setColumnMapping(res.suggested_mapping || {})
+      }
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || e.message || 'Failed to load sample database.')
+    } finally {
+      setLoadingSample(false)
+    }
+  }
+
+  const handleTestConnection = async () => {
     if (!tableName.trim()) {
       setError('Please provide a table or view name.')
       return
@@ -1994,13 +2558,19 @@ function DatabaseImportModal({
   }
 
   const handleImport = async () => {
+    const targetTable = preview?.table_name || tableName.trim()
+    if (!targetTable) {
+      setError('Missing table name.')
+      return
+    }
     setImporting(true)
     setError(null)
     try {
       const res = await ingestionAPI.importDatabase({
-        table_name: tableName.trim(),
-        connection_url: connectionUrl.trim() || undefined,
+        table_name: targetTable,
+        connection_url: importMode === 'live_connection' ? (connectionUrl.trim() || undefined) : undefined,
         column_mapping: columnMapping,
+        source_name: importMode === 'sql_file' ? (selectedFile ? `SQL Script: ${selectedFile.name}` : `SQL Dump: ${targetTable}`) : `PostgreSQL: ${targetTable}`,
         limit: 100,
       })
       setImportResult(res)
@@ -2029,7 +2599,13 @@ function DatabaseImportModal({
   return (
     <ModalShell
       title="Import Database Data"
-      subtitle="Connect to authorized PostgreSQL or external departmental databases (e.g. Bhoomi Rashi, PM GatiShakti) using configured credentials."
+      subtitle={
+        importResult
+          ? 'Live ML delay risk scoring results from database records.'
+          : preview
+          ? 'Review extracted schema and verify canonical column mappings.'
+          : 'Directly upload SQL database script dumps (.sql) or connect to authorized PostgreSQL systems.'
+      }
       onClose={onClose}
       maxWidth={importResult ? 960 : preview ? 900 : 720}
     >
@@ -2200,9 +2776,10 @@ function DatabaseImportModal({
               onClick={() => {
                 setImportResult(null)
                 setPreview(null)
+                setSelectedFile(null)
               }}
             >
-              Import Another Table
+              Import Another Database
             </button>
             <div style={{ display: 'flex', gap: 10 }}>
               <button
@@ -2229,8 +2806,8 @@ function DatabaseImportModal({
       ) : preview && preview.success ? (
         /* ── State 2: Table Data Preview & Column Mapping ── */
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <Database size={18} style={{ color: '#fbbf24' }} />
               <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text-primary)' }}>
                 Table: <span style={{ fontFamily: 'monospace', color: '#fbbf24' }}>{preview.table_name || tableName}</span>
@@ -2247,9 +2824,16 @@ function DatabaseImportModal({
               style={{ fontSize: '0.75rem', padding: '4px 10px' }}
               onClick={() => setPreview(null)}
             >
-              Change Table
+              Change File / Table
             </button>
           </div>
+
+          {preview.message && (
+            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399', padding: '8px 12px', borderRadius: 6, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <CheckCircle2 size={15} />
+              <span>{preview.message}</span>
+            </div>
+          )}
 
           {error && (
             <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem' }}>
@@ -2305,7 +2889,7 @@ function DatabaseImportModal({
               </span>
             </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', margin: 0 }}>
-              Recognized {Object.keys(columnMapping).length} canonical fields (project identifiers, sector, land areas, compensation outlay, PAFs, R&R metrics, and statutory dates). These will be automatically extracted, validated, and fed directly into the ML delay prediction engine.
+              Recognized {Object.keys(columnMapping).length} canonical fields (project code, name, sector, land area, compensation outlay, PAFs, R&R metrics, and statutory dates). These are automatically extracted and fed into the LightGBM + SHAP ML delay prediction engine.
             </p>
           </div>
 
@@ -2331,84 +2915,294 @@ function DatabaseImportModal({
           </div>
         </div>
       ) : (
-        /* ── State 1: Table Input & Connection Form ── */
-        <div>
-          <div style={{ marginBottom: 16 }}>
-            <label>
-              <span className="input-label">External Table / View Name *</span>
-              <input
-                className="input"
-                value={tableName}
-                onChange={(e) => setTableName(e.target.value)}
-                placeholder="e.g. bhoomirashi_projects, state_land_records, or projects_export"
-              />
-            </label>
-            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
-              Authorized table or view in your PostgreSQL database (e.g. <code style={{ color: '#fbbf24' }}>bhoomirashi_projects</code>).
-            </p>
-          </div>
-
-          <div style={{ marginBottom: 16 }}>
+        /* ── State 1: Upload SQL File OR Live Connection Form ── */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Segmented Mode Selector */}
+          <div
+            style={{
+              display: 'inline-flex',
+              padding: 4,
+              borderRadius: 8,
+              background: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-border-subtle)',
+              gap: 4,
+            }}
+          >
             <button
               type="button"
-              onClick={() => setShowAdvUrl(!showAdvUrl)}
+              onClick={() => {
+                setImportMode('sql_file')
+                setError(null)
+              }}
               style={{
-                background: 'none',
+                padding: '6px 14px',
+                borderRadius: 6,
+                fontSize: '0.82rem',
+                fontWeight: 600,
                 border: 'none',
-                color: 'var(--color-accent-primary)',
-                fontSize: '0.78rem',
                 cursor: 'pointer',
-                padding: 0,
+                transition: 'all 0.15s ease',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 4,
+                gap: 6,
+                background: importMode === 'sql_file' ? 'var(--color-accent-primary)' : 'transparent',
+                color: importMode === 'sql_file' ? '#0f172a' : 'var(--color-text-secondary)',
               }}
             >
-              {showAdvUrl ? '− Hide Custom Connection URL' : '+ Custom Database Connection URL (Optional)'}
+              <FileCode size={15} />
+              <span>Upload SQL File (.sql)</span>
             </button>
-            {showAdvUrl && (
-              <div style={{ marginTop: 8 }}>
-                <label>
-                  <span className="input-label">PostgreSQL Connection URL</span>
-                  <input
-                    className="input"
-                    value={connectionUrl}
-                    onChange={(e) => setConnectionUrl(e.target.value)}
-                    placeholder="postgresql://user:password@host:port/database"
-                  />
-                </label>
-                <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', margin: '3px 0 0' }}>
-                  Leave empty to use credentials securely configured in backend environment variables.
-                </p>
-              </div>
-            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                setImportMode('live_connection')
+                setError(null)
+              }}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 6,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                background: importMode === 'live_connection' ? 'var(--color-accent-primary)' : 'transparent',
+                color: importMode === 'live_connection' ? '#0f172a' : 'var(--color-text-secondary)',
+              }}
+            >
+              <Database size={15} />
+              <span>Live PostgreSQL Connection</span>
+            </button>
           </div>
 
+          {importMode === 'sql_file' ? (
+            /* Mode A: Direct SQL File Upload */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setIsDragging(true)
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  setIsDragging(false)
+                  if (e.dataTransfer.files?.[0]) handleFileSelect(e.dataTransfer.files[0])
+                }}
+                onClick={() => document.getElementById('db-sql-file-input')?.click()}
+                style={{
+                  border: isDragging ? '2px dashed #38bdf8' : '2px dashed rgba(255, 255, 255, 0.18)',
+                  borderRadius: 12,
+                  padding: '28px 20px',
+                  textAlign: 'center',
+                  background: isDragging ? 'rgba(56, 189, 248, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <input
+                  id="db-sql-file-input"
+                  type="file"
+                  accept=".sql,.dump,.txt"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) handleFileSelect(e.target.files[0])
+                  }}
+                />
+                {selectedFile ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 10,
+                        background: 'rgba(56, 189, 248, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <FileCode size={24} style={{ color: '#38bdf8' }} />
+                    </div>
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--color-text-primary)' }}>
+                        {selectedFile.name}
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
+                        {(selectedFile.size / 1024).toFixed(1)} KB • Click or drop another file to change
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <Upload size={32} style={{ color: 'var(--color-accent-primary)', margin: '0 auto 10px' }} />
+                    <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
+                      Click or drag database file (.sql) here
+                    </div>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                      Supports PostgreSQL dump scripts, DDL statements, and INSERT tuples (.sql)
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Sample Database File Quick Action */}
+              <div
+                style={{
+                  background: 'var(--color-bg-secondary)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                    Need a test SQL file?
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                    Use the pre-packaged external highway database schema with 6 realistic projects.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLoadSample}
+                  disabled={loadingSample || testing}
+                  style={{
+                    background: 'rgba(56, 189, 248, 0.12)',
+                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    borderRadius: 7,
+                    padding: '6px 12px',
+                    color: '#38bdf8',
+                    fontSize: '0.76rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  {loadingSample ? (
+                    <>
+                      <div className="spinner-sm" />
+                      <span>Loading Sample…</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={14} />
+                      <span>Load Sample (09_External_DB_Schema_And_Data.sql)</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Mode B: Live PostgreSQL Connection Form */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label>
+                  <span className="input-label">External Table / View Name *</span>
+                  <input
+                    className="input"
+                    value={tableName}
+                    onChange={(e) => setTableName(e.target.value)}
+                    placeholder="e.g. external_la_projects, bhoomirashi_projects, or state_land_records"
+                  />
+                </label>
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '4px 0 0' }}>
+                  Authorized table or view in your PostgreSQL database (e.g. <code style={{ color: '#fbbf24' }}>external_la_projects</code>).
+                </p>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowAdvUrl(!showAdvUrl)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--color-accent-primary)',
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  {showAdvUrl ? '− Hide Custom Connection URL' : '+ Custom Database Connection URL (Optional)'}
+                </button>
+                {showAdvUrl && (
+                  <div style={{ marginTop: 8 }}>
+                    <label>
+                      <span className="input-label">PostgreSQL Connection URL</span>
+                      <input
+                        className="input"
+                        value={connectionUrl}
+                        onChange={(e) => setConnectionUrl(e.target.value)}
+                        placeholder="postgresql://user:password@host:port/database"
+                      />
+                    </label>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', margin: '3px 0 0' }}>
+                      Leave empty to use credentials configured in backend environment variables.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {error && (
-            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem', marginBottom: 16 }}>
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: 6, fontSize: '0.82rem' }}>
               {error}
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4 }}>
             <button className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button
-              className="btn btn-primary"
-              onClick={handleTest}
-              disabled={testing}
-              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-            >
-              {testing ? (
-                <>
-                  <div className="spinner-sm" />
-                  <span>Connecting & Previewing…</span>
-                </>
-              ) : (
-                <span>Test Connection & Preview</span>
-              )}
-            </button>
+            {importMode === 'sql_file' ? (
+              <button
+                className="btn btn-primary"
+                onClick={handleUploadSQL}
+                disabled={testing || !selectedFile}
+                style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+              >
+                {testing ? (
+                  <>
+                    <div className="spinner-sm" />
+                    <span>Parsing & Inspecting SQL…</span>
+                  </>
+                ) : (
+                  <span>Parse & Preview Table Records →</span>
+                )}
+              </button>
+            ) : (
+              <button
+                className="btn btn-primary"
+                onClick={handleTestConnection}
+                disabled={testing}
+                style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+              >
+                {testing ? (
+                  <>
+                    <div className="spinner-sm" />
+                    <span>Connecting & Previewing…</span>
+                  </>
+                ) : (
+                  <span>Test Connection & Preview →</span>
+                )}
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -2443,6 +3237,8 @@ function GISUploadModal({
   const [district, setDistrict] = useState('')
   const [showAdvanced, setShowAdvanced] = useState(false)
 
+  const [isDragging, setIsDragging] = useState(false)
+
   useEffect(() => {
     projectsAPI.list({ page_size: 50 }).then((res: any) => {
       setProjectsList((res.items || []).map((p: any) => ({ id: p.id, code: p.project_code, name: p.name })))
@@ -2475,8 +3271,8 @@ function GISUploadModal({
 
   return (
     <ModalShell
-      title="Upload GIS Spatial Data"
-      subtitle="Import GeoJSON, KML, zipped Shapefiles, or CSV coordinates with PostGIS persistence and real-time ML delay predictions."
+      title="Upload GIS Data"
+      subtitle="Import GeoJSON, KML, Shapefile, or CSV parcel alignments with AI delay predictions."
       onClose={onClose}
       maxWidth={840}
     >
@@ -2492,7 +3288,7 @@ function GISUploadModal({
               <CheckCircle2 size={28} color="#10b981" />
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
-              GIS Spatial Alignment Ingested & Scored via Machine Learning!
+              GIS Spatial Alignment Ingested & Scored!
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
               Parcels validated and saved to PostGIS. Project <strong>{gisResult.project_name || gisResult.project_code || 'GIS Alignment'}</strong> ({gisResult.project_code || 'PROCESSED'}) is now active.
@@ -2502,18 +3298,18 @@ function GISUploadModal({
           {/* Machine Learning Delay Prediction Card */}
           {gisResult.prediction && (
             <div style={{
-              background: 'linear-gradient(180deg, var(--color-bg-secondary) 0%, rgba(20,28,45,0.85) 100%)',
+              background: 'var(--color-bg-secondary)',
               border: '1px solid var(--color-border-subtle)',
               borderRadius: 12,
               padding: '18px 22px',
               marginBottom: 16,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Sparkles size={18} color="var(--color-accent-primary)" />
+                  <Sparkles size={18} style={{ color: '#0d9488' }} />
                   <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                    Calibrated Machine Learning Delay Risk Forecast
+                    Machine Learning Delay Risk Forecast
                   </span>
                 </div>
                 <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 600, background: 'rgba(16,185,129,0.1)', padding: '2px 8px', borderRadius: 10 }}>
@@ -2544,7 +3340,7 @@ function GISUploadModal({
                   <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: 4 }}>
                     {(gisResult.prediction.delay_probability * 100).toFixed(0)}%
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>likelihood of schedule slippage</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>schedule slippage likelihood</div>
                 </div>
 
                 <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
@@ -2553,13 +3349,13 @@ function GISUploadModal({
                     +{Math.round(gisResult.prediction.predicted_delay_days)} <span style={{ fontSize: '0.85rem' }}>days</span>
                   </div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-                    ~{Math.round(gisResult.prediction.predicted_delay_days / 30)} months past deadline
+                    ~{Math.round(gisResult.prediction.predicted_delay_days / 30)} months past schedule
                   </div>
                 </div>
 
                 <div style={{ background: 'var(--color-bg-tertiary)', padding: '12px 14px', borderRadius: 8 }}>
                   <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Model Confidence</div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#2dd4bf', marginTop: 4 }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0d9488', marginTop: 4 }}>
                     {(gisResult.prediction.confidence_score * 100).toFixed(0)}%
                   </div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>high data completeness</div>
@@ -2567,8 +3363,8 @@ function GISUploadModal({
               </div>
 
               {gisResult.prediction.top_delay_drivers && gisResult.prediction.top_delay_drivers.length > 0 && (
-                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '10px 14px', borderRadius: 8, fontSize: '0.78rem' }}>
-                  <div style={{ fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: 6 }}>Key Delay Drivers Identified (Tree SHAP):</div>
+                <div style={{ background: 'var(--color-bg-tertiary)', padding: '10px 14px', borderRadius: 8, fontSize: '0.78rem' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: 6 }}>Key Delay Drivers Identified:</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {gisResult.prediction.top_delay_drivers.map((drv: any, idx: number) => (
                       <span key={idx} style={{
@@ -2593,7 +3389,7 @@ function GISUploadModal({
             marginBottom: 20,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <Layers size={17} color="#2dd4bf" />
+              <Layers size={17} style={{ color: '#0d9488' }} />
               <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                 Spatial Geometry & PostGIS Persistence Summary
               </span>
@@ -2638,7 +3434,7 @@ function GISUploadModal({
             </button>
             <div style={{ display: 'flex', gap: 10 }}>
               <button className="btn btn-secondary" onClick={onClose}>
-                Close & View Directory
+                Close
               </button>
               {gisResult.project_id && (
                 <a
@@ -2656,97 +3452,158 @@ function GISUploadModal({
       ) : (
         /* State 1: Upload and Configuration Form */
         <div>
-          {/* Mode Selector */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          {/* Segmented Mode Selector */}
+          <div
+            style={{
+              display: 'flex',
+              background: 'var(--color-bg-tertiary, rgba(0,0,0,0.04))',
+              padding: 4,
+              borderRadius: 8,
+              border: '1px solid var(--color-border-subtle, rgba(0,0,0,0.08))',
+              marginBottom: 16,
+              gap: 4,
+            }}
+          >
             <button
               type="button"
-              className={`btn ${mode === 'NEW_PROJECT' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
               onClick={() => setMode('NEW_PROJECT')}
+              style={{
+                flex: 1,
+                padding: '8px 14px',
+                borderRadius: 6,
+                border: 'none',
+                background: mode === 'NEW_PROJECT' ? 'var(--color-bg-secondary, #fff)' : 'transparent',
+                color: mode === 'NEW_PROJECT' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                boxShadow: mode === 'NEW_PROJECT' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                fontWeight: mode === 'NEW_PROJECT' ? 600 : 500,
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                transition: 'all 0.15s ease',
+              }}
             >
-              <Sparkles size={16} />
-              <span>Create New Project from GIS (Recommended)</span>
+              <Sparkles size={14} style={{ color: mode === 'NEW_PROJECT' ? '#0d9488' : 'currentColor' }} />
+              <span>Create New Project (Auto-derive)</span>
             </button>
             <button
               type="button"
-              className={`btn ${mode === 'LINK_EXISTING' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
               onClick={() => setMode('LINK_EXISTING')}
+              style={{
+                flex: 1,
+                padding: '8px 14px',
+                borderRadius: 6,
+                border: 'none',
+                background: mode === 'LINK_EXISTING' ? 'var(--color-bg-secondary, #fff)' : 'transparent',
+                color: mode === 'LINK_EXISTING' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                boxShadow: mode === 'LINK_EXISTING' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                fontWeight: mode === 'LINK_EXISTING' ? 600 : 500,
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                transition: 'all 0.15s ease',
+              }}
             >
-              <Layers size={16} />
+              <Layers size={14} style={{ color: mode === 'LINK_EXISTING' ? '#0d9488' : 'currentColor' }} />
               <span>Link to Existing Project</span>
             </button>
           </div>
 
           {mode === 'LINK_EXISTING' ? (
             <div style={{ marginBottom: 16 }}>
-              <label>
-                <span className="input-label">Select Target Project *</span>
-                <select
-                  className="input"
-                  value={selectedProject}
-                  onChange={(e) => setSelectedProject(e.target.value)}
-                >
-                  <option value="">-- Choose Existing Project --</option>
-                  {projectsList.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.code} — {p.name}
-                    </option>
-                  ))}
-                </select>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+                Select Target Project *
               </label>
+              <select
+                className="input"
+                value={selectedProject}
+                onChange={(e) => setSelectedProject(e.target.value)}
+                style={{ fontSize: '0.84rem' }}
+              >
+                <option value="">-- Choose Existing Project --</option>
+                {projectsList.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.code} — {p.name}
+                  </option>
+                ))}
+              </select>
             </div>
           ) : (
-            <div style={{
-              background: 'rgba(45, 212, 191, 0.05)',
-              border: '1px solid rgba(45, 212, 191, 0.2)',
-              borderRadius: 8,
-              padding: '12px 16px',
-              marginBottom: 16,
-              fontSize: '0.82rem',
-              color: 'var(--color-text-secondary)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, color: '#2dd4bf', marginBottom: 4 }}>
-                <Sparkles size={16} />
-                <span>Automated Project Creation & ML Ingestion</span>
-              </div>
-              <div>
-                LADRIS will automatically derive project name, code, land area (ha), and centroid coordinates directly from your GIS alignment, then run real-time ML delay predictions.
-              </div>
-              <div style={{ marginTop: 8 }}>
+            <div style={{ marginBottom: 14 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '8px 12px',
+                  background: 'rgba(13, 148, 136, 0.05)',
+                  border: '1px solid rgba(13, 148, 136, 0.15)',
+                  borderRadius: 8,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                  <Sparkles size={13} style={{ color: '#0d9488', flexShrink: 0 }} />
+                  <span>Project details will be automatically derived from GIS alignment geometry.</span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setShowAdvanced(!showAdvanced)}
-                  style={{ background: 'none', border: 'none', color: 'var(--color-accent-primary)', cursor: 'pointer', padding: 0, fontSize: '0.8rem', fontWeight: 600, textDecoration: 'underline' }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#0d9488',
+                    cursor: 'pointer',
+                    fontSize: '0.76rem',
+                    fontWeight: 600,
+                    textDecoration: 'underline',
+                    whiteSpace: 'nowrap',
+                    marginLeft: 8,
+                  }}
                 >
-                  {showAdvanced ? 'Hide Custom Project Fields' : 'Customize Project Details (Optional)'}
+                  {showAdvanced ? 'Hide Custom Fields' : 'Customize Details (Optional)'}
                 </button>
               </div>
 
               {showAdvanced && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                <div
+                  style={{
+                    background: 'var(--color-bg-secondary)',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    marginTop: 8,
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+                    gap: 10,
+                  }}
+                >
                   <div>
-                    <label className="input-label" style={{ fontSize: '0.74rem' }}>Project Name</label>
+                    <label className="input-label" style={{ fontSize: '0.72rem' }}>Project Name</label>
                     <input
                       className="input"
                       style={{ fontSize: '0.8rem', padding: '6px 10px' }}
-                      placeholder="e.g. NH65 Vijayawada-Hyderabad Expressway"
+                      placeholder="e.g. NH65 Vijayawada Expressway"
                       value={projectName}
                       onChange={(e) => setProjectName(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="input-label" style={{ fontSize: '0.74rem' }}>Project Code</label>
+                    <label className="input-label" style={{ fontSize: '0.72rem' }}>Project Code</label>
                     <input
                       className="input"
                       style={{ fontSize: '0.8rem', padding: '6px 10px' }}
-                      placeholder="e.g. GIS-NH65-SEC2"
+                      placeholder="e.g. NHAI-NH65-PKG2"
                       value={projectCode}
                       onChange={(e) => setProjectCode(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="input-label" style={{ fontSize: '0.74rem' }}>Project Type</label>
+                    <label className="input-label" style={{ fontSize: '0.72rem' }}>Project Type</label>
                     <select
                       className="input"
                       style={{ fontSize: '0.8rem', padding: '6px 10px' }}
@@ -2759,7 +3616,7 @@ function GISUploadModal({
                     </select>
                   </div>
                   <div>
-                    <label className="input-label" style={{ fontSize: '0.74rem' }}>State</label>
+                    <label className="input-label" style={{ fontSize: '0.72rem' }}>State</label>
                     <select
                       className="input"
                       style={{ fontSize: '0.8rem', padding: '6px 10px' }}
@@ -2772,11 +3629,11 @@ function GISUploadModal({
                     </select>
                   </div>
                   <div>
-                    <label className="input-label" style={{ fontSize: '0.74rem' }}>District</label>
+                    <label className="input-label" style={{ fontSize: '0.72rem' }}>District</label>
                     <input
                       className="input"
                       style={{ fontSize: '0.8rem', padding: '6px 10px' }}
-                      placeholder="e.g. Hyderabad / Ranga Reddy"
+                      placeholder="e.g. Rangareddy"
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
                     />
@@ -2788,25 +3645,119 @@ function GISUploadModal({
 
           {/* File Upload Dropzone */}
           <div
+            id="gis-dropzone"
             style={{
-              border: file ? '2px solid rgba(45, 212, 191, 0.5)' : '2px dashed rgba(255,255,255,0.15)',
-              borderRadius: 10,
-              padding: '28px 20px',
+              border: isDragging
+                ? '2px dashed #0d9488'
+                : file
+                ? '2px solid rgba(13, 148, 136, 0.6)'
+                : '2px dashed rgba(13, 148, 136, 0.45)',
+              borderRadius: 12,
+              padding: file ? '20px 16px' : '36px 20px',
               textAlign: 'center',
-              cursor: 'pointer',
-              background: file ? 'rgba(45, 212, 191, 0.04)' : 'rgba(255,255,255,0.02)',
-              marginBottom: 16,
+              cursor: uploading ? 'wait' : 'pointer',
+              background: isDragging
+                ? 'rgba(13, 148, 136, 0.1)'
+                : file
+                ? 'rgba(13, 148, 136, 0.05)'
+                : 'rgba(13, 148, 136, 0.02)',
+              marginBottom: 20,
               transition: 'all 0.2s ease',
             }}
             onClick={() => document.getElementById('gis-file-input')?.click()}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setIsDragging(true)
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault()
+              setIsDragging(false)
+            }}
+            onDrop={(e) => {
+              e.preventDefault()
+              setIsDragging(false)
+              if (e.dataTransfer.files?.[0]) {
+                setFile(e.dataTransfer.files[0])
+              }
+            }}
+            onMouseEnter={(e) => {
+              if (!isDragging && !file) {
+                e.currentTarget.style.borderColor = '#0d9488'
+                e.currentTarget.style.background = 'rgba(13, 148, 136, 0.06)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isDragging && !file) {
+                e.currentTarget.style.borderColor = 'rgba(13, 148, 136, 0.45)'
+                e.currentTarget.style.background = 'rgba(13, 148, 136, 0.02)'
+              }
+            }}
           >
-            <MapPin size={32} style={{ color: '#2dd4bf', margin: '0 auto 8px' }} />
-            <div style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-              {file ? file.name : 'Select GeoJSON, KML, Shapefile (.zip), or CSV file'}
-            </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
-              {file ? `${(file.size / 1024).toFixed(1)} KB — Ready to process` : 'Supports GeoJSON polygons/lines, KML placemarks, zipped shapefiles, or CSV latitude/longitude'}
-            </div>
+            {file ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <CheckCircle2 size={22} color="#10b981" />
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                      {file.name}
+                    </div>
+                    <div style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
+                      {(file.size / 1024).toFixed(1)} KB • Ready for spatial ingestion & ML scoring
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setFile(null)
+                  }}
+                  style={{
+                    background: 'none',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderRadius: 6,
+                    padding: '4px 10px',
+                    color: '#ef4444',
+                    fontSize: '0.76rem',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <>
+                <div style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: '50%',
+                  background: 'rgba(13, 148, 136, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 12px auto'
+                }}>
+                  <MapPin size={26} style={{ color: '#0d9488' }} />
+                </div>
+                <h4 style={{ fontSize: '0.98rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
+                  Click or drag GIS file here
+                </h4>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+                  Supports GeoJSON (.geojson), KML (.kml), Shapefile (.zip), or CSV coordinates
+                </p>
+              </>
+            )}
             <input
               id="gis-file-input"
               type="file"
@@ -2824,7 +3775,7 @@ function GISUploadModal({
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', alignItems: 'center' }}>
             <button className="btn btn-secondary" onClick={onClose} disabled={uploading}>
               Cancel
             </button>
@@ -2837,12 +3788,12 @@ function GISUploadModal({
               {uploading ? (
                 <>
                   <span className="spinner" />
-                  <span>Processing Geometries & Running ML…</span>
+                  <span>Processing Alignment & Running ML…</span>
                 </>
               ) : (
                 <>
-                  <Sparkles size={16} />
-                  <span>Ingest GIS & Run ML Delay Prediction</span>
+                  <Sparkles size={15} />
+                  <span>Ingest GIS & Run Delay Prediction</span>
                 </>
               )}
             </button>
