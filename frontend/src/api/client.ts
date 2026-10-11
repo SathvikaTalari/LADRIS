@@ -691,6 +691,33 @@ export const ingestionAPI = {
     apiClient.get<{ total: number; jobs: IngestionJobItem[] }>('/api/v1/ingestion/history', { params }).then((r) => r.data),
 
   errorReportUrl: (jobId: string) => `${BASE_URL}/api/v1/ingestion/jobs/${jobId}/errors.csv`,
+
+  downloadSampleDocsUrl: () => `${BASE_URL}/api/v1/ingestion/sample-documents/download`,
+
+  downloadSampleDocuments: async () => {
+    try {
+      const resp = await apiClient.get('/api/v1/ingestion/sample-documents/download', {
+        responseType: 'blob',
+      })
+      const blob = new Blob([resp.data], { type: 'application/zip' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'LADRIS_Sample_Documents.zip'
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (err) {
+      // Direct fallback to public bundle
+      const a = document.createElement('a')
+      a.href = '/LADRIS_Sample_Documents.zip'
+      a.download = 'LADRIS_Sample_Documents.zip'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+  },
 }
 
 // ─── Decision Intelligence Types & API ────────────────────────────────────────
