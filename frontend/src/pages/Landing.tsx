@@ -66,43 +66,43 @@ const FEATURES = [
 /* ─── Hero Slideshow data ───────────────────────────────────────────────── */
 const HERO_SLIDES = [
   {
-    src: '/slide_highway.png',
+    src: '/slide_highway.webp',
     ministry: 'Ministry of Road Transport & Highways (MoRTH)',
     caption: 'Keeping Highway Projects Moving',
     tag: 'Land Acquisition & Highways',
   },
   {
-    src: '/slide_railway.png',
+    src: '/slide_railway.webp',
     ministry: 'Ministry of Railways',
     caption: 'Clearing the Way for Railway Projects',
     tag: 'Land Acquisition & Railways',
   },
   {
-    src: '/slide_metro.png',
+    src: '/slide_metro.webp',
     ministry: 'Ministry of Housing & Urban Affairs (MoHUA)',
     caption: 'Supporting Faster Metro Development',
     tag: 'Land Acquisition & Metro ',
   },
   {
-    src: '/slide_powergrid.png',
+    src: '/slide_powergrid.webp',
     ministry: 'Ministry of Power',
     caption: 'Keeping Power Projects on Track',
     tag: 'Land Acquisition & Power Grids',
   },
   {
-    src: '/slide_airport.png',
+    src: '/slide_airport.webp',
     ministry: 'Ministry of Civil Aviation',
     caption: 'Supporting Timely Airport Development',
     tag: 'Land Acquisition & Airports',
   },
   {
-    src: '/slide_urban_const.png',
+    src: '/slide_urban_const.webp',
     ministry: 'Ministry of Housing & Urban Affairs (MoHUA)',
     caption: 'Enabling Timely Urban Development',
     tag: 'Land Acquisition & Urban Projects',
   },
   {
-    src: '/slide_industrial.png',
+    src: '/slide_industrial.webp',
     ministry: 'Ministry of Commerce & Industry',
     caption: 'Enabling Faster Industrial Development',
     tag: 'Land Acquisition & Industrial Zones',
@@ -158,6 +158,14 @@ export default function Landing() {
       setActiveSlide(prev => (prev + 1) % HERO_SLIDES.length)
     }, 4500)
     return () => clearInterval(timer)
+  }, [])
+
+  // Proactively preload all hero slide images so transitions are instantaneous
+  useEffect(() => {
+    HERO_SLIDES.forEach(slide => {
+      const img = new Image()
+      img.src = slide.src
+    })
   }, [])
 
   const goToSlide = (idx: number) => setActiveSlide(idx)
@@ -1199,6 +1207,8 @@ export default function Landing() {
               src={slide.src}
               alt={slide.caption}
               loading={i === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+              fetchPriority={i === 0 ? 'high' : 'low'}
               style={{
                 width: '100%',
                 height: '100%',
