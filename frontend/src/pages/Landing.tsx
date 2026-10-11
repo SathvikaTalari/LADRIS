@@ -66,43 +66,43 @@ const FEATURES = [
 /* ─── Hero Slideshow data ───────────────────────────────────────────────── */
 const HERO_SLIDES = [
   {
-    src: '/slide_highway.jpg',
+    src: '/slide_highway.png',
     ministry: 'Ministry of Road Transport & Highways (MoRTH)',
     caption: 'Keeping Highway Projects Moving',
     tag: 'Land Acquisition & Highways',
   },
   {
-    src: '/slide_railway.jpg',
+    src: '/slide_railway.png',
     ministry: 'Ministry of Railways',
     caption: 'Clearing the Way for Railway Projects',
     tag: 'Land Acquisition & Railways',
   },
   {
-    src: '/slide_metro.jpg',
+    src: '/slide_metro.png',
     ministry: 'Ministry of Housing & Urban Affairs (MoHUA)',
     caption: 'Supporting Faster Metro Development',
     tag: 'Land Acquisition & Metro ',
   },
   {
-    src: '/slide_powergrid.jpg',
+    src: '/slide_powergrid.png',
     ministry: 'Ministry of Power',
     caption: 'Keeping Power Projects on Track',
     tag: 'Land Acquisition & Power Grids',
   },
   {
-    src: '/slide_airport.jpg',
+    src: '/slide_airport.png',
     ministry: 'Ministry of Civil Aviation',
     caption: 'Supporting Timely Airport Development',
     tag: 'Land Acquisition & Airports',
   },
   {
-    src: '/slide_urban_const.jpg',
+    src: '/slide_urban_const.png',
     ministry: 'Ministry of Housing & Urban Affairs (MoHUA)',
     caption: 'Enabling Timely Urban Development',
     tag: 'Land Acquisition & Urban Projects',
   },
   {
-    src: '/slide_industrial.jpg',
+    src: '/slide_industrial.png',
     ministry: 'Ministry of Commerce & Industry',
     caption: 'Enabling Faster Industrial Development',
     tag: 'Land Acquisition & Industrial Zones',
@@ -1190,27 +1190,36 @@ export default function Landing() {
             key={slide.src}
             style={{
               position: 'absolute', inset: 0, zIndex: 0,
-              backgroundImage: `url(${slide.src})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center 40%',
               opacity: i === activeSlide ? 1 : 0,
               transition: 'opacity 1.2s cubic-bezier(0.4,0,0.2,1)',
-              // Ken-Burns zoom on the active slide
-              transform: i === activeSlide ? 'scale(1.05)' : 'scale(1)',
-              transformOrigin: 'center center',
+              overflow: 'hidden',
             }}
-          />
+          >
+            <img
+              src={slide.src}
+              alt={slide.caption}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center 40%',
+                display: 'block',
+                imageRendering: 'auto',
+              }}
+            />
+          </div>
         ))}
 
-        {/* Gradient overlays */}
+        {/* Gradient overlays — kept light so image detail stays visible */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 1,
-          background: 'linear-gradient(180deg, rgba(6,15,30,0.52) 0%, rgba(6,15,30,0.22) 45%, rgba(6,15,30,0.78) 100%)',
+          background: 'linear-gradient(180deg, rgba(6,15,30,0.38) 0%, rgba(6,15,30,0.10) 45%, rgba(6,15,30,0.60) 100%)',
         }} />
         {/* Left text fade */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 1,
-          background: 'linear-gradient(90deg, rgba(6,15,30,0.55) 0%, transparent 50%)',
+          background: 'linear-gradient(90deg, rgba(6,15,30,0.40) 0%, transparent 55%)',
         }} />
 
         {/* Subtle grid overlay */}
