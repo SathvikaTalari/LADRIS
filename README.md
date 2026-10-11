@@ -1,104 +1,127 @@
-# 🛣️ LADRIS
-### **AI-Powered Land Acquisition Early-Warning & Decision Support Intelligence Platform**
+﻿# 🛣️ LADRIS — Land Acquisition Decision & Risk Intelligence System
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20PostGIS-336791?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10--3.12-3776AB?style=flat-square&logo=python)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 ---
 
-## 📌 Executive Summary
+## 📖 What is LADRIS?
 
-**LADRIS** (Land Acquisition Decision & Risk Intelligence System) is an enterprise AI decision-support platform designed for predictive analytics and proactive delay prevention across Indian infrastructure and National Highway projects.
+**LADRIS** is an AI-powered platform that helps government officers and infrastructure agencies **predict and prevent delays** in land acquisition for Indian highway and infrastructure projects.
 
-Linear infrastructure development across India frequently faces multi-year delays due to statutory notification lapses, compensation distribution bottlenecks, court disputes, and Right-of-Way (RoW) encumbrances. LADRIS transforms this paradigm from **reactive tracking** into **predictive early intervention** by continuously auditing real gazettes, court filings, and milestone progress.
+In India, large infrastructure projects often get stuck for years because of:
+- Missed legal notification deadlines (e.g., Section 3D lapsing)
+- Slow compensation payments to landowners
+- Court disputes and Right-of-Way blockages
 
----
+LADRIS solves this by **continuously monitoring** project milestones, legal statuses, and gazette notifications — and **alerting teams before a delay happens**, not after.
 
-## 🌟 Core Features & Modules
-
-| Module | Route | What it Does |
-| :--- | :--- | :--- |
-| **🤖 Saarthi AI Copilot** | *Floating in all screens* | In-app intelligent conversational assistant grounded in live database metrics, statutory land laws (NH Act 1956 & RFCTLARR 2013), with speech-to-text and voice narration. |
-| **📊 Command Dashboard** | `/dashboard` | Executive KPI overview displaying total verified projects, delayed corridors, high-risk counts, and the priority intervention queue. |
-| **🎯 Priority Intelligence** | `/priority-intelligence` | Multi-factor decision-support ranking engine that explains *why* each corridor is prioritized based on timeline slippage, statutory lapse proximity, and legal bottlenecks. |
-| **🏛️ LA Officer Workbench** | `/la-workbench` | Operational dashboard for CALA (Competent Authority for Land Acquisition) officers to manage 3A/3D/3G notifications, objection hearings, and compensation disbursement. |
-| **🚜 Implementing Agency Portal** | `/agency-portal` | Project execution hub for NHAI and state agencies to monitor civil contractor handovers and encumbrance-free physical possession. |
-| **🧪 What-If Policy Simulator** | `/intelligence` | Simulation sandbox allowing planners to model how allocating special arbitration budgets or faster disbursement compresses project delay months. |
-| **🗺️ GIS Geospatial Risk Map** | `/gis` | Interactive PostGIS map showing highway alignment pins with colored risk tiers (Critical, High, Medium, Low) and strict zero-hallucination coordinates. |
-| **📈 District Analytics** | `/analytics` | Aggregated district and state distributions with sample-size safeguards. |
-| **🚨 Early-Warning Alerts** | `/alerts` | Automated triggers warning of impending statutory lapse cliffs (e.g. 1-year Section 3D deadline). |
-| **🔗 Data Sources & Quality** | `/data-sources` | Pipeline health monitor for BhoomiRashi gazette scrapers, Data.gov.in, and e-Courts case feeds. |
+> Think of it as an early-warning system for land acquisition, powered by AI.
 
 ---
 
-## 🏗️ Monorepo Architecture
+## ✨ Key Features
+
+| Feature | What it does |
+|---|---|
+| 🤖 **Saarthi AI Copilot** | Built-in AI assistant. Ask it questions in plain English or by voice — it queries the live database and explains legal statuses. |
+| 📊 **Command Dashboard** | One-screen overview of all projects: how many are delayed, high-risk, or need urgent action. |
+| 🎯 **Priority Intelligence** | Automatically ranks which projects need attention first, and explains *why*. |
+| 🏛️ **LA Officer Workbench** | Workspace for Land Acquisition Officers to track hearings, notifications, and compensation. |
+| 🚜 **Agency Portal** | For NHAI/state agencies to track handovers and physical possession of land. |
+| 🧪 **What-If Simulator** | Lets planners test scenarios: *"If we fast-track compensation, by how many months does the project finish early?"* |
+| 🗺️ **GIS Risk Map** | Interactive map showing all highway corridors color-coded by risk level (Critical → Low). |
+| 📈 **District Analytics** | Charts and summaries grouped by district and state. |
+| 🚨 **Early-Warning Alerts** | Automatic alerts when a legal deadline is about to lapse (e.g., the 1-year Section 3D window). |
+| 🔗 **Data Source Monitor** | Tracks the health of data feeds from BhoomiRashi, Data.gov.in, and e-Courts. |
+
+---
+
+## 🏗️ Project Structure
 
 ```
 LADRIS/
-├── frontend/             # React 19 + TypeScript + Vite + Zustand + Framer Motion
-│   ├── src/
-│   │   ├── api/          # Axios API client with automatic JWT token refresh
-│   │   ├── components/   # UI components (Layout, Chatbot, Voice, Charts)
-│   │   ├── pages/        # Dashboard, GIS, Workbench, Analytics, Intelligence
-│   │   └── store/        # Zustand state stores (Auth, Theme)
-├── backend/              # FastAPI + Async SQLAlchemy + Pydantic v2 + JWT
-│   ├── app/
-│   │   ├── api/v1/       # REST API endpoints (Projects, Intelligence, Chatbot, Alerts)
-│   │   ├── models/       # PostgreSQL models (Project, Alert, User, DataSource)
-│   │   ├── services/     # Business logic (Saarthi chatbot, Anomaly scoring, Audit)
-│   │   └── etl/          # BhoomiRashi scraper and data normalizer
-├── database/             # PostgreSQL + PostGIS migrations and seed scripts
-│   └── migrations/       # SQL schema versions (001 to 006)
-├── ml/                   # Machine learning training, features, and model cards
-│   ├── models/           # Serialized IsolationForest model artifacts (.pkl)
-│   └── training/         # Model training scripts and validation
-├── docs/                 # Detailed architectural and domain documentation
-└── docker-compose.yml    # Docker configuration for PostgreSQL + PostGIS
+├── frontend/          ← Web UI (React 19, TypeScript, Vite)
+│   └── src/
+│       ├── api/       ← API client (auto-refreshes JWT tokens)
+│       ├── components/← Reusable UI components
+│       ├── pages/     ← Full pages (Dashboard, GIS Map, Workbench…)
+│       └── store/     ← App-wide state (auth, theme)
+│
+├── backend/           ← REST API server (Python FastAPI)
+│   └── app/
+│       ├── api/v1/    ← API endpoints (projects, alerts, chatbot…)
+│       ├── models/    ← Database table definitions
+│       ├── services/  ← Business logic (AI chatbot, risk scoring…)
+│       └── etl/       ← Data scraper and normalizer
+│
+├── database/          ← PostgreSQL + PostGIS migrations (SQL files)
+├── land-delay-predictor/ ← Trained ML model for delay prediction
+├── docs/              ← In-depth technical documentation
+├── doctor.py          ← Automated health-check tool
+├── docker-compose.yml ← Starts the database with one command
+├── setup_team.ps1     ← One-click setup for Windows
+└── setup_team.sh      ← One-click setup for Linux/macOS
 ```
 
 ---
 
-## ⚡ Quick Start Guide (Run in 3 Minutes)
+## ⚙️ Prerequisites
 
-### 📋 Prerequisites
-- **Docker Desktop** (for PostgreSQL + PostGIS) — https://www.docker.com/products/docker-desktop/
-- **Python 3.10, 3.11, or 3.12** (3.13 not yet supported)
-- **Node.js 18+** & `npm`
+Before you begin, make sure these are installed:
+
+| Tool | Version | Download |
+|---|---|---|
+| **Docker Desktop** | Latest | https://www.docker.com/products/docker-desktop/ |
+| **Python** | 3.10, 3.11, or 3.12 *(NOT 3.13)* | https://www.python.org/downloads/ |
+| **Node.js** | 18 or higher | https://nodejs.org/ |
+
+> ⚠️ **Python 3.13 is not supported yet** — some ML libraries haven't caught up.
 
 ---
 
-### 🚀 One-Click Automated Team Setup (Fastest)
+## 🚀 Getting Started
 
-Run the automated setup script from the root `LADRIS` directory. It handles **everything**: creates `.env`, starts PostGIS, installs dependencies, runs migrations, and loads all 25 demo projects with ML predictions:
+You have two options: **automatic** (recommended) or **manual step-by-step**.
 
+---
+
+### ✅ Option 1 — Automatic Setup (Recommended)
+
+One command does everything: creates config files, starts the database, installs packages, runs migrations, and loads demo data.
+
+**Windows (PowerShell):**
 ```powershell
-# Windows PowerShell:
 .\setup_team.ps1
 ```
 
+**Linux / macOS (Terminal):**
 ```bash
-# Linux / macOS:
 chmod +x ./setup_team.sh && ./setup_team.sh
 ```
 
-> 📖 **Full setup guide & troubleshooting**: See [TEAM_SETUP.md](./TEAM_SETUP.md)
-> 🩺 **Facing errors?** Run `python doctor.py` (from the `backend/` folder with venv active) for automated diagnosis.
+After setup, skip to [Starting the App](#-starting-the-app-after-setup).
 
 ---
 
-### 🛠️ Manual Step-by-Step Setup
+### 🛠️ Option 2 — Manual Step-by-Step
 
-### Step 1: Clone the Repository & Configure Environment
+Follow these steps in order if the automatic script fails or you prefer manual control.
+
+#### Step 1 — Clone the repository
 
 ```bash
 git clone https://github.com/SathvikaTalari/LADRIS.git
 cd LADRIS
+```
 
-# Copy the environment file template
+#### Step 2 — Create your config file
+
+```bash
 # Windows PowerShell:
 Copy-Item .env.example .env
 
@@ -106,23 +129,29 @@ Copy-Item .env.example .env
 cp .env.example .env
 ```
 
----
+> The `.env.example` already has all the correct default values for local development. You don't need to edit anything.
 
-### Step 2: Start the PostGIS Database Container
+#### Step 3 — Start the database
 
 ```bash
 docker compose up -d db
 ```
-> This starts PostgreSQL with the PostGIS extension on port `15432` with auto-initialized schemas.
 
----
+This starts PostgreSQL with the PostGIS extension on **port 15432**. Wait about 20 seconds, then verify it's running:
 
-### Step 3: Setup & Start Backend (Terminal 1)
+```bash
+docker ps
+# You should see: landpulse_db ... (healthy)
+```
+
+#### Step 4 — Set up and start the Backend
+
+Open a terminal in the `backend/` folder:
 
 ```bash
 cd backend
 
-# Create and activate Python virtual environment
+# Create a Python virtual environment:
 # Windows:
 python -m venv venv
 .\venv\Scripts\Activate.ps1
@@ -131,134 +160,213 @@ python -m venv venv
 python3 -m venv venv
 source venv/bin/activate
 
-# Install dependencies (requires Python 3.10 - 3.12)
+# Install Python packages:
 pip install -r requirements.txt
 
-# Apply database migrations & sync schema:
+# Create database tables and load demo users:
 python run_migrations.py
 
-# Sync projects from my_raw_projects.csv and generate ML predictions:
+# Load the 25 demo projects and run ML predictions:
 python seed_my_raw_projects.py
 
-# Start the FastAPI development server with hot-reload
+# Start the backend server:
 uvicorn app.main:app --reload --port 8000
 ```
-- **Backend API URL**: `http://localhost:8000`
-- **Interactive Swagger Docs**: `http://localhost:8000/docs`
 
----
+**The backend is now running at:** `http://localhost:8000`
+**Interactive API docs:** `http://localhost:8000/docs`
 
-### Step 4: Setup & Start Frontend (Terminal 2)
+#### Step 5 — Set up and start the Frontend
 
-Open a new terminal window:
+Open a **new terminal** in the `frontend/` folder:
 
 ```bash
 cd frontend
-
-# Install Node dependencies
 npm install
-
-# Start Vite development server
 npm run dev
 ```
-- **Web Application URL**: `http://localhost:5173`
+
+**The web app is now running at:** `http://localhost:5173`
 
 ---
 
-## 🔑 Demo Access Credentials
+## 🌐 Starting the App (After Setup)
 
-The platform includes pre-configured demo credentials representing every stakeholder role in the land acquisition lifecycle:
+Once everything is set up, you only need two commands each time:
 
-| Stakeholder Role | Email Address | Password | Jurisdiction Scope |
-| :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@ladris.gov.in` | `Password123!` *(or `admin123`)* | Full System Admin |
-| **Central Ministry (MoRTH)** | `central@ladris.gov.in` | `Password123!` | National Highway Network |
-| **State Government** | `state@ladris.gov.in` | `Password123!` | State Revenue & PWD |
-| **District Administration** | `district@ladris.gov.in` | `Password123!` | District Collectorate |
-| **Land Acquiring Authority (CALA)** | `authority@ladris.gov.in` | `Password123!` | Land Acquisition Hearings |
-| **Land Requiring Body** | `lrb@ladris.gov.in` | `Password123!` | Infrastructure Project Sponsor |
-| **Project Implementing Agency** | `agency@ladris.gov.in` | `Password123!` | NHAI / NHIDCL Execution |
-| **Policy Maker** | `policy@ladris.gov.in` | `Password123!` | NITI Aayog / MoRTH Research |
+**Terminal 1 — Backend:**
+```bash
+# Windows:
+cd backend
+.\venv\Scripts\Activate.ps1
+uvicorn app.main:app --reload --port 8000
 
-> 💡 **Quick Login**: On the login screen (`http://localhost:5173/login`), simply select any role from the **"Select User Role"** dropdown. It will automatically populate the demo email and password for you!
-
----
-
-## 🤖 Saarthi — In-App AI Assistant
-
-**Saarthi** is your interactive decision copilot built into the bottom-right of every screen:
-
-- 💬 **Live Database Queries**: Ask *"Which projects have the highest delay risk?"* or *"Tell me about the Sangareddy Bypass"* and Saarthi will query the live 250 corridors and generate a summarized table.
-- 📜 **Statutory Law Guidance**: Ask about the **National Highways Act 1956** (Sections 3A to 3H) or **RFCTLARR Act 2013** (solatium and market value calculations).
-- 🧭 **In-App Action Buttons**: Every reply contains direct navigation links (e.g. `[Open GIS Map]`, `[Priority Queue]`) that route inside the app without reloading.
-- 🎙️ **Voice Accessibility**: Includes a microphone button for voice queries (Speech-to-Text) and a speaker toggle for audio narration (Text-to-Speech).
-
----
-
-## ⚖️ Statutory Land Acquisition Framework
-
-LADRIS directly tracks the statutory stages defined under Indian law:
-
-### 1. National Highways Act, 1956
-```
-Section 3A (Intention to Acquire)
-      ↓ (21 Days for Objections)
-Section 3C (Hearing of Objections by CALA)
-      ↓ ⚠️ MUST BE PUBLISHED WITHIN 1 YEAR, OR 3A LAPSES!
-Section 3D (Declaration of Acquisition - Land Vests in Govt)
-      ↓
-Section 3G (Determination of Compensation by CALA)
-      ↓ (Dispute? → Arbitration by Divisional Commissioner)
-Section 3H (Deposit of Compensation with CALA)
-      ↓ (60 Days Notice)
-Section 3E (Enforcing Physical Possession of Right-of-Way)
+# Linux / macOS:
+cd backend
+source venv/bin/activate
+uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. RFCTLARR Act, 2013
-- **Market Value**: Higher of circle rate or average of top 50% sale deeds over past 3 years.
-- **Solatium**: Mandatory **100% additional amount** added to the market value.
-- **Rural Multiplication Factor**: Between **1.0x and 2.0x** based on distance from urban zones.
-- **Interest**: **12% per annum** from notification to award date.
+**Terminal 2 — Frontend:**
+```bash
+cd frontend
+npm run dev
+```
+
+Then open your browser: **http://localhost:5173**
 
 ---
 
-## 🧪 Testing & Code Quality
+## 🔑 Demo Login Credentials
 
-### Backend Tests
+The platform comes with pre-loaded users for every stakeholder role. On the login page, use the **"Select User Role"** dropdown to auto-fill the email and password.
+
+| Role | Email | Password |
+|---|---|---|
+| **Super Admin** | `admin@ladris.gov.in` | `Password123!` |
+| Central Ministry (MoRTH) | `central@ladris.gov.in` | `Password123!` |
+| State Government | `state@ladris.gov.in` | `Password123!` |
+| District Administration | `district@ladris.gov.in` | `Password123!` |
+| Land Acquiring Officer (CALA) | `authority@ladris.gov.in` | `Password123!` |
+| Project Implementing Agency | `agency@ladris.gov.in` | `Password123!` |
+| Policy Maker | `policy@ladris.gov.in` | `Password123!` |
+
+> 💡 Tip: Go to `http://localhost:5173/login`, pick a role from the dropdown, and the credentials fill in automatically.
+
+---
+
+## 🤖 Saarthi — The AI Assistant
+
+**Saarthi** is the floating chat button at the bottom-right of every page.
+
+**What you can ask it:**
+- *"Which projects have the highest delay risk?"*
+- *"Tell me about the Sangareddy Bypass project"*
+- *"What does Section 3D mean?"*
+- *"How is compensation calculated under RFCTLARR 2013?"*
+
+**What makes it useful:**
+- 🗄️ **Queries live data** — answers are pulled from the real database, not pre-written
+- ⚖️ **Knows Indian land law** — explains NH Act 1956 and RFCTLARR 2013 in plain language
+- 🔗 **Navigation links** — replies include buttons like `[Open GIS Map]` that take you directly to the relevant page
+- 🎙️ **Voice support** — use the microphone to ask questions, and toggle the speaker to hear answers read aloud
+
+---
+
+## ⚖️ Indian Land Acquisition Law — Quick Reference
+
+LADRIS tracks the following statutory stages defined under Indian law:
+
+### National Highways Act, 1956 — Acquisition Stages
+
+```
+Section 3A  →  Intention to Acquire (published in gazette)
+     ↓            ↳ Landowners have 21 days to file objections
+Section 3C  →  CALA hears and decides on objections
+     ↓
+Section 3D  →  Declaration of Acquisition (land officially vests in Government)
+     ↓            ⚠️ MUST be published within 1 year of 3A, or 3A lapses and
+     ↓               the process must restart from scratch!
+Section 3G  →  Compensation determined by CALA
+     ↓            ↳ If disputed → goes to Arbitration by Divisional Commissioner
+Section 3H  →  Compensation deposited with CALA
+     ↓
+Section 3E  →  Physical possession of land enforced (60-day notice required)
+```
+
+### RFCTLARR Act, 2013 — Compensation Rules
+
+| Component | Rule |
+|---|---|
+| **Market Value** | Higher of: circle rate OR average of top 50% sale deeds over past 3 years |
+| **Solatium** | Mandatory **+100%** added on top of market value |
+| **Rural Multiplier** | **1.0x to 2.0x** based on distance from urban area |
+| **Interest** | **12% per annum** from gazette notification date to award date |
+
+---
+
+## 🩺 Troubleshooting
+
+If something isn't working, run the automated diagnostics tool:
+
+```bash
+# From the backend/ folder, with the virtual environment active:
+python ../doctor.py
+```
+
+To attempt automatic fixes:
+```bash
+python ../doctor.py --fix
+```
+
+This checks 30+ things including: database connection, ML model files, Python packages, PostGIS extension, and demo user accounts.
+
+**Common problems and quick fixes:**
+
+| Problem | Fix |
+|---|---|
+| `Cannot connect to PostgreSQL` | Run `docker compose up -d db` and wait 30 seconds |
+| `relation "users" does not exist` | Run `python run_migrations.py` inside `backend/` |
+| `Invalid email or password` on login | Run `python run_migrations.py`, then restart the backend |
+| `ML model not found` | Check `land-delay-predictor/models/` folder exists; contact repo owner if empty |
+| `uvicorn: command not found` | Your virtual environment isn't activated — run the activate command first |
+| Frontend shows blank page | Confirm backend is running at `http://localhost:8000/health` |
+
+For the full troubleshooting guide with detailed solutions, see [TEAM_SETUP.md](./TEAM_SETUP.md).
+
+---
+
+## 🧪 Running Tests
+
+**Backend tests:**
 ```bash
 cd backend
-venv\Scripts\activate
+# (activate venv first)
 pytest
 ```
 
-### Frontend Type Check
+**Frontend type check:**
 ```bash
 cd frontend
 npx tsc --noEmit
 ```
 
-### Verify Saarthi AI Endpoint
-```bash
-# In backend virtual environment:
-python -c "import urllib.request, json; print(urllib.request.urlopen(urllib.request.Request('http://localhost:8000/api/v1/chatbot/chat', data=json.dumps({'message':'Show high risk projects'}).encode(), headers={'Content-Type':'application/json'})).read().decode())"
-```
+---
+
+## 📚 Technical Documentation
+
+Deep-dive documents are in the [`docs/`](./docs) folder:
+
+| Document | What it covers |
+|---|---|
+| [architecture.md](./docs/architecture.md) | System design and component overview |
+| [database.md](./docs/database.md) | Database schema and entity relationships |
+| [model-card.md](./docs/model-card.md) | ML anomaly detection model details |
+| [ml-integration.md](./docs/ml-integration.md) | How ML predictions are generated |
+| [api.md](./docs/api.md) | Full API endpoint reference |
+| [security.md](./docs/security.md) | Authentication, RBAC, and data provenance |
+| [system-user-guide.md](./docs/system-user-guide.md) | End-user guide for each portal |
 
 ---
 
-## 📚 Technical Documentation Directory
+## 📁 Important Files at a Glance
 
-For deep-dive architectural specifications, refer to the [`docs/`](./docs) folder:
-
-- 📖 [System Architecture Specifications](./docs/architecture.md)
-- 🗄️ [Database Schema & ERD Design](./docs/database.md)
-- 🤖 [Model Card & Anomaly Scorer](./docs/model-card.md)
-- 📊 [ML Methodology & Stage Intelligence](./docs/ml-methodology.md)
-- 🔌 [API Reference Specifications](./docs/api.md)
-- 🛡️ [Security, RBAC & Data Provenance Standard](./docs/security.md)
-- 📋 [System User Guide](./docs/system-user-guide.md)
+| File | What it does |
+|---|---|
+| `.env.example` | Config template with all default values |
+| `.env` | Your actual config — **never commit this file** |
+| `backend/run_migrations.py` | Creates DB tables, extensions, and demo users |
+| `backend/seed_my_raw_projects.py` | Loads demo projects and ML predictions |
+| `doctor.py` | 30+ health checks for diagnosing issues |
+| `setup_team.ps1` | Windows one-click full setup |
+| `setup_team.sh` | Linux/macOS one-click full setup |
+| `docker-compose.yml` | Starts the PostgreSQL + PostGIS database |
+| `land-delay-predictor/models/` | Trained LightGBM model files |
 
 ---
 
-## 👥 Contributors & Maintainers
+## 👥 Contributing & Maintainers
 
-Maintained with ❤️ for modernized, transparent, and predictive Indian infrastructure governance.
+Built with ❤️ to modernize and bring transparency to Indian infrastructure governance.
+
+Maintained by the LADRIS team. For issues or contributions, open a GitHub issue or pull request.
