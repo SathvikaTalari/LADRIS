@@ -333,22 +333,6 @@ npx tsc --noEmit
 
 ---
 
-## 📚 Technical Documentation
-
-Deep-dive documents are in the [`docs/`](./docs) folder:
-
-| Document | What it covers |
-|---|---|
-| [architecture.md](./docs/architecture.md) | System design and component overview |
-| [database.md](./docs/database.md) | Database schema and entity relationships |
-| [model-card.md](./docs/model-card.md) | ML anomaly detection model details |
-| [ml-integration.md](./docs/ml-integration.md) | How ML predictions are generated |
-| [api.md](./docs/api.md) | Full API endpoint reference |
-| [security.md](./docs/security.md) | Authentication, RBAC, and data provenance |
-| [system-user-guide.md](./docs/system-user-guide.md) | End-user guide for each portal |
-
----
-
 ## 📁 Important Files at a Glance
 
 | File | What it does |
