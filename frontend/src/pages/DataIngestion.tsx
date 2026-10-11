@@ -81,6 +81,7 @@ export interface NewProjectModalProps {
 export function NewProjectModal({ isOpen, onClose, onProjectCreated }: NewProjectModalProps) {
   const [activeModal, setActiveModal] = useState<string | null>(null)
   const [successToast, setSuccessToast] = useState<string | null>(null)
+  const [downloadingSamples, setDownloadingSamples] = useState(false)
 
   const showToast = (msg: string) => {
     setSuccessToast(msg)
@@ -144,26 +145,71 @@ export function NewProjectModal({ isOpen, onClose, onProjectCreated }: NewProjec
                 Choose how you want to ingest or populate project, land acquisition, compensation, and GIS data.
               </p>
             </div>
-            <button
-              onClick={onClose}
-              style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 8,
-                color: 'var(--color-text-muted)',
-                cursor: 'pointer',
-                padding: '6px 8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
-              aria-label="Close"
-            >
-              <X size={18} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <button
+                id="btn-download-sample-docs-modal"
+                onClick={async () => {
+                  setDownloadingSamples(true)
+                  try {
+                    await ingestionAPI.downloadSampleDocuments()
+                    showToast('Sample documents package (.zip) downloaded successfully!')
+                  } catch (e) {
+                    showToast('Failed to download sample documents.')
+                  } finally {
+                    setDownloadingSamples(false)
+                  }
+                }}
+                disabled={downloadingSamples}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '7px 14px',
+                  borderRadius: 8,
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.15))',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  color: '#38bdf8',
+                  cursor: downloadingSamples ? 'wait' : 'pointer',
+                  transition: 'all 0.18s ease',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                }}
+                title="Download all sample test files (.csv, .json, .kml, .geojson, .sql, .txt)"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(56, 189, 248, 0.28), rgba(99, 102, 241, 0.28))'
+                  e.currentTarget.style.borderColor = '#38bdf8'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.15))'
+                  e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.35)'
+                }}
+              >
+                <Download size={15} />
+                <span>{downloadingSamples ? 'Downloading…' : 'Download Sample Docs'}</span>
+              </button>
+
+              <button
+                onClick={onClose}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 8,
+                  color: 'var(--color-text-muted)',
+                  cursor: 'pointer',
+                  padding: '6px 8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
 
           {/* Toast Notification */}
@@ -327,10 +373,23 @@ export function NewProjectModal({ isOpen, onClose, onProjectCreated }: NewProjec
 export default function DataIngestion() {
   const [activeModal, setActiveModal] = useState<string | null>(null)
   const [successToast, setSuccessToast] = useState<string | null>(null)
+  const [downloadingSamples, setDownloadingSamples] = useState(false)
 
   const showToast = (msg: string) => {
     setSuccessToast(msg)
     setTimeout(() => setSuccessToast(null), 5000)
+  }
+
+  const handleDownloadSamples = async () => {
+    setDownloadingSamples(true)
+    try {
+      await ingestionAPI.downloadSampleDocuments()
+      showToast('Sample documents package (.zip) downloaded successfully!')
+    } catch {
+      showToast('Failed to download sample documents.')
+    } finally {
+      setDownloadingSamples(false)
+    }
   }
 
   return (
@@ -338,6 +397,31 @@ export default function DataIngestion() {
       <PageHeader
         title="Data Ingestion"
         subtitle="Add project data from forms, files, APIs, maps, or documents."
+        actions={
+          <button
+            id="btn-download-sample-docs-page"
+            onClick={handleDownloadSamples}
+            disabled={downloadingSamples}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 16px',
+              borderRadius: 8,
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.15))',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              color: '#38bdf8',
+              cursor: downloadingSamples ? 'wait' : 'pointer',
+              transition: 'all 0.18s ease',
+            }}
+            title="Download complete sample test files folder (.zip) for all 6 input methods"
+          >
+            <Download size={15} />
+            <span>{downloadingSamples ? 'Downloading…' : 'Download Sample Docs'}</span>
+          </button>
+        }
       />
 
       <AnimatePresence>

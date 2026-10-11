@@ -14,6 +14,7 @@ import csv
 import io
 import json
 import os
+import zipfile
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -582,3 +583,47 @@ async def list_ingestion_history(
         total=total,
         jobs=[IngestionJobResponse.model_validate(j) for j in jobs],
     )
+
+
+@router.get("/sample-documents/download")
+async def download_sample_documents():
+    """
+    Download a zip archive containing all test sample documents for testing
+    all 6 project creation / data ingestion methods.
+    """
+    candidates = [
+        Path(__file__).resolve().parent.parent.parent.parent / "sample_documents",
+        Path("sample_documents").resolve(),
+        Path("../sample_documents").resolve(),
+        Path(r"c:\LandAcquisition\LADRIS\sample_documents"),
+    ]
+    sample_dir = None
+    for c in candidates:
+        if c.exists() and c.is_dir():
+            sample_dir = c
+            break
+
+    if not sample_dir:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="sample_documents folder not found on server",
+        )
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(sample_dir):
+            for file in sorted(files):
+                file_path = Path(root) / file
+                arcname = file_path.relative_to(sample_dir)
+                zipf.write(file_path, arcname=str(arcname))
+
+    buf.seek(0)
+    return StreamingResponse(
+        buf,
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": 'attachment; filename="LADRIS_Sample_Documents.zip"',
+            "Access-Control-Expose-Headers": "Content-Disposition",
+        },
+    )
+
