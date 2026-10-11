@@ -31,8 +31,6 @@ import {
   Check,
   Code,
   Terminal,
-  Info,
-  HelpCircle,
   FileCode,
 } from 'lucide-react'
 import { ingestionAPI, projectsAPI } from '@/api/client'
