@@ -14,8 +14,9 @@ import ProjectList from '@/pages/Projects/ProjectList'
 import ProjectDetail from '@/pages/Projects/ProjectDetail'
 import ProjectForm from '@/pages/Projects/ProjectForm'
 import GIS from '@/pages/GIS'
-import Analytics from '@/pages/Analytics'
+import AnalyticsPage from '@/pages/Analytics'
 import Alerts from '@/pages/Alerts'
+import { Analytics } from '@vercel/analytics/react'
 import Admin from '@/pages/Admin'
 import DataSources from '@/pages/DataSources'
 import DataQuality from '@/pages/DataQuality'
@@ -67,63 +68,65 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/landing" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/sitemap" element={<SiteMap />} />
+    <>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/landing" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/sitemap" element={<SiteMap />} />
 
-        {/* About pages */}
-        <Route path="/about/project" element={<AboutProject />} />
-        <Route path="/about/user-guide" element={<UserGuide />} />
-        <Route path="/about/compliance" element={<Compliance />} />
+          {/* About pages */}
+          <Route path="/about/project" element={<AboutProject />} />
+          <Route path="/about/user-guide" element={<UserGuide />} />
+          <Route path="/about/compliance" element={<Compliance />} />
 
-        {/* Help pages */}
-        <Route path="/help/contact" element={<ContactFeedback />} />
-        <Route path="/help/privacy" element={<Privacy />} />
-        <Route path="/help/terms" element={<Terms />} />
-        <Route path="/help/faq" element={<FAQ />} />
+          {/* Help pages */}
+          <Route path="/help/contact" element={<ContactFeedback />} />
+          <Route path="/help/privacy" element={<Privacy />} />
+          <Route path="/help/terms" element={<Terms />} />
+          <Route path="/help/faq" element={<FAQ />} />
 
-        {/* Document pages */}
-        <Route path="/documents/blogs" element={<Blogs />} />
-        <Route path="/documents/research-papers" element={<ResearchPapers />} />
-        <Route path="/documents/case-studies" element={<CaseStudies />} />
-        <Route path="/documents/real-world-examples" element={<RealWorldExamples />} />
+          {/* Document pages */}
+          <Route path="/documents/blogs" element={<Blogs />} />
+          <Route path="/documents/research-papers" element={<ResearchPapers />} />
+          <Route path="/documents/case-studies" element={<CaseStudies />} />
+          <Route path="/documents/real-world-examples" element={<RealWorldExamples />} />
 
-        {/* Protected Dashboard Routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <AppShell />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="la-workbench" element={<LAWorkbench />} />
-          <Route path="agency-portal" element={<AgencyPortal />} />
-          <Route path="priority-intelligence" element={<PriorityIntelligence />} />
-          <Route path="intelligence" element={<DecisionIntelligence />} />
-          <Route path="decision-intelligence" element={<DecisionIntelligence />} />
-          <Route path="projects" element={<ProjectList />} />
-          <Route path="projects/new" element={<Navigate to="/projects?new=true" replace />} />
-          <Route path="ingestion" element={<Navigate to="/projects?new=true" replace />} />
-          <Route path="projects/:id/edit" element={<ProjectForm />} />
-          <Route path="projects/:id" element={<ProjectDetail />} />
-          <Route path="gis" element={<GIS />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="alerts" element={<Alerts />} />
-          <Route path="data-sources" element={<DataSources />} />
-          <Route path="data-quality" element={<DataQuality />} />
-          <Route path="admin" element={<Admin />} />
-        </Route>
+          {/* Protected Dashboard Routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppShell />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="la-workbench" element={<LAWorkbench />} />
+            <Route path="agency-portal" element={<AgencyPortal />} />
+            <Route path="priority-intelligence" element={<PriorityIntelligence />} />
+            <Route path="intelligence" element={<DecisionIntelligence />} />
+            <Route path="decision-intelligence" element={<DecisionIntelligence />} />
+            <Route path="projects" element={<ProjectList />} />
+            <Route path="projects/new" element={<Navigate to="/projects?new=true" replace />} />
+            <Route path="ingestion" element={<Navigate to="/projects?new=true" replace />} />
+            <Route path="projects/:id/edit" element={<ProjectForm />} />
+            <Route path="projects/:id" element={<ProjectDetail />} />
+            <Route path="gis" element={<GIS />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="alerts" element={<Alerts />} />
+            <Route path="data-sources" element={<DataSources />} />
+            <Route path="data-quality" element={<DataQuality />} />
+            <Route path="admin" element={<Admin />} />
+          </Route>
 
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/landing" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/landing" replace />} />
+        </Routes>
+      </BrowserRouter>
+      <Analytics />
+    </>
   )
 }
