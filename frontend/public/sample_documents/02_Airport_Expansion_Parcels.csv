@@ -1,0 +1,5 @@
+khasra_number,village,tehsil,district,state_code,area_ha,latitude,longitude,project_name,project_code,project_type
+101/A,Shamshabad,Shamshabad,Rangareddy,TS,12.5,17.2403,78.4294,Hyderabad Aerotropolis Zone B,AAI-HYD-AERO,AIRPORT
+102/B,Gaganpahad,Rajendranagar,Rangareddy,TS,18.0,17.2512,78.4350,Hyderabad Aerotropolis Zone B,AAI-HYD-AERO,AIRPORT
+103/C,Mamidipally,Saroornagar,Rangareddy,TS,24.2,17.2350,78.4410,Hyderabad Aerotropolis Zone B,AAI-HYD-AERO,AIRPORT
+104/D,Satamrai,Rajendranagar,Rangareddy,TS,15.8,17.2600,78.4220,Hyderabad Aerotropolis Zone B,AAI-HYD-AERO,AIRPORT

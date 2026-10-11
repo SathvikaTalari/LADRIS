@@ -542,6 +542,7 @@ export interface DatabaseTestResult {
   sample_rows: Record<string, any>[]
   suggested_mapping?: Record<string, string>
   total_rows_approx?: number
+  message?: string
   error?: string
 }
 
@@ -676,6 +677,17 @@ export const ingestionAPI = {
 
   testDatabase: (data: { connection_url?: string; table_name: string; limit?: number }) =>
     apiClient.post<DatabaseTestResult>('/api/v1/ingestion/database/test', data).then((r) => r.data),
+
+  uploadDatabaseSQL: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient.post<DatabaseTestResult>('/api/v1/ingestion/database/upload-sql', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
+
+  loadSampleDatabaseSQL: () =>
+    apiClient.post<DatabaseTestResult>('/api/v1/ingestion/database/load-sample').then((r) => r.data),
 
   importDatabase: (data: {
     connection_url?: string

@@ -153,6 +153,7 @@ class DatabaseTestResponse(BaseModel):
     sample_rows: List[Dict[str, Any]] = []
     suggested_mapping: Optional[Dict[str, str]] = None
     total_rows_approx: Optional[int] = None
+    message: Optional[str] = None
     error: Optional[str] = None
 
 

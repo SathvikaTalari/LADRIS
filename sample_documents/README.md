@@ -15,8 +15,9 @@ This folder contains **ready-to-use sample files** for testing all 6 data input 
 | 5 | **Upload GIS Data → Upload GIS Data** *(GeoJSON)* | `06_NH48_Bengaluru_Pune_Parcels.geojson` | GeoJSON |
 | 6 | **Upload GIS Data → Upload GIS Data** *(KML)* | `03_Metro_Phase2_Alignment.kml` | KML |
 | 7 | **Upload GIS Data → Upload GIS Data** *(KML)* | `07_NH366_Nagarjunasagar_Bypass_Alignment.kml` | KML |
-| 8 | **Upload Documents (PDF) → Upload Document** | `08_Section3A_Notification_NH130D.txt` | TXT (simulates PDF gazette) |
-| 9 | **Import Database Data → Connect Database** | `09_External_DB_Schema_And_Data.sql` | SQL |
+| 8 | **Upload Documents (PDF) → Single or Multi-PDF** | `08_Section3A_Gazette_Notification_NH130D.pdf` | PDF (Gazette Notification) |
+| 9 | **Upload Documents (PDF) → Multi-PDF Merging** | `10_Section3G_Compensation_Award_NH130D.pdf` | PDF (Section 3G Compensation Award) |
+| 10 | **Import Database Data → Connect Database** | `09_External_DB_Schema_And_Data.sql` | SQL |
 
 ---
 
@@ -89,18 +90,27 @@ KML alignment file for the **NH-366 Nagarjunasagar Bypass** showing the full hig
 
 ---
 
-### 8. `08_Section3A_Notification_NH130D.txt`
-> **Use for:** Upload Documents (PDF) → "Upload Document (PDF)" button
+### 8. `08_Section3A_Gazette_Notification_NH130D.pdf`
+> **Use for:** Upload Documents (PDF) → "Select or Drag Multiple PDF Documents" button
 
-A complete simulated **Gazette Notification** under **Section 3A of the National Highways Act, 1956** for the NH-130D Patna–Aurangabad Six-Lane Expressway (Bihar).
+A complete official **Gazette Notification PDF** under **Section 3A of the National Highways Act, 1956** for the NH-130D Patna–Aurangabad Six-Lane Expressway (Bihar).
 
-Contains all real-world gazette sections: project identification, statutory dates, affected villages, land schedule (parcel-wise), compensation estimates, CALA details, and objection filing instructions.
-
-> 💡 In production, upload the actual scanned PDF gazette. This `.txt` file simulates the document structure for testing the PDF extraction engine.
+Contains all statutory gazette sections: project identification, statutory dates (3A date: 14-03-2024, 3D deadline: 13-03-2025), affected villages, land schedule table (parcel-wise), compensation estimates (Rs 428.50 Cr), CALA details, and objection filing instructions.
 
 ---
 
-### 9. `09_External_DB_Schema_And_Data.sql`
+### 9. `10_Section3G_Compensation_Award_NH130D.pdf`
+> **Use for:** Upload Documents (PDF) → "Select or Drag Multiple PDF Documents" (multi-document merge test)
+
+An official **Compensation Award PDF** under **Section 3G of the National Highways Act, 1956** and First Schedule of RFCTLARR Act, 2013 by the Competent Authority for Land Acquisition (CALA), Patna.
+
+Contains village-wise compensation determinations (Rs 428.50 Cr total, Rs 310.20 Cr disbursed), 100% Solatium breakdown, and 2,840 khatedar beneficiaries.
+
+> 💡 **Multi-Document Merging Test:** Select BOTH `08_Section3A_Gazette_Notification_NH130D.pdf` AND `10_Section3G_Compensation_Award_NH130D.pdf` together in the upload modal. LADRIS will automatically extract and merge their fields into a unified review and confirmation screen!
+
+---
+
+### 10. `09_External_DB_Schema_And_Data.sql`
 > **Use for:** Import Database Data → "Connect Database" button
 
 A complete **PostgreSQL SQL file** that:
@@ -122,5 +132,6 @@ A complete **PostgreSQL SQL file** that:
 | GIS map parcel import | Open modal → "Upload GIS Data" → upload `01_NH65_Highway_Parcels.geojson` |
 | KML alignment import | Open modal → "Upload GIS Data" → upload `03_Metro_Phase2_Alignment.kml` |
 | API batch ingest | Open modal → "View API & Test" → use `05_API_Batch_Payload.json` as the request body |
-| Gazette PDF extraction | Open modal → "Upload Document (PDF)" → upload `08_Section3A_Notification_NH130D.txt` |
+| Single Gazette PDF extraction | Open modal → "Upload Documents" → select `08_Section3A_Gazette_Notification_NH130D.pdf` |
+| Multi-PDF document merge | Open modal → "Upload Documents" → select BOTH `08_Section3A_Gazette_Notification_NH130D.pdf` and `10_Section3G_Compensation_Award_NH130D.pdf` |
 | External DB connection | Open modal → "Connect Database" → run `09_External_DB_Schema_And_Data.sql` first, then connect |

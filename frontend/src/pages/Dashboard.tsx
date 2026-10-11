@@ -8,6 +8,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   ChevronRight,
+  Check,
 } from 'lucide-react'
 import ReactECharts from 'echarts-for-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
@@ -594,80 +595,179 @@ export default function Dashboard() {
         {/* Top Automated Alerts Panel */}
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <div>
-              <h3 style={{ fontSize: '0.98rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h3 style={{ fontSize: '0.78rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                 Top Active Alerts
               </h3>
+              {activeAlerts.length > 0 && (
+                <span
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    color: '#ef4444',
+                    fontSize: '0.66rem',
+                    fontWeight: 700,
+                    padding: '1px 6px',
+                    borderRadius: 10,
+                  }}
+                >
+                  {activeAlerts.length}
+                </span>
+              )}
             </div>
             <Link to="/alerts" style={{ fontSize: '0.72rem', color: 'var(--color-accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
               All Alerts →
             </Link>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {activeAlerts.map((a: any) => {
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {activeAlerts.map((a: any, idx: number) => {
               const projectName = a.project_name || a.alert_metadata?.project_name || 'Project'
               const reason = a.alert_reason || (a.title && !a.title.startsWith('ML') ? a.title : 'High Delay Risk')
               const explanation = a.explanation || a.message || ''
+              const isCrit = a.severity === 'CRITICAL'
+              const isHigh = a.severity === 'HIGH'
+              const severityColor = isCrit ? '#ef4444' : isHigh ? '#f59e0b' : '#38bdf8'
+              const severityBg = isCrit ? 'rgba(239, 68, 68, 0.12)' : isHigh ? 'rgba(245, 158, 11, 0.12)' : 'rgba(56, 189, 248, 0.12)'
+              const timeStr = a.triggered_at
+                ? new Date(a.triggered_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : 'Recent'
+
               return (
-                <div key={a.id} style={{
-                  padding: '10px 12px',
-                  background: 'var(--color-bg-tertiary)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--color-border-subtle)',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'space-between',
-                  gap: 10,
-                }}>
+                <div
+                  key={a.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                    padding: '10px 0',
+                    borderBottom: idx < activeAlerts.length - 1 ? '1px solid var(--color-border-subtle)' : 'none',
+                  }}
+                >
                   <div style={{ minWidth: 0, flex: 1 }}>
+                    {/* Header Row: Project Name + Severity Badge + Reason */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
-                      <strong style={{ fontSize: '0.8rem', color: 'var(--color-text-primary)' }}>
-                        {projectName}
-                      </strong>
-                      <span className="badge badge-purple" style={{ fontSize: '0.62rem' }}>
-                        {reason}
-                      </span>
-                      <span className={`badge ${a.severity === 'CRITICAL' ? 'badge-red' : a.severity === 'HIGH' ? 'badge-yellow' : 'badge-blue'}`} style={{ fontSize: '0.62rem' }}>
+                      {a.project_id ? (
+                        <Link
+                          to={`/projects/${a.project_id}`}
+                          style={{
+                            fontSize: '0.84rem',
+                            fontWeight: 700,
+                            color: 'var(--color-text-primary)',
+                            textDecoration: 'none',
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-accent-primary)')}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-primary)')}
+                        >
+                          {projectName}
+                        </Link>
+                      ) : (
+                        <strong style={{ fontSize: '0.84rem', color: 'var(--color-text-primary)' }}>
+                          {projectName}
+                        </strong>
+                      )}
+
+                      <span
+                        style={{
+                          fontSize: '0.62rem',
+                          fontWeight: 700,
+                          color: severityColor,
+                          background: severityBg,
+                          padding: '1px 6px',
+                          borderRadius: 4,
+                          letterSpacing: '0.03em',
+                        }}
+                      >
                         {a.severity}
                       </span>
+
+                      <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
+                        • {reason}
+                      </span>
                     </div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, marginBottom: 4 }}>
+
+                    {/* Concise message */}
+                    <div style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, marginBottom: 3 }}>
                       {explanation}
                     </div>
+
+                    {/* Timestamp */}
                     <div style={{ fontSize: '0.66rem', color: 'var(--color-text-muted)' }}>
-                      {a.triggered_at ? new Date(a.triggered_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
+                      {timeStr}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0 }}>
-                    {a.project_id && (
-                      <Link to={`/projects/${a.project_id}`} className="btn btn-ghost btn-sm" style={{ padding: '2px 8px', fontSize: '0.68rem', textAlign: 'center' }}>
-                        View
-                      </Link>
-                    )}
+
+                  {/* Actions: Clean inline Ack and Resolve */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, paddingTop: 2 }}>
                     {a.status === 'ACTIVE' && (
                       <button
                         onClick={() => handleUpdateAlertStatus(a.id, 'ACKNOWLEDGED')}
-                        className="btn btn-secondary btn-sm"
-                        style={{ padding: '2px 8px', fontSize: '0.68rem' }}
+                        title="Acknowledge alert"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.04)',
+                          border: '1px solid var(--color-border-subtle)',
+                          color: 'var(--color-text-secondary)',
+                          borderRadius: 5,
+                          padding: '3px 8px',
+                          fontSize: '0.68rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
+                          e.currentTarget.style.color = 'var(--color-text-primary)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)'
+                          e.currentTarget.style.color = 'var(--color-text-secondary)'
+                        }}
                       >
-                        Acknowledge
+                        Ack
                       </button>
                     )}
                     {a.status !== 'RESOLVED' && (
                       <button
                         onClick={() => handleUpdateAlertStatus(a.id, 'RESOLVED')}
-                        className="btn btn-secondary btn-sm"
-                        style={{ padding: '2px 8px', fontSize: '0.68rem', color: 'var(--color-success)' }}
+                        title="Mark alert as resolved"
+                        style={{
+                          background: 'rgba(16, 185, 129, 0.08)',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
+                          color: '#10b981',
+                          borderRadius: 5,
+                          padding: '3px 8px',
+                          fontSize: '0.68rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 3,
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(16, 185, 129, 0.16)'
+                          e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.5)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(16, 185, 129, 0.08)'
+                          e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+                        }}
                       >
-                        Resolve
+                        <Check size={11} />
+                        <span>Resolve</span>
                       </button>
                     )}
                   </div>
                 </div>
               )
             })}
-            {activeAlerts.length === 0 && <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>No active alerts returned by the API.</div>}
+            {activeAlerts.length === 0 && (
+              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', padding: '12px 0' }}>
+                No active alerts. All project milestones are currently on track.
+              </div>
+            )}
           </div>
         </div>
 
