@@ -46,7 +46,7 @@ export function GlobalSearch() {
   }, [query])
 
   return (
-    <div ref={wrapperRef} style={{ position: 'relative', width: '100%', maxWidth: 420 }}>
+    <div ref={wrapperRef} style={{ position: 'relative', width: '100%', maxWidth: 500 }}>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
         <Search
           size={14}
