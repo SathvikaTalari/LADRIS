@@ -376,7 +376,7 @@ export default function ProjectList() {
                 </tr>
               </thead>
               <tbody>
-                {projects.map((project) => {
+                {projects.map((project, index) => {
                   const districtName =
                     project.district_codes && project.district_codes.length > 0
                       ? project.district_codes.join(', ')
@@ -387,6 +387,7 @@ export default function ProjectList() {
                   return (
                     <tr
                       key={project.id}
+                      id={index === 0 ? 'tour-first-project-row' : undefined}
                       onClick={() => navigate(`/projects/${project.id}`)}
                     >
                       {/* Project Code */}

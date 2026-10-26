@@ -470,23 +470,48 @@ def _portfolio(projects, prediction_rows):
 
 
 
+import time as _time
+
+_EXECUTIVE_CACHE: dict = {"ts": 0.0, "data": None}
+_OVERVIEW_CACHE: dict = {"ts": 0.0, "data": None}
+ANALYTICS_CACHE_TTL = 30.0  # 30-second TTL cache for blazing-fast roundtrips
+
+
+def invalidate_analytics_cache():
+    _EXECUTIVE_CACHE["ts"] = 0.0
+    _EXECUTIVE_CACHE["data"] = None
+    _OVERVIEW_CACHE["ts"] = 0.0
+    _OVERVIEW_CACHE["data"] = None
+
+
 @analytics_router.get("/overview")
 async def analytics_overview(db: AsyncSession = Depends(get_db), _: User = Depends(get_current_user)):
+    now = _time.time()
+    if _OVERVIEW_CACHE["data"] and (now - _OVERVIEW_CACHE["ts"] < ANALYTICS_CACHE_TTL):
+        return _OVERVIEW_CACHE["data"]
+
     projects = (await db.execute(select(Project).where(Project.deleted_at.is_(None)))).scalars().all()
     predictions = await latest_predictions(db)
     counts, *_ = _portfolio(projects, predictions)
     delay_values = [row.predicted_delay_days for row in predictions if row.predicted_delay_days is not None]
     high_risk_total = counts["HIGH"] + counts["CRITICAL"]
-    return {"status": "success" if projects else "no_data", "data_loaded": bool(projects), "summary": {
+    result = {"status": "success" if projects else "no_data", "data_loaded": bool(projects), "summary": {
         "total_projects": len(projects), "high_risk_projects": high_risk_total, "projects_requiring_attention": high_risk_total,
         "average_delay_days": round(sum(delay_values) / len(delay_values), 1) if delay_values else None,
         "total_area_ha": round(sum(float(project.total_area_ha or 0) for project in projects), 1),
         "total_affected_families": sum(project.total_affected_families or 0 for project in projects),
     }}
+    _OVERVIEW_CACHE["ts"] = now
+    _OVERVIEW_CACHE["data"] = result
+    return result
 
 
 @analytics_router.get("/executive")
 async def analytics_executive(db: AsyncSession = Depends(get_db), _: User = Depends(get_current_user)):
+    now = _time.time()
+    if _EXECUTIVE_CACHE["data"] and (now - _EXECUTIVE_CACHE["ts"] < ANALYTICS_CACHE_TTL):
+        return _EXECUTIVE_CACHE["data"]
+
     projects = (await db.execute(select(Project).where(Project.deleted_at.is_(None)))).scalars().all()
     predictions = await latest_predictions(db)
     active_alerts = (await db.execute(select(func.count(Alert.id)).where(Alert.status == AlertStatus.ACTIVE))).scalar_one()
@@ -504,7 +529,7 @@ async def analytics_executive(db: AsyncSession = Depends(get_db), _: User = Depe
             return True
         return False
     projects_delayed_count = sum(1 for p in projects if _is_delayed(p))
-    return {
+    result = {
         "status": "success" if total else "no_data", "data_loaded": bool(total),
         "executive_kpis": {"total_active_projects": total, "total_land_required_ha": round(sum(float(p.total_area_ha or 0) for p in projects), 1),
             "financial_outlay_cr": round(sum(float(p.estimated_compensation_inr or 0) for p in projects) / 1e7, 1),
@@ -518,6 +543,9 @@ async def analytics_executive(db: AsyncSession = Depends(get_db), _: User = Depe
         "state_district_comparison": {"top_states": states, "top_districts": districts},
         "data_health": {"total_projects": total, "prediction_available": len(predictions), "prediction_unavailable": total - len(predictions), "average_trust_score": round(completeness)},
     }
+    _EXECUTIVE_CACHE["ts"] = now
+    _EXECUTIVE_CACHE["data"] = result
+    return result
 
 
 @analytics_router.get("/risk-trend")

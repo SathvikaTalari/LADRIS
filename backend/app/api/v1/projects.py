@@ -226,6 +226,12 @@ async def create_project(
         import logging
         logging.getLogger(__name__).error("Failed to append project %s to CSV: %s", project.project_code, exc)
 
+    try:
+        from app.api.v1.stubs import invalidate_analytics_cache
+        invalidate_analytics_cache()
+    except Exception:
+        pass
+
     await db.commit()
     await db.refresh(project)
 
@@ -332,6 +338,12 @@ async def update_project(
         import logging
         logging.getLogger(__name__).error("Failed to update project %s in CSV: %s", project.project_code, exc)
 
+    try:
+        from app.api.v1.stubs import invalidate_analytics_cache
+        invalidate_analytics_cache()
+    except Exception:
+        pass
+
     await db.commit()
     await db.refresh(project)
 
@@ -380,6 +392,11 @@ async def delete_project(
         .where(Project.id == project_id)
         .values(deleted_at=datetime.now(tz=timezone.utc))
     )
+    try:
+        from app.api.v1.stubs import invalidate_analytics_cache
+        invalidate_analytics_cache()
+    except Exception:
+        pass
     await db.commit()
 
     try:

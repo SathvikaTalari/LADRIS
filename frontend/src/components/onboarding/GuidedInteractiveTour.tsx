@@ -22,6 +22,7 @@ import {
   Database,
   ShieldCheck,
   CheckCircle2,
+  Eye,
 } from 'lucide-react'
 import { useThemeStore } from '@/store/themeStore'
 
@@ -70,6 +71,18 @@ const TOUR_STEPS: TourStep[] = [
     description: 'Manage all 12 NHAI corridors or click "+ New Project" to upload fresh parcel data.',
     icon: FolderPlus,
     iconColor: '#10b981',
+    preferredPlacement: 'bottom',
+  },
+  {
+    id: 'project-detail-view',
+    page: '/projects',
+    selector: '#tour-first-project-row',
+    title: 'Detailed Project View',
+    badge: 'Project Details',
+    description: 'Click on any project in the directory to see its detailed view — explore land acquisition progress, parcel survey numbers, compensation disbursement, and court dispute status.',
+    tip: 'Click on Pune Ring Road or any corridor row to open the complete 360° project dashboard.',
+    icon: Eye,
+    iconColor: '#3b82f6',
     preferredPlacement: 'bottom',
   },
   {
@@ -363,27 +376,30 @@ export function GuidedInteractiveTour() {
     const spaceLeft = targetRect.left
 
     const placement = step.preferredPlacement || 'bottom'
+    const isWide = targetRect.width > tooltipWidth
 
     if (placement === 'bottom' && spaceBelow > 220) {
       // Place below target
       const top = targetRect.bottom + 16
-      const left = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, targetRect.left - 10))
+      const left = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, targetRect.left + (isWide ? 20 : -10)))
       cardStyle.top = top
       cardStyle.left = left
 
       arrowDirection = 'up'
       arrowStyle.top = targetRect.bottom + 4
-      arrowStyle.left = Math.min(targetRect.left + targetRect.width / 2 - 12, window.innerWidth - 30)
+      const idealArrowLeft = targetRect.left + (isWide ? 80 : targetRect.width / 2) - 11
+      arrowStyle.left = Math.max(left + 24, Math.min(left + tooltipWidth - 36, idealArrowLeft))
     } else if (placement === 'top' && spaceAbove > 220) {
       // Place above target
       const bottom = window.innerHeight - targetRect.top + 16
-      const left = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, targetRect.left - 10))
+      const left = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, targetRect.left + (isWide ? 20 : -10)))
       cardStyle.bottom = bottom
       cardStyle.left = left
 
       arrowDirection = 'down'
       arrowStyle.bottom = window.innerHeight - targetRect.top + 4
-      arrowStyle.left = Math.min(targetRect.left + targetRect.width / 2 - 12, window.innerWidth - 30)
+      const idealArrowLeft = targetRect.left + (isWide ? 80 : targetRect.width / 2) - 11
+      arrowStyle.left = Math.max(left + 24, Math.min(left + tooltipWidth - 36, idealArrowLeft))
     } else if (placement === 'left' && spaceLeft > tooltipWidth + 24) {
       // Place to left of target
       const right = window.innerWidth - targetRect.left + 16
@@ -407,17 +423,21 @@ export function GuidedInteractiveTour() {
     } else {
       // Fallback
       if (spaceBelow >= spaceAbove && spaceBelow > 180) {
+        const left = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, targetRect.left + (isWide ? 20 : -10)))
         cardStyle.top = targetRect.bottom + 16
-        cardStyle.left = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, targetRect.left - 10))
+        cardStyle.left = left
         arrowDirection = 'up'
         arrowStyle.top = targetRect.bottom + 4
-        arrowStyle.left = Math.min(targetRect.left + targetRect.width / 2 - 12, window.innerWidth - 30)
+        const idealArrowLeft = targetRect.left + (isWide ? 80 : targetRect.width / 2) - 11
+        arrowStyle.left = Math.max(left + 24, Math.min(left + tooltipWidth - 36, idealArrowLeft))
       } else if (spaceAbove > 180) {
+        const left = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, targetRect.left + (isWide ? 20 : -10)))
         cardStyle.bottom = window.innerHeight - targetRect.top + 16
-        cardStyle.left = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, targetRect.left - 10))
+        cardStyle.left = left
         arrowDirection = 'down'
         arrowStyle.bottom = window.innerHeight - targetRect.top + 4
-        arrowStyle.left = Math.min(targetRect.left + targetRect.width / 2 - 12, window.innerWidth - 30)
+        const idealArrowLeft = targetRect.left + (isWide ? 80 : targetRect.width / 2) - 11
+        arrowStyle.left = Math.max(left + 24, Math.min(left + tooltipWidth - 36, idealArrowLeft))
       } else {
         cardStyle.top = '50%'
         cardStyle.left = '50%'
@@ -439,6 +459,14 @@ export function GuidedInteractiveTour() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
+            onClick={() => {
+              if (step.id === 'project-detail-view') {
+                stopTour(true)
+                const el = document.querySelector(step.selector) as HTMLElement | null
+                if (el) el.click()
+              }
+            }}
+            title={step.id === 'project-detail-view' ? 'Click row to see detailed project view' : undefined}
             style={{
               position: 'fixed',
               top: targetRect.top - boxPadding,
@@ -450,7 +478,8 @@ export function GuidedInteractiveTour() {
               boxShadow: isDark
                 ? '0 0 0 9999px rgba(3, 7, 18, 0.68), 0 0 18px rgba(239, 68, 68, 0.5)'
                 : '0 0 0 9999px rgba(0, 15, 35, 0.50), 0 0 18px rgba(239, 68, 68, 0.5)',
-              pointerEvents: 'none',
+              pointerEvents: step.id === 'project-detail-view' ? 'auto' : 'none',
+              cursor: step.id === 'project-detail-view' ? 'pointer' : 'default',
               zIndex: 10001,
               transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
@@ -609,6 +638,54 @@ export function GuidedInteractiveTour() {
           >
             {step.description}
           </p>
+
+          {/* Quick Action for Detailed Project View */}
+          {step.id === 'project-detail-view' && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '9px 12px',
+                marginBottom: 14,
+                borderRadius: 8,
+                background: isDark ? 'rgba(59, 130, 246, 0.12)' : 'rgba(59, 130, 246, 0.08)',
+                border: isDark ? '1px solid rgba(59, 130, 246, 0.25)' : '1px solid rgba(59, 130, 246, 0.2)',
+              }}
+            >
+              <span style={{ fontSize: '0.76rem', color: isDark ? '#93c5fd' : '#1d4ed8', fontWeight: 500 }}>
+                💡 Click the row or button:
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  stopTour(true)
+                  const el = document.querySelector(step.selector) as HTMLElement | null
+                  if (el) el.click()
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  background: '#2563eb',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '5px 10px',
+                  cursor: 'pointer',
+                  boxShadow: '0 1px 4px rgba(37, 99, 235, 0.35)',
+                  transition: 'background 0.15s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#1d4ed8')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = '#2563eb')}
+              >
+                Open Project View
+                <ArrowRight size={12} />
+              </button>
+            </div>
+          )}
 
           {/* Footer Controls */}
           <div
