@@ -21,17 +21,9 @@ import {
   Filter,
   ChevronDown,
   ChevronRight,
-  Map,
-  X,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  Gavel,
-  BarChart3,
-  Info,
 } from 'lucide-react'
 import { PageHeader } from '@/components/common'
-import { projectsAPI, gisAPI } from '@/api/client'
+import { projectsAPI } from '@/api/client'
 import DetailedMapView from '@/components/gis/DetailedMapView'
 import {
   MapContainer,
@@ -39,7 +31,6 @@ import {
   Marker,
   Popup,
   useMap,
-  GeoJSON,
 } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -86,14 +77,6 @@ const MAP_TILES = {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '&copy; OpenStreetMap contributors',
   },
-}
-
-// Parcel Risk Colours
-const PARCEL_RISK_COLORS: Record<string, { fill: string; stroke: string; fillOpacity: number }> = {
-  CRITICAL: { fill: '#dc2626', stroke: '#991b1b', fillOpacity: 0.55 },
-  HIGH: { fill: '#f97316', stroke: '#c2410c', fillOpacity: 0.5 },
-  MEDIUM: { fill: '#eab308', stroke: '#a16207', fillOpacity: 0.45 },
-  LOW: { fill: '#10b981', stroke: '#059669', fillOpacity: 0.4 },
 }
 
 function createRiskMarkerIcon(riskLevel: string, showHalo: boolean = true) {
@@ -226,267 +209,6 @@ function MapViewController({ center, zoom }: { center: [number, number]; zoom: n
     map.flyTo(center, zoom, { duration: 1.2, easeLinearity: 0.25 })
   }, [center, zoom, map])
   return null
-}
-
-function parcelStyle(feature: any) {
-  const risk = feature?.properties?.risk_bucket || 'MEDIUM'
-  const cfg = PARCEL_RISK_COLORS[risk] || PARCEL_RISK_COLORS.MEDIUM
-  return { color: cfg.stroke, fillColor: cfg.fill, fillOpacity: cfg.fillOpacity, weight: 1.5 }
-}
-
-function onEachParcelFeature(feature: any, layer: any) {
-  if (!feature.properties) return
-  const p = feature.properties
-  const riskColors: Record<string, string> = { CRITICAL: '#dc2626', HIGH: '#f97316', MEDIUM: '#eab308', LOW: '#16a34a' }
-  const rc = riskColors[p.risk_bucket] || '#64748b'
-  layer.bindPopup(`<div style="min-width:220px;font-family:Inter,sans-serif;font-size:0.78rem;color:#0f172a;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><strong style="font-size:0.85rem;">Khasra ${p.khasra_number}</strong><span style="padding:2px 8px;border-radius:10px;font-size:0.65rem;font-weight:700;background:${rc}20;color:${rc};border:1px solid ${rc}40;">${p.risk_bucket}</span></div><div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid #e2e8f0;padding-top:6px;"><div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">Village:</span><strong>${p.village}${p.tehsil ? ' / ' + p.tehsil : ''}</strong></div><div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">Area:</span><strong>${p.area_ha != null ? Number(p.area_ha).toFixed(3) + ' ha' : 'N/A'}</strong></div><div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">Land Use:</span><strong>${p.land_use_type}</strong></div><div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">Owners:</span><strong>${p.owner_count}</strong></div><div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">Status:</span><strong style="color:${rc};">${p.comp_status}</strong></div>${p.has_legal_dispute ? '<div style="margin-top:4px;padding:4px 6px;background:#fef2f2;border-radius:6px;color:#dc2626;font-size:0.7rem;font-weight:600;">Legal Dispute Active</div>' : ''}${p.days_pending != null ? '<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">Days Pending:</span><strong>' + p.days_pending + '</strong></div>' : ''}</div></div>`, { maxWidth: 280 })
-}
-
-interface DetailedMapProps {
-  project: any
-  onClose: () => void
-}
-
-function DetailedMapModal({ project, onClose }: DetailedMapProps) {
-  const [gisData, setGisData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [detailTile, setDetailTile] = useState<'SATELLITE' | 'OSM'>('OSM')
-  const [activeParcel, setActiveParcel] = useState<any | null>(null)
-  const [parcelFilter, setParcelFilter] = useState<'ALL' | 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'>('ALL')
-
-  const mapCenter: [number, number] = project.lat && project.lng ? [project.lat, project.lng] : [21.1458, 79.0882]
-
-  useEffect(() => {
-    setLoading(true); setError(null)
-    gisAPI.getProjectGIS(project.id)
-      .then((data: any) => { setGisData(data); setLoading(false) })
-      .catch((err: any) => { console.error(err); setError('Could not load GIS data for this project.'); setLoading(false) })
-  }, [project.id])
-
-  const summary = gisData?.risk_summary || {}
-  const parcels = gisData?.parcels || { type: 'FeatureCollection', features: [] }
-
-  const filteredParcels = useMemo(() => {
-    if (parcelFilter === 'ALL') return parcels
-    return { type: 'FeatureCollection', features: (parcels.features || []).filter((f: any) => f?.properties?.risk_bucket === parcelFilter) }
-  }, [parcels, parcelFilter])
-
-  const parcelList = useMemo(() => {
-    const feats: any[] = (parcels.features || [])
-    if (parcelFilter === 'ALL') return feats
-    return feats.filter((f: any) => f?.properties?.risk_bucket === parcelFilter)
-  }, [parcels, parcelFilter])
-
-  const hasGeometries = (parcels.features || []).some((f: any) => f?.geometry != null)
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [onClose])
-
-  const riskBadge = (risk: string) => ({
-    padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700,
-    background: getRiskLevelColor(risk) + '20', color: getRiskLevelColor(risk),
-    border: `1px solid ${getRiskLevelColor(risk)}40`,
-  } as React.CSSProperties)
-
-  return (
-    <div
-      style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'stretch' }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 20 }} transition={{ duration: 0.22 }}
-        style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--color-bg-primary)', overflow: 'hidden' }}
-      >
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px', borderBottom: '1px solid var(--color-border-subtle)', background: 'var(--color-bg-card)', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#1e40af,#3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Map size={18} color="#fff" />
-            </div>
-            <div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{project.name}</div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <code style={{ fontSize: '0.68rem', padding: '1px 5px', background: '#eff6ff', borderRadius: 4, color: '#1d4ed8' }}>{project.project_code}</code>
-                <span style={riskBadge(project.risk_level)}>{project.risk_level}</span>
-                Land Acquisition Risk Map
-              </div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Link to={`/projects/${project.id}`} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 14px', borderRadius: 8, fontSize: '0.76rem', fontWeight: 700, background: 'var(--color-accent-primary)', color: '#fff', textDecoration: 'none' }}>
-              Open Full Project <ExternalLink size={12} />
-            </Link>
-            <button id="detailed-map-close" onClick={onClose} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid var(--color-border-subtle)', background: 'var(--color-bg-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <X size={16} color="var(--color-text-muted)" />
-            </button>
-          </div>
-        </div>
-
-        {/* Body */}
-        {loading ? (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 14 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', border: '3px solid var(--color-border-subtle)', borderTopColor: 'var(--color-accent-primary)', animation: 'spin 0.9s linear infinite' }} />
-            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Loading land parcel data…</div>
-          </div>
-        ) : error ? (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: '#dc2626' }}>
-            <AlertTriangle size={22} /> {error}
-          </div>
-        ) : (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 340px', overflow: 'hidden' }}>
-            {/* Map */}
-            <div style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 1000, display: 'flex', background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 10, padding: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.14)', gap: 2 }}>
-                {(['SATELLITE', 'OSM'] as const).map(k => (
-                  <button key={k} onClick={() => setDetailTile(k)} style={{ padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, borderRadius: 7, border: 'none', cursor: 'pointer', background: detailTile === k ? '#2563eb' : 'transparent', color: detailTile === k ? '#fff' : '#475569' }}>
-                    {k === 'SATELLITE' ? 'Satellite' : 'Street'}
-                  </button>
-                ))}
-              </div>
-              <MapContainer center={mapCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
-                <TileLayer key={detailTile} attribution={MAP_TILES[detailTile].attribution} url={MAP_TILES[detailTile].url} />
-                {detailTile === 'SATELLITE' && (
-                  <TileLayer
-                    key="modal-boundaries"
-                    url="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
-                    attribution="&copy; Esri &mdash; Boundaries and Places"
-                    zIndex={400}
-                    opacity={0.92}
-                    maxZoom={19}
-                  />
-                )}
-                {project.lat && project.lng && (
-                  <Marker position={[project.lat, project.lng]} icon={createRiskMarkerIcon(project.risk_level)}>
-                    <Popup><strong>{project.name}</strong><br /><span style={{ fontSize: '0.75rem', color: '#64748b' }}>Project Centroid</span></Popup>
-                  </Marker>
-                )}
-                {hasGeometries && (
-                  <GeoJSON
-                    key={`${project.id}-${parcelFilter}`}
-                    data={filteredParcels as any}
-                    style={parcelStyle}
-                    onEachFeature={(feature, layer) => {
-                      onEachParcelFeature(feature, layer)
-                      ;(layer as any).on('click', () => setActiveParcel(feature.properties))
-                    }}
-                  />
-                )}
-              </MapContainer>
-              {!hasGeometries && !loading && (
-                <div style={{ position: 'absolute', bottom: 14, left: 14, zIndex: 1000, background: 'rgba(255,255,255,0.97)', border: '1px solid #fde68a', borderRadius: 10, padding: '8px 14px', fontSize: '0.72rem', color: '#92400e', maxWidth: 360, boxShadow: '0 4px 18px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Info size={13} /> Parcel geometries not yet uploaded. Attribute data is shown in the panel.
-                </div>
-              )}
-            </div>
-
-            {/* Right Panel */}
-            <div style={{ display: 'flex', flexDirection: 'column', borderLeft: '1px solid var(--color-border-subtle)', background: 'var(--color-bg-card)', overflow: 'hidden' }}>
-              {/* Acquisition Summary */}
-              <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--color-border-subtle)', flexShrink: 0 }}>
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-muted)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <BarChart3 size={13} color="var(--color-accent-primary)" /> Acquisition Summary
-                </div>
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: 4 }}>
-                    <span>Possession Progress</span>
-                    <strong style={{ color: (summary.acquisition_pct || 0) >= 75 ? '#16a34a' : (summary.acquisition_pct || 0) >= 40 ? '#eab308' : '#dc2626' }}>{summary.acquisition_pct || 0}%</strong>
-                  </div>
-                  <div style={{ width: '100%', height: 7, background: 'var(--color-border-subtle)', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: 4, width: `${summary.acquisition_pct || 0}%`, background: (summary.acquisition_pct || 0) >= 75 ? '#16a34a' : (summary.acquisition_pct || 0) >= 40 ? '#eab308' : '#dc2626', transition: 'width 0.5s' }} />
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                  {[
-                    { icon: <Target size={12} />, label: 'Total Parcels', value: summary.total_parcels || 0, color: '#6366f1' },
-                    { icon: <CheckCircle2 size={12} />, label: 'In Possession', value: summary.in_possession || 0, color: '#16a34a' },
-                    { icon: <Clock size={12} />, label: 'Pending', value: summary.pending || 0, color: '#f97316' },
-                    { icon: <Gavel size={12} />, label: 'Disputed', value: summary.disputed || 0, color: '#dc2626' },
-                  ].map(s => (
-                    <div key={s.label} style={{ padding: '8px 10px', borderRadius: 8, background: 'var(--color-bg-primary)', border: `1px solid ${s.color}25`, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ color: s.color }}>{s.icon}</div>
-                      <div>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</div>
-                        <div style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>{s.label}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Risk Filter */}
-              <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--color-border-subtle)', flexShrink: 0 }}>
-                <div style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--color-text-muted)', marginBottom: 7 }}>Filter by Risk</div>
-                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' as const }}>
-                  {(['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] as const).map(f => (
-                    <button key={f} onClick={() => setParcelFilter(f)} style={{ padding: '3px 10px', borderRadius: 20, fontSize: '0.68rem', fontWeight: 700, border: `1px solid ${parcelFilter === f ? (f === 'ALL' ? 'var(--color-accent-primary)' : getRiskLevelColor(f)) : 'var(--color-border-subtle)'}`, background: parcelFilter === f ? (f === 'ALL' ? 'var(--color-accent-primary)' : getRiskLevelColor(f) + '20') : 'transparent', color: parcelFilter === f ? (f === 'ALL' ? '#fff' : getRiskLevelColor(f)) : 'var(--color-text-muted)', cursor: 'pointer' }}>
-                      {f}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Parcel List */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {parcelList.length === 0 ? (
-                  <div style={{ padding: 20, textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
-                    {(summary.total_parcels || 0) === 0 ? 'No parcel data available for this project yet.' : 'No parcels match the selected filter.'}
-                  </div>
-                ) : (
-                  parcelList.map((f: any, i: number) => {
-                    const p = f.properties || f
-                    const rc = getRiskLevelColor(p.risk_bucket)
-                    const isActive = activeParcel?.id === p.id
-                    return (
-                      <div key={p.id || i} onClick={() => setActiveParcel(isActive ? null : p)} style={{ padding: '8px 10px', borderRadius: 8, cursor: 'pointer', border: `1px solid ${isActive ? rc + '60' : 'var(--color-border-subtle)'}`, background: isActive ? rc + '08' : 'var(--color-bg-primary)', transition: 'all 0.15s' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
-                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>Khasra {p.khasra_number}</span>
-                          <span style={{ padding: '1px 7px', borderRadius: 10, fontSize: '0.6rem', fontWeight: 700, background: rc + '20', color: rc, border: `1px solid ${rc}40` }}>{p.risk_bucket}</span>
-                        </div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'flex', gap: 8 }}>
-                          <span>{p.village}</span>
-                          {p.area_ha != null && <span>{Number(p.area_ha).toFixed(2)} ha</span>}
-                          <span style={{ color: rc, fontWeight: 600 }}>{p.comp_status}</span>
-                        </div>
-                        {p.has_legal_dispute && (
-                          <div style={{ marginTop: 3, fontSize: '0.62rem', color: '#dc2626', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
-                            <AlertTriangle size={10} /> Legal Dispute Active
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })
-                )}
-              </div>
-
-              {/* Legend */}
-              <div style={{ padding: '10px 16px', borderTop: '1px solid var(--color-border-subtle)', flexShrink: 0 }}>
-                <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--color-text-muted)', marginBottom: 6 }}>Parcel Risk Legend</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {[
-                    { color: '#dc2626', label: 'Critical', sub: 'Legal dispute active' },
-                    { color: '#f97316', label: 'High', sub: 'Notified, compensation pending' },
-                    { color: '#eab308', label: 'Medium', sub: 'Not yet notified' },
-                    { color: '#16a34a', label: 'Low', sub: 'Compensated / Clear' },
-                  ].map(l => (
-                    <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: '0.7rem' }}>
-                      <div style={{ width: 11, height: 11, borderRadius: 3, background: l.color, flexShrink: 0 }} />
-                      <span style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>{l.label}</span>
-                      <span style={{ color: 'var(--color-text-muted)' }}>— {l.sub}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </motion.div>
-    </div>
-  )
 }
 
 // Main Component
@@ -706,7 +428,14 @@ export default function GIS() {
                         <div style={{ height: '100%', width: `${p.priorityScore}%`, background: getRiskLevelColor(p.risk_level), borderRadius: 3 }} />
                       </div>
                     </div>
-                    <button id={`gis-open-detailed-${p.id}`} onClick={() => setDetailedMapProject(p)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', marginTop: 8, padding: '6px 12px', background: '#1e40af', color: '#fff', fontSize: '0.72rem', fontWeight: 700, borderRadius: 7, border: 'none', cursor: 'pointer' }}>
+                    <button
+                      id={`gis-open-detailed-${p.id}`}
+                      onClick={() => {
+                        setDetailedMapProject(p)
+                        setActiveTab('DETAILED_MAP')
+                      }}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', marginTop: 8, padding: '6px 12px', background: '#1e40af', color: '#fff', fontSize: '0.72rem', fontWeight: 700, borderRadius: 7, border: 'none', cursor: 'pointer' }}
+                    >
                       Open Detailed Map
                     </button>
                     <Link to={`/projects/${p.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', marginTop: 6, padding: '7px 12px', background: '#2563eb', color: '#fff', fontSize: '0.75rem', fontWeight: 700, borderRadius: 8, textDecoration: 'none', boxShadow: '0 2px 8px rgba(37,99,235,0.3)' }}>
@@ -778,14 +507,12 @@ export default function GIS() {
         )}
       </div>
 
-      <AnimatePresence>
-        {detailedMapProject && (
-          <DetailedMapModal project={detailedMapProject} onClose={() => setDetailedMapProject(null)} />
-        )}
-      </AnimatePresence>
       </>
       ) : (
-        <DetailedMapView initialProjectId={detailedMapProject?.id} />
+        <DetailedMapView
+          initialProjectId={detailedMapProject?.id}
+          onBackToProjectMap={() => setActiveTab('PROJECT_MAP')}
+        />
       )}
 
       <style>{`

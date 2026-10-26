@@ -21,6 +21,7 @@ import {
   Building2,
   Info,
   X,
+  ArrowLeft,
 } from 'lucide-react'
 import { gisAPI } from '@/api/client'
 
@@ -97,11 +98,19 @@ function MapBoundsController({
 
 interface DetailedMapViewProps {
   initialProjectId?: string
+  onBackToProjectMap?: () => void
 }
 
-export default function DetailedMapView({ initialProjectId }: DetailedMapViewProps) {
+export default function DetailedMapView({ initialProjectId, onBackToProjectMap }: DetailedMapViewProps) {
   // Main Controls
   const [selectedProjectId, setSelectedProjectId] = useState<string>(initialProjectId || '')
+
+  // Keep selectedProjectId in sync when a project is selected from external interactions (e.g. pointer click)
+  useEffect(() => {
+    if (initialProjectId) {
+      setSelectedProjectId(initialProjectId)
+    }
+  }, [initialProjectId])
   const [projectsList, setProjectsList] = useState<any[]>([])
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'RED' | 'ORANGE' | 'GREEN'>('ALL')
   const [selectedVillage, setSelectedVillage] = useState<string | null>(null)
@@ -337,13 +346,38 @@ export default function DetailedMapView({ initialProjectId }: DetailedMapViewPro
       >
         {/* Row 1: Title & Map Layer Toggles */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-          <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
-              Detailed Map View
-            </h3>
-            <p style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', margin: '2px 0 0 0' }}>
-              Click any land parcel on the map to inspect its ownership, compensation, and legal status.
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {onBackToProjectMap && (
+              <button
+                id="detailed-map-back-btn"
+                onClick={onBackToProjectMap}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 12px',
+                  borderRadius: 8,
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  border: '1px solid var(--color-border-subtle)',
+                  background: 'var(--color-bg-primary)',
+                  color: 'var(--color-accent-primary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                title="Back to National Project Map View"
+              >
+                <ArrowLeft size={13} /> Back to National Map
+              </button>
+            )}
+            <div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
+                Detailed Map View
+              </h3>
+              <p style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', margin: '2px 0 0 0' }}>
+                Click any land parcel on the map to inspect its ownership, compensation, and legal status.
+              </p>
+            </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
