@@ -47,9 +47,9 @@ export const PAGE_VOICE_INSTRUCTIONS: Record<string, string> = {
   '/alerts':
     'This is the Alerts and Early Warnings center. It constantly checks project deadlines to warn officers before delays become serious. Alerts are clearly marked as Critical, High, or Medium for legal disputes, pending payments, or overdue approvals. You can check email notifications sent to officers and take fast action to keep projects on track.',
 
-  // 9. Official Data Sources
+  // 9. Data Sources & Provenance
   '/data-sources':
-    'This is the Official Data Sources page. LADRIS securely connects with official government portals, including BhoomiRashi, the national data portal, and court records. Here, you can verify when data was last updated, check connection status, and refresh project information with a single click.',
+    'This is the Data Sources and Provenance page. It tracks verified acquisition records across five key categories — project details, compensation disbursements, legal disputes, rehabilitation, and GIS alignments. Here, you can check category availability, see record counts, and inspect the recent data ingestion audit history.',
 
   // 10. Data Health & Quality
   '/data-quality':
