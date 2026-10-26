@@ -8,10 +8,6 @@
 [![License](https://img.shields.io/badge/License-Proprietary%20%7C%20All%20Rights%20Reserved-red?style=flat-square)](LICENSE)
 [![Author](https://img.shields.io/badge/Author-Sathvika%20Talari-blue?style=flat-square)](https://github.com/SathvikaTalari)
 
-> [!IMPORTANT]
-> - **Strict Prohibition on Copying:** Any unauthorized reproduction, cloning for re-submission, copying of architecture or code, or representation of this project as someone else's work is strictly prohibited.
-> - **Anti-Plagiarism Enforcement:** All commits, architectural designs, and files carry immutable, cryptographic timestamps in Git proving original authorship. Any unauthorized copies submitted to hackathons, competitions, academic panels, or hiring evaluations will be formally reported for academic dishonesty and intellectual property infringement.
-
 ---
 
 ## 📖 What is LADRIS?
@@ -364,4 +360,8 @@ This repository, software architecture, machine learning models, database schema
 - **Project:** LADRIS — Land Acquisition Decision & Risk Intelligence System
 - **License:** Proprietary & Confidential — All Rights Reserved. See [LICENSE](LICENSE) for terms.
 
-This project was conceived, designed, and engineered by **Sathvika Talari** as an original software and decision intelligence platform. Unauthorized copying, cloning, or plagiarism is strictly prohibited.
+This project was conceived, designed, and engineered by **Sathvika Talari** as an original software and decision intelligence platform.
+
+> [!IMPORTANT]
+> - **Strict Prohibition on Copying:** Any unauthorized reproduction, cloning for re-submission, copying of architecture or code, or representation of this project as someone else's work is strictly prohibited.
+> - **Anti-Plagiarism Enforcement:** All commits, architectural designs, and files carry immutable, cryptographic timestamps in Git proving original authorship. Any unauthorized copies submitted to hackathons, competitions, academic panels, or hiring evaluations will be formally reported for academic dishonesty and intellectual property infringement.
