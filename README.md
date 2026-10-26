@@ -1,11 +1,22 @@
-﻿# 🛣️ LADRIS — Land Acquisition Decision & Risk Intelligence System
+# 🛣️ LADRIS — Land Acquisition Decision & Risk Intelligence System
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20PostGIS-336791?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Python](https://img.shields.io/badge/Python-3.10--3.12-3776AB?style=flat-square&logo=python)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/License-Proprietary%20%7C%20All%20Rights%20Reserved-red?style=flat-square)](LICENSE)
+[![Author](https://img.shields.io/badge/Author-Sathvika%20Talari-blue?style=flat-square)](https://github.com/SathvikaTalari)
+
+> [!IMPORTANT]
+> ### 🛡️ Intellectual Property, Copyright & Anti-Plagiarism Notice
+> **Copyright © 2026 Sathvika Talari. All Rights Reserved.**
+>
+> This repository, software architecture, machine learning models, database schemas, and documentation are the original, proprietary intellectual property of **Sathvika Talari**.
+>
+> - **Permitted Inspection:** Permission is granted strictly for recruitment portfolio evaluation, technical assessments, and authorized competition judging.
+> - **Strict Prohibition on Copying:** Any unauthorized reproduction, cloning for re-submission, copying of architecture or code, or representation of this project as someone else's work is strictly prohibited.
+> - **Anti-Plagiarism Enforcement:** All commits, architectural designs, and files carry immutable, cryptographic timestamps in Git proving original authorship. Any unauthorized copies submitted to hackathons, competitions, academic panels, or hiring evaluations will be formally reported for academic dishonesty and intellectual property infringement.
 
 ---
 
@@ -37,7 +48,7 @@ LADRIS solves this by **continuously monitoring** project milestones, legal stat
 | 🗺️ **GIS Risk Map** | Interactive map showing all highway corridors color-coded by risk level (Critical → Low). |
 | 📈 **District Analytics** | Charts and summaries grouped by district and state. |
 | 🚨 **Early-Warning Alerts** | Automatic alerts when a legal deadline is about to lapse (e.g., the 1-year Section 3D window). |
-| 🔗 **Data Source Monitor** | Tracks the health of data feeds from BhoomiRashi, Data.gov.in, and e-Courts. |
+| 🔗 **Data Source Monitor** | Tracks verified acquisition data availability across Project Records, Compensation, Legal Disputes, R&R, and GIS Alignments. |
 
 ---
 
@@ -349,8 +360,9 @@ npx tsc --noEmit
 
 ---
 
-## 👥 Contributing & Maintainers
+## 👤 Author & Intellectual Property
+- **Author & Creator:** [Sathvika Talari](https://github.com/SathvikaTalari)
+- **Project:** LADRIS — Land Acquisition Decision & Risk Intelligence System
+- **License:** Proprietary & Confidential — All Rights Reserved. See [LICENSE](LICENSE) for terms.
 
-Built with ❤️ to modernize and bring transparency to Indian infrastructure governance.
-
-Maintained by the LADRIS team. For issues or contributions, open a GitHub issue or pull request.
+This project was conceived, designed, and engineered by **Sathvika Talari** as an original software and decision intelligence platform. Unauthorized copying, cloning, or plagiarism is strictly prohibited.
