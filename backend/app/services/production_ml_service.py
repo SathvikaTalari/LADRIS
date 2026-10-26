@@ -443,6 +443,7 @@ async def generate_prediction(db: AsyncSession, project_id, snapshot_date: datet
     await db.flush()
     await sync_prediction_alert(db, project, result)
     await db.refresh(row)
+    invalidate_predictions_cache()
     log.info("ML prediction project=%s model=%s latency_ms=%s", project_id, row.model_version, row.latency_ms)
     return serialize_prediction(row, unavailable, previous_score=prev_score)
 
@@ -494,7 +495,22 @@ async def latest_prediction(db: AsyncSession, project_id) -> MLPrediction | None
     return result.scalar_one_or_none()
 
 
+import time as _ml_time
+
+_LATEST_PRED_CACHE: dict = {"ts": 0.0, "data": []}
+LATEST_PRED_CACHE_TTL = 15.0
+
+
+def invalidate_predictions_cache():
+    _LATEST_PRED_CACHE["ts"] = 0.0
+    _LATEST_PRED_CACHE["data"] = []
+
+
 async def latest_predictions(db: AsyncSession) -> list[MLPrediction]:
+    now = _ml_time.time()
+    if _LATEST_PRED_CACHE["data"] and (now - _LATEST_PRED_CACHE["ts"] < LATEST_PRED_CACHE_TTL):
+        return _LATEST_PRED_CACHE["data"]
+
     rows = (await db.execute(
         select(MLPrediction)
         .join(Project, Project.id == MLPrediction.project_id)
@@ -504,4 +520,7 @@ async def latest_predictions(db: AsyncSession) -> list[MLPrediction]:
     found = {}
     for row in rows:
         found.setdefault(row.project_id, row)
-    return list(found.values())
+    res = list(found.values())
+    _LATEST_PRED_CACHE["ts"] = now
+    _LATEST_PRED_CACHE["data"] = res
+    return res

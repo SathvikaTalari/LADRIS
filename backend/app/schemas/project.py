@@ -181,6 +181,8 @@ class ProjectListResponse(BaseModel):
     longitude: Optional[float] = None
     priority_score: Optional[float] = None
     top_bottleneck: Optional[str] = None
+    predicted_delay_days: Optional[int] = None
+    recommendation: Optional[str] = None
     created_at: datetime
 
 

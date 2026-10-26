@@ -142,11 +142,14 @@ async def list_projects(
         if prediction is not None:
             item.risk_level = RiskLevel(prediction.risk_category)
             item.priority_score = float(prediction.risk_score)
+            item.predicted_delay_days = prediction.predicted_delay_days
+            item.recommendation = (prediction.recommendations or ["Review project milestones and land acquisition paperwork."])[0]
             raw_driver = next((d.get("feature") for d in (prediction.top_drivers or []) if d.get("contribution", 0) > 0), None)
             if raw_driver:
                 item.top_bottleneck = raw_driver.replace("_", " ").title()
         elif item.top_bottleneck is None and item.delay_reason:
             item.top_bottleneck = item.delay_reason
+            item.recommendation = f"Address {item.delay_reason} to prevent further delay."
         # Derive effective display status — if project is delayed but status not updated, show DELAYED
         current_status = str(getattr(project.status, "value", project.status)).upper()
         if current_status not in ("COMPLETED", "CANCELLED", "DELAYED"):

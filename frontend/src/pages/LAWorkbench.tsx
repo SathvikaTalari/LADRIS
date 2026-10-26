@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, Bell, FolderCheck } from 'lucide-react'
-import { alertsAPI, predictionsAPI, projectsAPI } from '@/api/client'
+import { alertsAPI, projectsAPI } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { RiskBadge, StatusBadge } from '@/components/common'
 
@@ -12,12 +12,17 @@ export default function LAWorkbench() {
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     Promise.all([projectsAPI.list({ page_size: 100 }), alertsAPI.list({ status: 'ACTIVE' })])
-      .then(async ([projectResponse, alertResponse]) => {
-        setProjects(await Promise.all((projectResponse.items || []).map(async (project: any) => ({ ...project, prediction: await predictionsAPI.get(project.id).catch(() => null) }))))
+      .then(([projectResponse, alertResponse]) => {
+        setProjects(projectResponse.items || [])
         setAlerts(Array.isArray(alertResponse) ? alertResponse : [])
+      }).catch((err) => {
+        console.error('Failed to load workbench data', err)
       }).finally(() => setLoading(false))
   }, [])
-  const highRisk = projects.filter((project) => project.prediction?.risk_category === 'HIGH').length
+  const highRisk = projects.filter((project) => {
+    const r = (project.risk_level || '').toUpperCase()
+    return r === 'HIGH' || r === 'CRITICAL'
+  }).length
   return <div style={{ padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
     <div>
       <span className="badge badge-blue">OFFICER WORKBENCH</span>
@@ -38,10 +43,10 @@ export default function LAWorkbench() {
           <code style={{ fontSize: '0.8rem' }}>{project.project_code}</code>
           <div>
             <strong style={{ fontSize: '0.95rem' }}>{project.name}</strong>
-            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: 2 }}>{project.prediction?.current_stage?.replaceAll('_', ' ') || 'Stage details available inside'}</div>
+            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: 2 }}>{project.current_stage?.replaceAll('_', ' ') || 'Stage details available inside'}</div>
           </div>
           <StatusBadge status={project.status} />
-          <RiskBadge level={project.prediction?.risk_category || 'UNKNOWN'} />
+          <RiskBadge level={project.risk_level || 'UNKNOWN'} />
           <Link to={`/projects/${project.id}`} className="btn btn-secondary btn-sm" style={{ padding: '6px 12px', fontSize: '0.75rem', textAlign: 'center' }}>
             View Details
           </Link>

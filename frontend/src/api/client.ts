@@ -123,12 +123,6 @@ export const usersAPI = {
   update: (id: string, data: any) => apiClient.patch<User>(`/api/v1/auth/users/${id}`, data).then((r) => r.data),
 }
 
-import {
-  BASELINE_PROJECTS,
-  BASELINE_EXECUTIVE,
-  BASELINE_OVERVIEW,
-} from '@/data/baselineData'
-
 // In-memory cache + sessionStorage persistence
 const memoryCache = new Map<string, { timestamp: number; data: any }>()
 const CACHE_TTL_MS = 60 * 1000 // 60 seconds memory TTL
@@ -179,45 +173,34 @@ export const projectsAPI = {
     risk_level?: string
     search?: string
   }): Promise<PaginatedResponse<ProjectListItem>> => {
-    const isDefaultQuery = !params || (Object.keys(params).length <= 2 && !params.search && !params.state_code && !params.district && !params.agency && !params.status && !params.risk_level)
     const cacheKey = `projects_list_${JSON.stringify(params || {})}`
     const cached = getCached<PaginatedResponse<ProjectListItem>>(cacheKey)
 
     const networkPromise = apiClient
       .get<PaginatedResponse<ProjectListItem>>('/api/v1/projects/', { params })
       .then((r) => {
-        if (r.data && Array.isArray(r.data.items) && r.data.items.length > 0) {
+        if (r.data && Array.isArray(r.data.items)) {
           setCached(cacheKey, r.data)
         }
         return r.data
       })
       .catch((err) => {
-        console.warn('Network fetch failed for projects, returning cached/baseline fallback', err)
+        console.warn('Network fetch failed for projects', err)
         if (cached) return cached
         return {
-          items: BASELINE_PROJECTS as any,
-          total: BASELINE_PROJECTS.length,
+          items: [],
+          total: 0,
           page: 1,
           page_size: params?.page_size || 25,
           total_pages: 1,
         }
       })
 
-    // Instant response if cached
+    // Return cached immediately if available, otherwise await real backend response
     if (cached) {
-      return cached
-    }
-
-    // Instant baseline response for default queries while background fetch runs
-    if (isDefaultQuery) {
+      // Revalidate in background
       networkPromise.then((data) => setCached(cacheKey, data)).catch(() => {})
-      return {
-        items: BASELINE_PROJECTS as any,
-        total: BASELINE_PROJECTS.length,
-        page: 1,
-        page_size: params?.page_size || 25,
-        total_pages: 1,
-      }
+      return cached
     }
 
     return networkPromise
@@ -356,14 +339,27 @@ export const analyticsAPI = {
         return r.data
       })
       .catch((err) => {
-        console.warn('Network fetch failed for analytics overview, returning cached/baseline fallback', err)
+        console.warn('Network fetch failed for analytics overview', err)
         if (cached) return cached
-        return BASELINE_OVERVIEW as any
+        return {
+          status: 'no_data',
+          data_loaded: false,
+          summary: {
+            total_projects: 0,
+            high_risk_projects: 0,
+            projects_requiring_attention: 0,
+            average_delay_days: null,
+            total_area_ha: 0,
+            total_affected_families: 0,
+          },
+        } as AnalyticsOverview
       })
 
-    if (cached) return cached
-    networkPromise.then((data) => setCached(cacheKey, data)).catch(() => {})
-    return BASELINE_OVERVIEW as any
+    if (cached) {
+      networkPromise.then((data) => setCached(cacheKey, data)).catch(() => {})
+      return cached
+    }
+    return networkPromise
   },
 
   executive: async (): Promise<any> => {
@@ -379,14 +375,37 @@ export const analyticsAPI = {
         return r.data
       })
       .catch((err) => {
-        console.warn('Network fetch failed for executive analytics, returning cached/baseline fallback', err)
+        console.warn('Network fetch failed for executive analytics', err)
         if (cached) return cached
-        return BASELINE_EXECUTIVE
+        return {
+          status: 'no_data',
+          data_loaded: false,
+          executive_kpis: {
+            total_active_projects: 0,
+            total_land_required_ha: 0,
+            financial_outlay_cr: 0,
+            high_critical_projects: 0,
+            projects_delayed: 0,
+            active_alerts: 0,
+            projects_requiring_intervention: 0,
+            avg_data_completeness: 0,
+            data_trust_score: 0,
+          },
+          needs_attention_today: [],
+          risk_distributions: {
+            verified_delay_risk: { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 },
+          },
+          stage_bottlenecks: { stages: [], dominant_national_bottleneck: null },
+          state_district_comparison: { top_states: [], top_districts: [] },
+          data_health: { total_projects: 0, prediction_available: 0, prediction_unavailable: 0, average_trust_score: 0 },
+        }
       })
 
-    if (cached) return cached
-    networkPromise.then((data) => setCached(cacheKey, data)).catch(() => {})
-    return BASELINE_EXECUTIVE
+    if (cached) {
+      networkPromise.then((data) => setCached(cacheKey, data)).catch(() => {})
+      return cached
+    }
+    return networkPromise
   },
 
   districtSummary: () =>

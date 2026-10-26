@@ -17,7 +17,6 @@ import 'leaflet/dist/leaflet.css'
 import { analyticsAPI, alertsAPI } from '@/api/client'
 import { MetricCard, DataNotice } from '@/components/common'
 import { Link, useNavigate } from 'react-router-dom'
-import { BASELINE_EXECUTIVE, BASELINE_RISK_DISTRIBUTION } from '@/data/baselineData'
 
 function createRiskMarkerIcon(riskLevel: string) {
   const norm = (riskLevel || 'LOW').toUpperCase()
@@ -76,9 +75,9 @@ function createRiskMarkerIcon(riskLevel: string) {
 export default function Dashboard() {
   const navigate = useNavigate()
 
-  // Initialize with authoritative baseline so dashboard renders instantaneously with zero wait time
-  const [executiveData, setExecutiveData] = useState<any>(BASELINE_EXECUTIVE)
-  const [isLoading, setIsLoading] = useState(false)
+  // Initialize state with real API data loading
+  const [executiveData, setExecutiveData] = useState<any | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [activeAlerts, setActiveAlerts] = useState<any[]>([])
 
   useEffect(() => {
@@ -128,7 +127,7 @@ export default function Dashboard() {
   const dataHealth = executiveData?.data_health
   const reliability = executiveData?.ai_reliability_distinction?.prediction_status
 
-  // Robust Delay Risk Breakdown distribution (falls back gracefully if API is empty/loading)
+  // Robust Delay Risk Breakdown distribution derived from verified backend risk data
   const finalDist = useMemo(() => {
     const v = distributions?.verified_delay_risk || executiveData?.risk_distributions?.verified_delay_risk
     if (v) {
@@ -136,11 +135,9 @@ export default function Dashboard() {
       const med = Number(v.MEDIUM ?? v.medium ?? 0)
       const high = Number(v.HIGH ?? v.high ?? 0)
       const crit = Number(v.CRITICAL ?? v.critical ?? 0)
-      if (low + med + high + crit > 0) {
-        return { LOW: low, MEDIUM: med, HIGH: high, CRITICAL: crit }
-      }
+      return { LOW: low, MEDIUM: med, HIGH: high, CRITICAL: crit }
     }
-    return BASELINE_RISK_DISTRIBUTION
+    return { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 }
   }, [distributions, executiveData])
 
   // ECharts Risk Distribution Donut / Bar Chart
@@ -192,6 +189,27 @@ export default function Dashboard() {
       ],
     }
   }, [finalDist])
+
+  const dynamicStages = useMemo(() => {
+    const list = executiveData?.stage_bottlenecks?.stages
+    if (Array.isArray(list) && list.length > 0) {
+      return list.map((s: any) => {
+        const pct = Math.round(s.risk_pct || 0)
+        let color = '#138808'
+        if (pct > 70) color = '#ff4757'
+        else if (pct > 50) color = '#f47721'
+        else if (pct > 35) color = '#d97706'
+        const label = s.stage ? String(s.stage).replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) : 'Stage'
+        return {
+          name: label,
+          pct,
+          color,
+          isBottleneck: !!s.is_bottleneck,
+        }
+      })
+    }
+    return []
+  }, [executiveData])
 
   return (
     <motion.div
@@ -272,12 +290,19 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <ReactECharts
-            option={distributionChartOption}
-            style={{ height: 240, width: '100%' }}
-            opts={{ renderer: 'canvas' }}
-            notMerge={true}
-          />
+          {isLoading ? (
+            <div style={{ height: 240, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
+              <div className="spinner" style={{ marginBottom: 12 }} />
+              <span style={{ fontSize: '0.8rem' }}>Loading verified delay risks...</span>
+            </div>
+          ) : (
+            <ReactECharts
+              option={distributionChartOption}
+              style={{ height: 240, width: '100%' }}
+              opts={{ renderer: 'canvas' }}
+              notMerge={true}
+            />
+          )}
 
           <div style={{
             display: 'grid',
@@ -291,7 +316,7 @@ export default function Dashboard() {
             <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>MEDIUM</span><br /><strong style={{ color: '#d97706', fontSize: '0.88rem' }}>{finalDist.MEDIUM}</strong></div>
             <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>HIGH</span><br /><strong style={{ color: '#f47721', fontSize: '0.88rem' }}>{finalDist.HIGH}</strong></div>
             <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>CRITICAL</span><br /><strong style={{ color: '#ff4757', fontSize: '0.88rem' }}>{finalDist.CRITICAL}</strong></div>
-            <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>UNAVAILABLE</span><br /><strong style={{ color: '#7daaff', fontSize: '0.88rem' }}>{Math.max(0, (kpis?.total_active_projects ?? 12) - (finalDist.LOW + finalDist.MEDIUM + finalDist.HIGH + finalDist.CRITICAL))}</strong></div>
+            <div><span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)' }}>UNAVAILABLE</span><br /><strong style={{ color: '#7daaff', fontSize: '0.88rem' }}>{Math.max(0, (kpis?.total_active_projects ?? 0) - (finalDist.LOW + finalDist.MEDIUM + finalDist.HIGH + finalDist.CRITICAL))}</strong></div>
           </div>
         </div>
 
@@ -311,39 +336,43 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {/* Stage Progress Bars */}
+          {/* Dynamic Stage Progress Bars from Backend */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1, justifyContent: 'center' }}>
-            {[
-              { name: 'Notification (Section 3A)', pct: 41, color: '#138808' },
-              { name: 'Objections Hearing (Section 3C)', pct: 37, color: '#138808' },
-              { name: 'Award Declaration', pct: 52, color: '#d97706' },
-              { name: 'Compensation Disbursement', pct: 78, color: '#ff4757', isBottleneck: true },
-              { name: 'R&R Implementation', pct: 49, color: '#d97706' },
-              { name: 'Land Possession (Section 3E)', pct: 66, color: '#f47721' },
-            ].map((s) => (
-              <div key={s.name}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', marginBottom: 3 }}>
-                  <span style={{ fontWeight: s.isBottleneck ? 800 : 500, color: s.isBottleneck ? 'var(--color-risk-critical)' : 'var(--color-text-primary)' }}>
-                    {s.name} {s.isBottleneck && '★'}
-                  </span>
-                  <strong style={{ fontFamily: 'var(--font-mono)', color: s.color }}>{s.pct}%</strong>
-                </div>
-                <div style={{
-                  height: 6,
-                  borderRadius: 3,
-                  background: 'var(--color-bg-tertiary)',
-                  overflow: 'hidden',
-                }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${s.pct}%`,
-                    backgroundColor: s.color,
-                    borderRadius: 3,
-                    transition: 'width 0.5s ease',
-                  }}></div>
-                </div>
+            {isLoading ? (
+              <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 20 }}>
+                <div className="spinner" style={{ margin: '0 auto 10px' }} />
+                <span style={{ fontSize: '0.8rem' }}>Analyzing stage risk bottlenecks...</span>
               </div>
-            ))}
+            ) : dynamicStages.length === 0 ? (
+              <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.8rem', padding: 20 }}>
+                Stage risk breakdown synchronized with project milestone databases.
+              </div>
+            ) : (
+              dynamicStages.map((s) => (
+                <div key={s.name}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', marginBottom: 3 }}>
+                    <span style={{ fontWeight: s.isBottleneck ? 800 : 500, color: s.isBottleneck ? 'var(--color-risk-critical)' : 'var(--color-text-primary)' }}>
+                      {s.name} {s.isBottleneck && '★'}
+                    </span>
+                    <strong style={{ fontFamily: 'var(--font-mono)', color: s.color }}>{s.pct}%</strong>
+                  </div>
+                  <div style={{
+                    height: 6,
+                    borderRadius: 3,
+                    background: 'var(--color-bg-tertiary)',
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${s.pct}%`,
+                      backgroundColor: s.color,
+                      borderRadius: 3,
+                      transition: 'width 0.5s ease',
+                    }}></div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

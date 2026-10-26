@@ -8,24 +8,34 @@ export default function AgencyPortal() {
   const { user } = useAuthStore()
   const [projects, setProjects] = useState<any[]>([])
   const [selectedId, setSelectedId] = useState('')
+  const [prediction, setPrediction] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     projectsAPI.list({ page_size: 100, agency: user?.agency_name || undefined })
-      .then(async (response) => {
-        const enriched = await Promise.all((response.items || []).map(async (project: any) => ({
-          ...project, prediction: await predictionsAPI.get(project.id).catch(() => null),
-        })))
-        setProjects(enriched)
-        setSelectedId(enriched[0]?.id || '')
+      .then((response) => {
+        const items = response.items || []
+        setProjects(items)
+        if (items.length > 0) {
+          setSelectedId(items[0].id)
+        }
       })
       .catch(() => setError('Agency project data is unavailable.'))
       .finally(() => setLoading(false))
   }, [user?.agency_name])
 
+  useEffect(() => {
+    if (!selectedId) {
+      setPrediction(null)
+      return
+    }
+    predictionsAPI.get(selectedId)
+      .then(setPrediction)
+      .catch(() => setPrediction(null))
+  }, [selectedId])
+
   const project = projects.find((item) => item.id === selectedId)
-  const prediction = project?.prediction
   const acquiredPct = project?.total_area_ha
     ? ((project.area_acquired_ha || 0) / project.total_area_ha * 100).toFixed(1) : null
 

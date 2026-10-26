@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Filter, ChevronRight, Zap, Search } from 'lucide-react'
-import { projectsAPI, predictionsAPI } from '@/api/client'
+import { projectsAPI } from '@/api/client'
 import { useNavigate } from 'react-router-dom'
 import { RiskBadge, StatusBadge, PageHeader } from '@/components/common'
 
@@ -124,37 +124,32 @@ export default function PriorityIntelligence() {
         const res = await projectsAPI.list({ page_size: 50 })
         const items = res.items || []
 
-        const predictions = await Promise.all(items.map((project: any) =>
-          predictionsAPI.get(project.id).catch(() => null)
-        ))
-        const enriched = items.map((project: any, index: number) => {
-          const prediction = predictions[index]
-          const riskLevel = prediction?.risk_category || project.risk_level || 'MEDIUM'
-          const priorityScore = prediction?.risk_score ?? project.priority_score ?? 45
+        const enriched = items.map((project: any) => {
+          const riskLevel = project.risk_level || 'MEDIUM'
+          const priorityScore = project.priority_score ?? project.risk_score ?? 45
+          const recText = project.recommendation || (
+            project.top_bottleneck
+              ? `Expedite resolution of ${project.top_bottleneck} to avoid scheduled milestones slip.`
+              : 'Review project milestones and land acquisition paperwork.'
+          )
           return {
             ...project,
             risk_level: riskLevel,
             priorityScore,
             priorityLabel: `${riskLevel} DELAY RISK`,
-            topIntervention: prediction ? {
-              display_name: prediction.recommendations?.[0] || 'Administrative review recommended',
+            topIntervention: {
+              display_name: 'Administrative action recommended',
               category: 'RECOMMENDATION',
-              action_description: prediction.recommendations?.[0] || 'Review project milestones and land acquisition paperwork.',
-              score_components: {},
-            } : {
-              display_name: 'Expedite statutory clearances',
-              category: 'RECOMMENDATION',
-              action_description: 'Review land parcel survey records and expedite section notifications.',
+              action_description: recText,
               score_components: {},
             },
           }
         })
         enriched.sort((a: any, b: any) => (b.priorityScore ?? -1) - (a.priorityScore ?? -1))
         setProjects(enriched)
-        setIsLoading(false)
-
       } catch (err) {
         console.error('Failed to load priority projects', err)
+      } finally {
         setIsLoading(false)
       }
     }

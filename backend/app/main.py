@@ -20,6 +20,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1.router import api_router
@@ -376,6 +377,7 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["X-Request-ID", "X-Process-Time"],
 )
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 
 # ─── Request Timing Middleware ─────────────────────────────────────────────────

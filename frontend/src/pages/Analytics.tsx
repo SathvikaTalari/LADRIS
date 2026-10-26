@@ -11,17 +11,44 @@ import { PageHeader, RiskBadge, StatusBadge } from '@/components/common'
 import { projectsAPI, analyticsAPI } from '@/api/client'
 import ReactECharts from 'echarts-for-react'
 import { Link } from 'react-router-dom'
-import { BASELINE_PROJECTS, BASELINE_OVERVIEW, computeStateDistributions } from '@/data/baselineData'
+function computeStateDistributions(projectsList: any[]) {
+  if (!Array.isArray(projectsList) || projectsList.length === 0) {
+    return []
+  }
+  const stateMap: Record<string, any[]> = {}
+  projectsList.forEach((p) => {
+    const s = (p.state_code || 'OTHER').toUpperCase()
+    if (!stateMap[s]) stateMap[s] = []
+    stateMap[s].push(p)
+  })
+
+  return Object.entries(stateMap)
+    .map(([state, projs]) => {
+      const highRisk = projs.filter((p) => {
+        const r = String(p.risk_level || '').toUpperCase()
+        return r === 'HIGH' || r === 'CRITICAL'
+      }).length
+      const totalArea = projs.reduce((acc, p) => acc + (Number(p.total_area_ha) || 0), 0)
+      return {
+        state_code: state,
+        project_count: projs.length,
+        high_risk_count: highRisk,
+        total_area: Math.round(totalArea * 10) / 10,
+        projects: projs,
+        sufficient_sample: projs.length >= 2,
+      }
+    })
+    .sort((a, b) => b.project_count - a.project_count || b.high_risk_count - a.high_risk_count)
+}
 
 type AnalyticsTab = 'states' | 'sectors' | 'timeline' | 'distribution'
 
 export default function Analytics() {
   const [activeTab, setActiveTab] = useState<AnalyticsTab>('states')
-  // Initialize with authoritative baseline data for instantaneous load times
-  const [projects, setProjects] = useState<any[]>(BASELINE_PROJECTS)
-  const [overviewSummary, setOverviewSummary] = useState<any>(BASELINE_OVERVIEW.summary)
-  const [selectedState, setSelectedState] = useState<string | null>('UP')
-  const [isLoading, setIsLoading] = useState(false)
+  const [projects, setProjects] = useState<any[]>([])
+  const [overviewSummary, setOverviewSummary] = useState<any>(null)
+  const [selectedState, setSelectedState] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([
@@ -29,19 +56,17 @@ export default function Analytics() {
       analyticsAPI.overview().catch(() => null),
     ])
       .then(([projRes, overRes]) => {
-        const items = (projRes && projRes.items && projRes.items.length > 0)
-          ? projRes.items
-          : BASELINE_PROJECTS
+        const items = projRes?.items || []
         setProjects(items)
-        setOverviewSummary(overRes?.summary || BASELINE_OVERVIEW.summary)
+        if (overRes?.summary) {
+          setOverviewSummary(overRes.summary)
+        }
         if (items.length > 0) {
-          setSelectedState((prev) => prev || items[0].state_code || 'UP')
+          setSelectedState((prev) => prev || items[0].state_code || null)
         }
       })
       .catch((err) => {
-        console.warn('Network sync failed in analytics, using cached baseline:', err)
-        setProjects(BASELINE_PROJECTS)
-        setOverviewSummary(BASELINE_OVERVIEW.summary)
+        console.error('Network sync failed in analytics:', err)
       })
       .finally(() => setIsLoading(false))
   }, [])
@@ -185,10 +210,10 @@ export default function Analytics() {
             Average Expected Delay
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f59e0b', marginTop: 4 }}>
-            {overviewSummary?.average_delay_days ? `${Math.round(overviewSummary.average_delay_days)} days` : '190 d'}
+            {overviewSummary?.average_delay_days ? `${Math.round(overviewSummary.average_delay_days)} days` : '—'}
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-            Approximately 6 months
+            Average schedule variance
           </div>
         </div>
 
@@ -197,10 +222,10 @@ export default function Analytics() {
             Total Land Area In Acquisition
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-accent-primary)', marginTop: 4 }}>
-            {overviewSummary?.total_area_ha?.toLocaleString() || '9,784.9'} ha
+            {overviewSummary?.total_area_ha ? `${Number(overviewSummary.total_area_ha).toLocaleString()} ha` : '—'}
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-            Across 10 states and UTs
+            Across {stateData.length} active states
           </div>
         </div>
       </div>
