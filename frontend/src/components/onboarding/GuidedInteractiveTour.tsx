@@ -639,53 +639,6 @@ export function GuidedInteractiveTour() {
             {step.description}
           </p>
 
-          {/* Quick Action for Detailed Project View */}
-          {step.id === 'project-detail-view' && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '9px 12px',
-                marginBottom: 14,
-                borderRadius: 8,
-                background: isDark ? 'rgba(59, 130, 246, 0.12)' : 'rgba(59, 130, 246, 0.08)',
-                border: isDark ? '1px solid rgba(59, 130, 246, 0.25)' : '1px solid rgba(59, 130, 246, 0.2)',
-              }}
-            >
-              <span style={{ fontSize: '0.76rem', color: isDark ? '#93c5fd' : '#1d4ed8', fontWeight: 500 }}>
-                💡 Click the row or button:
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  stopTour(true)
-                  const el = document.querySelector(step.selector) as HTMLElement | null
-                  if (el) el.click()
-                }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: '#ffffff',
-                  background: '#2563eb',
-                  border: 'none',
-                  borderRadius: 6,
-                  padding: '5px 10px',
-                  cursor: 'pointer',
-                  boxShadow: '0 1px 4px rgba(37, 99, 235, 0.35)',
-                  transition: 'background 0.15s ease',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#1d4ed8')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#2563eb')}
-              >
-                Open Project View
-                <ArrowRight size={12} />
-              </button>
-            </div>
-          )}
 
           {/* Footer Controls */}
           <div
