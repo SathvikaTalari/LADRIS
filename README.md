@@ -9,12 +9,6 @@
 [![Author](https://img.shields.io/badge/Author-Sathvika%20Talari-blue?style=flat-square)](https://github.com/SathvikaTalari)
 
 > [!IMPORTANT]
-> ### 🛡️ Intellectual Property, Copyright & Anti-Plagiarism Notice
-> **Copyright © 2026 Sathvika Talari. All Rights Reserved.**
->
-> This repository, software architecture, machine learning models, database schemas, and documentation are the original, proprietary intellectual property of **Sathvika Talari**.
->
-> - **Permitted Inspection:** Permission is granted strictly for recruitment portfolio evaluation, technical assessments, and authorized competition judging.
 > - **Strict Prohibition on Copying:** Any unauthorized reproduction, cloning for re-submission, copying of architecture or code, or representation of this project as someone else's work is strictly prohibited.
 > - **Anti-Plagiarism Enforcement:** All commits, architectural designs, and files carry immutable, cryptographic timestamps in Git proving original authorship. Any unauthorized copies submitted to hackathons, competitions, academic panels, or hiring evaluations will be formally reported for academic dishonesty and intellectual property infringement.
 
@@ -360,7 +354,12 @@ npx tsc --noEmit
 
 ---
 
-## 👤 Author & Intellectual Property
+## 👤 Author & Copyright Notice
+
+**Copyright © 2026 Sathvika Talari. All Rights Reserved.**
+
+This repository, software architecture, machine learning models, database schemas, and documentation are the original, proprietary intellectual property of **Sathvika Talari**.
+
 - **Author & Creator:** [Sathvika Talari](https://github.com/SathvikaTalari)
 - **Project:** LADRIS — Land Acquisition Decision & Risk Intelligence System
 - **License:** Proprietary & Confidential — All Rights Reserved. See [LICENSE](LICENSE) for terms.
